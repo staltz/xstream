@@ -2,6 +2,7 @@ import {Observer} from './Observer';
 import {Machine} from './Machine';
 import {MapMachine} from './operator/MapMachine';
 import {FilterMachine} from './operator/FilterMachine';
+import {TakeMachine} from './operator/TakeMachine';
 
 export class Stream<T> implements Observer<T> {
   public observers: Array<Observer<T>>;
@@ -52,5 +53,9 @@ export class Stream<T> implements Observer<T> {
 
   filter(predicate: (t: T) => boolean): Stream<T> {
     return new Stream<T>(new FilterMachine(predicate, this));
+  }
+
+  take(amount: number): Stream<T> {
+    return new Stream<T>(new TakeMachine(amount, this));
   }
 }
