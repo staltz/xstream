@@ -1,6 +1,7 @@
 import {Observer} from './Observer';
 import {Machine} from './Machine';
 import {MapMachine} from './operator/MapMachine';
+import {FilterMachine} from './operator/FilterMachine';
 
 export class Stream<T> implements Observer<T> {
   public observers: Array<Observer<T>>;
@@ -47,5 +48,9 @@ export class Stream<T> implements Observer<T> {
 
   map<U>(projection: (t: T) => U): Stream<U> {
     return new Stream<U>(new MapMachine(projection, this));
+  }
+
+  filter(predicate: (t: T) => boolean): Stream<T> {
+    return new Stream<T>(new FilterMachine(predicate, this));
   }
 }
