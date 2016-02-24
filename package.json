@@ -8,7 +8,7 @@
     "lint": "tslint -c tslint.json src/*.ts",
     "premocha": "npm run lib",
     "mocha": "mocha tests/**/*.ts --require ts-node/register",
-    "postmocha": "rm -f tests/**/*.js",
+    "postmocha": "rm -rf tests/**/*.js",
     "test": "npm run lint && npm run mocha",
     "prelib": "rm -rf lib/ && mkdirp lib/",
     "lib": "tsc",
