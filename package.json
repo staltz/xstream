@@ -1,0 +1,51 @@
+{
+  "name": "xstream",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "commit": "git-cz",
+    "lint": "tslint -c tslint.json src/*.ts",
+    "pretape": "npm run lib",
+    "tape": "ts-node ./node_modules/.bin/tape tests/**/*.ts",
+    "test": "npm run lint && npm run tape",
+    "prelib": "rm -rf lib/ && mkdirp lib/",
+    "lib": "tsc",
+    "predist": "rm -rf dist/ && mkdirp dist/ && npm run lib",
+    "dist": "browserify lib/index.js -o dist/xstream.js",
+    "postdist": "uglifyjs dist/xstream.js -o dist/xstream.min.js",
+    "start": "npm install && npm prune",
+    "prepublish": "npm run lib",
+    "preversion": "npm run dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/staltz/xstream.git"
+  },
+  "author": "Andre Staltz <andre+npm@staltz.com> (http://andre.staltz.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/staltz/xstream/issues"
+  },
+  "homepage": "https://github.com/staltz/xstream#readme",
+  "devDependencies": {
+    "browserify": "^13.0.0",
+    "commitizen": "^2.5.0",
+    "conventional-changelog": "^1.1.0",
+    "cz-conventional-changelog": "^1.1.5",
+    "ghooks": "^1.0.3",
+    "mkdirp": "^0.5.1",
+    "ts-node": "^0.5.5",
+    "tslint": "^3.5.0",
+    "typescript": "^1.8.2",
+    "validate-commit-msg": "^2.1.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    },
+    "ghooks": {
+      "commit-msg": "node ./node_modules/validate-commit-msg/index.js"
+    }
+  }
+}
