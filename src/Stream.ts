@@ -3,6 +3,7 @@ import {Machine} from './Machine';
 import {MapMachine} from './operator/MapMachine';
 import {FilterMachine} from './operator/FilterMachine';
 import {TakeMachine} from './operator/TakeMachine';
+import {SkipMachine} from './operator/SkipMachine';
 
 export class Stream<T> implements Observer<T> {
   public observers: Array<Observer<T>>;
@@ -57,5 +58,9 @@ export class Stream<T> implements Observer<T> {
 
   take(amount: number): Stream<T> {
     return new Stream<T>(new TakeMachine(amount, this));
+  }
+
+  skip(amount: number): Stream<T> {
+    return new Stream<T>(new SkipMachine(amount, this));
   }
 }
