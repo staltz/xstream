@@ -13,7 +13,9 @@ class IntervalMachine implements Machine<number> {
   }
 
   start(stream: Observer<number>): void {
-    this.intervalID = setInterval(() => stream.next(this.i++), this.period);
+    const self = this;
+    function intervalHandler() { stream.next(self.i++); }
+    this.intervalID = setInterval(intervalHandler, this.period);
   }
 
   stop(): void {
