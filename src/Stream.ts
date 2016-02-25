@@ -4,6 +4,7 @@ import {MapMachine} from './operator/MapMachine';
 import {FilterMachine} from './operator/FilterMachine';
 import {TakeMachine} from './operator/TakeMachine';
 import {SkipMachine} from './operator/SkipMachine';
+import {DebugMachine} from './operator/DebugMachine';
 
 export class Stream<T> implements Observer<T> {
   public observers: Array<Observer<T>>;
@@ -62,5 +63,9 @@ export class Stream<T> implements Observer<T> {
 
   skip(amount: number): Stream<T> {
     return new Stream<T>(new SkipMachine(amount, this));
+  }
+
+  debug(spy: (t: T) => void = null): Stream<T> {
+    return new Stream<T>(new DebugMachine(spy, this));
   }
 }
