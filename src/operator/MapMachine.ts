@@ -9,11 +9,11 @@ export class MapMachine<T, U> implements Machine<U> {
               public inStream: Stream<T>) {
   }
 
-  start(outStream: Observer<U>): void {
+  start(outStream: Stream<U>): void {
     this.proxy = {
       next: (t: T) => outStream.next(this.projection(t)),
-      error: outStream.error,
-      complete: outStream.complete,
+      error: (err) => outStream.error(err),
+      complete: () => outStream.complete(),
     };
     this.inStream.subscribe(this.proxy);
   }

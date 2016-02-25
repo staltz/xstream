@@ -11,13 +11,13 @@ export class SkipMachine<T> implements Machine<T> {
     this.skipped = 0;
   }
 
-  start(outStream: Observer<T>): void {
+  start(outStream: Stream<T>): void {
     this.proxy = {
       next: (t: T) => {
         if (this.skipped++ >= this.max) outStream.next(t);
       },
-      error: outStream.error,
-      complete: outStream.complete,
+      error: (err) => outStream.error(err),
+      complete: () => outStream.complete(),
     };
     this.inStream.subscribe(this.proxy);
   }

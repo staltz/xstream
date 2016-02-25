@@ -9,7 +9,7 @@ export class DebugMachine<T> implements Machine<T> {
               public inStream: Stream<T>) {
   }
 
-  start(outStream: Observer<T>): void {
+  start(outStream: Stream<T>): void {
     this.proxy = {
       next: (t: T) => {
         if (this.spy) {
@@ -19,8 +19,8 @@ export class DebugMachine<T> implements Machine<T> {
         }
         outStream.next(t);
       },
-      error: outStream.error,
-      complete: outStream.complete,
+      error: (err) => outStream.error(err),
+      complete: () => outStream.complete(),
     };
     this.inStream.subscribe(this.proxy);
   }

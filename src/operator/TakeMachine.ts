@@ -11,7 +11,7 @@ export class TakeMachine<T> implements Machine<T> {
     this.taken = 0;
   }
 
-  start(outStream: Observer<T>): void {
+  start(outStream: Stream<T>): void {
     this.proxy = {
       next: (t: T) => {
         if (this.taken++ < this.max) {
@@ -21,8 +21,8 @@ export class TakeMachine<T> implements Machine<T> {
           this.stop();
         }
       },
-      error: outStream.error,
-      complete: outStream.complete,
+      error: (err) => outStream.error(err),
+      complete: () => outStream.complete(),
     };
     this.inStream.subscribe(this.proxy);
   }
