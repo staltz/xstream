@@ -1,10 +1,10 @@
-import xs from '../src/index';
+import xs from '../../src/index';
 import * as assert from 'assert';
 
-describe('Stream', () => {
-  it('can be subscribed and unsubscribed with one observer', (done) => {
-    const stream = xs.interval(100);
-    const expected = [0, 1, 2];
+describe('Stream.prototype.filter', () => {
+  it('should filter in only even numbers from an input stream', (done) => {
+    const stream = xs.interval(50).filter(i => i % 2 === 0);
+    const expected = [0, 2, 4, 6];
     let observer = {
       next: (x: number) => {
         assert.equal(x, expected.shift());
