@@ -1,9 +1,9 @@
 import {Observer} from '../Observer';
-import {Machine} from '../Machine';
+import {Producer} from '../Producer';
 import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
-export class TakeMachine<T> implements Machine<T> {
+export class TakeProducer<T> implements Producer<T> {
   public proxy: Observer<T> = emptyObserver;
   public taken: number = 0;
 

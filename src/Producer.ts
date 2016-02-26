@@ -1,6 +1,6 @@
 import {Observer} from './Observer';
 
-export interface Machine<T> {
+export interface Producer<T> {
   start: (observer: Observer<T>) => void;
   stop: () => void;
 }

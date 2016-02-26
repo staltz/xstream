@@ -1,16 +1,15 @@
 import {Observer} from '../Observer';
-import {Machine} from '../Machine';
+import {Producer} from '../Producer';
 import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
-export class Proxy<T, R> implements Observer<T> {
-  constructor(public out: Stream<R>,
-              public m: FoldMachine<T, R>) {
+export class Proxy<T, U> implements Observer<T> {
+  constructor(public out: Stream<U>,
+              public p: MapProducer<T, U>) {
   }
 
   next(t: T) {
-    const m = this.m;
-    this.out.next(m.acc = m.a(m.acc, t));
+    this.out.next(this.p.project(t));
   }
 
   error(err: any) {
@@ -22,18 +21,14 @@ export class Proxy<T, R> implements Observer<T> {
   }
 }
 
-export class FoldMachine<T, R> implements Machine<R> {
+export class MapProducer<T, U> implements Producer<U> {
   public proxy: Observer<T> = emptyObserver;
-  public acc: R;
 
-  constructor(public a: (acc: R, t: T) => R,
-              seed: R,
+  constructor(public project: (t: T) => U,
               public ins: Stream<T>) {
-    this.acc = seed;
   }
 
-  start(out: Stream<R>): void {
-    out.next(this.acc);
+  start(out: Stream<U>): void {
     this.proxy = new Proxy(out, this);
     this.ins.subscribe(this.proxy);
   }

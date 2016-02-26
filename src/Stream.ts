@@ -1,18 +1,18 @@
 import {Observer} from './Observer';
-import {Machine} from './Machine';
-import {MapMachine} from './operator/MapMachine';
-import {FilterMachine} from './operator/FilterMachine';
-import {TakeMachine} from './operator/TakeMachine';
-import {SkipMachine} from './operator/SkipMachine';
-import {DebugMachine} from './operator/DebugMachine';
-import {FoldMachine} from './operator/FoldMachine';
-import {LastMachine} from './operator/LastMachine';
+import {Producer} from './Producer';
+import {MapProducer} from './operator/MapProducer';
+import {FilterProducer} from './operator/FilterProducer';
+import {TakeProducer} from './operator/TakeProducer';
+import {SkipProducer} from './operator/SkipProducer';
+import {DebugProducer} from './operator/DebugProducer';
+import {FoldProducer} from './operator/FoldProducer';
+import {LastProducer} from './operator/LastProducer';
 
 export class Stream<T> implements Observer<T> {
   public observers: Array<Observer<T>>;
   public num: number; // Number of non-operator subscribers
 
-  constructor(public machine: Machine<T>) {
+  constructor(public machine: Producer<T>) {
     this.observers = [];
     this.num = 0;
   }
@@ -64,30 +64,30 @@ export class Stream<T> implements Observer<T> {
   }
 
   map<U>(project: (t: T) => U): Stream<U> {
-    return new Stream<U>(new MapMachine(project, this));
+    return new Stream<U>(new MapProducer(project, this));
   }
 
   filter(predicate: (t: T) => boolean): Stream<T> {
-    return new Stream<T>(new FilterMachine(predicate, this));
+    return new Stream<T>(new FilterProducer(predicate, this));
   }
 
   take(amount: number): Stream<T> {
-    return new Stream<T>(new TakeMachine(amount, this));
+    return new Stream<T>(new TakeProducer(amount, this));
   }
 
   skip(amount: number): Stream<T> {
-    return new Stream<T>(new SkipMachine(amount, this));
+    return new Stream<T>(new SkipProducer(amount, this));
   }
 
   debug(spy: (t: T) => void = null): Stream<T> {
-    return new Stream<T>(new DebugMachine(spy, this));
+    return new Stream<T>(new DebugProducer(spy, this));
   }
 
   fold<R>(accumulate: (acc: R, t: T) => R, init: R): Stream<R> {
-    return new Stream<R>(new FoldMachine(accumulate, init, this));
+    return new Stream<R>(new FoldProducer(accumulate, init, this));
   }
 
   last(): Stream<T> {
-    return new Stream<T>(new LastMachine(this));
+    return new Stream<T>(new LastProducer(this));
   }
 }

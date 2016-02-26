@@ -1,8 +1,8 @@
-import {Machine} from '../Machine';
+import {Producer} from '../Producer';
 import {Observer} from '../Observer';
 import {Stream} from '../Stream';
 
-class IntervalMachine implements Machine<number> {
+class IntervalProducer implements Producer<number> {
   on: boolean;
   intervalID: any;
   i: number;
@@ -25,6 +25,6 @@ class IntervalMachine implements Machine<number> {
 }
 
 export default function interval(period: number) {
-  const intervalMachine = new IntervalMachine(period);
-  return new Stream<number>(intervalMachine);
+  const intervalProducer = new IntervalProducer(period);
+  return new Stream<number>(intervalProducer);
 }

@@ -1,17 +1,17 @@
 import {Observer} from '../Observer';
-import {Machine} from '../Machine';
+import {Producer} from '../Producer';
 import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
 export class Proxy<T> implements Observer<T> {
   constructor(public out: Stream<T>,
-              public machine: LastMachine<T>) {
+              public p: LastProducer<T>) {
   }
 
   next(t: T) {
-    const m = this.machine;
-    m.has = true;
-    m.val = t;
+    const p = this.p;
+    p.has = true;
+    p.val = t;
   }
 
   error(err: any) {
@@ -19,10 +19,10 @@ export class Proxy<T> implements Observer<T> {
   }
 
   complete() {
-    const m = this.machine;
+    const p = this.p;
     const out = this.out;
-    if (m.has) {
-      out.next(m.val);
+    if (p.has) {
+      out.next(p.val);
       out.complete();
     } else {
       out.error('TODO show proper error');
@@ -30,7 +30,7 @@ export class Proxy<T> implements Observer<T> {
   }
 }
 
-export class LastMachine<T> implements Machine<T> {
+export class LastProducer<T> implements Producer<T> {
   public proxy: Observer<T> = emptyObserver;
   public has: boolean = false;
   public val: T = <T> {};

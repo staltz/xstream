@@ -1,9 +1,9 @@
-import {Machine} from '../Machine';
+import {Producer} from '../Producer';
 import {Observer} from '../Observer';
 import {Stream} from '../Stream';
 import {noop} from '../utils/noop';
 
-class FromMachine<T> implements Machine<T> {
+class FromProducer<T> implements Producer<T> {
   constructor(public array: Array<T>) {
   }
 
@@ -22,6 +22,6 @@ class FromMachine<T> implements Machine<T> {
 }
 
 export default function from<T>(array: Array<T>) {
-  const fromMachine = new FromMachine(array);
-  return new Stream<T>(fromMachine);
+  const fromProducer = new FromProducer(array);
+  return new Stream<T>(fromProducer);
 }
