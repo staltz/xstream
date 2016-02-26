@@ -1,6 +1,7 @@
 import {Observer} from '../Observer';
 import {Machine} from '../Machine';
 import {Stream} from '../Stream';
+import {emptyObserver} from '../utils/emptyObserver';
 
 export class TakeMachine<T> implements Machine<T> {
   public proxy: Observer<T>;
@@ -8,6 +9,7 @@ export class TakeMachine<T> implements Machine<T> {
 
   constructor(public max: number,
               public inStream: Stream<T>) {
+    this.proxy = emptyObserver;
     this.taken = 0;
   }
 

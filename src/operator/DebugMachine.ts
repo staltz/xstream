@@ -1,12 +1,14 @@
 import {Observer} from '../Observer';
 import {Machine} from '../Machine';
 import {Stream} from '../Stream';
+import {emptyObserver} from '../utils/emptyObserver';
 
 export class DebugMachine<T> implements Machine<T> {
   public proxy: Observer<T>;
 
   constructor(public spy: (t: T) => void = null,
               public inStream: Stream<T>) {
+    this.proxy = emptyObserver;
   }
 
   start(outStream: Stream<T>): void {

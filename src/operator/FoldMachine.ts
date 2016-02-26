@@ -18,7 +18,7 @@ export class FoldMachine<T, R> implements Machine<R> {
     outStream.next(this.initAcc);
     this.proxy = {
       next: (t: T) => {
-        this.acc = this.accumulator(this.acc, t)
+        this.acc = this.accumulator(this.acc, t);
         outStream.next(this.acc);
       },
       error: (err) => outStream.error(err),
