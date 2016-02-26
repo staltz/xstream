@@ -19,22 +19,34 @@ export class Stream<T> implements Observer<T> {
 
   next(x: T): void {
     const len = this.observers.length;
-    for (let i = len - 1; i >= 0; i--) {
-      this.observers[i].next(x);
+    if (len === 1) {
+      this.observers[0].next(x);
+    } else {
+      for (let i = 0; i < len; i++) {
+        this.observers[i].next(x);
+      }
     }
   }
 
   error(err: any): void {
     const len = this.observers.length;
-    for (let i = len - 1; i >= 0; i--) {
-      this.observers[i].error(err);
+    if (len === 1) {
+      this.observers[0].error(err);
+    } else {
+      for (let i = 0; i < len; i++) {
+        this.observers[i].error(err);
+      }
     }
   }
 
   complete(): void {
     const len = this.observers.length;
-    for (let i = len - 1; i >= 0; i--) {
-      this.observers[i].complete();
+    if (len === 1) {
+      this.observers[0].complete();
+    } else {
+      for (let i = 0; i < len; i++) {
+        this.observers[i].complete();
+      }
     }
   }
 

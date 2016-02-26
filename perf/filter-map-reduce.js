@@ -28,6 +28,10 @@ var options = {
 };
 
 suite
+  .add('xstream', function(deferred) {
+    runners.runXStream(deferred,
+      xstream.from(a).filter(even).map(add1).fold(sum, 0).last());
+  }, options)
   .add('most', function(deferred) {
     runners.runMost(deferred, most.from(a).filter(even).map(add1).reduce(sum, 0));
   }, options)
@@ -37,10 +41,6 @@ suite
   .add('rx 5', function(deferred) {
     runners.runRx5(deferred,
       rxjs.Observable.fromArray(a).filter(even).map(add1).reduce(sum, 0));
-  }, options)
-  .add('xstream', function(deferred) {
-    runners.runXStream(deferred,
-      xstream.from(a).filter(even).map(add1).fold(sum, 0).last());
   }, options)
   .add('kefir', function(deferred) {
     runners.runKefir(deferred, kefirFromArray(a).filter(even).map(add1).scan(sum, 0).last());
