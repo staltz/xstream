@@ -6,31 +6,31 @@ import {emptyObserver} from '../utils/emptyObserver';
 export class LastMachine<T> implements Machine<T> {
   public proxy: Observer<T> = emptyObserver;
   public has: boolean = false;
-  public val: T;
+  public val: T = <T> {};
 
-  constructor(public inStream: Stream<T>) {
+  constructor(public ins: Stream<T>) {
   }
 
-  start(outStream: Stream<T>): void {
+  start(out: Stream<T>): void {
     this.proxy = {
       next: (t: T) => {
         this.has = true;
         this.val = t;
       },
-      error: (err) => outStream.error(err),
+      error: (err) => out.error(err),
       complete: () => {
         if (this.has) {
-          outStream.next(this.val);
-          outStream.complete();
+          out.next(this.val);
+          out.complete();
         } else {
-          outStream.error('TODO show error about empty stream has no last value');
+          out.error('TODO show error about empty stream has no last value');
         }
       },
     };
-    this.inStream.subscribe(this.proxy);
+    this.ins.subscribe(this.proxy);
   }
 
   stop(): void {
-    this.inStream.unsubscribe(this.proxy);
+    this.ins.unsubscribe(this.proxy);
   }
 }

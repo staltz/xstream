@@ -4,30 +4,29 @@ import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
 export class FoldMachine<T, R> implements Machine<R> {
-  public proxy: Observer<T>;
+  public proxy: Observer<T> = emptyObserver;
   public acc: R;
 
   constructor(public accumulator: (acc: R, t: T) => R,
-              public initAcc: R,
-              public inStream: Stream<T>) {
-    this.proxy = emptyObserver;
-    this.acc = initAcc;
+              public seed: R,
+              public ins: Stream<T>) {
+    this.acc = seed;
   }
 
-  start(outStream: Stream<R>): void {
-    outStream.next(this.initAcc);
+  start(out: Stream<R>): void {
+    out.next(this.seed);
     this.proxy = {
       next: (t: T) => {
         this.acc = this.accumulator(this.acc, t);
-        outStream.next(this.acc);
+        out.next(this.acc);
       },
-      error: (err) => outStream.error(err),
-      complete: () => outStream.complete(),
+      error: (err) => out.error(err),
+      complete: () => out.complete(),
     };
-    this.inStream.subscribe(this.proxy);
+    this.ins.subscribe(this.proxy);
   }
 
   stop(): void {
-    this.inStream.unsubscribe(this.proxy);
+    this.ins.unsubscribe(this.proxy);
   }
 }

@@ -4,23 +4,22 @@ import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
 export class MapMachine<T, U> implements Machine<U> {
-  public proxy: Observer<T>;
+  public proxy: Observer<T> = emptyObserver;
 
-  constructor(public projection: (t: T) => U,
-              public inStream: Stream<T>) {
-    this.proxy = emptyObserver;
+  constructor(public project: (t: T) => U,
+              public ins: Stream<T>) {
   }
 
-  start(outStream: Stream<U>): void {
+  start(out: Stream<U>): void {
     this.proxy = {
-      next: (t: T) => outStream.next(this.projection(t)),
-      error: (err) => outStream.error(err),
-      complete: () => outStream.complete(),
+      next: (t: T) => out.next(this.project(t)),
+      error: (err) => out.error(err),
+      complete: () => out.complete(),
     };
-    this.inStream.subscribe(this.proxy);
+    this.ins.subscribe(this.proxy);
   }
 
   stop(): void {
-    this.inStream.unsubscribe(this.proxy);
+    this.ins.unsubscribe(this.proxy);
   }
 }

@@ -51,8 +51,8 @@ export class Stream<T> implements Observer<T> {
     }
   }
 
-  map<U>(projection: (t: T) => U): Stream<U> {
-    return new Stream<U>(new MapMachine(projection, this));
+  map<U>(project: (t: T) => U): Stream<U> {
+    return new Stream<U>(new MapMachine(project, this));
   }
 
   filter(predicate: (t: T) => boolean): Stream<T> {
@@ -71,8 +71,8 @@ export class Stream<T> implements Observer<T> {
     return new Stream<T>(new DebugMachine(spy, this));
   }
 
-  fold<R>(accumulator: (acc: R, t: T) => R, initAcc: R): Stream<R> {
-    return new Stream<R>(new FoldMachine(accumulator, initAcc, this));
+  fold<R>(accumulate: (acc: R, t: T) => R, init: R): Stream<R> {
+    return new Stream<R>(new FoldMachine(accumulate, init, this));
   }
 
   last(): Stream<T> {

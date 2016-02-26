@@ -4,27 +4,25 @@ import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
 export class SkipMachine<T> implements Machine<T> {
-  public proxy: Observer<T>;
-  public skipped: number;
+  public proxy: Observer<T> = emptyObserver;
+  public skipped: number = 0;
 
   constructor(public max: number,
-              public inStream: Stream<T>) {
-    this.proxy = emptyObserver;
-    this.skipped = 0;
+              public ins: Stream<T>) {
   }
 
-  start(outStream: Stream<T>): void {
+  start(out: Stream<T>): void {
     this.proxy = {
       next: (t: T) => {
-        if (this.skipped++ >= this.max) outStream.next(t);
+        if (this.skipped++ >= this.max) out.next(t);
       },
-      error: (err) => outStream.error(err),
-      complete: () => outStream.complete(),
+      error: (err) => out.error(err),
+      complete: () => out.complete(),
     };
-    this.inStream.subscribe(this.proxy);
+    this.ins.subscribe(this.proxy);
   }
 
   stop(): void {
-    this.inStream.unsubscribe(this.proxy);
+    this.ins.unsubscribe(this.proxy);
   }
 }

@@ -4,14 +4,13 @@ import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
 export class DebugMachine<T> implements Machine<T> {
-  public proxy: Observer<T>;
+  public proxy: Observer<T> = emptyObserver;
 
   constructor(public spy: (t: T) => void = null,
-              public inStream: Stream<T>) {
-    this.proxy = emptyObserver;
+              public ins: Stream<T>) {
   }
 
-  start(outStream: Stream<T>): void {
+  start(out: Stream<T>): void {
     this.proxy = {
       next: (t: T) => {
         if (this.spy) {
@@ -19,15 +18,15 @@ export class DebugMachine<T> implements Machine<T> {
         } else {
           console.log(t);
         }
-        outStream.next(t);
+        out.next(t);
       },
-      error: (err) => outStream.error(err),
-      complete: () => outStream.complete(),
+      error: (err) => out.error(err),
+      complete: () => out.complete(),
     };
-    this.inStream.subscribe(this.proxy);
+    this.ins.subscribe(this.proxy);
   }
 
   stop(): void {
-    this.inStream.unsubscribe(this.proxy);
+    this.ins.unsubscribe(this.proxy);
   }
 }

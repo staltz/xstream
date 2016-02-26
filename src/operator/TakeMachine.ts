@@ -4,32 +4,30 @@ import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
 export class TakeMachine<T> implements Machine<T> {
-  public proxy: Observer<T>;
-  public taken: number;
+  public proxy: Observer<T> = emptyObserver;
+  public taken: number = 0;
 
   constructor(public max: number,
-              public inStream: Stream<T>) {
-    this.proxy = emptyObserver;
-    this.taken = 0;
+              public ins: Stream<T>) {
   }
 
-  start(outStream: Stream<T>): void {
+  start(out: Stream<T>): void {
     this.proxy = {
       next: (t: T) => {
         if (this.taken++ < this.max) {
-          outStream.next(t);
+          out.next(t);
         } else {
-          outStream.complete();
+          out.complete();
           this.stop();
         }
       },
-      error: (err) => outStream.error(err),
-      complete: () => outStream.complete(),
+      error: (err) => out.error(err),
+      complete: () => out.complete(),
     };
-    this.inStream.subscribe(this.proxy);
+    this.ins.subscribe(this.proxy);
   }
 
   stop(): void {
-    this.inStream.unsubscribe(this.proxy);
+    this.ins.unsubscribe(this.proxy);
   }
 }
