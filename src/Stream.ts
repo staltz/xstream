@@ -6,6 +6,7 @@ import {TakeMachine} from './operator/TakeMachine';
 import {SkipMachine} from './operator/SkipMachine';
 import {DebugMachine} from './operator/DebugMachine';
 import {FoldMachine} from './operator/FoldMachine';
+import {LastMachine} from './operator/LastMachine';
 
 export class Stream<T> implements Observer<T> {
   public observers: Array<Observer<T>>;
@@ -72,5 +73,9 @@ export class Stream<T> implements Observer<T> {
 
   fold<R>(accumulator: (acc: R, t: T) => R, initAcc: R): Stream<R> {
     return new Stream<R>(new FoldMachine(accumulator, initAcc, this));
+  }
+
+  last(): Stream<T> {
+    return new Stream<T>(new LastMachine(this));
   }
 }
