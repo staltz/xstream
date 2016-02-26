@@ -5,12 +5,12 @@ import {emptyObserver} from '../utils/emptyObserver';
 
 export class Proxy<T, R> implements Observer<T> {
   constructor(public out: Stream<R>,
-              public machine: FoldMachine<T, R>) {
+              public m: FoldMachine<T, R>) {
   }
 
   next(t: T) {
-    const m = this.machine;
-    this.out.next(m.acc = m.accumulate(m.acc, t));
+    const m = this.m;
+    this.out.next(m.acc = m.a(m.acc, t));
   }
 
   error(err: any) {
@@ -26,7 +26,7 @@ export class FoldMachine<T, R> implements Machine<R> {
   public proxy: Observer<T> = emptyObserver;
   public acc: R;
 
-  constructor(public accumulate: (acc: R, t: T) => R,
+  constructor(public a: (acc: R, t: T) => R,
               seed: R,
               public ins: Stream<T>) {
     this.acc = seed;
