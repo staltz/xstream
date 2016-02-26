@@ -3,6 +3,33 @@ import {Machine} from '../Machine';
 import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
+export class Proxy<T> implements Observer<T> {
+  constructor(public out: Stream<T>,
+              public machine: LastMachine<T>) {
+  }
+
+  next(t: T) {
+    const m = this.machine;
+    m.has = true;
+    m.val = t;
+  }
+
+  error(err: any) {
+    this.out.error(err);
+  }
+
+  complete() {
+    const m = this.machine;
+    const out = this.out;
+    if (m.has) {
+      out.next(m.val);
+      out.complete();
+    } else {
+      out.error('TODO show proper error');
+    }
+  }
+}
+
 export class LastMachine<T> implements Machine<T> {
   public proxy: Observer<T> = emptyObserver;
   public has: boolean = false;
@@ -12,21 +39,7 @@ export class LastMachine<T> implements Machine<T> {
   }
 
   start(out: Stream<T>): void {
-    this.proxy = {
-      next: (t: T) => {
-        this.has = true;
-        this.val = t;
-      },
-      error: (err) => out.error(err),
-      complete: () => {
-        if (this.has) {
-          out.next(this.val);
-          out.complete();
-        } else {
-          out.error('TODO show error about empty stream has no last value');
-        }
-      },
-    };
+    this.proxy = new Proxy(out, this);
     this.ins.subscribe(this.proxy);
   }
 

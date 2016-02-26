@@ -7,13 +7,13 @@ class FromMachine<T> implements Machine<T> {
   constructor(public array: Array<T>) {
   }
 
-  start(stream: Observer<T>): void {
-    const arr = this.array;
-    const len = arr.length;
-    for (let i = 0; i < len; i++) {
-      stream.next(arr[i]);
+  start(out: Observer<T>): void {
+    const a = this.array;
+    const L = a.length;
+    for (let i = 0; i < L; i++) {
+      out.next(a[i]);
     }
-    stream.complete();
+    out.complete();
   }
 
   stop(): void {
