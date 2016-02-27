@@ -4,11 +4,11 @@ import {Stream} from '../Stream';
 import {noop} from '../utils/noop';
 
 class FromProducer<T> implements Producer<T> {
-  constructor(public array: Array<T>) {
+  constructor(public a: Array<T>) {
   }
 
   start(out: Observer<T>): void {
-    const a = this.array;
+    const a = this.a;
     const L = a.length;
     for (let i = 0; i < L; i++) {
       out.next(a[i]);
