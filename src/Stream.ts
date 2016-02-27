@@ -10,11 +10,9 @@ import {LastProducer} from './operator/LastProducer';
 
 export class Stream<T> implements Observer<T> {
   public observers: Array<Observer<T>>;
-  public num: number; // Number of non-operator subscribers
 
   constructor(public machine: Producer<T>) {
     this.observers = [];
-    this.num = 0;
   }
 
   next(x: T): void {
@@ -52,14 +50,14 @@ export class Stream<T> implements Observer<T> {
 
   subscribe(observer: Observer<T>): void {
     this.observers.push(observer);
-    if (++this.num === 1) this.machine.start(this);
+    if (this.observers.length === 1) this.machine.start(this);
   }
 
   unsubscribe(observer: Observer<T>): void {
     const i = this.observers.indexOf(observer);
     if (i > -1) {
       this.observers.splice(i, 1);
-      if (--this.num <= 0) this.machine.stop();
+      if (this.observers.length <= 0) this.machine.stop();
     }
   }
 
