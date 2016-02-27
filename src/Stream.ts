@@ -9,55 +9,55 @@ import {FoldProducer} from './operator/FoldProducer';
 import {LastProducer} from './operator/LastProducer';
 
 export class Stream<T> implements Observer<T> {
-  public observers: Array<Observer<T>>;
+  public _observers: Array<Observer<T>>;
 
-  constructor(public producer: Producer<T>) {
-    this.observers = [];
+  constructor(public _producer: Producer<T>) {
+    this._observers = [];
   }
 
   next(x: T): void {
-    const len = this.observers.length;
+    const len = this._observers.length;
     if (len === 1) {
-      this.observers[0].next(x);
+      this._observers[0].next(x);
     } else {
       for (let i = 0; i < len; i++) {
-        this.observers[i].next(x);
+        this._observers[i].next(x);
       }
     }
   }
 
   error(err: any): void {
-    const len = this.observers.length;
+    const len = this._observers.length;
     if (len === 1) {
-      this.observers[0].error(err);
+      this._observers[0].error(err);
     } else {
       for (let i = 0; i < len; i++) {
-        this.observers[i].error(err);
+        this._observers[i].error(err);
       }
     }
   }
 
   end(): void {
-    const len = this.observers.length;
+    const len = this._observers.length;
     if (len === 1) {
-      this.observers[0].end();
+      this._observers[0].end();
     } else {
       for (let i = 0; i < len; i++) {
-        this.observers[i].end();
+        this._observers[i].end();
       }
     }
   }
 
   subscribe(observer: Observer<T>): void {
-    this.observers.push(observer);
-    if (this.observers.length === 1) this.producer.start(this);
+    this._observers.push(observer);
+    if (this._observers.length === 1) this._producer.start(this);
   }
 
   unsubscribe(observer: Observer<T>): void {
-    const i = this.observers.indexOf(observer);
+    const i = this._observers.indexOf(observer);
     if (i > -1) {
-      this.observers.splice(i, 1);
-      if (this.observers.length <= 0) this.producer.stop();
+      this._observers.splice(i, 1);
+      if (this._observers.length <= 0) this._producer.stop();
     }
   }
 
