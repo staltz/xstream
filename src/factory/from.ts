@@ -9,8 +9,7 @@ class FromProducer<T> implements Producer<T> {
 
   start(out: Observer<T>): void {
     const a = this.a;
-    const L = a.length;
-    for (let i = 0; i < L; i++) {
+    for (let i = 0, l = a.length; i < l; i++) {
       out.next(a[i]);
     }
     out.end();
