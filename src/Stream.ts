@@ -7,6 +7,7 @@ import {SkipProducer} from './operator/SkipProducer';
 import {DebugProducer} from './operator/DebugProducer';
 import {FoldProducer} from './operator/FoldProducer';
 import {LastProducer} from './operator/LastProducer';
+import merge from './factory/merge';
 import {empty} from './utils/empty';
 
 export class Stream<T> implements Observer<T> {
@@ -98,5 +99,9 @@ export class Stream<T> implements Observer<T> {
 
   last(): Stream<T> {
     return new Stream<T>(new LastProducer(this));
+  }
+
+  merge(other: Stream<T>): Stream<T> {
+    return merge(this, other);
   }
 }
