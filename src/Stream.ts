@@ -7,9 +7,11 @@ import {SkipProducer} from './operator/SkipProducer';
 import {DebugProducer} from './operator/DebugProducer';
 import {FoldProducer} from './operator/FoldProducer';
 import {LastProducer} from './operator/LastProducer';
+import {empty} from './utils/empty';
 
 export class Stream<T> implements Observer<T> {
   public _observers: Array<Observer<T>>;
+  public _stopID: any = empty;
 
   constructor(public _producer: Producer<T>) {
     this._observers = [];
@@ -46,18 +48,27 @@ export class Stream<T> implements Observer<T> {
         this._observers[i].end();
       }
     }
+    this._stopID = setTimeout(() => this._producer.stop());
   }
 
   subscribe(observer: Observer<T>): void {
     this._observers.push(observer);
-    if (this._observers.length === 1) this._producer.start(this);
+    if (this._observers.length === 1) {
+      if (this._stopID !== empty) {
+        clearTimeout(this._stopID);
+        this._stopID = empty;
+      }
+      this._producer.start(this);
+    }
   }
 
   unsubscribe(observer: Observer<T>): void {
     const i = this._observers.indexOf(observer);
     if (i > -1) {
       this._observers.splice(i, 1);
-      if (this._observers.length <= 0) this._producer.stop();
+      if (this._observers.length <= 0) {
+        this._stopID = setTimeout(() => this._producer.stop());
+      }
     }
   }
 
