@@ -1,5 +1,5 @@
 var Benchmark = require('benchmark');
-var xstream = require('../lib/index').default;
+var xs = require('../lib/index').default;
 var most = require('most');
 var rx = require('rx');
 var rxjs = require('@reactivex/rxjs')
@@ -30,7 +30,7 @@ var options = {
 suite
   .add('xstream', function(deferred) {
     runners.runXStream(deferred,
-      xstream.from(a).filter(even).map(add1).fold(sum, 0).last());
+      xs.from(a).filter(even).map(add1).fold(sum, 0).last());
   }, options)
   .add('most', function(deferred) {
     runners.runMost(deferred, most.from(a).filter(even).map(add1).reduce(sum, 0));
