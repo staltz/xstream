@@ -2,6 +2,7 @@ import {Observer} from '../Observer';
 import {Producer} from '../Producer';
 import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
+import {empty} from '../utils/empty';
 
 export class Proxy<T> implements Observer<T> {
   constructor(public out: Stream<T>,
@@ -33,7 +34,7 @@ export class Proxy<T> implements Observer<T> {
 export class LastProducer<T> implements Producer<T> {
   public proxy: Observer<T> = emptyObserver;
   public has: boolean = false;
-  public val: T = <T> {};
+  public val: T = <T> empty;
 
   constructor(public ins: Stream<T>) {
   }
