@@ -39,8 +39,7 @@ export class LastProducer<T> implements Producer<T> {
   }
 
   start(out: Stream<T>): void {
-    this.proxy = new Proxy(out, this);
-    this.ins.subscribe(this.proxy);
+    this.ins.subscribe(this.proxy = new Proxy(out, this));
   }
 
   stop(): void {

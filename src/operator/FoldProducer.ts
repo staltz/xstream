@@ -34,8 +34,7 @@ export class FoldProducer<T, R> implements Producer<R> {
 
   start(out: Stream<R>): void {
     out.next(this.acc);
-    this.proxy = new Proxy(out, this);
-    this.ins.subscribe(this.proxy);
+    this.ins.subscribe(this.proxy = new Proxy(out, this));
   }
 
   stop(): void {

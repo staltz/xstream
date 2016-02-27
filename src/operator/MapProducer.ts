@@ -29,8 +29,7 @@ export class MapProducer<T, U> implements Producer<U> {
   }
 
   start(out: Stream<U>): void {
-    this.proxy = new Proxy(out, this);
-    this.ins.subscribe(this.proxy);
+    this.ins.subscribe(this.proxy = new Proxy(out, this));
   }
 
   stop(): void {
