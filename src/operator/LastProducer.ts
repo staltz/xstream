@@ -18,12 +18,12 @@ export class Proxy<T> implements Observer<T> {
     this.out.error(err);
   }
 
-  complete() {
+  end() {
     const p = this.p;
     const out = this.out;
     if (p.has) {
       out.next(p.val);
-      out.complete();
+      out.end();
     } else {
       out.error('TODO show proper error');
     }

@@ -13,7 +13,7 @@ class FromProducer<T> implements Producer<T> {
     for (let i = 0; i < L; i++) {
       out.next(a[i]);
     }
-    out.complete();
+    out.end();
   }
 
   stop(): void {

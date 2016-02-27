@@ -16,7 +16,7 @@ describe('Stream.prototype.debug', () => {
         }
       },
       error: done.fail,
-      complete: done.fail,
+      end: done.fail,
     };
     stream.subscribe(observer);
   });

@@ -37,13 +37,13 @@ export class Stream<T> implements Observer<T> {
     }
   }
 
-  complete(): void {
+  end(): void {
     const len = this.observers.length;
     if (len === 1) {
-      this.observers[0].complete();
+      this.observers[0].end();
     } else {
       for (let i = 0; i < len; i++) {
-        this.observers[i].complete();
+        this.observers[i].end();
       }
     }
   }

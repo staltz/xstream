@@ -10,7 +10,7 @@ describe('Stream.prototype.fold', () => {
         assert.equal(x, expected.shift());
       },
       error: done.fail,
-      complete: () => {
+      end: () => {
         assert.equal(expected.length, 0);
         stream.unsubscribe(observer);
         done();

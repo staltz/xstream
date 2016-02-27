@@ -14,7 +14,7 @@ describe('Stream.prototype.map', () => {
         }
       },
       error: done.fail,
-      complete: done.fail,
+      end: done.fail,
     };
     stream.subscribe(observer);
   });

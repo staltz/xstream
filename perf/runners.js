@@ -103,7 +103,7 @@ function runRx5(deferred, rxStream) {
 function runXStream(deferred, xstream) {
   xstream.subscribe({
     next: noop,
-    complete: function() {
+    end: function() {
       deferred.resolve();
     },
     error: function(e) {

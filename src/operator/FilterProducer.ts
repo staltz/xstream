@@ -16,8 +16,8 @@ export class Proxy<T> implements Observer<T> {
     this.out.error(err);
   }
 
-  complete() {
-    this.out.complete();
+  end() {
+    this.out.end();
   }
 }
 

@@ -11,7 +11,7 @@ describe('Stream.prototype.from', () => {
         assert.equal(x, expected.shift());
       },
       error: done.fail,
-      complete: () => {
+      end: () => {
         assert.equal(expected.length, 0);
         done();
       },

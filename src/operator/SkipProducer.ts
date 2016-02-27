@@ -17,7 +17,7 @@ export class SkipProducer<T> implements Producer<T> {
         if (this.skipped++ >= this.max) out.next(t);
       },
       error: (err) => out.error(err),
-      complete: () => out.complete(),
+      end: () => out.end(),
     };
     this.ins.subscribe(this.proxy);
   }

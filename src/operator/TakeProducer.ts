@@ -17,12 +17,12 @@ export class TakeProducer<T> implements Producer<T> {
         if (this.taken++ < this.max) {
           out.next(t);
         } else {
-          out.complete();
+          out.end();
           this.stop();
         }
       },
       error: (err) => out.error(err),
-      complete: () => out.complete(),
+      end: () => out.end(),
     };
     this.ins.subscribe(this.proxy);
   }

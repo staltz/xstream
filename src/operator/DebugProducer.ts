@@ -21,7 +21,7 @@ export class DebugProducer<T> implements Producer<T> {
         out.next(t);
       },
       error: (err) => out.error(err),
-      complete: () => out.complete(),
+      end: () => out.end(),
     };
     this.ins.subscribe(this.proxy);
   }
