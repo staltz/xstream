@@ -7,12 +7,14 @@ import {SkipProducer} from './operator/SkipProducer';
 import {DebugProducer} from './operator/DebugProducer';
 import {FoldProducer} from './operator/FoldProducer';
 import {LastProducer} from './operator/LastProducer';
+import {RememberProducer} from './operator/RememberProducer';
 import merge from './factory/merge';
 import {empty} from './utils/empty';
 
 export class Stream<T> implements Observer<T> {
   public _observers: Array<Observer<T>>;
   public _stopID: any = empty;
+  public value: any;
 
   constructor(public _producer: Producer<T>) {
     this._observers = [];
@@ -61,6 +63,12 @@ export class Stream<T> implements Observer<T> {
       }
       this._producer.start(this);
     }
+    if (this.value) {
+      observer.next(this.value);
+      if (this._stopID !== empty) {
+        observer.end();
+      }
+    }
   }
 
   unsubscribe(observer: Observer<T>): void {
@@ -99,6 +107,10 @@ export class Stream<T> implements Observer<T> {
 
   last(): Stream<T> {
     return new Stream<T>(new LastProducer(this));
+  }
+
+  remember(): Stream<T> {
+    return new Stream<T>(new RememberProducer(this));
   }
 
   merge(other: Stream<T>): Stream<T> {
