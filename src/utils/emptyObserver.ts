@@ -1,6 +1,7 @@
 import {Observer} from '../Observer';
+import {noop} from './noop';
 export var emptyObserver: Observer<any> = {
-  next: null,
-  error: null,
-  end: null,
+  next: noop,
+  error: noop,
+  end: noop,
 };
