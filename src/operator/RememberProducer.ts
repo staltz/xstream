@@ -10,7 +10,7 @@ export class Proxy<T> implements Observer<T> {
 
   next(t: T) {
     this.out.next(t);
-    this.out.value = t;
+    this.out._val = t;
   }
 
   error(err: any) {

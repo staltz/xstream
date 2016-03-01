@@ -14,7 +14,7 @@ import {empty} from './utils/empty';
 export class Stream<T> implements Observer<T> {
   public _observers: Array<Observer<T>>;
   public _stopID: any = empty;
-  public value: any;
+  public _val: any; // For RememberProducer only
 
   constructor(public _producer: Producer<T>) {
     this._observers = [];
@@ -52,6 +52,7 @@ export class Stream<T> implements Observer<T> {
       }
     }
     this._stopID = setTimeout(() => this._producer.stop());
+    this._observers = [];
   }
 
   subscribe(observer: Observer<T>): void {
@@ -63,11 +64,8 @@ export class Stream<T> implements Observer<T> {
       }
       this._producer.start(this);
     }
-    if (this.value) {
-      observer.next(this.value);
-      if (this._stopID !== empty) {
-        observer.end();
-      }
+    if (this._val) {
+      observer.next(this._val);
     }
   }
 
