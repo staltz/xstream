@@ -2,7 +2,7 @@ import xs from '../../src/index';
 import {emptyObserver} from '../../src/utils/emptyObserver';
 import * as assert from 'assert';
 
-describe.only('Stream.prototype.remember', () => {
+describe('Stream.prototype.remember', () => {
   it('should replay the last event to a new observer', (done) => {
     const stream = xs.interval(1).take(6).remember();
 
