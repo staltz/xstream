@@ -15,8 +15,10 @@ export class Stream<T> implements Observer<T> {
   public _observers: Array<Observer<T>>;
   public _stopID: any = empty;
   public _val: any; // For RememberProducer only
+  public _prod: Producer<T>;
 
-  constructor(public _producer: Producer<T>) {
+  constructor(producer: Producer<T>) {
+    this._prod = producer;
     this._observers = [];
   }
 
@@ -51,7 +53,7 @@ export class Stream<T> implements Observer<T> {
         this._observers[i].end();
       }
     }
-    this._stopID = setTimeout(() => this._producer.stop());
+    this._stopID = setTimeout(() => this._prod.stop());
     this._observers = [];
   }
 
@@ -62,7 +64,7 @@ export class Stream<T> implements Observer<T> {
         clearTimeout(this._stopID);
         this._stopID = empty;
       }
-      this._producer.start(this);
+      this._prod.start(this);
     }
     if (this._val) {
       observer.next(this._val);
@@ -74,7 +76,7 @@ export class Stream<T> implements Observer<T> {
     if (i > -1) {
       this._observers.splice(i, 1);
       if (this._observers.length <= 0) {
-        this._stopID = setTimeout(() => this._producer.stop());
+        this._stopID = setTimeout(() => this._prod.stop());
       }
     }
   }
