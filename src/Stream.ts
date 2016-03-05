@@ -17,6 +17,7 @@ import {combine, FactoryCombineSignature} from './factory/combine';
 import merge from './factory/merge';
 import from from './factory/from';
 import interval from './factory/interval';
+import domEvent from './factory/domEvent';
 
 export class Stream<T> implements Observer<T> {
   public _observers: Array<Observer<T>>;
@@ -92,6 +93,7 @@ export class Stream<T> implements Observer<T> {
   static combine: FactoryCombineSignature;
   static merge: typeof merge;
   static interval: typeof interval;
+  static domEvent: typeof domEvent;
 
   map<U>(project: (t: T) => U): Stream<U> {
     return new Stream<U>(new MapProducer(project, this));
@@ -136,6 +138,7 @@ Stream.from = from;
 Stream.merge = merge;
 Stream.combine = combine;
 Stream.interval = interval;
+Stream.domEvent = domEvent;
 
 Stream.prototype.combine = function <R>(project: ProjectFunction,
                                         ...streams: Array<Stream<any>>) {
