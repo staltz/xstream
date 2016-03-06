@@ -52,14 +52,14 @@ suite
     var streams = a.map(most.from);
     runners.runMost(deferred, most.mergeArray(streams).reduce(sum, 0));
   }, options)
-  .add('rx 4', function(deferred) {
-    var streams = a.map(rx.Observable.fromArray);
-    runners.runRx(deferred, rx.Observable.merge.apply(void 0, streams).reduce(sum, 0));
-  }, options)
   .add('rx 5', function(deferred) {
     var streams = a.map(function(x) {return rxjs.Observable.fromArray(x)});
     runners.runRx5(deferred,
       rxjs.Observable.merge.apply(rxjs.Observable, streams).reduce(sum, 0))
+  }, options)
+  .add('rx 4', function(deferred) {
+    var streams = a.map(rx.Observable.fromArray);
+    runners.runRx(deferred, rx.Observable.merge.apply(void 0, streams).reduce(sum, 0));
   }, options)
   .add('kefir', function(deferred) {
     var streams = a.map(kefirFromArray);

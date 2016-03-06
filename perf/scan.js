@@ -34,11 +34,11 @@ suite
   .add('most', function(deferred) {
     runners.runMost(deferred, most.from(a).scan(sum, 0).reduce(passthrough, 0));
   }, options)
-  .add('rx 4', function(deferred) {
-    runners.runRx(deferred, rx.Observable.fromArray(a).scan(sum, 0).reduce(passthrough, 0));
-  }, options)
   .add('rx 5', function(deferred) {
     runners.runRx5(deferred, rxjs.Observable.fromArray(a).scan(sum, 0).reduce(passthrough, 0));
+  }, options)
+  .add('rx 4', function(deferred) {
+    runners.runRx(deferred, rx.Observable.fromArray(a).scan(sum, 0).reduce(passthrough, 0));
   }, options)
   .add('kefir', function(deferred) {
     runners.runKefir(deferred, kefirFromArray(a).scan(sum, 0).scan(passthrough, 0).last());
