@@ -11,13 +11,13 @@ import {RememberProducer} from './operator/RememberProducer';
 import {
   CombineProducer,
   InstanceCombineSignature,
+  FactoryCombineSignature,
   ProjectFunction} from './operator/CombineProducer';
+import {EventProducer} from './factory/EventProducer';
+import {FromProducer} from './factory/FromProducer';
+import {IntervalProducer} from './factory/IntervalProducer';
+import {MergeProducer} from './factory/MergeProducer';
 import {empty} from './utils/empty';
-import {combine, FactoryCombineSignature} from './factory/combine';
-import merge from './factory/merge';
-import from from './factory/from';
-import interval from './factory/interval';
-import domEvent from './factory/domEvent';
 
 export class Stream<T> implements Observer<T> {
   public _observers: Array<Observer<T>>;
@@ -89,11 +89,32 @@ export class Stream<T> implements Observer<T> {
     }
   }
 
-  static from: typeof from;
-  static combine: FactoryCombineSignature;
-  static merge: typeof merge;
-  static interval: typeof interval;
-  static domEvent: typeof domEvent;
+  static combine: FactoryCombineSignature =
+    function combine<R>(project: ProjectFunction,
+                        ...streams: Array<Stream<any>>): Stream<R> {
+      return new Stream<R>(new CombineProducer<R>(project, streams));
+    };
+
+  static from<T>(array: Array<T>): Stream<T> {
+    const fromProducer = new FromProducer(array);
+    return new Stream<T>(fromProducer);
+  }
+
+  static merge<T>(...streams: Array<Stream<T>>): Stream<T> {
+    const mergeProducer = new MergeProducer(streams);
+    return new Stream<T>(mergeProducer);
+  }
+
+  static interval(period: number): Stream<number> {
+    const intervalProducer = new IntervalProducer(period);
+    return new Stream<number>(intervalProducer);
+  }
+
+  static domEvent(node: EventTarget,
+                  eventType: string,
+                  useCapture: boolean = false): Stream<Event> {
+    return new Stream<Event>(new EventProducer(node, eventType, useCapture));
+  }
 
   map<U>(project: (t: T) => U): Stream<U> {
     return new Stream<U>(new MapProducer(project, this));
@@ -128,20 +149,13 @@ export class Stream<T> implements Observer<T> {
   }
 
   merge(other: Stream<T>): Stream<T> {
-    return merge(this, other);
+    return Stream.merge(this, other);
   }
 
-  combine: InstanceCombineSignature<T>;
+  combine: InstanceCombineSignature<T> =
+    function combine<R>(project: ProjectFunction,
+                        ...streams: Array<Stream<any>>): Stream<R> {
+      streams.unshift(this);
+      return new Stream<R>(new CombineProducer<R>(project, streams));
+    };
 }
-
-Stream.from = from;
-Stream.merge = merge;
-Stream.combine = combine;
-Stream.interval = interval;
-Stream.domEvent = domEvent;
-
-Stream.prototype.combine = function <R>(project: ProjectFunction,
-                                        ...streams: Array<Stream<any>>) {
-  streams.unshift(this);
-  return new Stream<R>(new CombineProducer<R>(project, streams));
-};
