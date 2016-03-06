@@ -10,9 +10,10 @@ export class Proxy<T> implements Observer<T> {
 
   next(t: T) {
     const {prod, out} = this;
-    if (prod.taken++ < prod.max) {
+    if (prod.taken++ < prod.max - 1) {
       out.next(t);
     } else {
+      out.next(t);
       out.end();
       prod.stop();
     }

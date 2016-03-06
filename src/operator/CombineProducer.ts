@@ -4,32 +4,6 @@ import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 import {invoke} from '../utils/invoke';
 
-export class Proxy<T> implements Observer<T> {
-  constructor(public i: number, public prod: CombineProducer<T>) {
-    prod.proxies.push(this);
-  }
-
-  next(t: T): void {
-    const prod = this.prod;
-    prod.hasVal[this.i] = true;
-    prod.vals[this.i] = t;
-    if (!prod.ready) {
-      prod.up();
-    }
-    if (prod.ready) {
-      prod.out.next(invoke(prod.project, prod.vals));
-    }
-  }
-
-  error(err: any): void {
-    this.prod.out.error(err);
-  }
-
-  end(): void {
-    this.prod.out.end();
-  }
-}
-
 export interface ProjectFunction {
   <T1, T2, R>(v1: T1, v2: T2): R;
   <T1, T2, T3, R>(v1: T1, v2: T2, v3: T3): R;
@@ -83,6 +57,35 @@ export interface InstanceCombineSignature<T> {
   <R>(project: (...args: Array<any>) => R, ...streams: Array<Stream<any>>): Stream<R>;
 }
 
+export class Proxy<T> implements Observer<T> {
+  constructor(public i: number, public prod: CombineProducer<T>) {
+    prod.proxies.push(this);
+  }
+
+  next(t: T): void {
+    const prod = this.prod;
+    prod.hasVal[this.i] = true;
+    prod.vals[this.i] = t;
+    if (!prod.ready) {
+      prod.up();
+    }
+    if (prod.ready) {
+      prod.out.next(invoke(prod.project, prod.vals));
+    }
+  }
+
+  error(err: any): void {
+    this.prod.out.error(err);
+  }
+
+  end(): void {
+    const prod = this.prod;
+    if (--prod.ac === 0) {
+      prod.out.end();
+    }
+  }
+}
+
 export class CombineProducer<R> implements Producer<R> {
   public out: Observer<R> = emptyObserver;
   public proxies: Array<Proxy<any>> = [];
@@ -90,11 +93,13 @@ export class CombineProducer<R> implements Producer<R> {
   public hasVal: Array<boolean>;
   public vals: Array<any>;
   public streams: Array<Stream<any>>;
+  public ac: number; // ac is activeCount
 
   constructor(public project: ProjectFunction, streams: Array<Stream<any>>) {
     this.streams = streams;
     this.vals = new Array(streams.length);
     this.hasVal = new Array(streams.length);
+    this.ac = streams.length;
   }
 
   up(): void {
