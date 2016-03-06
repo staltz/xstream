@@ -8,8 +8,15 @@ import {DebugProducer} from './operator/DebugProducer';
 import {FoldProducer} from './operator/FoldProducer';
 import {LastProducer} from './operator/LastProducer';
 import {RememberProducer} from './operator/RememberProducer';
-import merge from './factory/merge';
+import {
+  CombineProducer,
+  InstanceCombineSignature,
+  ProjectFunction} from './operator/CombineProducer';
 import {empty} from './utils/empty';
+import {combine, FactoryCombineSignature} from './factory/combine';
+import merge from './factory/merge';
+import from from './factory/from';
+import interval from './factory/interval';
 
 export class Stream<T> implements Observer<T> {
   public _observers: Array<Observer<T>>;
@@ -81,6 +88,11 @@ export class Stream<T> implements Observer<T> {
     }
   }
 
+  static from: typeof from;
+  static combine: FactoryCombineSignature;
+  static merge: typeof merge;
+  static interval: typeof interval;
+
   map<U>(project: (t: T) => U): Stream<U> {
     return new Stream<U>(new MapProducer(project, this));
   }
@@ -116,4 +128,17 @@ export class Stream<T> implements Observer<T> {
   merge(other: Stream<T>): Stream<T> {
     return merge(this, other);
   }
+
+  combine: InstanceCombineSignature<T>;
 }
+
+Stream.from = from;
+Stream.merge = merge;
+Stream.combine = combine;
+Stream.interval = interval;
+
+Stream.prototype.combine = function <R>(project: ProjectFunction,
+                                        ...streams: Array<Stream<any>>) {
+  streams.unshift(this);
+  return new Stream<R>(new CombineProducer<R>(project, streams));
+};

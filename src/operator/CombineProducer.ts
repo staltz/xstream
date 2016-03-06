@@ -1,0 +1,100 @@
+import {Observer} from '../Observer';
+import {Producer} from '../Producer';
+import {Stream} from '../Stream';
+import {emptyObserver} from '../utils/emptyObserver';
+import {invoke} from '../utils/invoke';
+
+export class Proxy<T> implements Observer<T> {
+  constructor(public i: number, public prod: CombineProducer<T>) {
+    prod.proxies.push(this);
+  }
+
+  next(t: T): void {
+    const prod = this.prod;
+    prod.hasVal[this.i] = true;
+    prod.vals[this.i] = t;
+    if (!prod.ready) {
+      prod.up();
+    }
+    if (prod.ready) {
+      prod.out.next(invoke(prod.project, prod.vals));
+    }
+  }
+
+  error(err: any): void {
+    this.prod.out.error(err);
+  }
+
+  end(): void {
+    this.prod.out.end();
+  }
+}
+
+export interface ProjectFunction {
+  <T1, T2, R>(v1: T1, v2: T2): R;
+  <T1, T2, T3, R>(v1: T1, v2: T2, v3: T3): R;
+  <T1, T2, T3, T4, R>(v1: T1, v2: T2, v3: T3, v4: T4): R;
+  <T1, T2, T3, T4, T5, R>(v1: T1, v2: T2, v3: T3, v4: T4, v5: T5): R;
+  <T1, T2, T3, T4, T5, T6, R>(v1: T1, v2: T2, v3: T3, v4: T4, v5: T5, v6: T6): R;
+  <R>(...values: Array<any>): R;
+}
+
+export interface InstanceCombineSignature<T> {
+  <T2, R>(
+    project: (t1: T, t2: T2) => R,
+    stream2: Stream<T2>): Stream<R>;
+  <T2, T3, R>(
+    project: (t1: T, t2: T2, t3: T3) => R,
+    stream2: Stream<T2>,
+    stream3: Stream<T3>): Stream<R>;
+  <T2, T3, T4, R>(
+    project: (t1: T, t2: T2, t3: T3, t4: T4) => R,
+    stream2: Stream<T2>,
+    stream3: Stream<T3>,
+    stream4: Stream<T4>): Stream<R>;
+  <T2, T3, T4, T5, R>(
+    project: (t1: T, t2: T2, t3: T3, t4: T4, t5: T5) => R,
+    stream2: Stream<T2>,
+    stream3: Stream<T3>,
+    stream4: Stream<T4>,
+    stream5: Stream<T5>): Stream<R>;
+  <R>(project: (...args: Array<any>) => R, ...streams: Array<Stream<any>>): Stream<R>;
+}
+
+export class CombineProducer<R> implements Producer<R> {
+  public out: Observer<R> = emptyObserver;
+  public proxies: Array<Proxy<any>> = [];
+  public ready: boolean = false;
+  public hasVal: Array<boolean>;
+  public vals: Array<any>;
+  public streams: Array<Stream<any>>;
+
+  constructor(public project: ProjectFunction, streams: Array<Stream<any>>) {
+    this.streams = streams;
+    this.vals = new Array(streams.length);
+    this.hasVal = new Array(streams.length);
+  }
+
+  up(): void {
+    for (let i = this.hasVal.length - 1; i >= 0; i--) {
+      if (!this.hasVal[i]) {
+        return;
+      }
+    }
+    this.ready = true;
+  }
+
+  start(out: Observer<R>): void {
+    this.out = out;
+    for (let i = this.streams.length - 1; i >= 0; i--) {
+      this.streams[i].subscribe(new Proxy(i, this));
+    }
+  }
+
+  stop(): void {
+    for (let i = this.streams.length - 1; i >= 0; i--) {
+      this.streams[i].unsubscribe(this.proxies[i]);
+    }
+    this.proxies = [];
+  }
+}
