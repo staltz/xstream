@@ -1,11 +1,11 @@
 import {Observer} from '../Observer';
-import {Producer} from '../Producer';
+import {Operator} from '../Operator';
 import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
 export class Proxy<T, R> implements Observer<T> {
   constructor(public out: Stream<R>,
-              public p: FoldProducer<T, R>) {
+              public p: FoldOperator<T, R>) {
   }
 
   next(t: T) {
@@ -22,7 +22,7 @@ export class Proxy<T, R> implements Observer<T> {
   }
 }
 
-export class FoldProducer<T, R> implements Producer<R> {
+export class FoldOperator<T, R> implements Operator<T, R> {
   public proxy: Observer<T> = emptyObserver;
   public acc: R;
 

@@ -1,18 +1,20 @@
 import {Observer} from '../Observer';
-import {Producer} from '../Producer';
+import {Operator} from '../Operator';
 import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
-import {empty} from '../utils/empty';
 
 export class Proxy<T> implements Observer<T> {
   constructor(public out: Stream<T>,
-              public p: LastProducer<T>) {
+              public p: DebugOperator<T>) {
   }
 
   next(t: T) {
-    const p = this.p;
-    p.has = true;
-    p.val = t;
+    if (this.p.spy) {
+      this.p.spy(t);
+    } else {
+      console.log(t);
+    }
+    this.out.next(t);
   }
 
   error(err: any) {
@@ -20,23 +22,15 @@ export class Proxy<T> implements Observer<T> {
   }
 
   end() {
-    const p = this.p;
-    const out = this.out;
-    if (p.has) {
-      out.next(p.val);
-      out.end();
-    } else {
-      out.error('TODO show proper error');
-    }
+    this.out.end();
   }
 }
 
-export class LastProducer<T> implements Producer<T> {
+export class DebugOperator<T> implements Operator<T, T> {
   public proxy: Observer<T> = emptyObserver;
-  public has: boolean = false;
-  public val: T = <T> empty;
 
-  constructor(public ins: Stream<T>) {
+  constructor(public spy: (t: T) => void = null,
+              public ins: Stream<T>) {
   }
 
   start(out: Stream<T>): void {

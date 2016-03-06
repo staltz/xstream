@@ -1,11 +1,11 @@
 import {Observer} from '../Observer';
-import {Producer} from '../Producer';
+import {Operator} from '../Operator';
 import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
-export class Proxy<T, U> implements Observer<T> {
-  constructor(public out: Stream<U>,
-              public p: MapProducer<T, U>) {
+export class Proxy<T, R> implements Observer<T> {
+  constructor(public out: Stream<R>,
+              public p: MapOperator<T, R>) {
   }
 
   next(t: T) {
@@ -21,14 +21,14 @@ export class Proxy<T, U> implements Observer<T> {
   }
 }
 
-export class MapProducer<T, U> implements Producer<U> {
+export class MapOperator<T, R> implements Operator<T, R> {
   public proxy: Observer<T> = emptyObserver;
 
-  constructor(public project: (t: T) => U,
+  constructor(public project: (t: T) => R,
               public ins: Stream<T>) {
   }
 
-  start(out: Stream<U>): void {
+  start(out: Stream<R>): void {
     this.ins.subscribe(this.proxy = new Proxy(out, this));
   }
 

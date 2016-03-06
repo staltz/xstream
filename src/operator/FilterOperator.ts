@@ -1,22 +1,15 @@
 import {Observer} from '../Observer';
-import {Producer} from '../Producer';
+import {Operator} from '../Operator';
 import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
 export class Proxy<T> implements Observer<T> {
   constructor(public out: Stream<T>,
-              public prod: TakeProducer<T>) {
+              public p: FilterOperator<T>) {
   }
 
   next(t: T) {
-    const {prod, out} = this;
-    if (prod.taken++ < prod.max - 1) {
-      out.next(t);
-    } else {
-      out.next(t);
-      out.end();
-      prod.stop();
-    }
+    if (this.p.predicate(t)) this.out.next(t);
   }
 
   error(err: any) {
@@ -28,11 +21,10 @@ export class Proxy<T> implements Observer<T> {
   }
 }
 
-export class TakeProducer<T> implements Producer<T> {
+export class FilterOperator<T> implements Operator<T, T> {
   public proxy: Observer<T> = emptyObserver;
-  public taken: number = 0;
 
-  constructor(public max: number,
+  constructor(public predicate: (t: T) => boolean,
               public ins: Stream<T>) {
   }
 

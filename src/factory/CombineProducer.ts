@@ -4,7 +4,7 @@ import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 import {invoke} from '../utils/invoke';
 
-export interface ProjectFunction {
+export interface CombineProjectFunction {
   <T1, T2, R>(v1: T1, v2: T2): R;
   <T1, T2, T3, R>(v1: T1, v2: T2, v3: T3): R;
   <T1, T2, T3, T4, R>(v1: T1, v2: T2, v3: T3, v4: T4): R;
@@ -13,7 +13,7 @@ export interface ProjectFunction {
   <R>(...values: Array<any>): R;
 }
 
-export interface FactoryCombineSignature {
+export interface CombineFactorySignature {
   <T1, T2, R>(
     project: (t1: T1, t2: T2) => R,
     stream2: Stream<T2>): Stream<R>;
@@ -35,7 +35,7 @@ export interface FactoryCombineSignature {
   <R>(project: (...args: Array<any>) => R, ...streams: Array<Stream<any>>): Stream<R>;
 }
 
-export interface InstanceCombineSignature<T> {
+export interface CombineInstanceSignature<T> {
   <T2, R>(
     project: (t1: T, t2: T2) => R,
     stream2: Stream<T2>): Stream<R>;
@@ -95,7 +95,7 @@ export class CombineProducer<R> implements Producer<R> {
   public streams: Array<Stream<any>>;
   public ac: number; // ac is activeCount
 
-  constructor(public project: ProjectFunction, streams: Array<Stream<any>>) {
+  constructor(public project: CombineProjectFunction, streams: Array<Stream<any>>) {
     this.streams = streams;
     this.vals = new Array(streams.length);
     this.hasVal = new Array(streams.length);

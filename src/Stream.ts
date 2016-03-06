@@ -1,18 +1,18 @@
 import {Observer} from './Observer';
 import {Producer} from './Producer';
-import {MapProducer} from './operator/MapProducer';
-import {FilterProducer} from './operator/FilterProducer';
-import {TakeProducer} from './operator/TakeProducer';
-import {SkipProducer} from './operator/SkipProducer';
-import {DebugProducer} from './operator/DebugProducer';
-import {FoldProducer} from './operator/FoldProducer';
-import {LastProducer} from './operator/LastProducer';
-import {RememberProducer} from './operator/RememberProducer';
+import {MapOperator} from './operator/MapOperator';
+import {FilterOperator} from './operator/FilterOperator';
+import {TakeOperator} from './operator/TakeOperator';
+import {SkipOperator} from './operator/SkipOperator';
+import {DebugOperator} from './operator/DebugOperator';
+import {FoldOperator} from './operator/FoldOperator';
+import {LastOperator} from './operator/LastOperator';
+import {RememberOperator} from './operator/RememberOperator';
 import {
   CombineProducer,
-  InstanceCombineSignature,
-  FactoryCombineSignature,
-  ProjectFunction} from './operator/CombineProducer';
+  CombineInstanceSignature,
+  CombineFactorySignature,
+  CombineProjectFunction} from './factory/CombineProducer';
 import {EventProducer} from './factory/EventProducer';
 import {FromProducer} from './factory/FromProducer';
 import {IntervalProducer} from './factory/IntervalProducer';
@@ -89,25 +89,22 @@ export class Stream<T> implements Observer<T> {
     }
   }
 
-  static combine: FactoryCombineSignature =
-    function combine<R>(project: ProjectFunction,
+  static combine: CombineFactorySignature =
+    function combine<R>(project: CombineProjectFunction,
                         ...streams: Array<Stream<any>>): Stream<R> {
       return new Stream<R>(new CombineProducer<R>(project, streams));
     };
 
   static from<T>(array: Array<T>): Stream<T> {
-    const fromProducer = new FromProducer(array);
-    return new Stream<T>(fromProducer);
+    return new Stream<T>(new FromProducer(array));
   }
 
   static merge<T>(...streams: Array<Stream<T>>): Stream<T> {
-    const mergeProducer = new MergeProducer(streams);
-    return new Stream<T>(mergeProducer);
+    return new Stream<T>(new MergeProducer(streams));
   }
 
   static interval(period: number): Stream<number> {
-    const intervalProducer = new IntervalProducer(period);
-    return new Stream<number>(intervalProducer);
+    return new Stream<number>(new IntervalProducer(period));
   }
 
   static domEvent(node: EventTarget,
@@ -117,45 +114,45 @@ export class Stream<T> implements Observer<T> {
   }
 
   map<U>(project: (t: T) => U): Stream<U> {
-    return new Stream<U>(new MapProducer(project, this));
+    return new Stream<U>(new MapOperator(project, this));
   }
 
   filter(predicate: (t: T) => boolean): Stream<T> {
-    return new Stream<T>(new FilterProducer(predicate, this));
+    return new Stream<T>(new FilterOperator(predicate, this));
   }
 
   take(amount: number): Stream<T> {
-    return new Stream<T>(new TakeProducer(amount, this));
+    return new Stream<T>(new TakeOperator(amount, this));
   }
 
   skip(amount: number): Stream<T> {
-    return new Stream<T>(new SkipProducer(amount, this));
+    return new Stream<T>(new SkipOperator(amount, this));
   }
 
   debug(spy: (t: T) => void = null): Stream<T> {
-    return new Stream<T>(new DebugProducer(spy, this));
+    return new Stream<T>(new DebugOperator(spy, this));
   }
 
   fold<R>(accumulate: (acc: R, t: T) => R, init: R): Stream<R> {
-    return new Stream<R>(new FoldProducer(accumulate, init, this));
+    return new Stream<R>(new FoldOperator(accumulate, init, this));
   }
 
   last(): Stream<T> {
-    return new Stream<T>(new LastProducer(this));
+    return new Stream<T>(new LastOperator(this));
   }
 
   remember(): Stream<T> {
-    return new Stream<T>(new RememberProducer(this));
+    return new Stream<T>(new RememberOperator(this));
   }
 
   merge(other: Stream<T>): Stream<T> {
     return Stream.merge(this, other);
   }
 
-  combine: InstanceCombineSignature<T> =
-    function combine<R>(project: ProjectFunction,
+  combine: CombineInstanceSignature<T> =
+    function combine<R>(project: CombineProjectFunction,
                         ...streams: Array<Stream<any>>): Stream<R> {
       streams.unshift(this);
-      return new Stream<R>(new CombineProducer<R>(project, streams));
+      return Stream.combine(project, ...streams);
     };
 }

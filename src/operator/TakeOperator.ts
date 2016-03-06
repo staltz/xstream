@@ -1,15 +1,22 @@
 import {Observer} from '../Observer';
-import {Producer} from '../Producer';
+import {Operator} from '../Operator';
 import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
 export class Proxy<T> implements Observer<T> {
   constructor(public out: Stream<T>,
-              public prod: SkipProducer<T>) {
+              public prod: TakeOperator<T>) {
   }
 
   next(t: T) {
-    if (this.prod.skipped++ >= this.prod.max) this.out.next(t);
+    const {prod, out} = this;
+    if (prod.taken++ < prod.max - 1) {
+      out.next(t);
+    } else {
+      out.next(t);
+      out.end();
+      prod.stop();
+    }
   }
 
   error(err: any) {
@@ -21,9 +28,9 @@ export class Proxy<T> implements Observer<T> {
   }
 }
 
-export class SkipProducer<T> implements Producer<T> {
+export class TakeOperator<T> implements Operator<T, T> {
   public proxy: Observer<T> = emptyObserver;
-  public skipped: number = 0;
+  public taken: number = 0;
 
   constructor(public max: number,
               public ins: Stream<T>) {

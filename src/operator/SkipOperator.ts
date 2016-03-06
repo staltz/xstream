@@ -1,15 +1,15 @@
 import {Observer} from '../Observer';
-import {Producer} from '../Producer';
+import {Operator} from '../Operator';
 import {Stream} from '../Stream';
 import {emptyObserver} from '../utils/emptyObserver';
 
 export class Proxy<T> implements Observer<T> {
   constructor(public out: Stream<T>,
-              public p: FilterProducer<T>) {
+              public prod: SkipOperator<T>) {
   }
 
   next(t: T) {
-    if (this.p.predicate(t)) this.out.next(t);
+    if (this.prod.skipped++ >= this.prod.max) this.out.next(t);
   }
 
   error(err: any) {
@@ -21,10 +21,11 @@ export class Proxy<T> implements Observer<T> {
   }
 }
 
-export class FilterProducer<T> implements Producer<T> {
+export class SkipOperator<T> implements Operator<T, T> {
   public proxy: Observer<T> = emptyObserver;
+  public skipped: number = 0;
 
-  constructor(public predicate: (t: T) => boolean,
+  constructor(public max: number,
               public ins: Stream<T>) {
   }
 
