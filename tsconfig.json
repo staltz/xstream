@@ -7,7 +7,7 @@
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true,
     "module": "commonjs",
-    "noEmitHelpers": true,
+    "noEmitHelpers": false,
     "target": "ES5",
     "outDir": "lib/"
   },
