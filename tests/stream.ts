@@ -48,6 +48,8 @@ describe('Stream', () => {
     assert.equal(typeof stream.debug, 'function');
     assert.equal(typeof stream.fold, 'function');
     assert.equal(typeof stream.last, 'function');
+    assert.equal(typeof stream.remember, 'function');
+    assert.equal(typeof stream.startWith, 'function');
   });
 
   it('should be subscribeable and unsubscribeable with one observer', (done) => {

@@ -92,6 +92,10 @@ export class Stream<T> implements Observer<T> {
       return new Stream<R>(new CombineProducer<R>(project, streams));
     };
 
+  static Stream<T>(): Stream<T> {
+    return new Stream<T>({start: noop, stop: noop});
+  }
+
   static MemoryStream<T>(): MemoryStream<T> {
     return new MemoryStream<T>({start: noop, stop: noop});
   }
