@@ -18,11 +18,11 @@ import {FromProducer} from './factory/FromProducer';
 import {IntervalProducer} from './factory/IntervalProducer';
 import {MergeProducer} from './factory/MergeProducer';
 import {empty} from './utils/empty';
+import {noop} from './utils/noop';
 
 export class Stream<T> implements Observer<T> {
   public _observers: Array<Observer<T>>;
   public _stopID: any = empty;
-  public _val: any; // For RememberProducer only
   public _prod: Producer<T>;
 
   constructor(producer: Producer<T>) {
@@ -74,9 +74,6 @@ export class Stream<T> implements Observer<T> {
       }
       this._prod.start(this);
     }
-    if (this._val) {
-      observer.next(this._val);
-    }
   }
 
   unsubscribe(observer: Observer<T>): void {
@@ -94,6 +91,10 @@ export class Stream<T> implements Observer<T> {
                         ...streams: Array<Stream<any>>): Stream<R> {
       return new Stream<R>(new CombineProducer<R>(project, streams));
     };
+
+  static MemoryStream<T>(): MemoryStream<T> {
+    return new MemoryStream<T>({start: noop, stop: noop});
+  }
 
   static from<T>(array: Array<T>): Stream<T> {
     return new Stream<T>(new FromProducer(array));
@@ -142,7 +143,7 @@ export class Stream<T> implements Observer<T> {
   }
 
   remember(): Stream<T> {
-    return new Stream<T>(new RememberOperator(this));
+    return new MemoryStream<T>(new RememberOperator(this));
   }
 
   merge(other: Stream<T>): Stream<T> {
@@ -155,4 +156,21 @@ export class Stream<T> implements Observer<T> {
       streams.unshift(this);
       return Stream.combine(project, ...streams);
     };
+}
+
+export class MemoryStream<T> extends Stream<T> implements Observer<T> {
+  public _val: any;
+  constructor(producer: Producer<T>) {
+    super(producer);
+  }
+
+  next(x: T) {
+    this._val = x;
+    super.next(x);
+  }
+
+  subscribe(observer: Observer<T>): void {
+    super.subscribe(observer);
+    if (this._val) { observer.next(this._val); }
+  }
 }
