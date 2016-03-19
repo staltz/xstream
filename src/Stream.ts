@@ -8,6 +8,7 @@ import {DebugOperator} from './operator/DebugOperator';
 import {FoldOperator} from './operator/FoldOperator';
 import {LastOperator} from './operator/LastOperator';
 import {RememberOperator} from './operator/RememberOperator';
+import {StartWithOperator} from './operator/StartWithOperator';
 import {
   CombineProducer,
   CombineInstanceSignature,
@@ -92,10 +93,6 @@ export class Stream<T> implements Observer<T> {
       return new Stream<R>(new CombineProducer<R>(project, streams));
     };
 
-  static Stream<T>(): Stream<T> {
-    return new Stream<T>({start: noop, stop: noop});
-  }
-
   static MemoryStream<T>(): MemoryStream<T> {
     return new MemoryStream<T>({start: noop, stop: noop});
   }
@@ -148,6 +145,10 @@ export class Stream<T> implements Observer<T> {
 
   remember(): Stream<T> {
     return new MemoryStream<T>(new RememberOperator(this));
+  }
+
+  startWith(x: T): Stream<T> {
+    return new Stream<T>(new StartWithOperator(this, x));
   }
 
   merge(other: Stream<T>): Stream<T> {
