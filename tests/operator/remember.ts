@@ -22,4 +22,20 @@ describe('Stream.prototype.remember', () => {
       });
     }, 125);
   });
+
+  it('should allow use like a subject', (done) => {
+    const stream = xs.MemoryStream()
+
+    stream.next(1);
+
+    stream.subscribe({
+      next(x: any) {
+        assert.strictEqual(x, 1);
+      },
+      error: done.fail,
+      end: done,
+    });
+
+    stream.end();
+  });
 });
