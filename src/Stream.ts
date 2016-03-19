@@ -9,6 +9,7 @@ import {FoldOperator} from './operator/FoldOperator';
 import {LastOperator} from './operator/LastOperator';
 import {RememberOperator} from './operator/RememberOperator';
 import {StartWithOperator} from './operator/StartWithOperator';
+import {TakeUntilOperator} from './operator/TakeUntilOperator';
 import {
   CombineProducer,
   CombineInstanceSignature,
@@ -149,6 +150,10 @@ export class Stream<T> implements Observer<T> {
 
   startWith(x: T): Stream<T> {
     return new Stream<T>(new StartWithOperator(this, x));
+  }
+
+  takeUntil<T>(s: Stream<any>): Stream<T> {
+    return new Stream<T>(new TakeUntilOperator(this, s));
   }
 
   merge(other: Stream<T>): Stream<T> {
