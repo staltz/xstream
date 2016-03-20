@@ -7,7 +7,6 @@ import {SkipOperator} from './operator/SkipOperator';
 import {DebugOperator} from './operator/DebugOperator';
 import {FoldOperator} from './operator/FoldOperator';
 import {LastOperator} from './operator/LastOperator';
-import {RememberOperator} from './operator/RememberOperator';
 import {StartWithOperator} from './operator/StartWithOperator';
 import {
   CombineProducer,
@@ -144,7 +143,7 @@ export class Stream<T> implements Observer<T> {
   }
 
   remember(): Stream<T> {
-    return new MemoryStream<T>(new RememberOperator(this));
+    return new MemoryStream<T>(this._prod);
   }
 
   startWith(x: T): Stream<T> {
@@ -163,7 +162,7 @@ export class Stream<T> implements Observer<T> {
     };
 }
 
-export class MemoryStream<T> extends Stream<T> implements Observer<T> {
+export class MemoryStream<T> extends Stream<T> {
   public _val: any;
   constructor(producer: Producer<T>) {
     super(producer);
