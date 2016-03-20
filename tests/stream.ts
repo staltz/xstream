@@ -91,7 +91,7 @@ describe('Stream', () => {
       end: done.fail,
     };
     setTimeout(() => {
-      stream.subscribe(observer2)
+      stream.subscribe(observer2);
     }, 150);
 
     setTimeout(() => {
