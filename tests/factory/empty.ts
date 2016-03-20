@@ -5,8 +5,8 @@ describe('xs.empty()', function() {
     const stream = xs.empty();
 
     stream.subscribe({
-      next: done,
-      error: done,
+      next: () => done(new Error('This should not be called')),
+      error: () => done(new Error('This should not be called')),
       end: done,
     });
   });
