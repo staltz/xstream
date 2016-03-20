@@ -114,6 +114,17 @@ export class Stream<T> implements Observer<T> {
     return new Stream<Event>(new EventProducer(node, eventType, useCapture));
   }
 
+  static never(): Stream<void> {
+    return new Stream<void>({start: noop, stop: noop});
+  }
+
+  static empty(): Stream<void> {
+    return new Stream<void>({
+      start(obs: Observer<void>) { obs.end(); },
+      stop: noop,
+    });
+  }
+
   map<U>(project: (t: T) => U): Stream<U> {
     return new Stream<U>(new MapOperator(project, this));
   }
