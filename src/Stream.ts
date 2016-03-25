@@ -101,6 +101,10 @@ export class Stream<T> implements Observer<T> {
     return new Stream<T>(new FromProducer(array));
   }
 
+  static of<T>(...items: Array<T>): Stream<T> {
+    return Stream.from(items);
+  }
+
   static merge<T>(...streams: Array<Stream<T>>): Stream<T> {
     return new Stream<T>(new MergeProducer(streams));
   }
