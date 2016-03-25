@@ -9,13 +9,13 @@ describe('Stream.prototype.map', () => {
       next: (x: number) => {
         assert.equal(x, expected.shift());
         if (expected.length === 0) {
-          stream.unsubscribe(observer);
+          stream.removeListener(observer);
           done();
         }
       },
       error: done.fail,
       end: done.fail,
     };
-    stream.subscribe(observer);
+    stream.addListener(observer);
   });
 });

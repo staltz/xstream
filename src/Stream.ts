@@ -66,7 +66,7 @@ export class Stream<T> implements Observer<T> {
     this._observers = [];
   }
 
-  subscribe(observer: Observer<T>): void {
+  addListener(observer: Observer<T>): void {
     this._observers.push(observer);
     if (this._observers.length === 1) {
       if (this._stopID !== empty) {
@@ -77,7 +77,7 @@ export class Stream<T> implements Observer<T> {
     }
   }
 
-  unsubscribe(observer: Observer<T>): void {
+  removeListener(observer: Observer<T>): void {
     const i = this._observers.indexOf(observer);
     if (i > -1) {
       this._observers.splice(i, 1);
@@ -193,8 +193,8 @@ export class MemoryStream<T> extends Stream<T> {
     super.next(x);
   }
 
-  subscribe(observer: Observer<T>): void {
-    super.subscribe(observer);
+  addListener(observer: Observer<T>): void {
+    super.addListener(observer);
     if (this._val) { observer.next(this._val); }
   }
 }

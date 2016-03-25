@@ -12,10 +12,10 @@ describe('Stream.prototype.take', () => {
       error: done.fail,
       end: () => {
         assert.equal(expected.length, 0);
-        stream.unsubscribe(observer);
+        stream.removeListener(observer);
         done();
       },
     };
-    stream.subscribe(observer);
+    stream.addListener(observer);
   });
 });

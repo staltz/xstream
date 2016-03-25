@@ -10,7 +10,7 @@ describe('xs.never()', () => {
       end: () => done(new Error('This should not be called')),
     };
 
-    stream.subscribe(observer);
-    setTimeout(function() { stream.unsubscribe(observer); done(); }, 1000);
+    stream.addListener(observer);
+    setTimeout(function() { stream.removeListener(observer); done(); }, 1000);
   });
 });

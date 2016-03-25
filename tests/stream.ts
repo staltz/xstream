@@ -22,7 +22,7 @@ describe('Stream', () => {
     };
 
     const stream: Stream<number> = new Stream(producer);
-    stream.subscribe({
+    stream.addListener({
       next: (x: number) => {
         assert.equal(x, expected.shift());
       },
@@ -33,14 +33,14 @@ describe('Stream', () => {
     });
   });
 
-  it('should have all the core operators as methods, plus subscribe and unsubscribe', () => {
+  it('should have all the core operators as methods, plus addListener and removeListener', () => {
     const emptyProducer = {
       start(): void { return undefined; },
       stop(): void { return undefined; },
     };
     const stream = new Stream(emptyProducer);
-    assert.equal(typeof stream.subscribe, 'function');
-    assert.equal(typeof stream.unsubscribe, 'function');
+    assert.equal(typeof stream.addListener, 'function');
+    assert.equal(typeof stream.removeListener, 'function');
     assert.equal(typeof stream.map, 'function');
     assert.equal(typeof stream.filter, 'function');
     assert.equal(typeof stream.take, 'function');
@@ -52,21 +52,21 @@ describe('Stream', () => {
     assert.equal(typeof stream.startWith, 'function');
   });
 
-  it('should be subscribeable and unsubscribeable with one observer', (done) => {
+  it('should be addListenerable and removeListenerable with one observer', (done) => {
     const stream = xs.interval(100);
     const expected = [0, 1, 2];
     let observer = {
       next: (x: number) => {
         assert.equal(x, expected.shift());
         if (expected.length === 0) {
-          stream.unsubscribe(observer);
+          stream.removeListener(observer);
           done();
         }
       },
       error: done.fail,
       end: done.fail,
     };
-    stream.subscribe(observer);
+    stream.addListener(observer);
   });
 
   it('should broadcast events to two observers', (done) => {
@@ -81,7 +81,7 @@ describe('Stream', () => {
       error: done.fail,
       end: done.fail,
     };
-    stream.subscribe(observer1);
+    stream.addListener(observer1);
 
     let observer2 = {
       next: (x: number) => {
@@ -91,63 +91,63 @@ describe('Stream', () => {
       end: done.fail,
     };
     setTimeout(() => {
-      stream.subscribe(observer2);
+      stream.addListener(observer2);
     }, 150);
 
     setTimeout(() => {
-      stream.unsubscribe(observer1);
-      stream.unsubscribe(observer2);
+      stream.removeListener(observer1);
+      stream.removeListener(observer2);
       assert.equal(expected1.length, 0);
       assert.equal(expected2.length, 0);
       done();
     }, 400);
   });
 
-  it('should not stop if unsubscribed and re-subscribed synchronously', (done) => {
+  it('should not stop if removeListenerd and re-addListenerd synchronously', (done) => {
     const stream = xs.interval(100);
     const expected = [0, 1, 2];
     let observer = {
       next: (x: number) => {
         assert.equal(x, expected.shift());
         if (expected.length === 0) {
-          stream.unsubscribe(observer);
+          stream.removeListener(observer);
           done();
         }
       },
       error: done.fail,
       end: done.fail,
     };
-    stream.subscribe(observer);
+    stream.addListener(observer);
 
     setTimeout(() => {
-      stream.unsubscribe(observer);
-      stream.subscribe(observer);
+      stream.removeListener(observer);
+      stream.addListener(observer);
     }, 150);
   });
 
-  it('should restart if unsubscribed and re-subscribed asynchronously', (done) => {
+  it('should restart if removeListenerd and re-addListenerd asynchronously', (done) => {
     const stream = xs.interval(100);
     let expected = [0, 1, 2];
     let observer = {
       next: (x: number) => {
         assert.equal(x, expected.shift());
         if (expected.length === 0) {
-          stream.unsubscribe(observer);
+          stream.removeListener(observer);
           done();
         }
       },
       error: done.fail,
       end: done.fail,
     };
-    stream.subscribe(observer);
+    stream.addListener(observer);
 
     setTimeout(() => {
-      stream.unsubscribe(observer);
+      stream.removeListener(observer);
     }, 130);
     setTimeout(() => {
       assert.equal(expected.length, 2);
       expected = [0, 1, 2];
-      stream.subscribe(observer);
+      stream.addListener(observer);
     }, 180);
   });
 });

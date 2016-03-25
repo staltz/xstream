@@ -29,10 +29,10 @@ export class MapOperator<T, R> implements Operator<T, R> {
   }
 
   start(out: Stream<R>): void {
-    this.ins.subscribe(this.proxy = new Proxy(out, this));
+    this.ins.addListener(this.proxy = new Proxy(out, this));
   }
 
   stop(): void {
-    this.ins.unsubscribe(this.proxy);
+    this.ins.removeListener(this.proxy);
   }
 }

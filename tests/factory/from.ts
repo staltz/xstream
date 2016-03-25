@@ -16,6 +16,6 @@ describe('xs.from', () => {
         done();
       },
     };
-    stream.subscribe(observer);
+    stream.addListener(observer);
   });
 });

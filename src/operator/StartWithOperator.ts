@@ -11,10 +11,10 @@ export class StartWithOperator<T> implements Operator<T, T> {
   start(out: Observer<T>): void {
     this.out = out;
     this.out.next(this.value);
-    this.ins.subscribe(out);
+    this.ins.addListener(out);
   }
 
   stop(): void {
-    this.ins.unsubscribe(this.out);
+    this.ins.removeListener(this.out);
   }
 }

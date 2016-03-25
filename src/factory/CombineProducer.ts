@@ -114,13 +114,13 @@ export class CombineProducer<R> implements Producer<R> {
   start(out: Observer<R>): void {
     this.out = out;
     for (let i = this.streams.length - 1; i >= 0; i--) {
-      this.streams[i].subscribe(new Proxy(i, this));
+      this.streams[i].addListener(new Proxy(i, this));
     }
   }
 
   stop(): void {
     for (let i = this.streams.length - 1; i >= 0; i--) {
-      this.streams[i].unsubscribe(this.proxies[i]);
+      this.streams[i].removeListener(this.proxies[i]);
     }
     this.proxies = [];
   }

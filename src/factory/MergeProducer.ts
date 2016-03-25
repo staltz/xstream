@@ -36,13 +36,13 @@ export class MergeProducer<T> implements Producer<T> {
     this.out = out;
     this.proxy = new Proxy(this);
     for (let i = this.streams.length - 1; i >= 0; i--) {
-      this.streams[i].subscribe(this.proxy);
+      this.streams[i].addListener(this.proxy);
     }
   }
 
   stop(): void {
     for (let i = this.streams.length - 1; i >= 0; i--) {
-      this.streams[i].unsubscribe(this.proxy);
+      this.streams[i].removeListener(this.proxy);
     }
   }
 }

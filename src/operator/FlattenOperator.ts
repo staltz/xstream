@@ -28,7 +28,7 @@ export class Outer<T> implements Observer<Stream<T>> {
   }
 
   next(s: Stream<T>) {
-    s.subscribe(new Inner(this.out, this.op));
+    s.addListener(new Inner(this.out, this.op));
   }
 
   error(err: any) {
@@ -48,7 +48,7 @@ export class MapOuter<T> implements Observer<T> {
 
   next(v: T) {
     this.op.active++;
-    this.pr(v).subscribe(new Inner(this.out, this.op));
+    this.pr(v).addListener(new Inner(this.out, this.op));
   }
 
   error(err: any) {
@@ -76,14 +76,14 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
     this.out = out;
     const mapOp = this.mapOp;
     if (mapOp) {
-      mapOp.ins.subscribe(this.proxy = new MapOuter(out, mapOp.project, this));
+      mapOp.ins.addListener(this.proxy = new MapOuter(out, mapOp.project, this));
     } else {
-      this.ins.subscribe(this.proxy = new Outer(out, this));
+      this.ins.addListener(this.proxy = new Outer(out, this));
     }
   }
 
   stop(): void {
-    this.ins.unsubscribe(this.proxy);
+    this.ins.removeListener(this.proxy);
   }
 
   less(): void {

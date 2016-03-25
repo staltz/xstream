@@ -12,14 +12,14 @@ describe('Stream.prototype.flatten', () => {
         next: (x: number) => {
           assert.equal(x, expected.shift());
           if (expected.length === 0) {
-            stream.unsubscribe(observer);
+            stream.removeListener(observer);
             done();
           }
         },
         error: done.fail,
         end: done.fail,
       };
-      stream.subscribe(observer);
+      stream.addListener(observer);
     });
 
     it('should expand 3 sync events as an interval each', (done) => {
@@ -35,14 +35,14 @@ describe('Stream.prototype.flatten', () => {
         next: (x: number) => {
           assert.equal(x, expected.shift());
           if (expected.length === 0) {
-            stream.unsubscribe(observer);
+            stream.removeListener(observer);
             done();
           }
         },
         error: (err: any) => done(err),
         end: () => done(new Error('No end() should be called')),
       };
-      stream.subscribe(observer);
+      stream.addListener(observer);
     });
   });
 });

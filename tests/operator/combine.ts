@@ -7,7 +7,7 @@ describe('Stream.prototype.combine', () => {
     const other = xs.interval(120).take(2);
     const stream = source.combine((x, y) => `${x}${y}`, other);
     let expected = ['00', '10', '11'];
-    stream.subscribe({
+    stream.addListener({
       next: (x) => {
         assert.equal(x, expected.shift());
       },
@@ -24,7 +24,7 @@ describe('Stream.prototype.combine', () => {
     const other = xs.interval(50).take(4);
     const stream = source.combine((x, y) => `${x}${y}`, other);
     let expected = ['00', '01', '02', '03'];
-    stream.subscribe({
+    stream.addListener({
       next: (x) => {
         assert.equal(x, expected.shift());
       },

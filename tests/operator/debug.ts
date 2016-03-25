@@ -11,13 +11,13 @@ describe('Stream.prototype.debug', () => {
       next: (x: number) => {
         if (x === 2) {
           assert.equal(expected.length, 0);
-          stream.unsubscribe(observer);
+          stream.removeListener(observer);
           done();
         }
       },
       error: done.fail,
       end: done.fail,
     };
-    stream.subscribe(observer);
+    stream.addListener(observer);
   });
 });

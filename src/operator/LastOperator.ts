@@ -40,10 +40,10 @@ export class LastOperator<T> implements Operator<T, T> {
   }
 
   start(out: Stream<T>): void {
-    this.ins.subscribe(this.proxy = new Proxy(out, this));
+    this.ins.addListener(this.proxy = new Proxy(out, this));
   }
 
   stop(): void {
-    this.ins.unsubscribe(this.proxy);
+    this.ins.removeListener(this.proxy);
   }
 }

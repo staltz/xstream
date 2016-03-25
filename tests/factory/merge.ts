@@ -8,7 +8,7 @@ describe('xs.merge', () => {
       xs.interval(120).take(2)
     );
     let expected = [0, 0, 1, 1];
-    stream.subscribe({
+    stream.addListener({
       next: (x) => {
         assert.equal(x, expected.shift());
       },
@@ -25,7 +25,7 @@ describe('xs.merge', () => {
     const stream2 = xs.interval(50).take(4);
     const stream = xs.merge(stream1, stream2);
     let expected = [0, 0, 1, 2, 3];
-    stream.subscribe({
+    stream.addListener({
       next: (x) => {
         assert.equal(x, expected.shift());
       },

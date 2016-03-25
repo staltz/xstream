@@ -40,7 +40,7 @@ describe('xs.domEvent', () => {
     const target = new FakeEventTarget();
     const stream = xs.domEvent(target, 'test', true);
 
-    stream.subscribe({next: () => {}, error: () => {}, end: () => {}});
+    stream.addListener({next: () => {}, error: () => {}, end: () => {}});
 
     assert.strictEqual('test', target.event);
     assert.strictEqual(true, target.capture);
@@ -50,7 +50,7 @@ describe('xs.domEvent', () => {
     const target = new FakeEventTarget();
     const stream = xs.domEvent(target, 'test');
 
-    stream.subscribe({next: () => {}, error: () => {}, end: () => {}});
+    stream.addListener({next: () => {}, error: () => {}, end: () => {}});
 
     assert.strictEqual('test', target.event);
     assert.strictEqual(false, target.capture);
@@ -73,7 +73,7 @@ describe('xs.domEvent', () => {
       }
     };
 
-    stream.subscribe(observer);
+    stream.addListener(observer);
 
     target.emit(1);
     target.emit(2);
@@ -85,7 +85,7 @@ describe('xs.domEvent', () => {
     const target = new FakeEventTarget();
     const stream = xs.domEvent(target, 'test', true);
 
-    stream.take(1).subscribe({
+    stream.take(1).addListener({
       next(x) {},
       error: done.fail,
       end() {

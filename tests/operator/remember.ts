@@ -6,11 +6,11 @@ describe('Stream.prototype.remember', () => {
   it('should replay the second event to a new observer', (done) => {
     const stream = xs.interval(50).take(4).remember();
 
-    stream.subscribe(emptyObserver);
+    stream.addListener(emptyObserver);
 
     let expected = [1, 2, 3];
     setTimeout(() => {
-      stream.subscribe({
+      stream.addListener({
         next(x) {
           assert.strictEqual(x, expected.shift());
         },
@@ -28,7 +28,7 @@ describe('Stream.prototype.remember', () => {
 
     stream.next(1);
 
-    stream.subscribe({
+    stream.addListener({
       next(x: any) {
         assert.strictEqual(x, 1);
       },
