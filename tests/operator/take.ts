@@ -5,17 +5,17 @@ describe('Stream.prototype.take', () => {
   it('should allow specifying max amount to take from input stream', (done) => {
     const stream = xs.interval(50).take(4)
     const expected = [0, 1, 2, 3];
-    let observer = {
+    let listener = {
       next: (x: number) => {
         assert.equal(x, expected.shift());
       },
       error: done.fail,
       end: () => {
         assert.equal(expected.length, 0);
-        stream.removeListener(observer);
+        stream.removeListener(listener);
         done();
       },
     };
-    stream.addListener(observer);
+    stream.addListener(listener);
   });
 });

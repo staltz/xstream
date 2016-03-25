@@ -6,7 +6,7 @@ describe('xs.from', () => {
     const stream = xs.from([10, 20, 30, 40, 50])
       .map(i => String(i));
     let expected = ['10', '20', '30', '40', '50'];
-    let observer = {
+    let listener = {
       next: (x: string) => {
         assert.equal(x, expected.shift());
       },
@@ -16,6 +16,6 @@ describe('xs.from', () => {
         done();
       },
     };
-    stream.addListener(observer);
+    stream.addListener(listener);
   });
 });

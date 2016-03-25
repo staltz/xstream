@@ -22,53 +22,53 @@ import {empty} from './utils/empty';
 import {noop} from './utils/noop';
 
 export class Stream<T> implements Listener<T> {
-  public _observers: Array<Listener<T>>;
+  public _listeners: Array<Listener<T>>;
   public _stopID: any = empty;
   public _prod: Producer<T>;
 
   constructor(producer: Producer<T>) {
     this._prod = producer;
-    this._observers = [];
+    this._listeners = [];
   }
 
   next(x: T): void {
-    const len = this._observers.length;
+    const len = this._listeners.length;
     if (len === 1) {
-      this._observers[0].next(x);
+      this._listeners[0].next(x);
     } else {
       for (let i = 0; i < len; i++) {
-        this._observers[i].next(x);
+        this._listeners[i].next(x);
       }
     }
   }
 
   error(err: any): void {
-    const len = this._observers.length;
+    const len = this._listeners.length;
     if (len === 1) {
-      this._observers[0].error(err);
+      this._listeners[0].error(err);
     } else {
       for (let i = 0; i < len; i++) {
-        this._observers[i].error(err);
+        this._listeners[i].error(err);
       }
     }
   }
 
   end(): void {
-    const len = this._observers.length;
+    const len = this._listeners.length;
     if (len === 1) {
-      this._observers[0].end();
+      this._listeners[0].end();
     } else {
       for (let i = 0; i < len; i++) {
-        this._observers[i].end();
+        this._listeners[i].end();
       }
     }
     this._stopID = setTimeout(() => this._prod.stop());
-    this._observers = [];
+    this._listeners = [];
   }
 
-  addListener(observer: Listener<T>): void {
-    this._observers.push(observer);
-    if (this._observers.length === 1) {
+  addListener(listener: Listener<T>): void {
+    this._listeners.push(listener);
+    if (this._listeners.length === 1) {
       if (this._stopID !== empty) {
         clearTimeout(this._stopID);
         this._stopID = empty;
@@ -77,11 +77,11 @@ export class Stream<T> implements Listener<T> {
     }
   }
 
-  removeListener(observer: Listener<T>): void {
-    const i = this._observers.indexOf(observer);
+  removeListener(listener: Listener<T>): void {
+    const i = this._listeners.indexOf(listener);
     if (i > -1) {
-      this._observers.splice(i, 1);
-      if (this._observers.length <= 0) {
+      this._listeners.splice(i, 1);
+      if (this._listeners.length <= 0) {
         this._stopID = setTimeout(() => this._prod.stop());
       }
     }
@@ -193,8 +193,8 @@ export class MemoryStream<T> extends Stream<T> {
     super.next(x);
   }
 
-  addListener(observer: Listener<T>): void {
-    super.addListener(observer);
-    if (this._val) { observer.next(this._val); }
+  addListener(listener: Listener<T>): void {
+    super.addListener(listener);
+    if (this._val) { listener.next(this._val); }
   }
 }

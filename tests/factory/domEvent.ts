@@ -62,7 +62,7 @@ describe('xs.domEvent', () => {
 
     let expected = [1, 2, 3];
 
-    const observer = {
+    const listener = {
       next(x: any) {
         assert.strictEqual(x, expected.shift());
       },
@@ -73,7 +73,7 @@ describe('xs.domEvent', () => {
       }
     };
 
-    stream.addListener(observer);
+    stream.addListener(listener);
 
     target.emit(1);
     target.emit(2);

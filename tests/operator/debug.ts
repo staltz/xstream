@@ -7,17 +7,17 @@ describe('Stream.prototype.debug', () => {
     const stream = xs.interval(50).debug(x => {
       assert.equal(x, expected.shift());
     });
-    let observer = {
+    let listener = {
       next: (x: number) => {
         if (x === 2) {
           assert.equal(expected.length, 0);
-          stream.removeListener(observer);
+          stream.removeListener(listener);
           done();
         }
       },
       error: done.fail,
       end: done.fail,
     };
-    stream.addListener(observer);
+    stream.addListener(listener);
   });
 });

@@ -5,17 +5,17 @@ describe('Stream.prototype.fold', () => {
   it('should accumulating a value over time', (done) => {
     const stream = xs.interval(50).take(4).fold((x: number, y: number) => x + y, 0);
     const expected = [0, 0, 1, 3, 6];
-    let observer = {
+    let listener = {
       next: (x: number) => {
         assert.equal(x, expected.shift());
       },
       error: done.fail,
       end: () => {
         assert.equal(expected.length, 0);
-        stream.removeListener(observer);
+        stream.removeListener(listener);
         done();
       },
     };
-    stream.addListener(observer);
+    stream.addListener(listener);
   });
 });

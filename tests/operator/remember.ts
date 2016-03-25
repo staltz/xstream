@@ -3,7 +3,7 @@ import {emptyListener} from '../../src/utils/emptyListener';
 import * as assert from 'assert';
 
 describe('Stream.prototype.remember', () => {
-  it('should replay the second event to a new observer', (done) => {
+  it('should replay the second event to a new listener', (done) => {
     const stream = xs.interval(50).take(4).remember();
 
     stream.addListener(emptyListener);

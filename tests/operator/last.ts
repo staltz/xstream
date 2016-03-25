@@ -5,17 +5,17 @@ describe('Stream.prototype.last', () => {
   it('should emit only the last value from a stream', (done) => {
     const expected = [50];
     const stream = xs.from([10, 20, 30, 40, 50]).last();
-    let observer = {
+    let listener = {
       next: (x: number) => {
         assert.equal(x, expected.shift());
       },
       error: done.fail,
       end: () => {
         assert.equal(expected.length, 0);
-        stream.removeListener(observer);
+        stream.removeListener(listener);
         done();
       },
     };
-    stream.addListener(observer);
+    stream.addListener(listener);
   });
 });
