@@ -6,7 +6,7 @@ import {MapOperator} from './MapOperator';
 
 export class Inner<T> implements Listener<T> {
   constructor(public out: Stream<T>,
-              public op: FlattenOperator<T>) {
+              public op: FlattenConcurrentlyOperator<T>) {
   }
 
   next(t: T) {
@@ -24,7 +24,7 @@ export class Inner<T> implements Listener<T> {
 
 export class Outer<T> implements Listener<Stream<T>> {
   constructor(public out: Stream<T>,
-              public op: FlattenOperator<T>) {
+              public op: FlattenConcurrentlyOperator<T>) {
   }
 
   next(s: Stream<T>) {
@@ -43,7 +43,7 @@ export class Outer<T> implements Listener<Stream<T>> {
 export class MapOuter<T> implements Listener<T> {
   constructor(public out: Stream<T>,
               public pr: (t: T) => Stream<T>,
-              public op: FlattenOperator<T>) { // pr = project
+              public op: FlattenConcurrentlyOperator<T>) { // pr = project
   }
 
   next(v: T) {
@@ -60,7 +60,7 @@ export class MapOuter<T> implements Listener<T> {
   }
 }
 
-export class FlattenOperator<T> implements Operator<Stream<T>, T> {
+export class FlattenConcurrentlyOperator<T> implements Operator<Stream<T>, T> {
   public proxy: Listener<T | Stream<T>> = emptyListener;
   public mapOp: MapOperator<T, Stream<T>>;
   public active: number = 1; // number of outers and inners that have not yet ended

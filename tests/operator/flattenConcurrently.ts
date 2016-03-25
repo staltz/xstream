@@ -1,12 +1,12 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
-describe('Stream.prototype.flatten', () => {
+describe('Stream.prototype.flattenConcurrently', () => {
   describe('with map', () => {
     it('should expand each interval event with 3 sync events', (done) => {
       const stream = xs.interval(100).take(3)
       .map(i => xs.from([1 + i, 2 + i, 3 + i]))
-      .flatten();
+      .flattenConcurrently();
       const expected = [1, 2, 3, 2, 3, 4, 3, 4, 5];
       const listener = {
         next: (x: number) => {
@@ -25,8 +25,8 @@ describe('Stream.prototype.flatten', () => {
     it('should expand 3 sync events as an interval each', (done) => {
       const stream = xs.from([0, 1, 2])
         .map(i => xs.interval(100 * i).take(2).map(x => `${i}${x}`))
-        .flatten();
-      // ---|---|---|---|---|---|
+        .flattenConcurrently();
+      // ---x---x---x---x---x---x
       // ---00--01
       // -------10------11
       // -----------20----------21
