@@ -1,4 +1,4 @@
-import xs, {Producer, Observer, Stream} from '../src/index';
+import xs, {Producer, Listener, Stream} from '../src/index';
 import * as assert from 'assert';
 
 describe('Stream', () => {
@@ -7,7 +7,7 @@ describe('Stream', () => {
     let observerGotEnd: boolean = false;
 
     const producer: Producer<number> = {
-      start(observer: Observer<number>) {
+      start(observer: Listener<number>) {
         observer.next(10);
         observer.next(20);
         observer.next(30);

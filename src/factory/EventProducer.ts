@@ -1,5 +1,5 @@
 import {Producer} from '../Producer';
-import {Observer} from '../Observer';
+import {Listener} from '../Listener';
 
 export class EventProducer implements Producer<Event> {
   private listener: EventListener;
@@ -9,7 +9,7 @@ export class EventProducer implements Producer<Event> {
               public useCapture: boolean) {
   }
 
-  start(out: Observer<Event>) {
+  start(out: Listener<Event>) {
     this.listener = (e) => out.next(e);
     const {node, eventType, useCapture} = this;
     node.addEventListener(eventType, this.listener, useCapture);

@@ -1,7 +1,7 @@
-import {Observer} from '../Observer';
+import {Listener} from '../Listener';
 import {Producer} from '../Producer';
 import {Stream} from '../Stream';
-import {emptyObserver} from '../utils/emptyObserver';
+import {emptyListener} from '../utils/emptyListener';
 import {invoke} from '../utils/invoke';
 
 export interface CombineProjectFunction {
@@ -57,7 +57,7 @@ export interface CombineInstanceSignature<T> {
   <R>(project: (...args: Array<any>) => R, ...streams: Array<Stream<any>>): Stream<R>;
 }
 
-export class Proxy<T> implements Observer<T> {
+export class Proxy<T> implements Listener<T> {
   constructor(public i: number, public prod: CombineProducer<T>) {
     prod.proxies.push(this);
   }
@@ -87,7 +87,7 @@ export class Proxy<T> implements Observer<T> {
 }
 
 export class CombineProducer<R> implements Producer<R> {
-  public out: Observer<R> = emptyObserver;
+  public out: Listener<R> = emptyListener;
   public proxies: Array<Proxy<any>> = [];
   public ready: boolean = false;
   public hasVal: Array<boolean>;
@@ -111,7 +111,7 @@ export class CombineProducer<R> implements Producer<R> {
     this.ready = true;
   }
 
-  start(out: Observer<R>): void {
+  start(out: Listener<R>): void {
     this.out = out;
     for (let i = this.streams.length - 1; i >= 0; i--) {
       this.streams[i].addListener(new Proxy(i, this));

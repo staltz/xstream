@@ -1,10 +1,10 @@
-import {Observer} from '../Observer';
+import {Listener} from '../Listener';
 import {Operator} from '../Operator';
 import {Stream} from '../Stream';
-import {emptyObserver} from '../utils/emptyObserver';
+import {emptyListener} from '../utils/emptyListener';
 import {empty} from '../utils/empty';
 
-export class Proxy<T> implements Observer<T> {
+export class Proxy<T> implements Listener<T> {
   constructor(public out: Stream<T>,
               public p: LastOperator<T>) {
   }
@@ -32,7 +32,7 @@ export class Proxy<T> implements Observer<T> {
 }
 
 export class LastOperator<T> implements Operator<T, T> {
-  public proxy: Observer<T> = emptyObserver;
+  public proxy: Listener<T> = emptyListener;
   public has: boolean = false;
   public val: T = <T> empty;
 

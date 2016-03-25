@@ -1,9 +1,9 @@
-import {Observer} from '../Observer';
+import {Listener} from '../Listener';
 import {Operator} from '../Operator';
 import {Stream} from '../Stream';
-import {emptyObserver} from '../utils/emptyObserver';
+import {emptyListener} from '../utils/emptyListener';
 
-export class Proxy<T, R> implements Observer<T> {
+export class Proxy<T, R> implements Listener<T> {
   constructor(public out: Stream<R>,
               public p: MapOperator<T, R>) {
   }
@@ -22,7 +22,7 @@ export class Proxy<T, R> implements Observer<T> {
 }
 
 export class MapOperator<T, R> implements Operator<T, R> {
-  public proxy: Observer<T> = emptyObserver;
+  public proxy: Listener<T> = emptyListener;
 
   constructor(public project: (t: T) => R,
               public ins: Stream<T>) {

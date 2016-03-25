@@ -1,14 +1,14 @@
 import {Stream} from '../Stream';
-import {Observer} from '../Observer';
+import {Listener} from '../Listener';
 import {Operator} from '../Operator';
-import {emptyObserver} from '../utils/emptyObserver';
+import {emptyListener} from '../utils/emptyListener';
 
 export class StartWithOperator<T> implements Operator<T, T> {
-  public out: Observer<T> = emptyObserver;
+  public out: Listener<T> = emptyListener;
   constructor(public ins: Stream<T>, public value: T) {
   }
 
-  start(out: Observer<T>): void {
+  start(out: Listener<T>): void {
     this.out = out;
     this.out.next(this.value);
     this.ins.addListener(out);

@@ -1,10 +1,10 @@
 import {Stream} from './Stream';
 import {Producer} from './Producer';
-import {Observer} from './Observer';
+import {Listener} from './Listener';
 
 export {
   Producer,
-  Observer,
+  Listener,
   Stream,
 };
 

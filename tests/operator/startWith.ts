@@ -1,5 +1,4 @@
 import xs from '../../src/index';
-import {noop} from '../../src/utils/noop';
 import * as assert from 'assert';
 
 describe('Stream.prototype.startWith', () => {
@@ -12,6 +11,6 @@ describe('Stream.prototype.startWith', () => {
       },
       error: done.fail,
       end: done
-    })
-  })
+    });
+  });
 });

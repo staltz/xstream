@@ -1,9 +1,9 @@
 import {Producer} from '../Producer';
-import {Observer} from '../Observer';
+import {Listener} from '../Listener';
 import {Stream} from '../Stream';
-import {emptyObserver} from '../utils/emptyObserver';
+import {emptyListener} from '../utils/emptyListener';
 
-export class Proxy<T> implements Observer<T> {
+export class Proxy<T> implements Listener<T> {
   constructor(public prod: MergeProducer<T>) {
   }
 
@@ -24,7 +24,7 @@ export class Proxy<T> implements Observer<T> {
 }
 
 export class MergeProducer<T> implements Producer<T> {
-  public out: Observer<T> = emptyObserver;
+  public out: Listener<T> = emptyListener;
   public ac: number; // ac is activeCount
   public proxy: Proxy<T>;
 
@@ -32,7 +32,7 @@ export class MergeProducer<T> implements Producer<T> {
     this.ac = streams.length;
   }
 
-  start(out: Observer<T>): void {
+  start(out: Listener<T>): void {
     this.out = out;
     this.proxy = new Proxy(this);
     for (let i = this.streams.length - 1; i >= 0; i--) {

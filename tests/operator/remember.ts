@@ -1,12 +1,12 @@
 import xs from '../../src/index';
-import {emptyObserver} from '../../src/utils/emptyObserver';
+import {emptyListener} from '../../src/utils/emptyListener';
 import * as assert from 'assert';
 
 describe('Stream.prototype.remember', () => {
   it('should replay the second event to a new observer', (done) => {
     const stream = xs.interval(50).take(4).remember();
 
-    stream.addListener(emptyObserver);
+    stream.addListener(emptyListener);
 
     let expected = [1, 2, 3];
     setTimeout(() => {

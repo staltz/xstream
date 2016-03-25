@@ -1,10 +1,10 @@
-import {Observer} from '../Observer';
+import {Listener} from '../Listener';
 import {Operator} from '../Operator';
 import {Stream} from '../Stream';
-import {emptyObserver} from '../utils/emptyObserver';
+import {emptyListener} from '../utils/emptyListener';
 import {MapOperator} from './MapOperator';
 
-export class Inner<T> implements Observer<T> {
+export class Inner<T> implements Listener<T> {
   constructor(public out: Stream<T>,
               public op: FlattenOperator<T>) {
   }
@@ -22,7 +22,7 @@ export class Inner<T> implements Observer<T> {
   }
 }
 
-export class Outer<T> implements Observer<Stream<T>> {
+export class Outer<T> implements Listener<Stream<T>> {
   constructor(public out: Stream<T>,
               public op: FlattenOperator<T>) {
   }
@@ -40,7 +40,7 @@ export class Outer<T> implements Observer<Stream<T>> {
   }
 }
 
-export class MapOuter<T> implements Observer<T> {
+export class MapOuter<T> implements Listener<T> {
   constructor(public out: Stream<T>,
               public pr: (t: T) => Stream<T>,
               public op: FlattenOperator<T>) { // pr = project
@@ -61,7 +61,7 @@ export class MapOuter<T> implements Observer<T> {
 }
 
 export class FlattenOperator<T> implements Operator<Stream<T>, T> {
-  public proxy: Observer<T | Stream<T>> = emptyObserver;
+  public proxy: Listener<T | Stream<T>> = emptyListener;
   public mapOp: MapOperator<T, Stream<T>>;
   public active: number = 1; // number of outers and inners that have not yet ended
   public out: Stream<T>;

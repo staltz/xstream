@@ -1,4 +1,4 @@
-import {Observer} from './Observer';
+import {Listener} from './Listener';
 import {Producer} from './Producer';
 import {MapOperator} from './operator/MapOperator';
 import {FilterOperator} from './operator/FilterOperator';
@@ -21,8 +21,8 @@ import {MergeProducer} from './factory/MergeProducer';
 import {empty} from './utils/empty';
 import {noop} from './utils/noop';
 
-export class Stream<T> implements Observer<T> {
-  public _observers: Array<Observer<T>>;
+export class Stream<T> implements Listener<T> {
+  public _observers: Array<Listener<T>>;
   public _stopID: any = empty;
   public _prod: Producer<T>;
 
@@ -66,7 +66,7 @@ export class Stream<T> implements Observer<T> {
     this._observers = [];
   }
 
-  addListener(observer: Observer<T>): void {
+  addListener(observer: Listener<T>): void {
     this._observers.push(observer);
     if (this._observers.length === 1) {
       if (this._stopID !== empty) {
@@ -77,7 +77,7 @@ export class Stream<T> implements Observer<T> {
     }
   }
 
-  removeListener(observer: Observer<T>): void {
+  removeListener(observer: Listener<T>): void {
     const i = this._observers.indexOf(observer);
     if (i > -1) {
       this._observers.splice(i, 1);
@@ -125,7 +125,7 @@ export class Stream<T> implements Observer<T> {
 
   static empty(): Stream<void> {
     return new Stream<void>({
-      start(obs: Observer<void>) { obs.end(); },
+      start(obs: Listener<void>) { obs.end(); },
       stop: noop,
     });
   }
@@ -193,7 +193,7 @@ export class MemoryStream<T> extends Stream<T> {
     super.next(x);
   }
 
-  addListener(observer: Observer<T>): void {
+  addListener(observer: Listener<T>): void {
     super.addListener(observer);
     if (this._val) { observer.next(this._val); }
   }

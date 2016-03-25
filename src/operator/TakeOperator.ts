@@ -1,9 +1,9 @@
-import {Observer} from '../Observer';
+import {Listener} from '../Listener';
 import {Operator} from '../Operator';
 import {Stream} from '../Stream';
-import {emptyObserver} from '../utils/emptyObserver';
+import {emptyListener} from '../utils/emptyListener';
 
-export class Proxy<T> implements Observer<T> {
+export class Proxy<T> implements Listener<T> {
   constructor(public out: Stream<T>,
               public prod: TakeOperator<T>) {
   }
@@ -29,7 +29,7 @@ export class Proxy<T> implements Observer<T> {
 }
 
 export class TakeOperator<T> implements Operator<T, T> {
-  public proxy: Observer<T> = emptyObserver;
+  public proxy: Listener<T> = emptyListener;
   public taken: number = 0;
 
   constructor(public max: number,

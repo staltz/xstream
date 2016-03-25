@@ -1,5 +1,5 @@
 import {Producer} from '../Producer';
-import {Observer} from '../Observer';
+import {Listener} from '../Listener';
 
 export class IntervalProducer implements Producer<number> {
   on: boolean;
@@ -11,7 +11,7 @@ export class IntervalProducer implements Producer<number> {
     this.i = 0;
   }
 
-  start(stream: Observer<number>): void {
+  start(stream: Listener<number>): void {
     const self = this;
     function intervalHandler() { stream.next(self.i++); }
     this.intervalID = setInterval(intervalHandler, this.period);

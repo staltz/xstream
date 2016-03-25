@@ -1,6 +1,6 @@
-import {Observer} from './Observer';
+import {Listener} from './Listener';
 
 export interface Producer<T> {
-  start: (observer: Observer<T>) => void;
+  start: (observer: Listener<T>) => void;
   stop: () => void;
 }
