@@ -1,10 +1,10 @@
-import {Observer} from '../Observer';
+import {Listener} from '../Listener';
 import {Operator} from '../Operator';
 import {Stream} from '../Stream';
-import {emptyObserver} from '../utils/emptyObserver';
+import {emptyListener} from '../utils/emptyListener';
 import {MapOperator} from './MapOperator';
 
-export class Inner<T> implements Observer<T> {
+export class Inner<T> implements Listener<T> {
   constructor(public out: Stream<T>,
               public op: FlattenOperator<T>) {
   }
@@ -23,14 +23,14 @@ export class Inner<T> implements Observer<T> {
   }
 }
 
-export class Outer<T> implements Observer<Stream<T>> {
+export class Outer<T> implements Listener<Stream<T>> {
   constructor(public out: Stream<T>,
               public op: FlattenOperator<T>) {
   }
 
   next(s: Stream<T>) {
     this.op.cut();
-    (this.op.curr = s).subscribe(this.op.inner = new Inner(this.out, this.op));
+    (this.op.curr = s).addListener(this.op.inner = new Inner(this.out, this.op));
   }
 
   error(err: any) {
@@ -43,7 +43,7 @@ export class Outer<T> implements Observer<Stream<T>> {
   }
 }
 
-export class MapOuter<T> implements Observer<T> {
+export class MapOuter<T> implements Listener<T> {
   constructor(public out: Stream<T>,
               public pr: (t: T) => Stream<T>, // pr = project
               public op: FlattenOperator<T>) {
@@ -51,7 +51,7 @@ export class MapOuter<T> implements Observer<T> {
 
   next(v: T) {
     this.op.cut();
-    (this.op.curr = this.pr(v)).subscribe(this.op.inner = new Inner(this.out, this.op));
+    (this.op.curr = this.pr(v)).addListener(this.op.inner = new Inner(this.out, this.op));
   }
 
   error(err: any) {
@@ -65,10 +65,10 @@ export class MapOuter<T> implements Observer<T> {
 }
 
 export class FlattenOperator<T> implements Operator<Stream<T>, T> {
-  public proxy: Observer<T | Stream<T>> = emptyObserver;
+  public proxy: Listener<T | Stream<T>> = emptyListener;
   public mapOp: MapOperator<T, Stream<T>>;
   public curr: Stream<T>; // Current inner Stream
-  public inner: Observer<T>; // Current inner Observer
+  public inner: Listener<T>; // Current inner Listener
   public open: boolean = true;
   public out: Stream<T>;
 
@@ -82,20 +82,20 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
     this.out = out;
     const mapOp = this.mapOp;
     if (mapOp) {
-      mapOp.ins.subscribe(this.proxy = new MapOuter(out, mapOp.project, this));
+      mapOp.ins.addListener(this.proxy = new MapOuter(out, mapOp.project, this));
     } else {
-      this.ins.subscribe(this.proxy = new Outer(out, this));
+      this.ins.addListener(this.proxy = new Outer(out, this));
     }
   }
 
   stop(): void {
-    this.ins.unsubscribe(this.proxy);
+    this.ins.removeListener(this.proxy);
   }
 
   cut(): void {
     const {curr, inner} = this;
     if (curr && inner) {
-      curr.unsubscribe(inner);
+      curr.removeListener(inner);
     }
   }
 

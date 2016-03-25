@@ -33,6 +33,17 @@ describe('Stream', () => {
     });
   });
 
+  it('should have all the core static operators', () => {
+    assert.equal(typeof Stream.MemoryStream, 'function');
+    assert.equal(typeof Stream.from, 'function');
+    assert.equal(typeof Stream.of, 'function');
+    assert.equal(typeof Stream.merge, 'function');
+    assert.equal(typeof Stream.interval, 'function');
+    assert.equal(typeof Stream.domEvent, 'function');
+    assert.equal(typeof Stream.never, 'function');
+    assert.equal(typeof Stream.empty, 'function');
+  });
+
   it('should have all the core operators as methods, plus addListener and removeListener', () => {
     const emptyProducer = {
       start(): void { return undefined; },
@@ -50,6 +61,10 @@ describe('Stream', () => {
     assert.equal(typeof stream.last, 'function');
     assert.equal(typeof stream.remember, 'function');
     assert.equal(typeof stream.startWith, 'function');
+    assert.equal(typeof stream.flatten, 'function');
+    assert.equal(typeof stream.flattenConcurrently, 'function');
+    assert.equal(typeof stream.merge, 'function');
+    assert.equal(typeof stream.combine, 'function');
   });
 
   it('should be addListenerable and removeListenerable with one listener', (done) => {

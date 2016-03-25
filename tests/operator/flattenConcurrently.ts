@@ -5,7 +5,7 @@ describe('Stream.prototype.flattenConcurrently', () => {
   describe('with map', () => {
     it('should expand each interval event with 3 sync events', (done) => {
       const stream = xs.interval(100).take(3)
-      .map(i => xs.from([1 + i, 2 + i, 3 + i]))
+      .map(i => xs.of(1 + i, 2 + i, 3 + i))
       .flattenConcurrently();
       const expected = [1, 2, 3, 2, 3, 4, 3, 4, 5];
       const listener = {
@@ -23,7 +23,7 @@ describe('Stream.prototype.flattenConcurrently', () => {
     });
 
     it('should expand 3 sync events as an interval each', (done) => {
-      const stream = xs.from([0, 1, 2])
+      const stream = xs.of(0, 1, 2)
         .map(i => xs.interval(100 * i).take(2).map(x => `${i}${x}`))
         .flattenConcurrently();
       // ---x---x---x---x---x---x
@@ -60,14 +60,14 @@ describe('Stream.prototype.flattenConcurrently', () => {
         next: (x: number) => {
           assert.equal(x, expected.shift());
           if (expected.length === 0) {
-            stream.unsubscribe(observer);
+            stream.removeListener(observer);
             done();
           }
         },
         error: (err: any) => done(err),
         end: () => done(new Error('No end() should be called')),
       };
-      stream.subscribe(observer);
+      stream.addListener(observer);
     });
   });
 });
