@@ -8,6 +8,7 @@ import {DebugOperator} from './operator/DebugOperator';
 import {FoldOperator} from './operator/FoldOperator';
 import {LastOperator} from './operator/LastOperator';
 import {StartWithOperator} from './operator/StartWithOperator';
+import {FlattenOperator} from './operator/FlattenOperator';
 import {FlattenConcurrentlyOperator} from './operator/FlattenConcurrentlyOperator';
 import {
   CombineProducer,
@@ -164,6 +165,10 @@ export class Stream<T> implements Listener<T> {
 
   startWith(x: T): Stream<T> {
     return new Stream<T>(new StartWithOperator(this, x));
+  }
+
+  flatten<R, T extends Stream<R>>(): T {
+    return <T> new Stream<R>(new FlattenOperator(<Stream<Stream<R>>> (<any> this)));
   }
 
   flattenConcurrently<R, T extends Stream<R>>(): T {
