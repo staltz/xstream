@@ -56,18 +56,18 @@ describe('Stream.prototype.flattenConcurrently', () => {
       //      ----10--11--12
       //           ------------20-----------21----------22
       const expected = ['00', '01', '10', '02', '11', '12', '20', '21', '22'];
-      const observer = {
+      const listener = {
         next: (x: number) => {
           assert.equal(x, expected.shift());
           if (expected.length === 0) {
-            stream.removeListener(observer);
+            stream.removeListener(listener);
             done();
           }
         },
         error: (err: any) => done(err),
         end: () => done(new Error('No end() should be called')),
       };
-      stream.addListener(observer);
+      stream.addListener(listener);
     });
   });
 });

@@ -8,18 +8,18 @@ describe('Stream.prototype.flatten', () => {
       .map(i => xs.of(1 + i, 2 + i, 3 + i))
       .flatten();
       const expected = [1, 2, 3, 2, 3, 4, 3, 4, 5];
-      const observer = {
+      const listener = {
         next: (x: number) => {
           assert.equal(x, expected.shift());
           if (expected.length === 0) {
-            stream.removeListener(observer);
+            stream.removeListener(listener);
             done();
           }
         },
         error: done.fail,
         end: done.fail,
       };
-      stream.addListener(observer);
+      stream.addListener(listener);
     });
 
     it('should expand 3 sync events as an interval, only last one passes', (done) => {
@@ -31,18 +31,18 @@ describe('Stream.prototype.flatten', () => {
       // -------10------11
       // -----------20----------21
       const expected = ['20', '21'];
-      const observer = {
+      const listener = {
         next: (x: number) => {
           assert.equal(x, expected.shift());
           if (expected.length === 0) {
-            stream.removeListener(observer);
+            stream.removeListener(listener);
             done();
           }
         },
         error: (err: any) => done(err),
         end: () => done(new Error('No end() should be called')),
       };
-      stream.addListener(observer);
+      stream.addListener(listener);
     });
 
     it('should expand 3 async events as an interval each', (done) => {
@@ -56,18 +56,18 @@ describe('Stream.prototype.flatten', () => {
       //      ----10--11--12
       //           ------------20-----------21----------22
       const expected = ['00', '10', '20', '21', '22'];
-      const observer = {
+      const listener = {
         next: (x: number) => {
           assert.equal(x, expected.shift());
           if (expected.length === 0) {
-            stream.removeListener(observer);
+            stream.removeListener(listener);
             done();
           }
         },
         error: (err: any) => done(err),
         end: () => done(new Error('No end() should be called')),
       };
-      stream.addListener(observer);
+      stream.addListener(listener);
     });
   });
 });

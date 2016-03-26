@@ -67,7 +67,7 @@ describe('Stream', () => {
     assert.equal(typeof stream.combine, 'function');
   });
 
-  it('should be addListenerable and removeListenerable with one listener', (done) => {
+  it('should be possible to addListener and removeListener with 1 listener', (done) => {
     const stream = xs.interval(100);
     const expected = [0, 1, 2];
     let listener = {
@@ -118,7 +118,7 @@ describe('Stream', () => {
     }, 400);
   });
 
-  it('should not stop if removeListenerd and re-addListenerd synchronously', (done) => {
+  it('should not stop if listener is synchronously removed and re-added', (done) => {
     const stream = xs.interval(100);
     const expected = [0, 1, 2];
     let listener = {
@@ -140,7 +140,7 @@ describe('Stream', () => {
     }, 150);
   });
 
-  it('should restart if removeListenerd and re-addListenerd asynchronously', (done) => {
+  it('should restart if listener is asynchronously removed and re-added', (done) => {
     const stream = xs.interval(100);
     let expected = [0, 1, 2];
     let listener = {
