@@ -50,11 +50,11 @@ function logResults(e) {
 
 function logStart() {
   console.log(this.name);
-  console.log('-------------------------------------------------------');
+  console.log('-----------------------------------------------');
 }
 
 function logComplete() {
-  console.log('-------------------------------------------------------');
+  console.log('-----------------------------------------------');
 }
 
 function runSuite(suite) {

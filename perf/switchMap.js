@@ -34,7 +34,7 @@ function buildArray(base, n) {
   return a;
 }
 
-var suite = Benchmark.Suite('flatMap ' + mn[0] + ' x ' + mn[1] + ' streams');
+var suite = Benchmark.Suite('switchMap ' + mn[0] + ' x ' + mn[1] + ' streams');
 var options = {
   defer: true,
   onError: function(e) {
@@ -45,34 +45,27 @@ var options = {
 suite
   .add('xstream', function(deferred) {
     runners.runXStream(deferred,
-      xs.from(a).map(xs.from).flattenConcurrently().fold(sum, 0).last());
+      xs.from(a).map(xs.from).flatten().fold(sum, 0).last());
   }, options)
   .add('most', function(deferred) {
-    runners.runMost(deferred, most.from(a).flatMap(most.from).reduce(sum, 0));
+    runners.runMost(deferred, most.from(a).map(most.from).switch().reduce(sum, 0));
   }, options)
   .add('rx 5', function(deferred) {
     runners.runRx5(deferred,
-      rxjs.Observable.fromArray(a).flatMap(
+      rxjs.Observable.fromArray(a).switchMap(
         function(x) {return rxjs.Observable.fromArray(x)}).reduce(sum, 0))
   }, options)
   .add('rx 4', function(deferred) {
-    runners.runRx(deferred, rx.Observable.fromArray(a).flatMap(rx.Observable.fromArray).reduce(sum, 0));
+    runners.runRx(deferred,
+      rx.Observable.fromArray(a).flatMapLatest(
+        function(x) {return rx.Observable.fromArray(x)}).reduce(sum, 0));
   }, options)
   .add('kefir', function(deferred) {
-    runners.runKefir(deferred, kefirFromArray(a).flatMap(kefirFromArray).scan(sum, 0).last());
+    runners.runKefir(deferred, kefirFromArray(a).flatMapLatest(kefirFromArray).scan(sum, 0).last());
   }, options)
   .add('bacon', function(deferred) {
-    runners.runBacon(deferred, bacon.fromArray(a).flatMap(bacon.fromArray).reduce(0, sum));
-  }, options)
-  .add('highland', function(deferred) {
-    runners.runHighland(deferred, highland(a).flatMap(highland).reduce(0, sum));
-  }, options)
-  .add('lodash', function() {
-    return lodashFlatMap(identity, a).reduce(sum, 0);
-  })
-  .add('Array', function() {
-    return arrayFlatMap(identity, a).reduce(sum, 0);
-  });
+    runners.runBacon(deferred, bacon.fromArray(a).flatMapLatest(bacon.fromArray).reduce(0, sum));
+  }, options);
 
 runners.runSuite(suite);
 
