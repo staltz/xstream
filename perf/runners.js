@@ -101,7 +101,7 @@ function runRx5(deferred, rxStream) {
 }
 
 function runXStream(deferred, xstream) {
-  xstream.subscribe({
+  xstream.addListener({
     next: noop,
     end: function() {
       deferred.resolve();
