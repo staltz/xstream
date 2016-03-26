@@ -3,7 +3,7 @@ import {Producer} from './Producer';
 import {MapOperator} from './operator/MapOperator';
 import {FilterOperator} from './operator/FilterOperator';
 import {TakeOperator} from './operator/TakeOperator';
-import {SkipOperator} from './operator/SkipOperator';
+import {DropOperator} from './operator/DropOperator';
 import {DebugOperator} from './operator/DebugOperator';
 import {FoldOperator} from './operator/FoldOperator';
 import {LastOperator} from './operator/LastOperator';
@@ -143,8 +143,8 @@ export class Stream<T> implements Listener<T> {
     return new Stream<T>(new TakeOperator(amount, this));
   }
 
-  skip(amount: number): Stream<T> {
-    return new Stream<T>(new SkipOperator(amount, this));
+  drop(amount: number): Stream<T> {
+    return new Stream<T>(new DropOperator(amount, this));
   }
 
   debug(spy: (t: T) => void = null): Stream<T> {

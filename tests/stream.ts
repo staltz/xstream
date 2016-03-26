@@ -55,7 +55,7 @@ describe('Stream', () => {
     assert.equal(typeof stream.map, 'function');
     assert.equal(typeof stream.filter, 'function');
     assert.equal(typeof stream.take, 'function');
-    assert.equal(typeof stream.skip, 'function');
+    assert.equal(typeof stream.drop, 'function');
     assert.equal(typeof stream.debug, 'function');
     assert.equal(typeof stream.fold, 'function');
     assert.equal(typeof stream.last, 'function');
