@@ -42,7 +42,7 @@
     "ts-node": "^0.5.5",
     "tslint": "^3.6.0",
     "typescript": "^1.8.9",
-    "typings": "^0.6.10",
+    "typings": "^0.7.9",
     "validate-commit-msg": "^2.4.0"
   },
   "config": {
