@@ -45,11 +45,7 @@ describe('Stream', () => {
   });
 
   it('should have all the core operators as methods, plus addListener and removeListener', () => {
-    const emptyProducer = {
-      start(): void { return undefined; },
-      stop(): void { return undefined; },
-    };
-    const stream = xs.create(emptyProducer);
+    const stream = xs.create();
     assert.equal(typeof stream.addListener, 'function');
     assert.equal(typeof stream.removeListener, 'function');
     assert.equal(typeof stream.map, 'function');
@@ -71,11 +67,7 @@ describe('Stream', () => {
     const expected = [10, 20, 30];
     let listenerGotEnd: boolean = false;
 
-    const emptyProducer = {
-      start(): void { return undefined; },
-      stop(): void { return undefined; },
-    };
-    const stream = xs.create(emptyProducer);
+    const stream = xs.create();
 
     stream.addListener({
       next: (x: number) => {
@@ -95,6 +87,25 @@ describe('Stream', () => {
     assert.equal(expected.length, 0);
     assert.equal(listenerGotEnd, true);
     done();
+  });
+
+  it('should allow being imitated by a proxy Stream', (done) => {
+    const stream = xs.of(10, 20, 30);
+    const proxyStream = xs.create();
+
+    const expected = [10, 20, 30];
+    proxyStream.addListener({
+      next: (x: string) => {
+        assert.equal(x, expected.shift());
+      },
+      error: e => done(e),
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      },
+    });
+
+    proxyStream.imitate(stream);
   });
 
   it('should be possible to addListener and removeListener with 1 listener', (done) => {

@@ -34,15 +34,17 @@ export class Stream<T> implements InternalListener<T> {
     this._listeners = [];
   }
 
-  static create<T>(producer: Producer<T>): Stream<T> {
-    (<InternalProducer<T>> (<any> producer))._start =
-      function _start(il: InternalListener<T>) {
-        (<Listener<T>> (<any> il)).next = il._n;
-        (<Listener<T>> (<any> il)).error = il._e;
-        (<Listener<T>> (<any> il)).complete = il._c;
-        this.start(<Listener<T>> (<any> il));
-      };
-    (<InternalProducer<T>> (<any> producer))._stop = producer.stop;
+  static create<T>(producer?: Producer<T>): Stream<T> {
+    if (producer) {
+      (<InternalProducer<T>> (<any> producer))._start =
+        function _start(il: InternalListener<T>) {
+          (<Listener<T>> (<any> il)).next = il._n;
+          (<Listener<T>> (<any> il)).error = il._e;
+          (<Listener<T>> (<any> il)).complete = il._c;
+          this.start(<Listener<T>> (<any> il));
+        };
+      (<InternalProducer<T>> (<any> producer))._stop = producer.stop;
+    }
     return new Stream(<InternalProducer<T>> (<any> producer));
   }
 
@@ -89,7 +91,7 @@ export class Stream<T> implements InternalListener<T> {
         this._listeners[i]._c();
       }
     }
-    this._stopID = setTimeout(() => this._prod._stop());
+    if (this._prod) this._stopID = setTimeout(() => this._prod._stop());
     this._listeners = [];
   }
 
@@ -104,22 +106,22 @@ export class Stream<T> implements InternalListener<T> {
     this._remove(<InternalListener<T>> (<any> listener));
   }
 
-  _add(listener: InternalListener<T>): void {
-    this._listeners.push(listener);
+  _add(il: InternalListener<T>): void {
+    this._listeners.push(il);
     if (this._listeners.length === 1) {
       if (this._stopID !== empty) {
         clearTimeout(this._stopID);
         this._stopID = empty;
       }
-      this._prod._start(this);
+      if (this._prod) this._prod._start(this);
     }
   }
 
-  _remove(listener: InternalListener<T>): void {
-    const i = this._listeners.indexOf(listener);
+  _remove(il: InternalListener<T>): void {
+    const i = this._listeners.indexOf(il);
     if (i > -1) {
       this._listeners.splice(i, 1);
-      if (this._listeners.length <= 0) {
+      if (this._prod && this._listeners.length <= 0) {
         this._stopID = setTimeout(() => this._prod._stop());
       }
     }
@@ -163,7 +165,7 @@ export class Stream<T> implements InternalListener<T> {
 
   static empty(): Stream<void> {
     return new Stream<void>({
-      _start(lner: InternalListener<void>) { lner._c(); },
+      _start(il: InternalListener<void>) { il._c(); },
       _stop: noop,
     });
   }
@@ -222,6 +224,10 @@ export class Stream<T> implements InternalListener<T> {
       streams.unshift(this);
       return Stream.combine(project, ...streams);
     };
+
+  imitate(other: Stream<T>): void {
+    other._add(this);
+  }
 }
 
 export class MemoryStream<T> extends Stream<T> {
