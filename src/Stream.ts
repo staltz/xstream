@@ -40,7 +40,7 @@ export class Stream<T> implements InternalListener<T> {
         (<Listener<T>> (<any> il)).next = il._n;
         (<Listener<T>> (<any> il)).error = il._e;
         (<Listener<T>> (<any> il)).complete = il._c;
-        producer.start(<Listener<T>> (<any> il));
+        this.start(<Listener<T>> (<any> il));
       };
     (<InternalProducer<T>> (<any> producer))._stop = producer.stop;
     return new Stream(<InternalProducer<T>> (<any> producer));
