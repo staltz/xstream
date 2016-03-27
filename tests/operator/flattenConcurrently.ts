@@ -11,13 +11,12 @@ describe('Stream.prototype.flattenConcurrently', () => {
       const listener = {
         next: (x: number) => {
           assert.equal(x, expected.shift());
-          if (expected.length === 0) {
-            stream.removeListener(listener);
-            done();
-          }
         },
-        error: done.fail,
-        complete: done.fail,
+        error: (err: any) => done(err),
+        complete: () => {
+          assert.equal(expected.length, 0);
+          done();
+        },
       };
       stream.addListener(listener);
     });
@@ -34,13 +33,12 @@ describe('Stream.prototype.flattenConcurrently', () => {
       const listener = {
         next: (x: number) => {
           assert.equal(x, expected.shift());
-          if (expected.length === 0) {
-            stream.removeListener(listener);
-            done();
-          }
         },
         error: (err: any) => done(err),
-        complete: () => done(new Error('No complete() should be called')),
+        complete: () => {
+          assert.equal(expected.length, 0);
+          done();
+        },
       };
       stream.addListener(listener);
     });
@@ -56,16 +54,40 @@ describe('Stream.prototype.flattenConcurrently', () => {
       //      ----10--11--12
       //           ------------20-----------21----------22
       const expected = ['00', '01', '10', '02', '11', '12', '20', '21', '22'];
+      stream.addListener({
+        next: (x: number) => {
+          assert.equal(x, expected.shift());
+        },
+        error: (err: any) => done(err),
+        complete: () => {
+          assert.equal(expected.length, 0);
+          done();
+        },
+      });
+    });
+
+    it('should expand 3 async events as an interval each, no optimization', (done) => {
+      const stream = xs.interval(140).take(3)
+        .map(i =>
+          xs.interval(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
+        )
+        .filter(() => true) // breaks the optimization map+flattenConcurrently
+        .flattenConcurrently();
+      // ---x---x---x---x---x---x---x---x---x---x---x---x
+      // ---00--01--02
+      //      ----10--11--12
+      //           ------------20-----------21----------22
+
+      const expected = ['00', '01', '10', '02', '11', '12', '20', '21', '22'];
       const listener = {
         next: (x: number) => {
           assert.equal(x, expected.shift());
-          if (expected.length === 0) {
-            stream.removeListener(listener);
-            done();
-          }
         },
         error: (err: any) => done(err),
-        complete: () => done(new Error('No complete() should be called')),
+        complete: () => {
+          assert.equal(expected.length, 0);
+          done();
+        }
       };
       stream.addListener(listener);
     });

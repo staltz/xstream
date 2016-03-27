@@ -28,6 +28,7 @@ export class Outer<T> implements InternalListener<Stream<T>> {
   }
 
   _n(s: Stream<T>) {
+    this.op.active++;
     s._add(new Inner(this.out, this.op));
   }
 
