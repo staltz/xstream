@@ -36,11 +36,11 @@ export class Stream<T> implements InternalListener<T> {
 
   static create<T>(producer: Producer<T>): Stream<T> {
     (<InternalProducer<T>> (<any> producer))._start =
-      function _start(internalListener: InternalListener<T>) {
-        (<Listener<T>> (<any> internalListener)).next = internalListener._n;
-        (<Listener<T>> (<any> internalListener)).error = internalListener._e;
-        (<Listener<T>> (<any> internalListener)).complete = internalListener._c;
-        producer.start(<Listener<T>> (<any> internalListener));
+      function _start(il: InternalListener<T>) {
+        (<Listener<T>> (<any> il)).next = il._n;
+        (<Listener<T>> (<any> il)).error = il._e;
+        (<Listener<T>> (<any> il)).complete = il._c;
+        producer.start(<Listener<T>> (<any> il));
       };
     (<InternalProducer<T>> (<any> producer))._stop = producer.stop;
     return new Stream(<InternalProducer<T>> (<any> producer));
