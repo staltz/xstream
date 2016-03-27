@@ -229,17 +229,19 @@ export class Stream<T> implements InternalListener<T> {
 
 export class MemoryStream<T> extends Stream<T> {
   public _val: any;
+  public _has: boolean = false;
   constructor(producer: InternalProducer<T>) {
     super(producer);
   }
 
   _n(x: T) {
     this._val = x;
+    this._has = true;
     super._n(x);
   }
 
   _add(listener: InternalListener<T>): void {
+    if (this._has) { listener._n(this._val); }
     super._add(listener);
-    if (this._val) { listener._n(this._val); }
   }
 }
