@@ -23,6 +23,7 @@ import {IntervalProducer} from './factory/IntervalProducer';
 import {MergeProducer} from './factory/MergeProducer';
 import {empty} from './utils/empty';
 import {noop} from './utils/noop';
+import {internalizeProducer} from './utils/internalizeProducer';
 
 export class Stream<T> implements InternalListener<T> {
   public _listeners: Array<InternalListener<T>>;
@@ -36,16 +37,16 @@ export class Stream<T> implements InternalListener<T> {
 
   static create<T>(producer?: Producer<T>): Stream<T> {
     if (producer) {
-      (<InternalProducer<T>> (<any> producer))._start =
-        function _start(il: InternalListener<T>) {
-          (<Listener<T>> (<any> il)).next = il._n;
-          (<Listener<T>> (<any> il)).error = il._e;
-          (<Listener<T>> (<any> il)).complete = il._c;
-          this.start(<Listener<T>> (<any> il));
-        };
-      (<InternalProducer<T>> (<any> producer))._stop = producer.stop;
+      internalizeProducer(producer); // mutates the input
     }
     return new Stream(<InternalProducer<T>> (<any> producer));
+  }
+
+  static createWithMemory<T>(producer?: Producer<T>): MemoryStream<T> {
+    if (producer) {
+      internalizeProducer(producer); // mutates the input
+    }
+    return new MemoryStream<T>(<InternalProducer<T>> (<any> producer));
   }
 
   shamefullySendNext(value: T) {
@@ -132,10 +133,6 @@ export class Stream<T> implements InternalListener<T> {
                         ...streams: Array<Stream<any>>): Stream<R> {
       return new Stream<R>(new CombineProducer<R>(project, streams));
     };
-
-  static MemoryStream<T>(): MemoryStream<T> {
-    return new MemoryStream<T>({_start: noop, _stop: noop});
-  }
 
   static from<T>(array: Array<T>): Stream<T> {
     return new Stream<T>(new FromProducer(array));

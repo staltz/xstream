@@ -34,7 +34,8 @@ describe('Stream', () => {
   });
 
   it('should have all the core static operators', () => {
-    assert.equal(typeof xs.MemoryStream, 'function');
+    assert.equal(typeof xs.create, 'function');
+    assert.equal(typeof xs.createWithMemory, 'function');
     assert.equal(typeof xs.from, 'function');
     assert.equal(typeof xs.of, 'function');
     assert.equal(typeof xs.merge, 'function');
