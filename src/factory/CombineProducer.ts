@@ -1,5 +1,5 @@
-import {Listener} from '../Listener';
-import {Producer} from '../Producer';
+import {InternalListener} from '../InternalListener';
+import {InternalProducer} from '../InternalProducer';
 import {Stream} from '../Stream';
 import {emptyListener} from '../utils/emptyListener';
 import {invoke} from '../utils/invoke';
@@ -57,12 +57,12 @@ export interface CombineInstanceSignature<T> {
   <R>(project: (...args: Array<any>) => R, ...streams: Array<Stream<any>>): Stream<R>;
 }
 
-export class Proxy<T> implements Listener<T> {
+export class Proxy<T> implements InternalListener<T> {
   constructor(public i: number, public prod: CombineProducer<T>) {
     prod.proxies.push(this);
   }
 
-  next(t: T): void {
+  _n(t: T): void {
     const prod = this.prod;
     prod.hasVal[this.i] = true;
     prod.vals[this.i] = t;
@@ -70,24 +70,24 @@ export class Proxy<T> implements Listener<T> {
       prod.up();
     }
     if (prod.ready) {
-      prod.out.next(invoke(prod.project, prod.vals));
+      prod.out._n(invoke(prod.project, prod.vals));
     }
   }
 
-  error(err: any): void {
-    this.prod.out.error(err);
+  _e(err: any): void {
+    this.prod.out._e(err);
   }
 
-  end(): void {
+  _c(): void {
     const prod = this.prod;
     if (--prod.ac === 0) {
-      prod.out.end();
+      prod.out._c();
     }
   }
 }
 
-export class CombineProducer<R> implements Producer<R> {
-  public out: Listener<R> = emptyListener;
+export class CombineProducer<R> implements InternalProducer<R> {
+  public out: InternalListener<R> = emptyListener;
   public proxies: Array<Proxy<any>> = [];
   public ready: boolean = false;
   public hasVal: Array<boolean>;
@@ -111,16 +111,16 @@ export class CombineProducer<R> implements Producer<R> {
     this.ready = true;
   }
 
-  start(out: Listener<R>): void {
+  _start(out: InternalListener<R>): void {
     this.out = out;
     for (let i = this.streams.length - 1; i >= 0; i--) {
-      this.streams[i].addListener(new Proxy(i, this));
+      this.streams[i]._add(new Proxy(i, this));
     }
   }
 
-  stop(): void {
+  _stop(): void {
     for (let i = this.streams.length - 1; i >= 0; i--) {
-      this.streams[i].removeListener(this.proxies[i]);
+      this.streams[i]._remove(this.proxies[i]);
     }
     this.proxies = [];
   }

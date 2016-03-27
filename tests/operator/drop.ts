@@ -14,7 +14,7 @@ describe('Stream.prototype.drop', () => {
         }
       },
       error: done.fail,
-      end: done.fail,
+      complete: done.fail,
     };
     stream.addListener(listener);
   });

@@ -1,5 +1,7 @@
 import {Listener} from './Listener';
 import {Producer} from './Producer';
+import {InternalListener} from './InternalListener';
+import {InternalProducer} from './InternalProducer';
 import {MapOperator} from './operator/MapOperator';
 import {FilterOperator} from './operator/FilterOperator';
 import {TakeOperator} from './operator/TakeOperator';
@@ -22,68 +24,103 @@ import {MergeProducer} from './factory/MergeProducer';
 import {empty} from './utils/empty';
 import {noop} from './utils/noop';
 
-export class Stream<T> implements Listener<T> {
-  public _listeners: Array<Listener<T>>;
+export class Stream<T> implements InternalListener<T> {
+  public _listeners: Array<InternalListener<T>>;
   public _stopID: any = empty;
-  public _prod: Producer<T>;
+  public _prod: InternalProducer<T>;
 
-  constructor(producer: Producer<T>) {
+  constructor(producer: InternalProducer<T>) {
     this._prod = producer;
     this._listeners = [];
   }
 
-  next(x: T): void {
+  static create<T>(producer: Producer<T>): Stream<T> {
+    (<InternalProducer<T>> (<any> producer))._start =
+      function _start(internalListener: InternalListener<T>) {
+        (<Listener<T>> (<any> internalListener)).next = internalListener._n;
+        (<Listener<T>> (<any> internalListener)).error = internalListener._e;
+        (<Listener<T>> (<any> internalListener)).complete = internalListener._c;
+        producer.start(<Listener<T>> (<any> internalListener));
+      };
+    (<InternalProducer<T>> (<any> producer))._stop = producer.stop;
+    return new Stream(<InternalProducer<T>> (<any> producer));
+  }
+
+  shamefullySendNext(value: T) {
+    this._n(value);
+  }
+
+  shamefullySendError(error: any) {
+    this._e(error);
+  }
+
+  shamefullySendComplete() {
+    this._c();
+  }
+
+  _n(t: T): void {
     const len = this._listeners.length;
     if (len === 1) {
-      this._listeners[0].next(x);
+      this._listeners[0]._n(t);
     } else {
       for (let i = 0; i < len; i++) {
-        this._listeners[i].next(x);
+        this._listeners[i]._n(t);
       }
     }
   }
 
-  error(err: any): void {
+  _e(err: any): void {
     const len = this._listeners.length;
     if (len === 1) {
-      this._listeners[0].error(err);
+      this._listeners[0]._e(err);
     } else {
       for (let i = 0; i < len; i++) {
-        this._listeners[i].error(err);
+        this._listeners[i]._e(err);
       }
     }
   }
 
-  end(): void {
+  _c(): void {
     const len = this._listeners.length;
     if (len === 1) {
-      this._listeners[0].end();
+      this._listeners[0]._c();
     } else {
       for (let i = 0; i < len; i++) {
-        this._listeners[i].end();
+        this._listeners[i]._c();
       }
     }
-    this._stopID = setTimeout(() => this._prod.stop());
+    this._stopID = setTimeout(() => this._prod._stop());
     this._listeners = [];
   }
 
   addListener(listener: Listener<T>): void {
+    (<InternalListener<T>> (<any> listener))._n = listener.next;
+    (<InternalListener<T>> (<any> listener))._e = listener.error;
+    (<InternalListener<T>> (<any> listener))._c = listener.complete;
+    this._add(<InternalListener<T>> (<any> listener));
+  }
+
+  removeListener(listener: Listener<T>): void {
+    this._remove(<InternalListener<T>> (<any> listener));
+  }
+
+  _add(listener: InternalListener<T>): void {
     this._listeners.push(listener);
     if (this._listeners.length === 1) {
       if (this._stopID !== empty) {
         clearTimeout(this._stopID);
         this._stopID = empty;
       }
-      this._prod.start(this);
+      this._prod._start(this);
     }
   }
 
-  removeListener(listener: Listener<T>): void {
+  _remove(listener: InternalListener<T>): void {
     const i = this._listeners.indexOf(listener);
     if (i > -1) {
       this._listeners.splice(i, 1);
       if (this._listeners.length <= 0) {
-        this._stopID = setTimeout(() => this._prod.stop());
+        this._stopID = setTimeout(() => this._prod._stop());
       }
     }
   }
@@ -95,7 +132,7 @@ export class Stream<T> implements Listener<T> {
     };
 
   static MemoryStream<T>(): MemoryStream<T> {
-    return new MemoryStream<T>({start: noop, stop: noop});
+    return new MemoryStream<T>({_start: noop, _stop: noop});
   }
 
   static from<T>(array: Array<T>): Stream<T> {
@@ -121,13 +158,13 @@ export class Stream<T> implements Listener<T> {
   }
 
   static never(): Stream<void> {
-    return new Stream<void>({start: noop, stop: noop});
+    return new Stream<void>({_start: noop, _stop: noop});
   }
 
   static empty(): Stream<void> {
     return new Stream<void>({
-      start(obs: Listener<void>) { obs.end(); },
-      stop: noop,
+      _start(lner: InternalListener<void>) { lner._c(); },
+      _stop: noop,
     });
   }
 
@@ -189,17 +226,17 @@ export class Stream<T> implements Listener<T> {
 
 export class MemoryStream<T> extends Stream<T> {
   public _val: any;
-  constructor(producer: Producer<T>) {
+  constructor(producer: InternalProducer<T>) {
     super(producer);
   }
 
-  next(x: T) {
+  _n(x: T) {
     this._val = x;
-    super.next(x);
+    super._n(x);
   }
 
-  addListener(listener: Listener<T>): void {
-    super.addListener(listener);
-    if (this._val) { listener.next(this._val); }
+  _add(listener: InternalListener<T>): void {
+    super._add(listener);
+    if (this._val) { listener._n(this._val); }
   }
 }

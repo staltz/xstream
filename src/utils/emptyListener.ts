@@ -1,7 +1,7 @@
-import {Listener} from '../Listener';
+import {InternalListener} from '../InternalListener';
 import {noop} from './noop';
-export var emptyListener: Listener<any> = {
-  next: noop,
-  error: noop,
-  end: noop,
+export var emptyListener: InternalListener<any> = {
+  _n: noop,
+  _e: noop,
+  _c: noop,
 };

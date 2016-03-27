@@ -1,20 +1,20 @@
-import {Producer} from '../Producer';
-import {Listener} from '../Listener';
+import {InternalProducer} from '../InternalProducer';
+import {InternalListener} from '../InternalListener';
 import {noop} from '../utils/noop';
 
-export class FromProducer<T> implements Producer<T> {
+export class FromProducer<T> implements InternalProducer<T> {
   constructor(public a: Array<T>) {
   }
 
-  start(out: Listener<T>): void {
+  _start(out: InternalListener<T>): void {
     const a = this.a;
     for (let i = 0, l = a.length; i < l; i++) {
-      out.next(a[i]);
+      out._n(a[i]);
     }
-    out.end();
+    out._c();
   }
 
-  stop(): void {
+  _stop(): void {
     noop();
   }
 }

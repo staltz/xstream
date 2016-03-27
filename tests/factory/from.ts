@@ -11,7 +11,7 @@ describe('xs.from', () => {
         assert.equal(x, expected.shift());
       },
       error: done.fail,
-      end: () => {
+      complete: () => {
         assert.equal(expected.length, 0);
         done();
       },

@@ -11,7 +11,7 @@ describe('Stream', () => {
         listener.next(10);
         listener.next(20);
         listener.next(30);
-        listener.end();
+        listener.complete();
       },
 
       stop() {
@@ -21,27 +21,27 @@ describe('Stream', () => {
       },
     };
 
-    const stream: Stream<number> = new Stream(producer);
+    const stream: Stream<number> = xs.create(producer);
     stream.addListener({
       next: (x: number) => {
         assert.equal(x, expected.shift());
       },
       error: done.fail,
-      end: () => {
+      complete: () => {
         listenerGotEnd = true;
       },
     });
   });
 
   it('should have all the core static operators', () => {
-    assert.equal(typeof Stream.MemoryStream, 'function');
-    assert.equal(typeof Stream.from, 'function');
-    assert.equal(typeof Stream.of, 'function');
-    assert.equal(typeof Stream.merge, 'function');
-    assert.equal(typeof Stream.interval, 'function');
-    assert.equal(typeof Stream.domEvent, 'function');
-    assert.equal(typeof Stream.never, 'function');
-    assert.equal(typeof Stream.empty, 'function');
+    assert.equal(typeof xs.MemoryStream, 'function');
+    assert.equal(typeof xs.from, 'function');
+    assert.equal(typeof xs.of, 'function');
+    assert.equal(typeof xs.merge, 'function');
+    assert.equal(typeof xs.interval, 'function');
+    assert.equal(typeof xs.domEvent, 'function');
+    assert.equal(typeof xs.never, 'function');
+    assert.equal(typeof xs.empty, 'function');
   });
 
   it('should have all the core operators as methods, plus addListener and removeListener', () => {
@@ -49,7 +49,7 @@ describe('Stream', () => {
       start(): void { return undefined; },
       stop(): void { return undefined; },
     };
-    const stream = new Stream(emptyProducer);
+    const stream = xs.create(emptyProducer);
     assert.equal(typeof stream.addListener, 'function');
     assert.equal(typeof stream.removeListener, 'function');
     assert.equal(typeof stream.map, 'function');
@@ -67,6 +67,36 @@ describe('Stream', () => {
     assert.equal(typeof stream.combine, 'function');
   });
 
+  it('should allow using shamefullySend* methods', (done) => {
+    const expected = [10, 20, 30];
+    let listenerGotEnd: boolean = false;
+
+    const emptyProducer = {
+      start(): void { return undefined; },
+      stop(): void { return undefined; },
+    };
+    const stream = xs.create(emptyProducer);
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.equal(x, expected.shift());
+      },
+      error: e => done.fail(e),
+      complete: () => {
+        listenerGotEnd = true;
+      },
+    });
+
+    stream.shamefullySendNext(10);
+    stream.shamefullySendNext(20);
+    stream.shamefullySendNext(30);
+    stream.shamefullySendComplete();
+
+    assert.equal(expected.length, 0);
+    assert.equal(listenerGotEnd, true);
+    done();
+  });
+
   it('should be possible to addListener and removeListener with 1 listener', (done) => {
     const stream = xs.interval(100);
     const expected = [0, 1, 2];
@@ -79,7 +109,7 @@ describe('Stream', () => {
         }
       },
       error: done.fail,
-      end: done.fail,
+      complete: done.fail,
     };
     stream.addListener(listener);
   });
@@ -94,7 +124,7 @@ describe('Stream', () => {
         assert.equal(x, expected1.shift());
       },
       error: done.fail,
-      end: done.fail,
+      complete: done.fail,
     };
     stream.addListener(listener1);
 
@@ -103,7 +133,7 @@ describe('Stream', () => {
         assert.equal(x, expected2.shift());
       },
       error: done.fail,
-      end: done.fail,
+      complete: done.fail,
     };
     setTimeout(() => {
       stream.addListener(listener2);
@@ -130,7 +160,7 @@ describe('Stream', () => {
         }
       },
       error: done.fail,
-      end: done.fail,
+      complete: done.fail,
     };
     stream.addListener(listener);
 
@@ -152,7 +182,7 @@ describe('Stream', () => {
         }
       },
       error: done.fail,
-      end: done.fail,
+      complete: done.fail,
     };
     stream.addListener(listener);
 

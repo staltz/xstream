@@ -1,38 +1,38 @@
-import {Listener} from '../Listener';
+import {InternalListener} from '../InternalListener';
 import {Operator} from '../Operator';
 import {Stream} from '../Stream';
 import {emptyListener} from '../utils/emptyListener';
 
-export class Proxy<T, R> implements Listener<T> {
+export class Proxy<T, R> implements InternalListener<T> {
   constructor(public out: Stream<R>,
-              public p: MapOperator<T, R>) {
+              public op: MapOperator<T, R>) {
   }
 
-  next(t: T) {
-    this.out.next(this.p.project(t));
+  _n(t: T) {
+    this.out._n(this.op.project(t));
   }
 
-  error(err: any) {
-    this.out.error(err);
+  _e(err: any) {
+    this.out._e(err);
   }
 
-  end() {
-    this.out.end();
+  _c() {
+    this.out._c();
   }
 }
 
 export class MapOperator<T, R> implements Operator<T, R> {
-  public proxy: Listener<T> = emptyListener;
+  public proxy: InternalListener<T> = emptyListener;
 
   constructor(public project: (t: T) => R,
               public ins: Stream<T>) {
   }
 
-  start(out: Stream<R>): void {
-    this.ins.addListener(this.proxy = new Proxy(out, this));
+  _start(out: Stream<R>): void {
+    this.ins._add(this.proxy = new Proxy(out, this));
   }
 
-  stop(): void {
-    this.ins.removeListener(this.proxy);
+  _stop(): void {
+    this.ins._remove(this.proxy);
   }
 }

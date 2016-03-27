@@ -7,7 +7,7 @@ describe('xs.never()', () => {
     const listener = {
       next: () => done(new Error('This should not be called')),
       error: () => done(new Error('This should not be called')),
-      end: () => done(new Error('This should not be called')),
+      complete: () => done(new Error('This should not be called')),
     };
 
     stream.addListener(listener);

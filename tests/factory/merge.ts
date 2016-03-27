@@ -13,14 +13,14 @@ describe('xs.merge', () => {
         assert.equal(x, expected.shift());
       },
       error: done.fail,
-      end: () => {
+      complete: () => {
         assert.equal(expected.length, 0);
         done();
       },
     });
   });
 
-  it('should end only when all member streams have ended', (done) => {
+  it('should complete only when all member streams have completed', (done) => {
     const stream1 = xs.interval(30).take(1);
     const stream2 = xs.interval(50).take(4);
     const stream = xs.merge(stream1, stream2);
@@ -30,7 +30,7 @@ describe('xs.merge', () => {
         assert.equal(x, expected.shift());
       },
       error: done.fail,
-      end: () => {
+      complete: () => {
         assert.equal(expected.length, 0);
         done();
       },

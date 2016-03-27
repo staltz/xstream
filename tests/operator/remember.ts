@@ -1,12 +1,12 @@
 import xs from '../../src/index';
-import {emptyListener} from '../../src/utils/emptyListener';
+import {noop} from '../../src/utils/noop';
 import * as assert from 'assert';
 
 describe('Stream.prototype.remember', () => {
   it('should replay the second event to a new listener', (done) => {
     const stream = xs.interval(50).take(4).remember();
 
-    stream.addListener(emptyListener);
+    stream.addListener({next: noop, error: noop, complete: noop});
 
     let expected = [1, 2, 3];
     setTimeout(() => {
@@ -15,7 +15,7 @@ describe('Stream.prototype.remember', () => {
           assert.strictEqual(x, expected.shift());
         },
         error: done.fail,
-        end: () => {
+        complete: () => {
           assert.strictEqual(expected.length, 0);
           done();
         }
@@ -24,18 +24,18 @@ describe('Stream.prototype.remember', () => {
   });
 
   it('should allow use like a subject', (done) => {
-    const stream = xs.MemoryStream()
+    const stream = xs.MemoryStream();
 
-    stream.next(1);
+    stream.shamefullySendNext(1);
 
     stream.addListener({
       next(x: any) {
         assert.strictEqual(x, 1);
       },
       error: done.fail,
-      end: done,
+      complete: done,
     });
 
-    stream.end();
+    stream.shamefullySendComplete();
   });
 });

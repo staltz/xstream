@@ -1,4 +1,5 @@
 import xs from '../../src/index';
+import {noop} from '../../src/utils/noop';
 import * as assert from 'assert';
 
 class FakeEventTarget implements EventTarget {
@@ -40,7 +41,7 @@ describe('xs.domEvent', () => {
     const target = new FakeEventTarget();
     const stream = xs.domEvent(target, 'test', true);
 
-    stream.addListener({next: () => {}, error: () => {}, end: () => {}});
+    stream.addListener({next: noop, error: noop, complete: noop});
 
     assert.strictEqual('test', target.event);
     assert.strictEqual(true, target.capture);
@@ -50,7 +51,7 @@ describe('xs.domEvent', () => {
     const target = new FakeEventTarget();
     const stream = xs.domEvent(target, 'test');
 
-    stream.addListener({next: () => {}, error: () => {}, end: () => {}});
+    stream.addListener({next: noop, error: noop, complete: noop});
 
     assert.strictEqual('test', target.event);
     assert.strictEqual(false, target.capture);
@@ -67,7 +68,7 @@ describe('xs.domEvent', () => {
         assert.strictEqual(x, expected.shift());
       },
       error: done.fail,
-      end: () => {
+      complete: () => {
         assert.strictEqual(expected.length, 0);
         done();
       }
@@ -88,7 +89,7 @@ describe('xs.domEvent', () => {
     stream.take(1).addListener({
       next(x) {},
       error: done.fail,
-      end() {
+      complete() {
         setTimeout(() => {
           assert.strictEqual('test', target.removedEvent);
           assert.strictEqual(true, target.removedCapture);

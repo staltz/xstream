@@ -1,74 +1,74 @@
-import {Listener} from '../Listener';
+import {InternalListener} from '../InternalListener';
 import {Operator} from '../Operator';
 import {Stream} from '../Stream';
 import {emptyListener} from '../utils/emptyListener';
 import {MapOperator} from './MapOperator';
 
-export class Inner<T> implements Listener<T> {
+export class Inner<T> implements InternalListener<T> {
   constructor(public out: Stream<T>,
               public op: FlattenOperator<T>) {
   }
 
-  next(t: T) {
-    this.out.next(t);
+  _n(t: T) {
+    this.out._n(t);
   }
 
-  error(err: any) {
-    this.out.error(err);
+  _e(err: any) {
+    this.out._e(err);
   }
 
-  end() {
+  _c() {
     this.op.curr = null;
     this.op.less();
   }
 }
 
-export class Outer<T> implements Listener<Stream<T>> {
+export class Outer<T> implements InternalListener<Stream<T>> {
   constructor(public out: Stream<T>,
               public op: FlattenOperator<T>) {
   }
 
-  next(s: Stream<T>) {
+  _n(s: Stream<T>) {
     this.op.cut();
-    (this.op.curr = s).addListener(this.op.inner = new Inner(this.out, this.op));
+    (this.op.curr = s)._add(this.op.inner = new Inner(this.out, this.op));
   }
 
-  error(err: any) {
-    this.out.error(err);
+  _e(err: any) {
+    this.out._e(err);
   }
 
-  end() {
+  _c() {
     this.op.open = false;
     this.op.less();
   }
 }
 
-export class MapOuter<T> implements Listener<T> {
+export class MapOuter<T> implements InternalListener<T> {
   constructor(public out: Stream<T>,
               public pr: (t: T) => Stream<T>, // pr = project
               public op: FlattenOperator<T>) {
   }
 
-  next(v: T) {
+  _n(v: T) {
     this.op.cut();
-    (this.op.curr = this.pr(v)).addListener(this.op.inner = new Inner(this.out, this.op));
+    (this.op.curr = this.pr(v))._add(this.op.inner = new Inner(this.out, this.op));
   }
 
-  error(err: any) {
-    this.out.error(err);
+  _e(err: any) {
+    this.out._e(err);
   }
 
-  end() {
+  _c() {
     this.op.open = false;
     this.op.less();
   }
 }
 
 export class FlattenOperator<T> implements Operator<Stream<T>, T> {
-  public proxy: Listener<T | Stream<T>> = emptyListener;
+  public proxy: InternalListener<T | Stream<T>> = emptyListener;
   public mapOp: MapOperator<T, Stream<T>>;
   public curr: Stream<T>; // Current inner Stream
-  public inner: Listener<T>; // Current inner Listener
+  public inner: InternalListener<T>; // Current inner InternalListener
   public open: boolean = true;
   public out: Stream<T>;
 
@@ -78,30 +78,30 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
     }
   }
 
-  start(out: Stream<T>): void {
+  _start(out: Stream<T>): void {
     this.out = out;
     const mapOp = this.mapOp;
     if (mapOp) {
-      mapOp.ins.addListener(this.proxy = new MapOuter(out, mapOp.project, this));
+      mapOp.ins._add(this.proxy = new MapOuter(out, mapOp.project, this));
     } else {
-      this.ins.addListener(this.proxy = new Outer(out, this));
+      this.ins._add(this.proxy = new Outer(out, this));
     }
   }
 
-  stop(): void {
-    this.ins.removeListener(this.proxy);
+  _stop(): void {
+    this.ins._remove(this.proxy);
   }
 
   cut(): void {
     const {curr, inner} = this;
     if (curr && inner) {
-      curr.removeListener(inner);
+      curr._remove(inner);
     }
   }
 
   less(): void {
     if (!this.open && !this.curr) {
-      this.out.end();
+      this.out._c();
     }
   }
 }

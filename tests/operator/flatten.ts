@@ -17,7 +17,7 @@ describe('Stream.prototype.flatten', () => {
           }
         },
         error: done.fail,
-        end: done.fail,
+        complete: done.fail,
       };
       stream.addListener(listener);
     });
@@ -40,7 +40,7 @@ describe('Stream.prototype.flatten', () => {
           }
         },
         error: (err: any) => done(err),
-        end: () => done(new Error('No end() should be called')),
+        complete: () => done(new Error('No complete() should be called')),
       };
       stream.addListener(listener);
     });
@@ -65,7 +65,7 @@ describe('Stream.prototype.flatten', () => {
           }
         },
         error: (err: any) => done(err),
-        end: () => done(new Error('No end() should be called')),
+        complete: () => done(new Error('No complete() should be called')),
       };
       stream.addListener(listener);
     });

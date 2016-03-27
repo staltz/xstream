@@ -1,30 +1,30 @@
-import {Producer} from '../Producer';
-import {Listener} from '../Listener';
+import {InternalProducer} from '../InternalProducer';
+import {InternalListener} from '../InternalListener';
 import {Stream} from '../Stream';
 import {emptyListener} from '../utils/emptyListener';
 
-export class Proxy<T> implements Listener<T> {
+export class Proxy<T> implements InternalListener<T> {
   constructor(public prod: MergeProducer<T>) {
   }
 
-  next(t: T) {
-    this.prod.out.next(t);
+  _n(t: T) {
+    this.prod.out._n(t);
   }
 
-  error(err: any) {
-    this.prod.out.error(err);
+  _e(err: any) {
+    this.prod.out._e(err);
   }
 
-  end() {
+  _c() {
     const prod = this.prod;
     if (--prod.ac === 0) {
-      prod.out.end();
+      prod.out._c();
     }
   }
 }
 
-export class MergeProducer<T> implements Producer<T> {
-  public out: Listener<T> = emptyListener;
+export class MergeProducer<T> implements InternalProducer<T> {
+  public out: InternalListener<T> = emptyListener;
   public ac: number; // ac is activeCount
   public proxy: Proxy<T>;
 
@@ -32,17 +32,17 @@ export class MergeProducer<T> implements Producer<T> {
     this.ac = streams.length;
   }
 
-  start(out: Listener<T>): void {
+  _start(out: InternalListener<T>): void {
     this.out = out;
     this.proxy = new Proxy(this);
     for (let i = this.streams.length - 1; i >= 0; i--) {
-      this.streams[i].addListener(this.proxy);
+      this.streams[i]._add(this.proxy);
     }
   }
 
-  stop(): void {
+  _stop(): void {
     for (let i = this.streams.length - 1; i >= 0; i--) {
-      this.streams[i].removeListener(this.proxy);
+      this.streams[i]._remove(this.proxy);
     }
   }
 }

@@ -10,7 +10,7 @@ describe('Stream.prototype.startWith', () => {
         assert.strictEqual(x, 1);
       },
       error: done.fail,
-      end: done
+      complete: done
     });
   });
 });

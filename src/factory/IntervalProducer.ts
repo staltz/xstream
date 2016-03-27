@@ -1,7 +1,7 @@
-import {Producer} from '../Producer';
-import {Listener} from '../Listener';
+import {InternalProducer} from '../InternalProducer';
+import {InternalListener} from '../InternalListener';
 
-export class IntervalProducer implements Producer<number> {
+export class IntervalProducer implements InternalProducer<number> {
   on: boolean;
   intervalID: any;
   i: number;
@@ -11,13 +11,13 @@ export class IntervalProducer implements Producer<number> {
     this.i = 0;
   }
 
-  start(stream: Listener<number>): void {
+  _start(stream: InternalListener<number>): void {
     const self = this;
-    function intervalHandler() { stream.next(self.i++); }
+    function intervalHandler() { stream._n(self.i++); }
     this.intervalID = setInterval(intervalHandler, this.period);
   }
 
-  stop(): void {
+  _stop(): void {
     this.i = 0;
     if (this.intervalID !== -1) clearInterval(this.intervalID);
   }

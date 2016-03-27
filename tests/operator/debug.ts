@@ -4,7 +4,7 @@ import * as assert from 'assert';
 describe('Stream.prototype.debug', () => {
   it('should allow inspecting the operator chain', (done) => {
     const expected = [0, 1, 2];
-    const stream = xs.interval(50).debug(x => {
+    const stream = xs.interval(50).take(3).debug(x => {
       assert.equal(x, expected.shift());
     });
     let listener = {
@@ -16,7 +16,7 @@ describe('Stream.prototype.debug', () => {
         }
       },
       error: done.fail,
-      end: done.fail,
+      complete: done.fail,
     };
     stream.addListener(listener);
   });

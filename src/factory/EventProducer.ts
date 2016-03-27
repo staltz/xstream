@@ -1,7 +1,7 @@
-import {Producer} from '../Producer';
-import {Listener} from '../Listener';
+import {InternalProducer} from '../InternalProducer';
+import {InternalListener} from '../InternalListener';
 
-export class EventProducer implements Producer<Event> {
+export class EventProducer implements InternalProducer<Event> {
   private listener: EventListener;
 
   constructor(public node: EventTarget,
@@ -9,13 +9,13 @@ export class EventProducer implements Producer<Event> {
               public useCapture: boolean) {
   }
 
-  start(out: Listener<Event>) {
-    this.listener = (e) => out.next(e);
+  _start(out: InternalListener<Event>) {
+    this.listener = (e) => out._n(e);
     const {node, eventType, useCapture} = this;
     node.addEventListener(eventType, this.listener, useCapture);
   }
 
-  stop() {
+  _stop() {
     const {node, eventType, listener, useCapture} = this;
     node.removeEventListener(eventType, listener, useCapture);
   }
