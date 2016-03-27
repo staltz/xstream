@@ -26,7 +26,7 @@ describe('Stream', () => {
       next: (x: number) => {
         assert.equal(x, expected.shift());
       },
-      error: done.fail,
+      error: (err: any) => done(err),
       complete: () => {
         listenerGotEnd = true;
       },
@@ -73,7 +73,7 @@ describe('Stream', () => {
       next: (x: number) => {
         assert.equal(x, expected.shift());
       },
-      error: e => done.fail(e),
+      error: (err: any) => done(err),
       complete: () => {
         listenerGotEnd = true;
       },
@@ -98,7 +98,7 @@ describe('Stream', () => {
       next: (x: string) => {
         assert.equal(x, expected.shift());
       },
-      error: e => done(e),
+      error: (err: any) => done(err),
       complete: () => {
         assert.equal(expected.length, 0);
         done();
@@ -119,8 +119,8 @@ describe('Stream', () => {
           done();
         }
       },
-      error: done.fail,
-      complete: done.fail,
+      error: (err: any) => done(err),
+      complete: () => done('should not call complete'),
     };
     stream.addListener(listener);
   });
@@ -134,8 +134,8 @@ describe('Stream', () => {
       next: (x: number) => {
         assert.equal(x, expected1.shift());
       },
-      error: done.fail,
-      complete: done.fail,
+      error: (err: any) => done(err),
+      complete: () => done('should not call complete'),
     };
     stream.addListener(listener1);
 
@@ -143,8 +143,8 @@ describe('Stream', () => {
       next: (x: number) => {
         assert.equal(x, expected2.shift());
       },
-      error: done.fail,
-      complete: done.fail,
+      error: (err: any) => done(err),
+      complete: () => done('should not call complete'),
     };
     setTimeout(() => {
       stream.addListener(listener2);
@@ -170,8 +170,8 @@ describe('Stream', () => {
           done();
         }
       },
-      error: done.fail,
-      complete: done.fail,
+      error: (err: any) => done(err),
+      complete: () => done('should not call complete'),
     };
     stream.addListener(listener);
 
@@ -192,8 +192,8 @@ describe('Stream', () => {
           done();
         }
       },
-      error: done.fail,
-      complete: done.fail,
+      error: (err: any) => done(err),
+      complete: () => done('should not call complete'),
     };
     stream.addListener(listener);
 
