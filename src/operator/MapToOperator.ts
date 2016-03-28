@@ -4,12 +4,12 @@ import {Stream} from '../Stream';
 import {emptyListener} from '../utils/emptyListener';
 
 export class Proxy<T, R> implements InternalListener<T> {
-  constructor(public out: Stream<R>,
-              public op: MapToOperator<T, R>) {
+  constructor(private out: Stream<R>,
+              private value: R) {
   }
 
   _n(t: T) {
-    this.out._n(this.op.projectedValue);
+    this.out._n(this.value);
   }
 
   _e(err: any) {
@@ -22,14 +22,14 @@ export class Proxy<T, R> implements InternalListener<T> {
 }
 
 export class MapToOperator<T, R> implements Operator<T, R> {
-  public proxy: InternalListener<T> = emptyListener;
+  private proxy: InternalListener<T> = emptyListener;
 
-  constructor(public projectedValue: R,
+  constructor(private projectedValue: R,
               public ins: Stream<T>) {
   }
 
   _start(out: Stream<R>): void {
-    this.ins._add(this.proxy = new Proxy(out, this));
+    this.ins._add(this.proxy = new Proxy(out, this.projectedValue));
   }
 
   _stop(): void {
