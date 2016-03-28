@@ -26,13 +26,13 @@ import {noop} from './utils/noop';
 import {internalizeProducer} from './utils/internalizeProducer';
 
 export class Stream<T> implements InternalListener<T> {
-  public _listeners: Array<InternalListener<T>>;
+  public _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
   public _stopID: any = empty;
   public _prod: InternalProducer<T>;
 
   constructor(producer: InternalProducer<T>) {
     this._prod = producer;
-    this._listeners = [];
+    this._ils = [];
   }
 
   static create<T>(producer?: Producer<T>): Stream<T> {
@@ -62,38 +62,38 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _n(t: T): void {
-    const len = this._listeners.length;
+    const len = this._ils.length;
     if (len === 1) {
-      this._listeners[0]._n(t);
+      this._ils[0]._n(t);
     } else {
       for (let i = 0; i < len; i++) {
-        this._listeners[i]._n(t);
+        this._ils[i]._n(t);
       }
     }
   }
 
   _e(err: any): void {
-    const len = this._listeners.length;
+    const len = this._ils.length;
     if (len === 1) {
-      this._listeners[0]._e(err);
+      this._ils[0]._e(err);
     } else {
       for (let i = 0; i < len; i++) {
-        this._listeners[i]._e(err);
+        this._ils[i]._e(err);
       }
     }
   }
 
   _c(): void {
-    const len = this._listeners.length;
+    const len = this._ils.length;
     if (len === 1) {
-      this._listeners[0]._c();
+      this._ils[0]._c();
     } else {
       for (let i = 0; i < len; i++) {
-        this._listeners[i]._c();
+        this._ils[i]._c();
       }
     }
     if (this._prod) this._stopID = setTimeout(() => this._prod._stop());
-    this._listeners = [];
+    this._ils = [];
   }
 
   addListener(listener: Listener<T>): void {
@@ -108,8 +108,8 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _add(il: InternalListener<T>): void {
-    this._listeners.push(il);
-    if (this._listeners.length === 1) {
+    this._ils.push(il);
+    if (this._ils.length === 1) {
       if (this._stopID !== empty) {
         clearTimeout(this._stopID);
         this._stopID = empty;
@@ -119,10 +119,10 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _remove(il: InternalListener<T>): void {
-    const i = this._listeners.indexOf(il);
+    const i = this._ils.indexOf(il);
     if (i > -1) {
-      this._listeners.splice(i, 1);
-      if (this._prod && this._listeners.length <= 0) {
+      this._ils.splice(i, 1);
+      if (this._prod && this._ils.length <= 0) {
         this._stopID = setTimeout(() => this._prod._stop());
       }
     }
