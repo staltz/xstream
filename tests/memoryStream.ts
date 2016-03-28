@@ -1,8 +1,10 @@
 import xs, {Producer, Listener, Stream} from '../src/index';
 import * as assert from 'assert';
 
+const noop = () => {};
+
 describe('MemoryStream', () => {
-  it('should allow use like a subject', (done) => {
+  it('should allow use like a subject, from xs.createWithMemory()', (done) => {
     const stream = xs.createWithMemory();
 
     stream.shamefullySendNext(1);
@@ -16,6 +18,27 @@ describe('MemoryStream', () => {
     });
 
     stream.shamefullySendComplete();
+  });
+
+  it('should allow being imitated by a proxy Stream', (done) => {
+    const stream = xs.interval(100).take(3);
+    const proxyStream = xs.createWithMemory();
+
+    const expected = [0, 1, 2];
+    setTimeout(() => {
+      proxyStream.addListener({
+        next: (x: string) => {
+          assert.equal(x, expected.shift());
+        },
+        error: (err: any) => done(err),
+        complete: () => {
+          assert.equal(expected.length, 0);
+          done();
+        },
+      });
+    }, 130);
+
+    proxyStream.imitate(stream);
   });
 
   it('should be createable giving a custom producer object', (done) => {
