@@ -4,12 +4,12 @@ import {Stream} from '../Stream';
 import {emptyListener} from '../utils/emptyListener';
 
 export class Proxy<T> implements InternalListener<T> {
-  constructor(public out: Stream<T>,
-              public prod: DropOperator<T>) {
+  constructor(private out: Stream<T>,
+              private op: DropOperator<T>) {
   }
 
   _n(t: T) {
-    if (this.prod.dropped++ >= this.prod.max) this.out._n(t);
+    if (this.op.dropped++ >= this.op.max) this.out._n(t);
   }
 
   _e(err: any) {
@@ -22,7 +22,7 @@ export class Proxy<T> implements InternalListener<T> {
 }
 
 export class DropOperator<T> implements Operator<T, T> {
-  public proxy: InternalListener<T> = emptyListener;
+  private proxy: InternalListener<T> = emptyListener;
   public dropped: number = 0;
 
   constructor(public max: number,

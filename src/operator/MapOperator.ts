@@ -4,8 +4,8 @@ import {Stream} from '../Stream';
 import {emptyListener} from '../utils/emptyListener';
 
 export class Proxy<T, R> implements InternalListener<T> {
-  constructor(public out: Stream<R>,
-              public op: MapOperator<T, R>) {
+  constructor(private out: Stream<R>,
+              private op: MapOperator<T, R>) {
   }
 
   _n(t: T) {
@@ -22,7 +22,7 @@ export class Proxy<T, R> implements InternalListener<T> {
 }
 
 export class MapOperator<T, R> implements Operator<T, R> {
-  public proxy: InternalListener<T> = emptyListener;
+  private proxy: InternalListener<T> = emptyListener;
 
   constructor(public project: (t: T) => R,
               public ins: Stream<T>) {

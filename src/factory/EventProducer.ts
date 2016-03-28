@@ -4,9 +4,9 @@ import {InternalListener} from '../InternalListener';
 export class EventProducer implements InternalProducer<Event> {
   private listener: EventListener;
 
-  constructor(public node: EventTarget,
-              public eventType: string,
-              public useCapture: boolean) {
+  constructor(private node: EventTarget,
+              private eventType: string,
+              private useCapture: boolean) {
   }
 
   _start(out: InternalListener<Event>) {

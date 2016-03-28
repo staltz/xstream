@@ -6,7 +6,7 @@ export class IntervalProducer implements InternalProducer<number> {
   intervalID: any;
   i: number;
 
-  constructor(public period: number) {
+  constructor(private period: number) {
     this.intervalID = -1;
     this.i = 0;
   }

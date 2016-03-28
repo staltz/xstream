@@ -58,7 +58,8 @@ export interface CombineInstanceSignature<T> {
 }
 
 export class Proxy<T> implements InternalListener<T> {
-  constructor(public i: number, public prod: CombineProducer<T>) {
+  constructor(private i: number,
+              private prod: CombineProducer<T>) {
     prod.proxies.push(this);
   }
 
@@ -88,12 +89,12 @@ export class Proxy<T> implements InternalListener<T> {
 
 export class CombineProducer<R> implements InternalProducer<R> {
   public out: InternalListener<R> = emptyListener;
+  public ac: number; // ac is activeCount
   public proxies: Array<Proxy<any>> = [];
   public ready: boolean = false;
   public hasVal: Array<boolean>;
   public vals: Array<any>;
-  public streams: Array<Stream<any>>;
-  public ac: number; // ac is activeCount
+  private streams: Array<Stream<any>>;
 
   constructor(public project: CombineProjectFunction, streams: Array<Stream<any>>) {
     this.streams = streams;

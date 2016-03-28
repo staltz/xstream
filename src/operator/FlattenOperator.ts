@@ -5,8 +5,8 @@ import {emptyListener} from '../utils/emptyListener';
 import {MapOperator} from './MapOperator';
 
 export class Inner<T> implements InternalListener<T> {
-  constructor(public out: Stream<T>,
-              public op: FlattenOperator<T>) {
+  constructor(private out: Stream<T>,
+              private op: FlattenOperator<T>) {
   }
 
   _n(t: T) {
@@ -24,8 +24,8 @@ export class Inner<T> implements InternalListener<T> {
 }
 
 export class Outer<T> implements InternalListener<Stream<T>> {
-  constructor(public out: Stream<T>,
-              public op: FlattenOperator<T>) {
+  constructor(private out: Stream<T>,
+              private op: FlattenOperator<T>) {
   }
 
   _n(s: Stream<T>) {
@@ -44,9 +44,9 @@ export class Outer<T> implements InternalListener<Stream<T>> {
 }
 
 export class MapOuter<T> implements InternalListener<T> {
-  constructor(public out: Stream<T>,
-              public pr: (t: T) => Stream<T>, // pr = project
-              public op: FlattenOperator<T>) {
+  constructor(private out: Stream<T>,
+              private pr: (t: T) => Stream<T>, // pr = project
+              private op: FlattenOperator<T>) {
   }
 
   _n(v: T) {
@@ -65,16 +65,16 @@ export class MapOuter<T> implements InternalListener<T> {
 }
 
 export class FlattenOperator<T> implements Operator<Stream<T>, T> {
-  public proxy: InternalListener<T | Stream<T>> = emptyListener;
-  public mapOp: MapOperator<T, Stream<T>>;
+  private proxy: InternalListener<T | Stream<T>> = emptyListener;
+  private mapOp: MapOperator<T, Stream<T>>;
   public curr: Stream<T>; // Current inner Stream
   public inner: InternalListener<T>; // Current inner InternalListener
   public open: boolean = true;
-  public out: Stream<T>;
+  private out: Stream<T>;
 
   constructor(public ins: Stream<Stream<T>>) {
-    if (ins._prod instanceof MapOperator) {
-      this.mapOp = <MapOperator<T, Stream<T>>> ins._prod;
+    if (ins['_prod'] instanceof MapOperator) { // yeah I know _prod is private, who cares
+      this.mapOp = <MapOperator<T, Stream<T>>> ins['_prod'];
     }
   }
 

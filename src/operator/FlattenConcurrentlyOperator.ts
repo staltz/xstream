@@ -5,8 +5,8 @@ import {emptyListener} from '../utils/emptyListener';
 import {MapOperator} from './MapOperator';
 
 export class Inner<T> implements InternalListener<T> {
-  constructor(public out: Stream<T>,
-              public op: FlattenConcurrentlyOperator<T>) {
+  constructor(private out: Stream<T>,
+              private op: FlattenConcurrentlyOperator<T>) {
   }
 
   _n(t: T) {
@@ -23,8 +23,8 @@ export class Inner<T> implements InternalListener<T> {
 }
 
 export class Outer<T> implements InternalListener<Stream<T>> {
-  constructor(public out: Stream<T>,
-              public op: FlattenConcurrentlyOperator<T>) {
+  constructor(private out: Stream<T>,
+              private op: FlattenConcurrentlyOperator<T>) {
   }
 
   _n(s: Stream<T>) {
@@ -42,9 +42,9 @@ export class Outer<T> implements InternalListener<Stream<T>> {
 }
 
 export class MapOuter<T> implements InternalListener<T> {
-  constructor(public out: Stream<T>,
-              public pr: (t: T) => Stream<T>,
-              public op: FlattenConcurrentlyOperator<T>) { // pr = project
+  constructor(private out: Stream<T>,
+              private pr: (t: T) => Stream<T>,
+              private op: FlattenConcurrentlyOperator<T>) { // pr = project
   }
 
   _n(v: T) {
@@ -62,14 +62,14 @@ export class MapOuter<T> implements InternalListener<T> {
 }
 
 export class FlattenConcurrentlyOperator<T> implements Operator<Stream<T>, T> {
-  public proxy: InternalListener<T | Stream<T>> = emptyListener;
-  public mapOp: MapOperator<T, Stream<T>>;
+  private proxy: InternalListener<T | Stream<T>> = emptyListener;
+  private mapOp: MapOperator<T, Stream<T>>;
   public active: number = 1; // number of outers and inners that have not yet ended
-  public out: Stream<T>;
+  private out: Stream<T>;
 
   constructor(public ins: Stream<Stream<T>>) {
-    if (ins._prod instanceof MapOperator) {
-      this.mapOp = <MapOperator<T, Stream<T>>> ins._prod;
+    if (ins['_prod'] instanceof MapOperator) { // yeah I know _prod is private, who cares
+      this.mapOp = <MapOperator<T, Stream<T>>> ins['_prod'];
     }
   }
 

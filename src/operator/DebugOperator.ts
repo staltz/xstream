@@ -4,13 +4,13 @@ import {Stream} from '../Stream';
 import {emptyListener} from '../utils/emptyListener';
 
 export class Proxy<T> implements InternalListener<T> {
-  constructor(public out: Stream<T>,
-              public p: DebugOperator<T>) {
+  constructor(private out: Stream<T>,
+              private op: DebugOperator<T>) {
   }
 
   _n(t: T) {
-    if (this.p.spy) {
-      this.p.spy(t);
+    if (this.op.spy) {
+      this.op.spy(t);
     } else {
       console.log(t);
     }
@@ -27,7 +27,7 @@ export class Proxy<T> implements InternalListener<T> {
 }
 
 export class DebugOperator<T> implements Operator<T, T> {
-  public proxy: InternalListener<T> = emptyListener;
+  private proxy: InternalListener<T> = emptyListener;
 
   constructor(public spy: (t: T) => void = null,
               public ins: Stream<T>) {

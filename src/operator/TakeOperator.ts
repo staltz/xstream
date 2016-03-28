@@ -4,8 +4,8 @@ import {Stream} from '../Stream';
 import {emptyListener} from '../utils/emptyListener';
 
 export class Proxy<T> implements InternalListener<T> {
-  constructor(public out: Stream<T>,
-              public prod: TakeOperator<T>) {
+  constructor(private out: Stream<T>,
+              private prod: TakeOperator<T>) {
   }
 
   _n(t: T) {
@@ -29,7 +29,7 @@ export class Proxy<T> implements InternalListener<T> {
 }
 
 export class TakeOperator<T> implements Operator<T, T> {
-  public proxy: InternalListener<T> = emptyListener;
+  private proxy: InternalListener<T> = emptyListener;
   public taken: number = 0;
 
   constructor(public max: number,

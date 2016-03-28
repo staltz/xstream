@@ -4,7 +4,7 @@ import {Stream} from '../Stream';
 import {emptyListener} from '../utils/emptyListener';
 
 export class Proxy<T> implements InternalListener<T> {
-  constructor(public prod: MergeProducer<T>) {
+  constructor(private prod: MergeProducer<T>) {
   }
 
   _n(t: T) {
@@ -26,9 +26,9 @@ export class Proxy<T> implements InternalListener<T> {
 export class MergeProducer<T> implements InternalProducer<T> {
   public out: InternalListener<T> = emptyListener;
   public ac: number; // ac is activeCount
-  public proxy: Proxy<T>;
+  private proxy: Proxy<T>;
 
-  constructor(public streams: Array<Stream<T>>) {
+  constructor(private streams: Array<Stream<T>>) {
     this.ac = streams.length;
   }
 

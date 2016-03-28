@@ -26,9 +26,9 @@ import {noop} from './utils/noop';
 import {internalizeProducer} from './utils/internalizeProducer';
 
 export class Stream<T> implements InternalListener<T> {
-  public _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
-  public _stopID: any = empty;
-  public _prod: InternalProducer<T>;
+  private _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
+  private _stopID: any = empty;
+  private _prod: InternalProducer<T>;
 
   constructor(producer: InternalProducer<T>) {
     this._prod = producer;
@@ -228,8 +228,8 @@ export class Stream<T> implements InternalListener<T> {
 }
 
 export class MemoryStream<T> extends Stream<T> {
-  public _val: any;
-  public _has: boolean = false;
+  private _val: any;
+  private _has: boolean = false;
   constructor(producer: InternalProducer<T>) {
     super(producer);
   }

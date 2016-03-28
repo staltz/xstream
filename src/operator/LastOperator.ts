@@ -5,14 +5,14 @@ import {emptyListener} from '../utils/emptyListener';
 import {empty} from '../utils/empty';
 
 export class Proxy<T> implements InternalListener<T> {
-  constructor(public out: Stream<T>,
-              public p: LastOperator<T>) {
+  constructor(private out: Stream<T>,
+              private op: LastOperator<T>) {
   }
 
   _n(t: T) {
-    const p = this.p;
-    p.has = true;
-    p.val = t;
+    const op = this.op;
+    op.has = true;
+    op.val = t;
   }
 
   _e(err: any) {
@@ -20,10 +20,10 @@ export class Proxy<T> implements InternalListener<T> {
   }
 
   _c() {
-    const p = this.p;
+    const op = this.op;
     const out = this.out;
-    if (p.has) {
-      out._n(p.val);
+    if (op.has) {
+      out._n(op.val);
       out._c();
     } else {
       out._e('TODO show proper error');
@@ -32,7 +32,7 @@ export class Proxy<T> implements InternalListener<T> {
 }
 
 export class LastOperator<T> implements Operator<T, T> {
-  public proxy: InternalListener<T> = emptyListener;
+  private proxy: InternalListener<T> = emptyListener;
   public has: boolean = false;
   public val: T = <T> empty;
 

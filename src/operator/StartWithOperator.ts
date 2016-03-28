@@ -4,8 +4,10 @@ import {Operator} from '../Operator';
 import {emptyListener} from '../utils/emptyListener';
 
 export class StartWithOperator<T> implements Operator<T, T> {
-  public out: InternalListener<T> = emptyListener;
-  constructor(public ins: Stream<T>, public value: T) {
+  private out: InternalListener<T> = emptyListener;
+
+  constructor(public ins: Stream<T>,
+              private value: T) {
   }
 
   _start(out: InternalListener<T>): void {

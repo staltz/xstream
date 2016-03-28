@@ -4,12 +4,12 @@ import {Stream} from '../Stream';
 import {emptyListener} from '../utils/emptyListener';
 
 export class Proxy<T> implements InternalListener<T> {
-  constructor(public out: Stream<T>,
-              public p: FilterOperator<T>) {
+  constructor(private out: Stream<T>,
+              private op: FilterOperator<T>) {
   }
 
   _n(t: T) {
-    if (this.p.predicate(t)) this.out._n(t);
+    if (this.op.predicate(t)) this.out._n(t);
   }
 
   _e(err: any) {
@@ -22,7 +22,7 @@ export class Proxy<T> implements InternalListener<T> {
 }
 
 export class FilterOperator<T> implements Operator<T, T> {
-  public proxy: InternalListener<T> = emptyListener;
+  private proxy: InternalListener<T> = emptyListener;
 
   constructor(public predicate: (t: T) => boolean,
               public ins: Stream<T>) {
