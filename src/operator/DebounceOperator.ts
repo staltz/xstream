@@ -5,31 +5,31 @@ import {emptyListener} from '../utils/emptyListener';
 
 export class Proxy<T> implements InternalListener<T> {
   private value: T;
-  private timerID: any = null;
+  private id: any = null;
   constructor(private out: Stream<T>,
               private period: number) {
   }
 
-  _clearTimer() {
-    if (this.timerID !== null) {
-      clearTimeout(this.timerID);
+  clearTimer() {
+    if (this.id !== null) {
+      clearTimeout(this.id);
     }
-    this.timerID = null;
+    this.id = null;
   }
 
   _n(t: T) {
     this.value = t;
-    this._clearTimer();
-    this.timerID = setTimeout(() => this.out._n(this.value), this.period);
+    this.clearTimer();
+    this.id = setTimeout(() => this.out._n(this.value), this.period);
   }
 
   _e(err: any) {
-    this._clearTimer();
+    this.clearTimer();
     this.out._e(err);
   }
 
   _c() {
-    this._clearTimer();
+    this.clearTimer();
     this.out._c();
   }
 
