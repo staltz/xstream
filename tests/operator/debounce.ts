@@ -21,8 +21,8 @@ describe('Stream.prototype.debounce', () => {
           done();
         }
       },
-      error: done.fail,
-      complete: done.fail,
+      error: (err: Error) => done(err),
+      complete: () => done(new Error('This should not be called')),
     };
     stream.addListener(listener);
   });
