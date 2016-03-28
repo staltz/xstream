@@ -13,6 +13,7 @@ import {LastOperator} from './operator/LastOperator';
 import {StartWithOperator} from './operator/StartWithOperator';
 import {FlattenOperator} from './operator/FlattenOperator';
 import {FlattenConcurrentlyOperator} from './operator/FlattenConcurrentlyOperator';
+import {DebounceOperator} from './operator/DebounceOperator';
 import {
   CombineProducer,
   CombineInstanceSignature,
@@ -214,6 +215,10 @@ export class Stream<T> implements InternalListener<T> {
 
   flattenConcurrently<R, T extends Stream<R>>(): T {
     return <T> new Stream<R>(new FlattenConcurrentlyOperator(<Stream<Stream<R>>> (<any> this)));
+  }
+
+  debounce(period: number): Stream<T> {
+    return new Stream<T>(new DebounceOperator(period, this));
   }
 
   merge(other: Stream<T>): Stream<T> {
