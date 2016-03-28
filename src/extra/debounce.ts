@@ -3,7 +3,7 @@ import {Operator} from '../Operator';
 import {Stream} from '../Stream';
 import {emptyListener} from '../utils/emptyListener';
 
-export class Proxy<T> implements InternalListener<T> {
+class Proxy<T> implements InternalListener<T> {
   private value: T;
   private id: any = null;
   constructor(private out: Stream<T>,
@@ -35,7 +35,7 @@ export class Proxy<T> implements InternalListener<T> {
 
 }
 
-export class DebounceOperator<T> implements Operator<T, T> {
+class DebounceOperator<T> implements Operator<T, T> {
   private proxy: InternalListener<T> = emptyListener;
 
   constructor(private period: number,
@@ -49,4 +49,10 @@ export class DebounceOperator<T> implements Operator<T, T> {
   _stop(): void {
     this.ins._remove(this.proxy);
   }
+}
+
+export default function debounce<T>(period: number): (ins: Stream<T>) => Stream<T> {
+  return function debounceOperator(ins: Stream<T>) {
+    return new Stream<T>(new DebounceOperator(period, ins));
+  };
 }

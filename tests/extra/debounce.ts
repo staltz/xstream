@@ -1,7 +1,8 @@
 import xs, {Listener, Producer} from '../../src/index';
+import debounce from '../../src/extra/debounce';
 import * as assert from 'assert';
 
-describe('Stream.prototype.debounce', () => {
+describe('debounce (extra)', () => {
   it('should delay events until a period of silence has passed', (done) => {
     const producer: Producer<number> = {
       start(out: Listener<number>) {
@@ -11,7 +12,7 @@ describe('Stream.prototype.debounce', () => {
       },
       stop() {}
     }
-    const stream = xs.create(producer).debounce(100);
+    const stream = xs.create(producer).compose(debounce(100));
     const expected = [5];
     let listener = {
       next: (x: number) => {

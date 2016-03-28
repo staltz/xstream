@@ -33,7 +33,7 @@ class Proxy<T> implements InternalListener<T> {
   }
 }
 
-export class DelayOperator<T> implements Operator<T, T> {
+class DelayOperator<T> implements Operator<T, T> {
   private proxy: InternalListener<T> = emptyListener;
 
   constructor(public period: number,
