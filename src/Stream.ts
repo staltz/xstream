@@ -225,6 +225,10 @@ export class Stream<T> implements InternalListener<T> {
     return Stream.merge(this, other);
   }
 
+  compose(operator: (stream: Stream<T>) => Stream<any>): Stream<any> {
+    return operator(this);
+  }
+
   combine: CombineInstanceSignature<T> =
     function combine<R>(project: CombineProjectFunction,
                         ...streams: Array<Stream<any>>): Stream<R> {
