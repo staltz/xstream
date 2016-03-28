@@ -3,6 +3,7 @@ import {Producer} from './Producer';
 import {InternalListener} from './InternalListener';
 import {InternalProducer} from './InternalProducer';
 import {MapOperator} from './operator/MapOperator';
+import {MapToOperator} from './operator/MapToOperator';
 import {FilterOperator} from './operator/FilterOperator';
 import {TakeOperator} from './operator/TakeOperator';
 import {DropOperator} from './operator/DropOperator';
@@ -169,6 +170,10 @@ export class Stream<T> implements InternalListener<T> {
 
   map<U>(project: (t: T) => U): Stream<U> {
     return new Stream<U>(new MapOperator(project, this));
+  }
+
+  mapTo<U>(projectedValue: U): Stream<U> {
+    return new Stream<U>(new MapToOperator(projectedValue, this));
   }
 
   filter(predicate: (t: T) => boolean): Stream<T> {
