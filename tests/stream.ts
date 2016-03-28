@@ -50,6 +50,7 @@ describe('Stream', () => {
     assert.equal(typeof stream.addListener, 'function');
     assert.equal(typeof stream.removeListener, 'function');
     assert.equal(typeof stream.map, 'function');
+    assert.equal(typeof stream.mapTo, 'function');
     assert.equal(typeof stream.filter, 'function');
     assert.equal(typeof stream.take, 'function');
     assert.equal(typeof stream.drop, 'function');
@@ -62,6 +63,7 @@ describe('Stream', () => {
     assert.equal(typeof stream.flattenConcurrently, 'function');
     assert.equal(typeof stream.merge, 'function');
     assert.equal(typeof stream.combine, 'function');
+    assert.equal(typeof stream.imitate, 'function');
   });
 
   it('should allow using shamefullySend* methods', (done) => {
