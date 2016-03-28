@@ -129,34 +129,6 @@ export class Stream<T> implements InternalListener<T> {
     }
   }
 
-  static combine: CombineFactorySignature =
-    function combine<R>(project: CombineProjectFunction,
-                        ...streams: Array<Stream<any>>): Stream<R> {
-      return new Stream<R>(new CombineProducer<R>(project, streams));
-    };
-
-  static from<T>(array: Array<T>): Stream<T> {
-    return new Stream<T>(new FromProducer(array));
-  }
-
-  static of<T>(...items: Array<T>): Stream<T> {
-    return Stream.from(items);
-  }
-
-  static merge<T>(...streams: Array<Stream<T>>): Stream<T> {
-    return new Stream<T>(new MergeProducer(streams));
-  }
-
-  static interval(period: number): Stream<number> {
-    return new Stream<number>(new IntervalProducer(period));
-  }
-
-  static domEvent(node: EventTarget,
-                  eventType: string,
-                  useCapture: boolean = false): Stream<Event> {
-    return new Stream<Event>(new EventProducer(node, eventType, useCapture));
-  }
-
   static never(): Stream<void> {
     return new Stream<void>({_start: noop, _stop: noop});
   }
@@ -166,6 +138,34 @@ export class Stream<T> implements InternalListener<T> {
       _start(il: InternalListener<void>) { il._c(); },
       _stop: noop,
     });
+  }
+
+  static from<T>(array: Array<T>): Stream<T> {
+    return new Stream<T>(new FromProducer(array));
+  }
+
+  static of<T>(...items: Array<T>): Stream<T> {
+    return Stream.from(items);
+  }
+
+  static interval(period: number): Stream<number> {
+    return new Stream<number>(new IntervalProducer(period));
+  }
+
+  static merge<T>(...streams: Array<Stream<T>>): Stream<T> {
+    return new Stream<T>(new MergeProducer(streams));
+  }
+
+  static combine: CombineFactorySignature =
+    function combine<R>(project: CombineProjectFunction,
+                        ...streams: Array<Stream<any>>): Stream<R> {
+      return new Stream<R>(new CombineProducer<R>(project, streams));
+    };
+
+  static domEvent(node: EventTarget,
+                  eventType: string,
+                  useCapture: boolean = false): Stream<Event> {
+    return new Stream<Event>(new EventProducer(node, eventType, useCapture));
   }
 
   map<U>(project: (t: T) => U): Stream<U> {
@@ -188,24 +188,16 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<T>(new DropOperator(amount, this));
   }
 
-  debug(spy: (t: T) => void = null): Stream<T> {
-    return new Stream<T>(new DebugOperator(spy, this));
-  }
-
-  fold<R>(accumulate: (acc: R, t: T) => R, init: R): Stream<R> {
-    return new Stream<R>(new FoldOperator(accumulate, init, this));
-  }
-
   last(): Stream<T> {
     return new Stream<T>(new LastOperator(this));
   }
 
-  remember(): Stream<T> {
-    return new MemoryStream<T>(this._prod);
-  }
-
   startWith(x: T): Stream<T> {
     return new Stream<T>(new StartWithOperator(this, x));
+  }
+
+  fold<R>(accumulate: (acc: R, t: T) => R, init: R): Stream<R> {
+    return new Stream<R>(new FoldOperator(accumulate, init, this));
   }
 
   flatten<R, T extends Stream<R>>(): T {
@@ -220,10 +212,6 @@ export class Stream<T> implements InternalListener<T> {
     return Stream.merge(this, other);
   }
 
-  compose(operator: (stream: Stream<T>) => Stream<any>): Stream<any> {
-    return operator(this);
-  }
-
   combine: CombineInstanceSignature<T> =
     function combine<R>(project: CombineProjectFunction,
                         ...streams: Array<Stream<any>>): Stream<R> {
@@ -231,8 +219,20 @@ export class Stream<T> implements InternalListener<T> {
       return Stream.combine(project, ...streams);
     };
 
+  compose(operator: (stream: Stream<T>) => Stream<any>): Stream<any> {
+    return operator(this);
+  }
+
+  remember(): Stream<T> {
+    return new MemoryStream<T>(this._prod);
+  }
+
   imitate(other: Stream<T>): void {
     other._add(this);
+  }
+
+  debug(spy: (t: T) => void = null): Stream<T> {
+    return new Stream<T>(new DebugOperator(spy, this));
   }
 }
 
