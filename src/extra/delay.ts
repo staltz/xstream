@@ -50,7 +50,7 @@ class DelayOperator<T> implements Operator<T, T> {
 }
 
 export default function delay<T>(period: number): (ins: Stream<T>) => Stream<T> {
-  return function delayOperator(ins: Stream<T>) {
+  return function delayOperator(ins: Stream<T>): Stream<T> {
     return new Stream<T>(new DelayOperator(period, ins));
   };
 }

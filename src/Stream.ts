@@ -11,6 +11,7 @@ import {DebugOperator} from './operator/DebugOperator';
 import {FoldOperator} from './operator/FoldOperator';
 import {LastOperator} from './operator/LastOperator';
 import {StartWithOperator} from './operator/StartWithOperator';
+import {EndWhenOperator} from './operator/EndWhenOperator';
 import {FlattenOperator} from './operator/FlattenOperator';
 import {FlattenConcurrentlyOperator} from './operator/FlattenConcurrentlyOperator';
 import {
@@ -194,6 +195,10 @@ export class Stream<T> implements InternalListener<T> {
 
   startWith(x: T): Stream<T> {
     return new Stream<T>(new StartWithOperator(this, x));
+  }
+
+  endWhen(other: Stream<any>): Stream<T> {
+    return new Stream<T>(new EndWhenOperator(other, this));
   }
 
   fold<R>(accumulate: (acc: R, t: T) => R, init: R): Stream<R> {

@@ -57,6 +57,7 @@ describe('Stream', () => {
     assert.equal(typeof stream.drop, 'function');
     assert.equal(typeof stream.last, 'function');
     assert.equal(typeof stream.startWith, 'function');
+    assert.equal(typeof stream.endWhen, 'function');
     assert.equal(typeof stream.fold, 'function');
     assert.equal(typeof stream.flatten, 'function');
     assert.equal(typeof stream.flattenConcurrently, 'function');
