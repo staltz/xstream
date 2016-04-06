@@ -141,6 +141,13 @@ export class Stream<T> implements InternalListener<T> {
     });
   }
 
+  static ['throw'](err: any): Stream<void> {
+    return new Stream<void>({
+      _start(il: InternalListener<void>) { il._e(err); },
+      _stop: noop,
+    });
+  }
+
   static from<T>(array: Array<T>): Stream<T> {
     return new Stream<T>(new FromProducer(array));
   }
