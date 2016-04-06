@@ -7,6 +7,7 @@ import {MapToOperator} from './operator/MapToOperator';
 import {FilterOperator} from './operator/FilterOperator';
 import {TakeOperator} from './operator/TakeOperator';
 import {DropOperator} from './operator/DropOperator';
+import {DropRepeatsOperator} from './operator/DropRepeatsOperator';
 import {DebugOperator} from './operator/DebugOperator';
 import {FoldOperator} from './operator/FoldOperator';
 import {LastOperator} from './operator/LastOperator';
@@ -141,7 +142,7 @@ export class Stream<T> implements InternalListener<T> {
     });
   }
 
-  static ['throw'](err: any): Stream<void> {
+  static throw(err: any): Stream<void> {
     return new Stream<void>({
       _start(il: InternalListener<void>) { il._e(err); },
       _stop: noop,
@@ -194,6 +195,10 @@ export class Stream<T> implements InternalListener<T> {
 
   drop(amount: number): Stream<T> {
     return new Stream<T>(new DropOperator(amount, this));
+  }
+
+  dropRepeats(isEqual: (x: T, y: T) => boolean = null): Stream<T> {
+    return new Stream<T>(new DropRepeatsOperator(isEqual, this));
   }
 
   last(): Stream<T> {
