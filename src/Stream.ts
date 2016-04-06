@@ -95,7 +95,7 @@ export class Stream<T> implements InternalListener<T> {
         this._ils[i]._c();
       }
     }
-    if (this._prod) this._stopID = setTimeout(() => this._prod._stop());
+    if (this._prod) this._prod._stop();
     this._ils = [];
   }
 

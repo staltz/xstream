@@ -216,4 +216,51 @@ describe('Stream', () => {
       stream.addListener(listener);
     }, 180);
   });
+
+  it('should synchronously stop producer when completed', (done) => {
+    let on = false;
+    const stream = xs.create({
+      start: (listener) => {
+        on = true;
+        listener.next(10);
+        listener.next(20);
+        listener.next(30);
+        listener.complete();
+      },
+      stop: () => {
+        on = false;
+      },
+    });
+    const expected1 = [10, 20, 30];
+    const expected2 = [10, 20, 30];
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.equal(on, true);
+        assert.equal(x, expected1.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.equal(on, true);
+        assert.equal(expected1.length, 0);
+      },
+    });
+    assert.equal(on, false);
+    assert.equal(expected1.length, 0);
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.equal(on, true);
+        assert.equal(x, expected2.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.equal(on, true);
+        assert.equal(expected2.length, 0);
+      },
+    });
+    assert.equal(on, false);
+    assert.equal(expected2.length, 0);
+    done();
+  });
 });
