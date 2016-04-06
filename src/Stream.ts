@@ -84,6 +84,8 @@ export class Stream<T> implements InternalListener<T> {
         this._ils[i]._e(err);
       }
     }
+    if (this._prod) this._prod._stop();
+    this._ils = [];
   }
 
   _c(): void {

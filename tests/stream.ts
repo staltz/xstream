@@ -263,4 +263,57 @@ describe('Stream', () => {
     assert.equal(expected2.length, 0);
     done();
   });
+
+  it('should synchronously stop producer when error thrown', (done) => {
+    let on = false;
+    const stream = xs.create({
+      start: (listener) => {
+        on = true;
+        listener.next(10);
+        listener.next(20);
+        listener.next(30);
+        listener.error('oops');
+      },
+      stop: () => {
+        on = false;
+      },
+    });
+    const expected1 = [10, 20, 30];
+    const expected2 = [10, 20, 30];
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.equal(on, true);
+        assert.equal(x, expected1.shift());
+      },
+      error: (err: any) => {
+        assert.equal(err, 'oops');
+        assert.equal(on, true);
+        assert.equal(expected1.length, 0);
+      },
+      complete: () => {
+        done('complete should not be called');
+      },
+    });
+    assert.equal(on, false);
+    assert.equal(expected1.length, 0);
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.equal(on, true);
+        assert.equal(x, expected2.shift());
+      },
+      error: (err: any) => {
+        assert.equal(err, 'oops');
+        assert.equal(on, true);
+        assert.equal(expected2.length, 0);
+      },
+      complete: () => {
+        done('complete should not be called');
+      },
+    });
+    assert.equal(on, false);
+    assert.equal(expected2.length, 0);
+    done();
+  });
 });
