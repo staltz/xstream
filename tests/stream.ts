@@ -55,7 +55,6 @@ describe('Stream', () => {
     assert.equal(typeof stream.filter, 'function');
     assert.equal(typeof stream.take, 'function');
     assert.equal(typeof stream.drop, 'function');
-    assert.equal(typeof stream.dropRepeats, 'function');
     assert.equal(typeof stream.last, 'function');
     assert.equal(typeof stream.startWith, 'function');
     assert.equal(typeof stream.endWhen, 'function');

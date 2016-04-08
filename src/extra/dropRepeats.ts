@@ -46,3 +46,9 @@ export class DropRepeatsOperator<T> implements Operator<T, T> {
     this.ins._remove(this.proxy);
   }
 }
+
+export default function dropRepeats<T>(isEqual: (x: T, y: T) => boolean = null): (ins: Stream<T>) => Stream<T> {
+  return function dropRepeatsOperator(ins: Stream<T>): Stream<T> {
+    return new Stream<T>(new DropRepeatsOperator(isEqual, ins));
+  };
+}
