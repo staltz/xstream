@@ -20,7 +20,6 @@ import {
   CombineInstanceSignature,
   CombineFactorySignature,
   CombineProjectFunction} from './factory/CombineProducer';
-import {EventProducer} from './factory/EventProducer';
 import {FromArrayProducer} from './factory/FromArrayProducer';
 import {IntervalProducer} from './factory/IntervalProducer';
 import {MergeProducer} from './factory/MergeProducer';
@@ -172,12 +171,6 @@ export class Stream<T> implements InternalListener<T> {
                         ...streams: Array<Stream<any>>): Stream<R> {
       return new Stream<R>(new CombineProducer<R>(project, streams));
     };
-
-  static domEvent(node: EventTarget,
-                  eventType: string,
-                  useCapture: boolean = false): Stream<Event> {
-    return new Stream<Event>(new EventProducer(node, eventType, useCapture));
-  }
 
   map<U>(project: (t: T) => U): Stream<U> {
     return new Stream<U>(new MapOperator(project, this));

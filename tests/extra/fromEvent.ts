@@ -1,4 +1,5 @@
 import xs from '../../src/index';
+import fromEvent from '../../src/extra/fromEvent';
 import {noop} from '../../src/utils/noop';
 import * as assert from 'assert';
 
@@ -36,10 +37,10 @@ class FakeEventTarget implements EventTarget {
   }
 };
 
-describe('xs.domEvent', () => {
+describe('fromEvent (extra)', () => {
   it('should call addEventListener with expected parameters', () => {
     const target = new FakeEventTarget();
-    const stream = xs.domEvent(target, 'test', true);
+    const stream = fromEvent(target, 'test', true);
 
     stream.addListener({next: noop, error: noop, complete: noop});
 
@@ -49,7 +50,7 @@ describe('xs.domEvent', () => {
 
   it('should call addEventListener with expected parameters', () => {
     const target = new FakeEventTarget();
-    const stream = xs.domEvent(target, 'test');
+    const stream = fromEvent(target, 'test');
 
     stream.addListener({next: noop, error: noop, complete: noop});
 
@@ -59,7 +60,7 @@ describe('xs.domEvent', () => {
 
   it('should propagate events', (done) => {
     const target = new FakeEventTarget();
-    const stream = xs.domEvent(target, 'test').take(3);
+    const stream = fromEvent(target, 'test').take(3);
 
     let expected = [1, 2, 3];
 
@@ -84,7 +85,7 @@ describe('xs.domEvent', () => {
 
   it('should call removeEventListener with expected parameters', (done) => {
     const target = new FakeEventTarget();
-    const stream = xs.domEvent(target, 'test', true);
+    const stream = fromEvent(target, 'test', true);
 
     stream.take(1).addListener({
       next(x) {},

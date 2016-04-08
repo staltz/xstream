@@ -44,7 +44,6 @@ describe('Stream', () => {
     assert.equal(typeof xs.interval, 'function');
     assert.equal(typeof xs.merge, 'function');
     assert.equal(typeof xs.combine, 'function');
-    assert.equal(typeof xs.domEvent, 'function');
   });
 
   it('should have all the core operators as methods, plus addListener and removeListener', () => {

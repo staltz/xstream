@@ -1,7 +1,8 @@
+import {Stream} from '../Stream';
 import {InternalProducer} from '../InternalProducer';
 import {InternalListener} from '../InternalListener';
 
-export class EventProducer implements InternalProducer<Event> {
+export class DOMEventProducer implements InternalProducer<Event> {
   private listener: EventListener;
 
   constructor(private node: EventTarget,
@@ -19,4 +20,10 @@ export class EventProducer implements InternalProducer<Event> {
     const {node, eventType, listener, useCapture} = this;
     node.removeEventListener(eventType, listener, useCapture);
   }
+}
+
+export default function fromEvent(node: EventTarget,
+                                  eventType: string,
+                                  useCapture: boolean = false): Stream<Event> {
+  return new Stream<Event>(new DOMEventProducer(node, eventType, useCapture));
 }
