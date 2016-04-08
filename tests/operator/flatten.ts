@@ -22,7 +22,7 @@ describe('Stream.prototype.flatten', () => {
     });
 
     it('should expand 3 sync events as an interval, only last one passes', (done) => {
-      const stream = xs.from([0, 1, 2])
+      const stream = xs.fromArray([0, 1, 2])
         .map(i => xs.interval(100 * i).take(2).map(x => `${i}${x}`))
         .flatten();
       // ---x---x---x---x---x---x

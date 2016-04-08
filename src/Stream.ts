@@ -21,7 +21,7 @@ import {
   CombineFactorySignature,
   CombineProjectFunction} from './factory/CombineProducer';
 import {EventProducer} from './factory/EventProducer';
-import {FromProducer} from './factory/FromProducer';
+import {FromArrayProducer} from './factory/FromArrayProducer';
 import {IntervalProducer} from './factory/IntervalProducer';
 import {MergeProducer} from './factory/MergeProducer';
 import {empty} from './utils/empty';
@@ -151,12 +151,12 @@ export class Stream<T> implements InternalListener<T> {
     });
   }
 
-  static from<T>(array: Array<T>): Stream<T> {
-    return new Stream<T>(new FromProducer(array));
+  static fromArray<T>(array: Array<T>): Stream<T> {
+    return new Stream<T>(new FromArrayProducer(array));
   }
 
   static of<T>(...items: Array<T>): Stream<T> {
-    return Stream.from(items);
+    return Stream.fromArray(items);
   }
 
   static interval(period: number): Stream<number> {

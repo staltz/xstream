@@ -39,7 +39,7 @@ describe('Stream', () => {
     assert.equal(typeof xs.never, 'function');
     assert.equal(typeof xs.empty, 'function');
     assert.equal(typeof xs.throw, 'function');
-    assert.equal(typeof xs.from, 'function');
+    assert.equal(typeof xs.fromArray, 'function');
     assert.equal(typeof xs.of, 'function');
     assert.equal(typeof xs.interval, 'function');
     assert.equal(typeof xs.merge, 'function');

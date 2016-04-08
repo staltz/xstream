@@ -1,21 +1,21 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
-describe('xs.from', () => {
+describe('xs.fromArray', () => {
   it('should convert an array to a stream', (done) => {
-    const stream = xs.from([10, 20, 30, 40, 50])
+    const stream = xs.fromArray([10, 20, 30, 40, 50])
       .map(i => String(i));
     let expected = ['10', '20', '30', '40', '50'];
-    let listener = {
+
+    stream.addListener({
       next: (x: string) => {
         assert.equal(x, expected.shift());
       },
-      error: done.fail,
+      error: (err: any) => done(err),
       complete: () => {
         assert.equal(expected.length, 0);
         done();
       },
-    };
-    stream.addListener(listener);
+    });
   });
 });

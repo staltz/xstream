@@ -2,7 +2,7 @@ import {InternalProducer} from '../InternalProducer';
 import {InternalListener} from '../InternalListener';
 import {noop} from '../utils/noop';
 
-export class FromProducer<T> implements InternalProducer<T> {
+export class FromArrayProducer<T> implements InternalProducer<T> {
   constructor(private a: Array<T>) {
   }
 
