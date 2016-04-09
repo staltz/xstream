@@ -44,7 +44,7 @@ var options = {
 
 suite
   .add('xstream', function(deferred) {
-    var streams = a.map(xs.from);
+    var streams = a.map(xs.fromArray);
     runners.runXStream(deferred,
       xs.merge.apply(void 0, streams).fold(sum, 0).last());
   }, options)
