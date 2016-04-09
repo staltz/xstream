@@ -5,12 +5,12 @@ var stream = xs.interval(1000)
   .filter(i => i % 2 === 0)
   .map(i => i * i);
 
-function observerNext(x) {
+function listenerNext(x) {
   console.log(x);
 }
 
-stream.subscribe({
-  next: observerNext,
+stream.addListener({
+  next: listenerNext,
   error: err => console.error(err),
   complete: () => console.log('done'),
 });
