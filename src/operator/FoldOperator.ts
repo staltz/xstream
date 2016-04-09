@@ -1,16 +1,28 @@
-import {InternalListener} from '../InternalListener';
 import {Operator} from '../Operator';
 import {Stream} from '../Stream';
-import {emptyListener} from '../utils/emptyListener';
 
-export class Proxy<T, R> implements InternalListener<T> {
-  constructor(private out: Stream<R>,
-              private op: FoldOperator<T, R>) {
+export class FoldOperator<T, R> implements Operator<T, R> {
+  private out: Stream<R> = null;
+  private acc: R; // initialized as seed
+
+  constructor(public f: (acc: R, t: T) => R,
+              public seed: R,
+              public ins: Stream<T>) {
+    this.acc = seed;
+  }
+
+  _start(out: Stream<R>): void {
+    this.out = out;
+    out._n(this.acc);
+    this.ins._add(this);
+  }
+
+  _stop(): void {
+    this.ins._remove(this);
   }
 
   _n(t: T) {
-    const op = this.op;
-    this.out._n(op.acc = op.f(op.acc, t));
+    this.out._n(this.acc = this.f(this.acc, t));
   }
 
   _e(err: any) {
@@ -19,25 +31,5 @@ export class Proxy<T, R> implements InternalListener<T> {
 
   _c() {
     this.out._c();
-  }
-}
-
-export class FoldOperator<T, R> implements Operator<T, R> {
-  private proxy: InternalListener<T> = emptyListener;
-  public acc: R;
-
-  constructor(public f: (acc: R, t: T) => R,
-              seed: R,
-              public ins: Stream<T>) {
-    this.acc = seed;
-  }
-
-  _start(out: Stream<R>): void {
-    out._n(this.acc);
-    this.ins._add(this.proxy = new Proxy(out, this));
-  }
-
-  _stop(): void {
-    this.ins._remove(this.proxy);
   }
 }

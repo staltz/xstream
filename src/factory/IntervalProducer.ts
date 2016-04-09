@@ -2,13 +2,10 @@ import {InternalProducer} from '../InternalProducer';
 import {InternalListener} from '../InternalListener';
 
 export class IntervalProducer implements InternalProducer<number> {
-  on: boolean;
-  intervalID: any;
-  i: number;
+  private intervalID: any = -1;
+  private i: number = 0;
 
-  constructor(private period: number) {
-    this.intervalID = -1;
-    this.i = 0;
+  constructor(public period: number) {
   }
 
   _start(stream: InternalListener<number>): void {

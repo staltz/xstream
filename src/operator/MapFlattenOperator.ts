@@ -1,10 +1,11 @@
+import {InternalProducer} from '../InternalProducer';
 import {InternalListener} from '../InternalListener';
-import {Operator} from '../Operator';
 import {Stream} from '../Stream';
+import {MapOperator} from './MapOperator';
 
 export class Inner<T> implements InternalListener<T> {
   constructor(private out: Stream<T>,
-              private op: FlattenOperator<T>) {
+              private op: MapFlattenOperator<T>) {
   }
 
   _n(t: T) {
@@ -21,22 +22,22 @@ export class Inner<T> implements InternalListener<T> {
   }
 }
 
-export class FlattenOperator<T> implements Operator<Stream<T>, T> {
+export class MapFlattenOperator<T> implements InternalProducer<T>, InternalListener<T> {
   public curr: Stream<T> = null; // Current inner Stream
   private inner: InternalListener<T> = null; // Current inner InternalListener
   private open: boolean = true;
   private out: Stream<T> = null;
 
-  constructor(public ins: Stream<Stream<T>>) {
+  constructor(public mapOp: MapOperator<T, Stream<T>>) {
   }
 
   _start(out: Stream<T>): void {
     this.out = out;
-    this.ins._add(this);
+    this.mapOp.ins._add(this);
   }
 
   _stop(): void {
-    this.ins._remove(this);
+    this.mapOp.ins._remove(this);
   }
 
   cut(): void {
@@ -52,9 +53,9 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
     }
   }
 
-  _n(s: Stream<T>) {
+  _n(v: T) {
     this.cut();
-    (this.curr = s)._add(this.inner = new Inner(this.out, this));
+    (this.curr = this.mapOp.project(v))._add(this.inner = new Inner(this.out, this));
   }
 
   _e(err: any) {

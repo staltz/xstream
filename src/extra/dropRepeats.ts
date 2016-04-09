@@ -1,24 +1,34 @@
-import {InternalListener} from '../InternalListener';
 import {Operator} from '../Operator';
 import {Stream} from '../Stream';
-import {emptyListener} from '../utils/emptyListener';
 import {empty} from '../utils/empty';
 
-export class Proxy<T> implements InternalListener<T> {
-  constructor(private out: Stream<T>,
-              private op: DropRepeatsOperator<T>) {
+export class DropRepeatsOperator<T> implements Operator<T, T> {
+  private out: Stream<T> = null;
+  private v: T = <any> empty;
+
+  constructor(public fn: (x: T, y: T) => boolean,
+              public ins: Stream<T>) {
+  }
+
+  _start(out: Stream<T>): void {
+    this.out = out;
+    this.ins._add(this);
+  }
+
+  _stop(): void {
+    this.ins._remove(this);
   }
 
   isEq(x: T, y: T) {
-    return this.op.compare ? this.op.compare(x, y) : x === y;
+    return this.fn ? this.fn(x, y) : x === y;
   }
 
   _n(t: T) {
-    const op = this.op;
-    if (op.v === empty || !this.isEq(t, op.v)) {
+    const v = this.v;
+    if (v === empty || !this.isEq(t, v)) {
       this.out._n(t);
     }
-    op.v = t;
+    this.v = t;
   }
 
   _e(err: any) {
@@ -27,23 +37,6 @@ export class Proxy<T> implements InternalListener<T> {
 
   _c() {
     this.out._c();
-  }
-}
-
-export class DropRepeatsOperator<T> implements Operator<T, T> {
-  private proxy: InternalListener<T> = emptyListener;
-  public v: T = <any> empty;
-
-  constructor(public compare: (x: T, y: T) => boolean,
-              public ins: Stream<T>) {
-  }
-
-  _start(out: Stream<T>): void {
-    this.ins._add(this.proxy = new Proxy(out, this));
-  }
-
-  _stop(): void {
-    this.ins._remove(this.proxy);
   }
 }
 

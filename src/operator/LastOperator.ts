@@ -1,18 +1,27 @@
-import {InternalListener} from '../InternalListener';
 import {Operator} from '../Operator';
 import {Stream} from '../Stream';
-import {emptyListener} from '../utils/emptyListener';
 import {empty} from '../utils/empty';
 
-export class Proxy<T> implements InternalListener<T> {
-  constructor(private out: Stream<T>,
-              private op: LastOperator<T>) {
+export class LastOperator<T> implements Operator<T, T> {
+  private out: Stream<T> = null;
+  private has: boolean = false;
+  private val: T = <T> empty;
+
+  constructor(public ins: Stream<T>) {
+  }
+
+  _start(out: Stream<T>): void {
+    this.out = out;
+    this.ins._add(this);
+  }
+
+  _stop(): void {
+    this.ins._remove(this);
   }
 
   _n(t: T) {
-    const op = this.op;
-    op.has = true;
-    op.val = t;
+    this.has = true;
+    this.val = t;
   }
 
   _e(err: any) {
@@ -20,30 +29,12 @@ export class Proxy<T> implements InternalListener<T> {
   }
 
   _c() {
-    const op = this.op;
     const out = this.out;
-    if (op.has) {
-      out._n(op.val);
+    if (this.has) {
+      out._n(this.val);
       out._c();
     } else {
       out._e('TODO show proper error');
     }
-  }
-}
-
-export class LastOperator<T> implements Operator<T, T> {
-  private proxy: InternalListener<T> = emptyListener;
-  public has: boolean = false;
-  public val: T = <T> empty;
-
-  constructor(public ins: Stream<T>) {
-  }
-
-  _start(out: Stream<T>): void {
-    this.ins._add(this.proxy = new Proxy(out, this));
-  }
-
-  _stop(): void {
-    this.ins._remove(this.proxy);
   }
 }

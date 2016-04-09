@@ -1,11 +1,20 @@
-import {Stream} from '../Stream';
-import {InternalListener} from '../InternalListener';
 import {Operator} from '../Operator';
-import {emptyListener} from '../utils/emptyListener';
+import {Stream} from '../Stream';
 
-class Proxy<T> implements InternalListener<T> {
-  constructor(private out: Stream<T>,
-              private op: DelayOperator<T>) {
+class DelayOperator<T> implements Operator<T, T> {
+  private out: Stream<T> = null;
+
+  constructor(public dt: number,
+              public ins: Stream<T>) {
+  }
+
+  _start(out: Stream<T>): void {
+    this.out = out;
+    this.ins._add(this);
+  }
+
+  _stop(): void {
+    this.ins._remove(this);
   }
 
   _n(t: T) {
@@ -13,7 +22,7 @@ class Proxy<T> implements InternalListener<T> {
     const id = setInterval(() => {
       self.out._n(t);
       clearInterval(id);
-    }, this.op.period);
+    }, this.dt);
   }
 
   _e(err: any) {
@@ -21,7 +30,7 @@ class Proxy<T> implements InternalListener<T> {
     const id = setInterval(() => {
       self.out._e(err);
       clearInterval(id);
-    }, this.op.period);
+    }, this.dt);
   }
 
   _c() {
@@ -29,23 +38,7 @@ class Proxy<T> implements InternalListener<T> {
     const id = setInterval(() => {
       self.out._c();
       clearInterval(id);
-    }, this.op.period);
-  }
-}
-
-class DelayOperator<T> implements Operator<T, T> {
-  private proxy: InternalListener<T> = emptyListener;
-
-  constructor(public period: number,
-              public ins: Stream<T>) {
-  }
-
-  _start(out: Stream<T>): void {
-    this.ins._add(this.proxy = new Proxy(out, this));
-  }
-
-  _stop(): void {
-    this.ins._remove(this.proxy);
+    }, this.dt);
   }
 }
 

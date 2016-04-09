@@ -1,9 +1,8 @@
 import {InternalProducer} from '../InternalProducer';
 import {InternalListener} from '../InternalListener';
-import {noop} from '../utils/noop';
 
 export class FromArrayProducer<T> implements InternalProducer<T> {
-  constructor(private a: Array<T>) {
+  constructor(public a: Array<T>) {
   }
 
   _start(out: InternalListener<T>): void {
@@ -15,6 +14,5 @@ export class FromArrayProducer<T> implements InternalProducer<T> {
   }
 
   _stop(): void {
-    noop();
   }
 }

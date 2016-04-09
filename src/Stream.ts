@@ -13,7 +13,9 @@ import {LastOperator} from './operator/LastOperator';
 import {StartWithOperator} from './operator/StartWithOperator';
 import {EndWhenOperator} from './operator/EndWhenOperator';
 import {FlattenOperator} from './operator/FlattenOperator';
-import {FlattenConcurrentlyOperator} from './operator/FlattenConcurrentlyOperator';
+import {MapFlattenOperator} from './operator/MapFlattenOperator';
+import {FlattenConcOperator} from './operator/FlattenConcOperator';
+import {MapFlattenConcOperator} from './operator/MapFlattenConcOperator';
 import {
   CombineProducer,
   CombineInstanceSignature,
@@ -211,11 +213,17 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   flatten<R, T extends Stream<R>>(): T {
-    return <T> new Stream<R>(new FlattenOperator(<Stream<Stream<R>>> (<any> this)));
+    return <T> new Stream<R>(this._prod instanceof MapOperator ?
+      new MapFlattenOperator(<MapOperator<R, Stream<R>>> <any> this._prod) :
+      new FlattenOperator(<Stream<Stream<R>>> <any> this)
+    );
   }
 
   flattenConcurrently<R, T extends Stream<R>>(): T {
-    return <T> new Stream<R>(new FlattenConcurrentlyOperator(<Stream<Stream<R>>> (<any> this)));
+    return <T> new Stream<R>(this._prod instanceof MapOperator ?
+      new MapFlattenConcOperator(<MapOperator<R, Stream<R>>> <any> this._prod) :
+      new FlattenConcOperator(<Stream<Stream<R>>> <any> this)
+    );
   }
 
   merge(other: Stream<T>): Stream<T> {
