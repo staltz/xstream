@@ -30,7 +30,7 @@ var options = {
 suite
   .add('xstream', function(deferred) {
     runners.runXStream(deferred,
-      xs.from(a).filter(even).map(add1).fold(sum, 0).last());
+      xs.fromArray(a).filter(even).map(add1).fold(sum, 0).last());
   }, options)
   .add('most', function(deferred) {
     runners.runMost(deferred, most.from(a).filter(even).map(add1).reduce(sum, 0));

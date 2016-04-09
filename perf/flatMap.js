@@ -45,7 +45,7 @@ var options = {
 suite
   .add('xstream', function(deferred) {
     runners.runXStream(deferred,
-      xs.from(a).map(xs.from).flattenConcurrently().fold(sum, 0).last());
+      xs.fromArray(a).map(xs.fromArray).flattenConcurrently().fold(sum, 0).last());
   }, options)
   .add('most', function(deferred) {
     runners.runMost(deferred, most.from(a).flatMap(most.from).reduce(sum, 0));

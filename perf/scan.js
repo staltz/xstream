@@ -29,7 +29,7 @@ var options = {
 
 suite
   .add('xstream', function(deferred) {
-    runners.runXStream(deferred, xs.from(a).fold(sum, 0).fold(passthrough, 0).last());
+    runners.runXStream(deferred, xs.fromArray(a).fold(sum, 0).fold(passthrough, 0).last());
   }, options)
   .add('most', function(deferred) {
     runners.runMost(deferred, most.from(a).scan(sum, 0).reduce(passthrough, 0));
