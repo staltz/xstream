@@ -55,7 +55,11 @@ export class MapFlattenOperator<T> implements InternalProducer<T>, InternalListe
 
   _n(v: T) {
     this.cut();
-    (this.curr = this.mapOp.project(v))._add(this.inner = new Inner(this.out, this));
+    try {
+      (this.curr = this.mapOp.project(v))._add(this.inner = new Inner(this.out, this));
+    } catch (e) {
+      this.out._e(e);
+    }
   }
 
   _e(err: any) {

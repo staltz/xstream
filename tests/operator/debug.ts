@@ -20,4 +20,21 @@ describe('Stream.prototype.debug', () => {
     };
     stream.addListener(listener);
   });
+
+  it('should propagate user mistakes in spy as errors', (done) => {
+    const source = xs.interval(30).take(1);
+    const stream = source.debug(
+      x => <number> <any> (<string> <any> x).toLowerCase()
+    );
+    stream.addListener({
+      next: () => done('next should not be called'),
+      error: (err) => {
+        assert.strictEqual(err.message, 'x.toLowerCase is not a function');
+        done();
+      },
+      complete: () => {
+        done('complete should not be called');
+      },
+    });
+  });
 });

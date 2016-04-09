@@ -1,10 +1,11 @@
 import {Operator} from '../Operator';
 import {Stream} from '../Stream';
+import {empty} from '../utils/empty';
 
-export class FilterOperator<T> implements Operator<T, T> {
-  private out: Stream<T> = null;
+export class ReplaceErrorOperator<T> implements Operator<T, T> {
+  private out: Stream<T> = <Stream<T>> empty;
 
-  constructor(public predicate: (t: T) => boolean,
+  constructor(public fn: (err: any) => Stream<T>,
               public ins: Stream<T>) {
   }
 
@@ -18,15 +19,16 @@ export class FilterOperator<T> implements Operator<T, T> {
   }
 
   _n(t: T) {
-    try {
-      if (this.predicate(t)) this.out._n(t);
-    } catch (e) {
-      this.out._e(e);
-    }
+    this.out._n(t);
   }
 
   _e(err: any) {
-    this.out._e(err);
+    try {
+      this.ins._remove(this);
+      (this.ins = this.fn(err))._add(this);
+    } catch (e) {
+      this.out._e(e);
+    }
   }
 
   _c() {

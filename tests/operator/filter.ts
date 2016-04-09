@@ -18,4 +18,21 @@ describe('Stream.prototype.filter', () => {
     };
     stream.addListener(listener);
   });
+
+  it('should propagate user mistakes in predicate as errors', (done) => {
+    const source = xs.interval(30).take(1);
+    const stream = source.filter(
+      x => (<string> <any> x).toLowerCase() === 'a'
+    );
+    stream.addListener({
+      next: () => done('next should not be called'),
+      error: (err) => {
+        assert.strictEqual(err.message, 'x.toLowerCase is not a function');
+        done();
+      },
+      complete: () => {
+        done('complete should not be called');
+      },
+    });
+  });
 });

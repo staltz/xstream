@@ -45,7 +45,11 @@ export class MapFlattenConcOperator<T> implements InternalProducer<T>, InternalL
 
   _n(v: T) {
     this.active++;
-    this.mapOp.project(v)._add(new Inner(this.out, this));
+    try {
+      this.mapOp.project(v)._add(new Inner(this.out, this));
+    } catch (e) {
+      this.out._e(e);
+    }
   }
 
   _e(err: any) {

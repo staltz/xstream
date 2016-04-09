@@ -18,7 +18,11 @@ export class MapOperator<T, R> implements Operator<T, R> {
   }
 
   _n(t: T) {
-    this.out._n(this.project(t));
+    try {
+      this.out._n(this.project(t));
+    } catch (e) {
+      this.out._e(e);
+    }
   }
 
   _e(err: any) {

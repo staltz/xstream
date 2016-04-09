@@ -10,6 +10,7 @@ import {DropOperator} from './operator/DropOperator';
 import {DebugOperator} from './operator/DebugOperator';
 import {FoldOperator} from './operator/FoldOperator';
 import {LastOperator} from './operator/LastOperator';
+import {ReplaceErrorOperator} from './operator/ReplaceErrorOperator';
 import {StartWithOperator} from './operator/StartWithOperator';
 import {EndWhenOperator} from './operator/EndWhenOperator';
 import {FlattenOperator} from './operator/FlattenOperator';
@@ -100,6 +101,7 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _x(): void { // tear down logic, after error or complete
+    if (this._ils.length === 0) return;
     if (this._prod) this._prod._stop();
     this._ils = [];
   }
@@ -136,20 +138,20 @@ export class Stream<T> implements InternalListener<T> {
     }
   }
 
-  static never(): Stream<void> {
-    return new Stream<void>({_start: noop, _stop: noop});
+  static never(): Stream<any> {
+    return new Stream<any>({_start: noop, _stop: noop});
   }
 
-  static empty(): Stream<void> {
-    return new Stream<void>({
-      _start(il: InternalListener<void>) { il._c(); },
+  static empty(): Stream<any> {
+    return new Stream<any>({
+      _start(il: InternalListener<any>) { il._c(); },
       _stop: noop,
     });
   }
 
-  static throw(err: any): Stream<void> {
-    return new Stream<void>({
-      _start(il: InternalListener<void>) { il._e(err); },
+  static throw(err: any): Stream<any> {
+    return new Stream<any>({
+      _start(il: InternalListener<any>) { il._e(err); },
       _stop: noop,
     });
   }
@@ -210,6 +212,10 @@ export class Stream<T> implements InternalListener<T> {
 
   fold<R>(accumulate: (acc: R, t: T) => R, init: R): Stream<R> {
     return new Stream<R>(new FoldOperator(accumulate, init, this));
+  }
+
+  replaceError(replace: (err: any) => Stream<T>): Stream<T> {
+    return new Stream<T>(new ReplaceErrorOperator(replace, this));
   }
 
   flatten<R, T extends Stream<R>>(): T {

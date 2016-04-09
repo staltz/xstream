@@ -4,7 +4,7 @@ import {Stream} from '../Stream';
 export class DebugOperator<T> implements Operator<T, T> {
   private out: Stream<T> = null;
 
-  constructor(public spy: (t: T) => void = null,
+  constructor(public spy: (t: T) => any = null,
               public ins: Stream<T>) {
   }
 
@@ -19,7 +19,11 @@ export class DebugOperator<T> implements Operator<T, T> {
 
   _n(t: T) {
     if (this.spy) {
-      this.spy(t);
+      try {
+        this.spy(t);
+      } catch (e) {
+        this.out._e(e);
+      }
     } else {
       console.log(t);
     }

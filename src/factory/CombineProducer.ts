@@ -65,13 +65,18 @@ export class Proxy<T> implements InternalListener<T> {
 
   _n(t: T): void {
     const prod = this.prod;
+    const vals = prod.vals;
     prod.hasVal[this.i] = true;
-    prod.vals[this.i] = t;
+    vals[this.i] = t;
     if (!prod.ready) {
       prod.up();
     }
     if (prod.ready) {
-      prod.out._n(invoke(prod.project, prod.vals));
+      try {
+        prod.out._n(invoke(prod.project, vals));
+      } catch (e) {
+        prod.out._e(e);
+      }
     }
   }
 
@@ -94,10 +99,9 @@ export class CombineProducer<R> implements InternalProducer<R> {
   public ready: boolean = false;
   public hasVal: Array<boolean>;
   public vals: Array<any>;
-  private streams: Array<Stream<any>>;
 
-  constructor(public project: CombineProjectFunction, streams: Array<Stream<any>>) {
-    this.streams = streams;
+  constructor(public project: CombineProjectFunction,
+              public streams: Array<Stream<any>>) {
     this.vals = new Array(streams.length);
     this.hasVal = new Array(streams.length);
     this.ac = streams.length;

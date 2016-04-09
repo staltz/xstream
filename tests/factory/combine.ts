@@ -35,4 +35,23 @@ describe('xs.combine', () => {
       },
     });
   });
+
+  it('should propagate user mistakes in project as errors', (done) => {
+    const stream1 = xs.interval(30).take(1);
+    const stream2 = xs.interval(50).take(4);
+    const stream = xs.combine(
+      (x, y) => <number> <any> (<string> <any> x).toLowerCase(),
+      stream1, stream2
+    );
+    stream.addListener({
+      next: () => done('next should not be called'),
+      error: (err) => {
+        assert.strictEqual(err.message, 'x.toLowerCase is not a function');
+        done();
+      },
+      complete: () => {
+        done('complete should not be called');
+      },
+    });
+  });
 });

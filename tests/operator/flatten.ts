@@ -5,8 +5,8 @@ describe('Stream.prototype.flatten', () => {
   describe('with map', () => {
     it('should expand each interval event with 3 sync events', (done) => {
       const stream = xs.interval(100).take(3)
-      .map(i => xs.of(1 + i, 2 + i, 3 + i))
-      .flatten();
+        .map(i => xs.of(1 + i, 2 + i, 3 + i))
+        .flatten();
       const expected = [1, 2, 3, 2, 3, 4, 3, 4, 5];
       const listener = {
         next: (x: number) => {
@@ -91,6 +91,27 @@ describe('Stream.prototype.flatten', () => {
         }
       };
       stream.addListener(listener);
+    });
+
+    it('should propagate user mistakes in project as errors', (done) => {
+      const source = xs.interval(30).take(1);
+      const stream = source.map(
+        x => {
+          const y = (<string> <any> x).toLowerCase();
+          return xs.of(y);
+        }
+      ).flatten();
+
+      stream.addListener({
+        next: () => done('next should not be called'),
+        error: (err) => {
+          assert.strictEqual(err.message, 'x.toLowerCase is not a function');
+          done();
+        },
+        complete: () => {
+          done('complete should not be called');
+        },
+      });
     });
   });
 });

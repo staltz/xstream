@@ -22,7 +22,11 @@ export class FoldOperator<T, R> implements Operator<T, R> {
   }
 
   _n(t: T) {
-    this.out._n(this.acc = this.f(this.acc, t));
+    try {
+      this.out._n(this.acc = this.f(this.acc, t));
+    } catch (e) {
+      this.out._e(e);
+    }
   }
 
   _e(err: any) {
