@@ -1,6 +1,4 @@
-import {InternalProducer} from '../InternalProducer';
-import {InternalListener} from '../InternalListener';
-import {Stream} from '../Stream';
+import {Stream, InternalProducer, InternalListener} from '../index';
 
 class ConcatProducer<T> implements InternalProducer<T>, InternalListener<T> {
   private out: InternalListener<T> = null;

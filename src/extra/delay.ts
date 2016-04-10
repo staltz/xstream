@@ -1,5 +1,4 @@
-import {Operator} from '../Operator';
-import {Stream} from '../Stream';
+import {Operator, Stream} from '../index';
 
 class DelayOperator<T> implements Operator<T, T> {
   private out: Stream<T> = null;

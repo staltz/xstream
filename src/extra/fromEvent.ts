@@ -1,6 +1,4 @@
-import {Stream} from '../Stream';
-import {InternalProducer} from '../InternalProducer';
-import {InternalListener} from '../InternalListener';
+import {Stream, InternalProducer, InternalListener} from '../index';
 
 export class DOMEventProducer implements InternalProducer<Event> {
   private listener: EventListener;

@@ -1,5 +1,4 @@
-import {Operator} from '../Operator';
-import {Stream} from '../Stream';
+import {Operator, Stream} from '../index';
 
 class PairwiseOperator<T> implements Operator<T, [T, T]> {
   private val: T = null;

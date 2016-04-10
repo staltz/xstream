@@ -1,6 +1,6 @@
 import xs from '../../src/index';
-import {noop} from '../../src/utils/noop';
 import * as assert from 'assert';
+function noop() {};
 
 describe('Stream.prototype.remember', () => {
   it('should replay the second event to a new listener', (done) => {

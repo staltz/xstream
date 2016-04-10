@@ -15,7 +15,7 @@
     "no-empty": false,
     "no-unused-expression": true,
     "no-unused-variable": true,
-    "no-use-before-declare": true,
+    "no-use-before-declare": false,
     "no-var-requires": true,
     "no-require-imports": true,
     "one-line": [true,

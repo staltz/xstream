@@ -1,6 +1,5 @@
-import {Operator} from '../Operator';
-import {Stream} from '../Stream';
-import {empty} from '../utils/empty';
+import {Operator, Stream} from '../index';
+const empty = {};
 
 export class DropRepeatsOperator<T> implements Operator<T, T> {
   private out: Stream<T> = null;

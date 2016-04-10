@@ -1,7 +1,7 @@
 import xs from '../../src/index';
 import fromEvent from '../../src/extra/fromEvent';
-import {noop} from '../../src/utils/noop';
 import * as assert from 'assert';
+function noop() {};
 
 class FakeEventTarget implements EventTarget {
   public handler: EventListener;
