@@ -1015,5 +1015,13 @@ exports.MemoryStream = MemoryStream;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Stream;
 
-},{}]},{},[1])(1)
+},{}],2:[function(require,module,exports){
+"use strict";
+var core_1 = require('./core');
+exports.Stream = core_1.Stream;
+exports.MemoryStream = core_1.MemoryStream;
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = core_1.Stream;
+
+},{"./core":1}]},{},[2])(2)
 });
