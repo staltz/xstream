@@ -1,3 +1,4 @@
+import {Promise} from '~es6-promise/dist/es6-promise';
 import {Listener} from './Listener';
 import {Producer} from './Producer';
 import {InternalListener} from './InternalListener';
@@ -23,6 +24,7 @@ import {
   CombineFactorySignature,
   CombineProjectFunction} from './factory/CombineProducer';
 import {FromArrayProducer} from './factory/FromArrayProducer';
+import {FromPromiseProducer} from './factory/FromPromiseProducer';
 import {PeriodicProducer} from './factory/PeriodicProducer';
 import {MergeProducer} from './factory/MergeProducer';
 import {empty} from './utils/empty';
@@ -156,12 +158,16 @@ export class Stream<T> implements InternalListener<T> {
     });
   }
 
+  static of<T>(...items: Array<T>): Stream<T> {
+    return Stream.fromArray(items);
+  }
+
   static fromArray<T>(array: Array<T>): Stream<T> {
     return new Stream<T>(new FromArrayProducer(array));
   }
 
-  static of<T>(...items: Array<T>): Stream<T> {
-    return Stream.fromArray(items);
+  static fromPromise<T>(promise: Promise<T>): Stream<T> {
+    return new Stream<T>(new FromPromiseProducer(promise));
   }
 
   static periodic(period: number): Stream<number> {

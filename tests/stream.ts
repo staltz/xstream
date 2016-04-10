@@ -2,6 +2,43 @@ import xs, {Producer, Listener, Stream} from '../src/index';
 import * as assert from 'assert';
 
 describe('Stream', () => {
+  it('should have all the core static operators', () => {
+    assert.equal(typeof xs.create, 'function');
+    assert.equal(typeof xs.createWithMemory, 'function');
+    assert.equal(typeof xs.never, 'function');
+    assert.equal(typeof xs.empty, 'function');
+    assert.equal(typeof xs.throw, 'function');
+    assert.equal(typeof xs.of, 'function');
+    assert.equal(typeof xs.fromArray, 'function');
+    assert.equal(typeof xs.fromPromise, 'function');
+    assert.equal(typeof xs.periodic, 'function');
+    assert.equal(typeof xs.merge, 'function');
+    assert.equal(typeof xs.combine, 'function');
+  });
+
+  it('should have all the core operators as methods, plus addListener and removeListener', () => {
+    const stream = xs.create();
+    assert.equal(typeof stream.addListener, 'function');
+    assert.equal(typeof stream.removeListener, 'function');
+    assert.equal(typeof stream.map, 'function');
+    assert.equal(typeof stream.mapTo, 'function');
+    assert.equal(typeof stream.filter, 'function');
+    assert.equal(typeof stream.take, 'function');
+    assert.equal(typeof stream.drop, 'function');
+    assert.equal(typeof stream.last, 'function');
+    assert.equal(typeof stream.startWith, 'function');
+    assert.equal(typeof stream.endWhen, 'function');
+    assert.equal(typeof stream.fold, 'function');
+    assert.equal(typeof stream.flatten, 'function');
+    assert.equal(typeof stream.flattenConcurrently, 'function');
+    assert.equal(typeof stream.merge, 'function');
+    assert.equal(typeof stream.combine, 'function');
+    assert.equal(typeof stream.compose, 'function');
+    assert.equal(typeof stream.remember, 'function');
+    assert.equal(typeof stream.imitate, 'function');
+    assert.equal(typeof stream.debug, 'function');
+  });
+
   it('should be createable giving a custom producer object', (done) => {
     const expected = [10, 20, 30];
     let listenerGotEnd: boolean = false;
@@ -31,42 +68,6 @@ describe('Stream', () => {
         listenerGotEnd = true;
       },
     });
-  });
-
-  it('should have all the core static operators', () => {
-    assert.equal(typeof xs.create, 'function');
-    assert.equal(typeof xs.createWithMemory, 'function');
-    assert.equal(typeof xs.never, 'function');
-    assert.equal(typeof xs.empty, 'function');
-    assert.equal(typeof xs.throw, 'function');
-    assert.equal(typeof xs.fromArray, 'function');
-    assert.equal(typeof xs.of, 'function');
-    assert.equal(typeof xs.periodic, 'function');
-    assert.equal(typeof xs.merge, 'function');
-    assert.equal(typeof xs.combine, 'function');
-  });
-
-  it('should have all the core operators as methods, plus addListener and removeListener', () => {
-    const stream = xs.create();
-    assert.equal(typeof stream.addListener, 'function');
-    assert.equal(typeof stream.removeListener, 'function');
-    assert.equal(typeof stream.map, 'function');
-    assert.equal(typeof stream.mapTo, 'function');
-    assert.equal(typeof stream.filter, 'function');
-    assert.equal(typeof stream.take, 'function');
-    assert.equal(typeof stream.drop, 'function');
-    assert.equal(typeof stream.last, 'function');
-    assert.equal(typeof stream.startWith, 'function');
-    assert.equal(typeof stream.endWhen, 'function');
-    assert.equal(typeof stream.fold, 'function');
-    assert.equal(typeof stream.flatten, 'function');
-    assert.equal(typeof stream.flattenConcurrently, 'function');
-    assert.equal(typeof stream.merge, 'function');
-    assert.equal(typeof stream.combine, 'function');
-    assert.equal(typeof stream.compose, 'function');
-    assert.equal(typeof stream.remember, 'function');
-    assert.equal(typeof stream.imitate, 'function');
-    assert.equal(typeof stream.debug, 'function');
   });
 
   it('should allow using shamefullySend* methods', (done) => {
