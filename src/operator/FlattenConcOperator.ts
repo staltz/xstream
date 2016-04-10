@@ -34,6 +34,8 @@ export class FlattenConcOperator<T> implements Operator<Stream<T>, T> {
 
   _stop(): void {
     this.ins._remove(this);
+    this.active = 1;
+    this.out = null;
   }
 
   less(): void {

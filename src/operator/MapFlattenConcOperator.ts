@@ -35,6 +35,8 @@ export class MapFlattenConcOperator<T> implements InternalProducer<T>, InternalL
 
   _stop(): void {
     this.mapOp.ins._remove(this);
+    this.active = 1;
+    this.out = null;
   }
 
   less(): void {

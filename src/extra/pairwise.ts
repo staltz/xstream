@@ -16,6 +16,9 @@ class PairwiseOperator<T> implements Operator<T, [T, T]> {
 
   _stop(): void {
     this.ins._remove(this);
+    this.has = false;
+    this.out = null;
+    this.val = null;
   }
 
   _n(t: T) {

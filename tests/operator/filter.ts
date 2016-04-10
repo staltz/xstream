@@ -35,4 +35,25 @@ describe('Stream.prototype.filter', () => {
       },
     });
   });
+
+  it('should clean up Operator producer when complete', (done) => {
+    const stream = xs.of(1, 2, 3).filter(i => i !== 2);
+    const expected = [1, 3];
+    let completeCalled = false;
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.strictEqual(x, expected.shift());
+        assert.strictEqual(stream['_prod']['out'], stream);
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        completeCalled = true;
+      },
+    });
+
+    assert.strictEqual(completeCalled, true);
+    assert.strictEqual(stream['_prod']['out'], null);
+    done();
+  });
 });

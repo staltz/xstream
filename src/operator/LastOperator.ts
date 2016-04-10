@@ -17,6 +17,9 @@ export class LastOperator<T> implements Operator<T, T> {
 
   _stop(): void {
     this.ins._remove(this);
+    this.out = null;
+    this.has = false;
+    this.val = <T> empty;
   }
 
   _n(t: T) {

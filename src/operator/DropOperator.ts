@@ -16,6 +16,8 @@ export class DropOperator<T> implements Operator<T, T> {
 
   _stop(): void {
     this.ins._remove(this);
+    this.out = null;
+    this.dropped = 0;
   }
 
   _n(t: T) {

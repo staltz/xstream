@@ -17,6 +17,8 @@ export class DropRepeatsOperator<T> implements Operator<T, T> {
 
   _stop(): void {
     this.ins._remove(this);
+    this.out = null;
+    this.v = <any> empty;
   }
 
   isEq(x: T, y: T) {

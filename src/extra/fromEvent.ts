@@ -19,6 +19,7 @@ export class DOMEventProducer implements InternalProducer<Event> {
   _stop() {
     const {node, eventType, listener, useCapture} = this;
     node.removeEventListener(eventType, listener, useCapture);
+    this.listener = null;
   }
 }
 

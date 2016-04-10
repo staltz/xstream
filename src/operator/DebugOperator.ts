@@ -15,6 +15,7 @@ export class DebugOperator<T> implements Operator<T, T> {
 
   _stop(): void {
     this.ins._remove(this);
+    this.out = null;
   }
 
   _n(t: T) {

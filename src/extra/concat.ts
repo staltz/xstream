@@ -20,6 +20,7 @@ class ConcatProducer<T> implements InternalProducer<T>, InternalListener<T> {
       streams[this.i]._remove(this);
     }
     this.i = 0;
+    this.out = null;
   }
 
   _n(t: T) {

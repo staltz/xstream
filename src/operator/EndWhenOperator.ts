@@ -38,14 +38,12 @@ export class EndWhenOperator<T> implements Operator<T, T> {
   _stop(): void {
     this.ins._remove(this);
     this.o._remove(this.oli);
+    this.out = null;
+    this.oli = null;
   }
 
   end(): void {
-    this.ins._remove(this);
-    this.o._remove(this.oli);
     this.out._c();
-    this.out = null;
-    this.oli = null;
   }
 
   _n(t: T) {

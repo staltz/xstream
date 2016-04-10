@@ -17,6 +17,9 @@ class DebounceOperator<T> implements Operator<T, T> {
 
   _stop(): void {
     this.ins._remove(this);
+    this.out = null;
+    this.value = null;
+    this.id = null;
   }
 
   clearTimer() {

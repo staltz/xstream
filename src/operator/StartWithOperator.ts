@@ -18,5 +18,6 @@ export class StartWithOperator<T> implements InternalProducer<T> {
 
   _stop(): void {
     this.ins._remove(this.out);
+    this.out = null;
   }
 }

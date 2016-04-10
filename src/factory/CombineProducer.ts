@@ -118,15 +118,22 @@ export class CombineProducer<R> implements InternalProducer<R> {
 
   _start(out: InternalListener<R>): void {
     this.out = out;
-    for (let i = this.streams.length - 1; i >= 0; i--) {
-      this.streams[i]._add(new Proxy(i, this));
+    const streams = this.streams;
+    for (let i = streams.length - 1; i >= 0; i--) {
+      streams[i]._add(new Proxy(i, this));
     }
   }
 
   _stop(): void {
-    for (let i = this.streams.length - 1; i >= 0; i--) {
-      this.streams[i]._remove(this.proxies[i]);
+    const streams = this.streams;
+    for (let i = streams.length - 1; i >= 0; i--) {
+      streams[i]._remove(this.proxies[i]);
     }
+    this.out = null;
+    this.ac = streams.length;
     this.proxies = [];
+    this.ready = false;
+    this.vals = new Array(streams.length);
+    this.hasVal = new Array(streams.length);
   }
 }

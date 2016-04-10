@@ -37,6 +37,10 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
 
   _stop(): void {
     this.ins._remove(this);
+    this.curr = null;
+    this.inner = null;
+    this.open = true;
+    this.out = null;
   }
 
   cut(): void {

@@ -38,6 +38,10 @@ export class MapFlattenOperator<T> implements InternalProducer<T>, InternalListe
 
   _stop(): void {
     this.mapOp.ins._remove(this);
+    this.curr = null;
+    this.inner = null;
+    this.open = true;
+    this.out = null;
   }
 
   cut(): void {

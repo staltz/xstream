@@ -15,6 +15,7 @@ export class MapToOperator<T, R> implements Operator<T, R> {
 
   _stop(): void {
     this.ins._remove(this);
+    this.out = null;
   }
 
   _n(t: T) {

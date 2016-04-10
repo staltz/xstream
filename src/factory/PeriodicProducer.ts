@@ -15,7 +15,8 @@ export class PeriodicProducer implements InternalProducer<number> {
   }
 
   _stop(): void {
-    this.i = 0;
     if (this.intervalID !== -1) clearInterval(this.intervalID);
+    this.intervalID = -1;
+    this.i = 0;
   }
 }

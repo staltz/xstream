@@ -13,15 +13,19 @@ export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T
 
   _start(out: InternalListener<T>): void {
     this.out = out;
-    for (let i = this.streams.length - 1; i >= 0; i--) {
-      this.streams[i]._add(this);
+    const streams = this.streams;
+    for (let i = streams.length - 1; i >= 0; i--) {
+      streams[i]._add(this);
     }
   }
 
   _stop(): void {
-    for (let i = this.streams.length - 1; i >= 0; i--) {
-      this.streams[i]._remove(this);
+    const streams = this.streams;
+    for (let i = streams.length - 1; i >= 0; i--) {
+      streams[i]._remove(this);
     }
+    this.out = null;
+    this.ac = streams.length;
   }
 
   _n(t: T) {
