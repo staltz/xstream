@@ -14,7 +14,7 @@
     "lib": "tsc",
     "postinstall": "typings install",
     "predist": "rm -rf dist/ && mkdirp dist/ && npm run lib",
-    "dist": "browserify lib/index.js -o dist/xstream.js",
+    "dist": "browserify lib/index.js --standalone xstream --outfile dist/xstream.js",
     "postdist": "uglifyjs dist/xstream.js -o dist/xstream.min.js",
     "start": "npm install && npm prune",
     "prepublish": "npm run lib",
@@ -44,6 +44,7 @@
     "tslint": "^3.6.0",
     "typescript": "^1.8.9",
     "typings": "^0.7.9",
+    "uglify-js": "^2.6.2",
     "validate-commit-msg": "^2.4.0"
   },
   "config": {
