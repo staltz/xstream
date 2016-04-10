@@ -3,7 +3,7 @@ import * as assert from 'assert';
 
 describe('Stream.prototype.map', () => {
   it('should transform values from input stream to output stream', (done) => {
-    const stream = xs.interval(100).map(i => 10 * i);
+    const stream = xs.periodic(100).map(i => 10 * i);
     const expected = [0, 10, 20];
     let listener = {
       next: (x: number) => {
@@ -20,7 +20,7 @@ describe('Stream.prototype.map', () => {
   });
 
   it('should propagate user mistakes in project as errors', (done) => {
-    const source = xs.interval(30).take(1);
+    const source = xs.periodic(30).take(1);
     const stream = source.map(
       x => (<string> <any> x).toLowerCase()
     );

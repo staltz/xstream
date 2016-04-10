@@ -4,7 +4,7 @@ import * as assert from 'assert';
 
 describe('Stream.prototype.remember', () => {
   it('should replay the second event to a new listener', (done) => {
-    const stream = xs.interval(50).take(4).remember();
+    const stream = xs.periodic(50).take(4).remember();
 
     stream.addListener({next: noop, error: noop, complete: noop});
 

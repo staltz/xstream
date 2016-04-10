@@ -3,7 +3,7 @@ import * as assert from 'assert';
 
 describe('Stream.prototype.filter', () => {
   it('should filter in only even numbers from an input stream', (done) => {
-    const stream = xs.interval(50).filter(i => i % 2 === 0);
+    const stream = xs.periodic(50).filter(i => i % 2 === 0);
     const expected = [0, 2, 4, 6];
     let listener = {
       next: (x: number) => {
@@ -20,7 +20,7 @@ describe('Stream.prototype.filter', () => {
   });
 
   it('should propagate user mistakes in predicate as errors', (done) => {
-    const source = xs.interval(30).take(1);
+    const source = xs.periodic(30).take(1);
     const stream = source.filter(
       x => (<string> <any> x).toLowerCase() === 'a'
     );

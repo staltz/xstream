@@ -3,8 +3,8 @@ import * as assert from 'assert';
 
 describe('Stream.prototype.flatten', () => {
   describe('with map', () => {
-    it('should expand each interval event with 3 sync events', (done) => {
-      const stream = xs.interval(100).take(3)
+    it('should expand each periodic event with 3 sync events', (done) => {
+      const stream = xs.periodic(100).take(3)
         .map(i => xs.of(1 + i, 2 + i, 3 + i))
         .flatten();
       const expected = [1, 2, 3, 2, 3, 4, 3, 4, 5];
@@ -21,9 +21,9 @@ describe('Stream.prototype.flatten', () => {
       stream.addListener(listener);
     });
 
-    it('should expand 3 sync events as an interval, only last one passes', (done) => {
+    it('should expand 3 sync events as a periodic, only last one passes', (done) => {
       const stream = xs.fromArray([0, 1, 2])
-        .map(i => xs.interval(100 * i).take(2).map(x => `${i}${x}`))
+        .map(i => xs.periodic(100 * i).take(2).map(x => `${i}${x}`))
         .flatten();
       // ---x---x---x---x---x---x
       // ---00--01
@@ -43,10 +43,10 @@ describe('Stream.prototype.flatten', () => {
       stream.addListener(listener);
     });
 
-    it('should expand 3 async events as an interval each', (done) => {
-      const stream = xs.interval(140).take(3)
+    it('should expand 3 async events as a periodic each', (done) => {
+      const stream = xs.periodic(140).take(3)
         .map(i =>
-          xs.interval(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
+          xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
         )
         .flatten();
       // ---x---x---x---x---x---x---x---x---x---x---x---x
@@ -67,10 +67,10 @@ describe('Stream.prototype.flatten', () => {
       stream.addListener(listener);
     });
 
-    it('should expand 3 async events as an interval each, no optimization', (done) => {
-      const stream = xs.interval(140).take(3)
+    it('should expand 3 async events as a periodic each, no optimization', (done) => {
+      const stream = xs.periodic(140).take(3)
         .map(i =>
-          xs.interval(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
+          xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
         )
         .filter(() => true) // breaks the optimization map+flattenConcurrently
         .flatten();
@@ -94,7 +94,7 @@ describe('Stream.prototype.flatten', () => {
     });
 
     it('should propagate user mistakes in project as errors', (done) => {
-      const source = xs.interval(30).take(1);
+      const source = xs.periodic(30).take(1);
       const stream = source.map(
         x => {
           const y = (<string> <any> x).toLowerCase();

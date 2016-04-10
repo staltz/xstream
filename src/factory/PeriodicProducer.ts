@@ -1,7 +1,7 @@
 import {InternalProducer} from '../InternalProducer';
 import {InternalListener} from '../InternalListener';
 
-export class IntervalProducer implements InternalProducer<number> {
+export class PeriodicProducer implements InternalProducer<number> {
   private intervalID: any = -1;
   private i: number = 0;
 

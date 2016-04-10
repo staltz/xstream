@@ -3,7 +3,7 @@ import * as assert from 'assert';
 
 describe('Stream.prototype.fold', () => {
   it('should accumulating a value over time', (done) => {
-    const stream = xs.interval(50).take(4).fold((x: number, y: number) => x + y, 0);
+    const stream = xs.periodic(50).take(4).fold((x: number, y: number) => x + y, 0);
     const expected = [0, 0, 1, 3, 6];
     let listener = {
       next: (x: number) => {
@@ -20,7 +20,7 @@ describe('Stream.prototype.fold', () => {
   });
 
   it('should propagate user mistakes in accumulate as errors', (done) => {
-    const source = xs.interval(30).take(1);
+    const source = xs.periodic(30).take(1);
     const stream = source.fold(
       (x, y) => <number> <any> (<string> <any> x).toLowerCase(),
       0

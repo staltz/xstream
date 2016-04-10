@@ -21,7 +21,7 @@ describe('MemoryStream', () => {
   });
 
   it('should allow being imitated by a proxy Stream', (done) => {
-    const stream = xs.interval(100).take(3);
+    const stream = xs.periodic(100).take(3);
     const proxyStream = xs.createWithMemory();
 
     const expected = [0, 1, 2];

@@ -23,7 +23,7 @@ import {
   CombineFactorySignature,
   CombineProjectFunction} from './factory/CombineProducer';
 import {FromArrayProducer} from './factory/FromArrayProducer';
-import {IntervalProducer} from './factory/IntervalProducer';
+import {PeriodicProducer} from './factory/PeriodicProducer';
 import {MergeProducer} from './factory/MergeProducer';
 import {empty} from './utils/empty';
 import {noop} from './utils/noop';
@@ -164,8 +164,8 @@ export class Stream<T> implements InternalListener<T> {
     return Stream.fromArray(items);
   }
 
-  static interval(period: number): Stream<number> {
-    return new Stream<number>(new IntervalProducer(period));
+  static periodic(period: number): Stream<number> {
+    return new Stream<number>(new PeriodicProducer(period));
   }
 
   static merge<T>(...streams: Array<Stream<T>>): Stream<T> {

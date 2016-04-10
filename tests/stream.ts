@@ -41,7 +41,7 @@ describe('Stream', () => {
     assert.equal(typeof xs.throw, 'function');
     assert.equal(typeof xs.fromArray, 'function');
     assert.equal(typeof xs.of, 'function');
-    assert.equal(typeof xs.interval, 'function');
+    assert.equal(typeof xs.periodic, 'function');
     assert.equal(typeof xs.merge, 'function');
     assert.equal(typeof xs.combine, 'function');
   });
@@ -96,7 +96,7 @@ describe('Stream', () => {
   });
 
   it('should allow being imitated by a proxy Stream', (done) => {
-    const stream = xs.interval(100).take(3);
+    const stream = xs.periodic(100).take(3);
     const proxyStream = xs.create();
 
     const expected = [1, 2];
@@ -117,7 +117,7 @@ describe('Stream', () => {
   });
 
   it('should be possible to addListener and removeListener with 1 listener', (done) => {
-    const stream = xs.interval(100);
+    const stream = xs.periodic(100);
     const expected = [0, 1, 2];
     let listener = {
       next: (x: number) => {
@@ -134,7 +134,7 @@ describe('Stream', () => {
   });
 
   it('should broadcast events to two listeners', (done) => {
-    const stream = xs.interval(100);
+    const stream = xs.periodic(100);
     const expected1 = [0, 1, 2];
     const expected2 = [1, 2];
 
@@ -168,7 +168,7 @@ describe('Stream', () => {
   });
 
   it('should not stop if listener is synchronously removed and re-added', (done) => {
-    const stream = xs.interval(100);
+    const stream = xs.periodic(100);
     const expected = [0, 1, 2];
     let listener = {
       next: (x: number) => {
@@ -190,7 +190,7 @@ describe('Stream', () => {
   });
 
   it('should restart if listener is asynchronously removed and re-added', (done) => {
-    const stream = xs.interval(100);
+    const stream = xs.periodic(100);
     let expected = [0, 1, 2];
     let listener = {
       next: (x: number) => {

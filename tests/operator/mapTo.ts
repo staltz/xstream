@@ -3,7 +3,7 @@ import * as assert from 'assert';
 
 describe('Stream.prototype.mapTo', () => {
   it('should transform events to a constant value', (done) => {
-    const stream = xs.interval(100).mapTo(10);
+    const stream = xs.periodic(100).mapTo(10);
     const expected = [10, 10, 10];
     let listener = {
       next: (x: number) => {

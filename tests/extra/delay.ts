@@ -3,8 +3,8 @@ import delay from '../../src/extra/delay';
 import * as assert from 'assert';
 
 describe('delay (extra)', () => {
-  it('should delay interval events by a given time period', (done) => {
-    const stream = xs.interval(100).take(3).compose(delay(200));
+  it('should delay periodic events by a given time period', (done) => {
+    const stream = xs.periodic(100).take(3).compose(delay(200));
     const expected = [0, 1, 2];
     let completeCalled = false;
 
