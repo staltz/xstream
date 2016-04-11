@@ -25,6 +25,8 @@ build/Release
 
 # Generated directories
 lib/
+.sass-cache/
+_site/
 
 # Dependency directory
 node_modules
