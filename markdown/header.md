@@ -1,0 +1,51 @@
+<h2 class="site-subtitle">An extremely intuitive, small, and fast<br />functional reactive stream library for JavaScript</h2>
+
+- Only 26 core operators and factories
+- Written in TypeScript
+- Approximately 30 kB in size, without minification or gzip
+- On average, faster than RxJS 4, RxJS 5, Kefir, Bacon.js but slower than most.js
+- Tailored for Cycle.js, or applications with limited use of `subscribe`
+
+# Example
+
+```js
+import xs from 'xstream'
+
+// Tick every second incremental numbers,
+// only pass even numbers, then map them to their square,
+// and stop after 5 seconds has passed
+
+var stream = xs.periodic(1000)
+  .filter(i => i % 2 === 0)
+  .map(i => i * i)
+  .endWhen(xs.periodic(5000).take(1))
+
+// So far, the stream is idle.
+// As soon as it gets its first listener, it starts executing.
+
+stream.addListener({
+  next: i => console.log(i),
+  error: err => console.error(err),
+  complete: () => console.log('completed'),
+})
+```
+
+# Installation
+
+```text
+npm install xstream
+```
+
+# Usage
+
+## ES2015 or TypeScript
+
+```js
+import xs from 'xstream'
+```
+
+## CommonJS
+
+```js
+var xs = require('xstream').default
+```

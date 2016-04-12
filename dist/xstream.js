@@ -795,27 +795,6 @@ var Stream = (function () {
         this._prod = producer;
         this._ils = [];
     }
-    Stream.create = function (producer) {
-        if (producer) {
-            internalizeProducer(producer); // mutates the input
-        }
-        return new Stream(producer);
-    };
-    Stream.createWithMemory = function (producer) {
-        if (producer) {
-            internalizeProducer(producer); // mutates the input
-        }
-        return new MemoryStream(producer);
-    };
-    Stream.prototype.shamefullySendNext = function (value) {
-        this._n(value);
-    };
-    Stream.prototype.shamefullySendError = function (error) {
-        this._e(error);
-    };
-    Stream.prototype.shamefullySendComplete = function () {
-        this._c();
-    };
     Stream.prototype._n = function (t) {
         var len = this._ils.length;
         if (len === 1) {
@@ -858,12 +837,22 @@ var Stream = (function () {
             this._prod._stop();
         this._ils = [];
     };
+    /**
+     * Adds a Listener to the Stream.
+     *
+     * @param {Listener<T>} listener
+     */
     Stream.prototype.addListener = function (listener) {
         listener._n = listener.next;
         listener._e = listener.error;
         listener._c = listener.complete;
         this._add(listener);
     };
+    /**
+     * Removes a Listener from the Stream, assuming the Listener was added to it.
+     *
+     * @param {Listener<T>} listener
+     */
     Stream.prototype.removeListener = function (listener) {
         this._remove(listener);
     };
@@ -888,6 +877,40 @@ var Stream = (function () {
             }
         }
     };
+    /**
+     * Creates a new Stream given a Producer.
+     *
+     * @factory true
+     * @param {Producer} producer An optional Producer that dictates how to
+     * start, generate events, and stop the Stream.
+     * @return {Stream}
+     */
+    Stream.create = function (producer) {
+        if (producer) {
+            internalizeProducer(producer); // mutates the input
+        }
+        return new Stream(producer);
+    };
+    /**
+     * Creates a new MemoryStream given a Producer.
+     *
+     * @factory true
+     * @param {Producer} producer An optional Producer that dictates how to
+     * start, generate events, and stop the Stream.
+     * @return {MemoryStream}
+     */
+    Stream.createWithMemory = function (producer) {
+        if (producer) {
+            internalizeProducer(producer); // mutates the input
+        }
+        return new MemoryStream(producer);
+    };
+    /**
+     * Creates a Stream that does nothing when started. It never emits any event.
+     *
+     * @factory true
+     * @return {Stream}
+     */
     Stream.never = function () {
         return new Stream({ _start: noop, _stop: noop });
     };
@@ -926,9 +949,40 @@ var Stream = (function () {
         }
         return new Stream(new MergeProducer(streams));
     };
+    /**
+     * Transform each event from the input Stream through a `project` function, to
+     * get a Stream that emits those transformed events.
+     *
+     * Marble diagram:
+     * ```text
+     * --1---3--5-----7------
+     *    map(i => i * 10)
+     * --10--30-50----70-----
+     * ```
+     *
+     * @param {Function} project A function of type `(t: T) => U` that takes event
+     * of type `T` from the input Stream and produces an event of type `U`, to be
+     * emitted on the output Stream.
+     * @return {Stream}
+     */
     Stream.prototype.map = function (project) {
         return new Stream(new MapOperator(project, this));
     };
+    /**
+     * It's like `map`, but transforms each input event to always the same
+     * constant value on the output Stream.
+     *
+     * Marble diagram:
+     * ```text
+     * --1---3--5-----7-----
+     *       mapTo(10)
+     * --10--10-10----10----
+     * ```
+     *
+     * @param projectedValue A value to emit on the output Stream whenever the
+     * input Stream emits any value.
+     * @return {Stream}
+     */
     Stream.prototype.mapTo = function (projectedValue) {
         return new Stream(new MapToOperator(projectedValue, this));
     };
@@ -981,6 +1035,42 @@ var Stream = (function () {
     Stream.prototype.debug = function (spy) {
         if (spy === void 0) { spy = null; }
         return new Stream(new DebugOperator(spy, this));
+    };
+    /**
+     * Forces the Stream to emit the given value to its listeners.
+     *
+     * As the name indicates, if you use this, you are most likely doing something
+     * The Wrong Way. Please try to understand the reactive way before using this
+     * method. Use it only when you know what you are doing.
+     *
+     * @param value The "next" value you want to broadcast to all listeners of
+     * this Stream.
+     */
+    Stream.prototype.shamefullySendNext = function (value) {
+        this._n(value);
+    };
+    /**
+     * Forces the Stream to emit the given error to its listeners.
+     *
+     * As the name indicates, if you use this, you are most likely doing something
+     * The Wrong Way. Please try to understand the reactive way before using this
+     * method. Use it only when you know what you are doing.
+     *
+     * @param {any} error The error you want to broadcast to all the listeners of
+     * this Stream.
+     */
+    Stream.prototype.shamefullySendError = function (error) {
+        this._e(error);
+    };
+    /**
+     * Forces the Stream to emit the "completed" event to its listeners.
+     *
+     * As the name indicates, if you use this, you are most likely doing something
+     * The Wrong Way. Please try to understand the reactive way before using this
+     * method. Use it only when you know what you are doing.
+     */
+    Stream.prototype.shamefullySendComplete = function () {
+        this._c();
     };
     Stream.combine = function combine(project) {
         var streams = [];

@@ -1,0 +1,11 @@
+<? docfiles.forEach(function(doc) { ?>
+# API
+
+## Factories
+  <? doc.javadoc.forEach(function(comment) { ?><? if (!comment.ignore && comment.raw.tags.findIndex(o => o.type === 'factory') >= 0) { ?>
+      <? if (comment.name) { ?>- [`<?= comment.name ?>`](#<?= comment.name ?>)<? } ?><? } ?><? }) ?>
+
+## Methods and Operators
+  <? doc.javadoc.forEach(function(comment) { ?><? if (!comment.ignore && comment.raw.tags.findIndex(o => o.type === 'factory') === -1) { ?>
+      <? if (comment.name) { ?>- [`<?= comment.name ?>`](#<?= comment.name ?>)<? } ?><? } ?><? }) ?>
+<? }) ?>
