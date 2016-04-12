@@ -16,10 +16,10 @@
     border: none;
     color: $brand-color;
     font-size: 20px;
+    text-shadow: $brand-color 0 0 8px;
 }
 
 .site-subtitle {
-    font-size: $base-font-size * 1.27;
     margin: $spacing-unit 0;
     &::before {
       content: '';
@@ -168,7 +168,7 @@
  * Page content
  */
 .page-content {
-    padding: $spacing-unit 0;
+    padding: 0 0 $spacing-unit;
 }
 
 .page-heading {

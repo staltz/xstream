@@ -3,6 +3,7 @@ _site
 .jekyll-metadata
 .ignore/
 .idea/
+Gemfile.lock
 lib/
 markdown/
 node_modules/

@@ -17,3 +17,5 @@ url: "http://yourdomain.com" # the base hostname & protocol for your site
 excerpt_separator: "\n\n\n"
 # Build settings
 markdown: kramdown
+kramdown:
+  input: GFM

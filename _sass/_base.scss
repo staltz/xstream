@@ -71,23 +71,37 @@ ul, ol {
 
 li {
     list-style-type: square;
+    margin-bottom: 6px;
     > ul,
     > ol {
          margin-bottom: 0;
     }
 }
-
+hr {
+    border-color: #1A6152;
+    margin: $spacing-unit 0;
+}
 
 
 /**
  * Headings
  */
 h1, h2, h3, h4, h5, h6 {
-    font-weight: $base-font-weight;
-    font-size: $base-font-size;
-    color: $white;
+    font-weight: 800;
+    color: $lime;
     margin-top: $spacing-unit * 2;
     margin-bottom: $spacing-unit;
+}
+h1 {
+  font-size: $base-font-size * 2.15;
+  text-shadow: adjust-color($lime, $alpha: -0.5) 0 0 18px;
+}
+h2 {
+  font-size: $base-font-size * 1.428;
+  text-shadow: adjust-color($lime, $alpha: -0.5) 0 0 18px;
+}
+h3, h4, h5, h6 {
+  font-size: $base-font-size;
 }
 
 
@@ -111,9 +125,9 @@ h4::before {
  */
 a {
     color: $brand-color;
-    text-decoration: none;
+    text-decoration: underline;
     &:hover {
-        text-decoration: underline;
+        color: $lime;
     }
 }
 
@@ -142,8 +156,10 @@ blockquote {
  */
 pre,
 code {
-    font-size: 15px;
     background-color: #000;
+    &:not(a > pre) {
+        color: #D4D4D4;
+    }
 }
 
 code {
