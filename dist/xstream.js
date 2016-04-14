@@ -678,43 +678,20 @@ var MapOperator = (function () {
     };
     return MapOperator;
 }());
-var FilterMapOperator = (function () {
+var FilterMapOperator = (function (_super) {
+    __extends(FilterMapOperator, _super);
     function FilterMapOperator(predicate, project, ins) {
+        _super.call(this, project, ins);
         this.predicate = predicate;
-        this.project = project;
-        this.ins = ins;
-        this.out = null;
     }
-    FilterMapOperator.prototype._start = function (out) {
-        this.out = out;
-        this.ins._add(this);
-    };
-    FilterMapOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.out = null;
-    };
-    FilterMapOperator.prototype._tryCatch = function (v) {
-        try {
-            this.out._n(this.project(v));
-        }
-        catch (e) {
-            this.out._e(e);
-        }
-    };
     FilterMapOperator.prototype._n = function (v) {
         if (this.predicate(v)) {
-            this._tryCatch(v);
+            _super.prototype._n.call(this, v);
         }
         ;
     };
-    FilterMapOperator.prototype._e = function (e) {
-        this.out._e(e);
-    };
-    FilterMapOperator.prototype._c = function () {
-        this.out._c();
-    };
     return FilterMapOperator;
-}());
+}(MapOperator));
 var MapToOperator = (function () {
     function MapToOperator(val, ins) {
         this.val = val;
@@ -1077,12 +1054,12 @@ var Stream = (function () {
         return new Stream(new ReplaceErrorOperator(replace, this));
     };
     Stream.prototype.flatten = function () {
-        return new Stream(this._prod instanceof MapOperator ?
+        return new Stream(this._prod instanceof MapOperator || this._prod instanceof FilterMapOperator ?
             new MapFlattenOperator(this._prod) :
             new FlattenOperator(this));
     };
     Stream.prototype.flattenConcurrently = function () {
-        return new Stream(this._prod instanceof MapOperator ?
+        return new Stream(this._prod instanceof MapOperator || this._prod instanceof FilterMapOperator ?
             new MapFlattenConcOperator(this._prod) :
             new FlattenConcOperator(this));
     };
