@@ -1215,6 +1215,10 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   filter(predicate: (t: T) => boolean): Stream<T> {
+    if (this._prod instanceof MapOperator) {
+      const prod = (<MapOperator<T, T>> this._prod);
+      return new Stream<T>(new FilterMapOperator(predicate, prod.project, prod.ins));
+    }
     return new Stream<T>(new FilterOperator(predicate, this));
   }
 
