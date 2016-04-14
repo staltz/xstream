@@ -63,6 +63,12 @@ function invoke(f: Function, args: Array<any>) {
   }
 }
 
+function compose2(f1: (t: any) => any, f2: (t: any) => any): (t: any) => any {
+  return function composedFn(arg: any): any {
+    return f1(f2(arg));
+  };
+}
+
 export interface CombineProjectFunction {
   <T1, T2, R>(v1: T1, v2: T2): R;
   <T1, T2, T3, R>(v1: T1, v2: T2, v3: T3): R;
@@ -1192,6 +1198,14 @@ export class Stream<T> implements InternalListener<T> {
       const prod = (<FilterOperator<T>> this._prod);
       return new Stream<U>(new FilterMapOperator(prod.predicate, project, prod.ins));
     }
+    if (this._prod instanceof FilterMapOperator) {
+      const prod = (<FilterMapOperator<T, T>> this._prod);
+      return new Stream<U>(new FilterMapOperator(prod.predicate, compose2(project, prod.project), prod.ins));
+    }
+    if (this._prod instanceof MapOperator) {
+      const prod = (<MapOperator<T, T>> this._prod);
+      return new Stream<U>(new MapOperator(compose2(project, prod.project), prod.ins));
+    }
     return new Stream<U>(new MapOperator(project, this));
   }
 
@@ -1218,6 +1232,14 @@ export class Stream<T> implements InternalListener<T> {
     if (this._prod instanceof MapOperator) {
       const prod = (<MapOperator<T, T>> this._prod);
       return new Stream<T>(new FilterMapOperator(predicate, prod.project, prod.ins));
+    }
+    if (this._prod instanceof FilterMapOperator) {
+      const prod = (<FilterMapOperator<T, T>> this._prod);
+      return new Stream<T>(new FilterMapOperator(compose2(predicate, prod.predicate), prod.project, prod.ins));
+    }
+    if (this._prod instanceof FilterOperator) {
+      const prod = (<FilterOperator<T>> this._prod);
+      return new Stream<T>(new FilterOperator(compose2(predicate, prod.predicate), prod.ins));
     }
     return new Stream<T>(new FilterOperator(predicate, this));
   }

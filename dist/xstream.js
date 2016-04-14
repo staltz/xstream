@@ -34,6 +34,11 @@ function invoke(f, args) {
         default: return f.apply(void 0, args);
     }
 }
+function compose2(f1, f2) {
+    return function composedFn(arg) {
+        return f1(f2(arg));
+    };
+}
 var CombineListener = (function () {
     function CombineListener(i, prod) {
         this.i = i;
@@ -1007,6 +1012,14 @@ var Stream = (function () {
             var prod = this._prod;
             return new Stream(new FilterMapOperator(prod.predicate, project, prod.ins));
         }
+        if (this._prod instanceof FilterMapOperator) {
+            var prod = this._prod;
+            return new Stream(new FilterMapOperator(prod.predicate, compose2(project, prod.project), prod.ins));
+        }
+        if (this._prod instanceof MapOperator) {
+            var prod = this._prod;
+            return new Stream(new MapOperator(compose2(project, prod.project), prod.ins));
+        }
         return new Stream(new MapOperator(project, this));
     };
     /**
@@ -1028,6 +1041,18 @@ var Stream = (function () {
         return new Stream(new MapToOperator(projectedValue, this));
     };
     Stream.prototype.filter = function (predicate) {
+        if (this._prod instanceof MapOperator) {
+            var prod = this._prod;
+            return new Stream(new FilterMapOperator(predicate, prod.project, prod.ins));
+        }
+        if (this._prod instanceof FilterMapOperator) {
+            var prod = this._prod;
+            return new Stream(new FilterMapOperator(compose2(predicate, prod.predicate), prod.project, prod.ins));
+        }
+        if (this._prod instanceof FilterOperator) {
+            var prod = this._prod;
+            return new Stream(new FilterOperator(compose2(predicate, prod.predicate), prod.ins));
+        }
         return new Stream(new FilterOperator(predicate, this));
     };
     Stream.prototype.take = function (amount) {
