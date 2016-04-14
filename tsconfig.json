@@ -17,10 +17,25 @@
   },
   "files": [
     "typings/main.d.ts",
-    "src/index.ts"
+    "src/core.ts",
+    "src/index.ts",
+    "src/extra/concat.ts",
+    "src/extra/debounce.ts",
+    "src/extra/delay.ts",
+    "src/extra/dropRepeats.ts",
+    "src/extra/fromEvent.ts",
+    "src/extra/pairwise.ts"
+  ],
+  "filesGlob": [
+    "typings/main.d.ts",
+    "src/*.ts",
+    "src/extra/*.ts"
   ],
   "exclude": [
     "node_modules",
     "tests"
-  ]
+  ],
+  "atom": {
+    "rewriteTsconfig": true
+  }
 }
