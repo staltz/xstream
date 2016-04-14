@@ -1174,17 +1174,26 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   map<U>(project: (t: T) => U): Stream<U> {
-    if (this._prod instanceof FilterOperator) {
-      const prod = (<FilterOperator<T>> this._prod);
-      return new Stream<U>(new FilterMapOperator(prod.predicate, project, prod.ins));
+    const p = this._prod;
+    if (p instanceof FilterOperator) {
+      return new Stream<U>(new FilterMapOperator(
+        (<FilterOperator<T>> p).predicate,
+        project,
+        (<FilterOperator<T>> p).ins
+      ));
     }
-    if (this._prod instanceof FilterMapOperator) {
-      const prod = (<FilterMapOperator<T, T>> this._prod);
-      return new Stream<U>(new FilterMapOperator(prod.predicate, compose2(project, prod.project), prod.ins));
+    if (p instanceof FilterMapOperator) {
+      return new Stream<U>(new FilterMapOperator(
+        (<FilterMapOperator<T, T>> p).predicate,
+        compose2(project, (<FilterMapOperator<T, T>> p).project),
+        (<FilterMapOperator<T, T>> p).ins
+      ));
     }
-    if (this._prod instanceof MapOperator) {
-      const prod = (<MapOperator<T, T>> this._prod);
-      return new Stream<U>(new MapOperator(compose2(project, prod.project), prod.ins));
+    if (p instanceof MapOperator) {
+      return new Stream<U>(new MapOperator(
+        compose2(project, (<MapOperator<T, T>> p).project),
+        (<MapOperator<T, T>> p).ins
+      ));
     }
     return new Stream<U>(new MapOperator(project, this));
   }
@@ -1209,17 +1218,26 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   filter(predicate: (t: T) => boolean): Stream<T> {
-    if (this._prod instanceof MapOperator) {
-      const prod = (<MapOperator<T, T>> this._prod);
-      return new Stream<T>(new FilterMapOperator(predicate, prod.project, prod.ins));
+    const p = this._prod;
+    if (p instanceof MapOperator) {
+      return new Stream<T>(new FilterMapOperator(
+        predicate,
+        (<MapOperator<T, T>> p).project,
+        (<MapOperator<T, T>> p).ins
+      ));
     }
-    if (this._prod instanceof FilterMapOperator) {
-      const prod = (<FilterMapOperator<T, T>> this._prod);
-      return new Stream<T>(new FilterMapOperator(compose2(predicate, prod.predicate), prod.project, prod.ins));
+    if (p instanceof FilterMapOperator) {
+      return new Stream<T>(new FilterMapOperator(
+        compose2(predicate, (<FilterMapOperator<T, T>> p).predicate),
+        (<FilterMapOperator<T, T>> p).project,
+        (<FilterMapOperator<T, T>> p).ins
+      ));
     }
-    if (this._prod instanceof FilterOperator) {
-      const prod = (<FilterOperator<T>> this._prod);
-      return new Stream<T>(new FilterOperator(compose2(predicate, prod.predicate), prod.ins));
+    if (p instanceof FilterOperator) {
+      return new Stream<T>(new FilterOperator(
+        compose2(predicate, (<FilterOperator<T>> p).predicate),
+        (<FilterOperator<T>> p).ins
+      ));
     }
     return new Stream<T>(new FilterOperator(predicate, this));
   }
@@ -1253,15 +1271,17 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   flatten<R, T extends Stream<R>>(): T {
-    return <T> new Stream<R>(this._prod instanceof MapOperator || this._prod instanceof FilterMapOperator ?
-      new MapFlattenOperator(<MapOperator<R, Stream<R>>> <any> this._prod) :
+    const p = this._prod;
+    return <T> new Stream<R>(p instanceof MapOperator || p instanceof FilterMapOperator ?
+      new MapFlattenOperator(<MapOperator<R, Stream<R>>> <any> p) :
       new FlattenOperator(<Stream<Stream<R>>> <any> this)
     );
   }
 
   flattenConcurrently<R, T extends Stream<R>>(): T {
-    return <T> new Stream<R>(this._prod instanceof MapOperator || this._prod instanceof FilterMapOperator ?
-      new MapFlattenConcOperator(<MapOperator<R, Stream<R>>> <any> this._prod) :
+    const p = this._prod;
+    return <T> new Stream<R>(p instanceof MapOperator || p instanceof FilterMapOperator ?
+      new MapFlattenConcOperator(<MapOperator<R, Stream<R>>> <any> p) :
       new FlattenConcOperator(<Stream<Stream<R>>> <any> this)
     );
   }

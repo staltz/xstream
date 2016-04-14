@@ -815,36 +815,39 @@ var Stream = (function () {
         this._ils = [];
     }
     Stream.prototype._n = function (t) {
-        var len = this._ils.length;
+        var a = this._ils;
+        var len = a.length;
         if (len === 1) {
-            this._ils[0]._n(t);
+            a[0]._n(t);
         }
         else {
             for (var i = 0; i < len; i++) {
-                this._ils[i]._n(t);
+                a[i]._n(t);
             }
         }
     };
     Stream.prototype._e = function (err) {
-        var len = this._ils.length;
+        var a = this._ils;
+        var len = a.length;
         if (len === 1) {
-            this._ils[0]._e(err);
+            a[0]._e(err);
         }
         else {
             for (var i = 0; i < len; i++) {
-                this._ils[i]._e(err);
+                a[i]._e(err);
             }
         }
         this._x();
     };
     Stream.prototype._c = function () {
-        var len = this._ils.length;
+        var a = this._ils;
+        var len = a.length;
         if (len === 1) {
-            this._ils[0]._c();
+            a[0]._c();
         }
         else {
             for (var i = 0; i < len; i++) {
-                this._ils[i]._c();
+                a[i]._c();
             }
         }
         this._x();
@@ -876,23 +879,26 @@ var Stream = (function () {
         this._remove(listener);
     };
     Stream.prototype._add = function (il) {
-        this._ils.push(il);
-        if (this._ils.length === 1) {
+        var a = this._ils;
+        a.push(il);
+        if (a.length === 1) {
             if (this._stopID !== empty) {
                 clearTimeout(this._stopID);
                 this._stopID = empty;
             }
-            if (this._prod)
-                this._prod._start(this);
+            var p = this._prod;
+            if (p)
+                p._start(this);
         }
     };
     Stream.prototype._remove = function (il) {
-        var _this = this;
-        var i = this._ils.indexOf(il);
+        var a = this._ils;
+        var i = a.indexOf(il);
         if (i > -1) {
-            this._ils.splice(i, 1);
-            if (this._prod && this._ils.length <= 0) {
-                this._stopID = setTimeout(function () { return _this._prod._stop(); });
+            a.splice(i, 1);
+            var p_1 = this._prod;
+            if (p_1 && a.length <= 0) {
+                this._stopID = setTimeout(function () { return p_1._stop(); });
             }
         }
     };
@@ -985,17 +991,15 @@ var Stream = (function () {
      * @return {Stream}
      */
     Stream.prototype.map = function (project) {
-        if (this._prod instanceof FilterOperator) {
-            var prod = this._prod;
-            return new Stream(new FilterMapOperator(prod.predicate, project, prod.ins));
+        var p = this._prod;
+        if (p instanceof FilterOperator) {
+            return new Stream(new FilterMapOperator(p.predicate, project, p.ins));
         }
-        if (this._prod instanceof FilterMapOperator) {
-            var prod = this._prod;
-            return new Stream(new FilterMapOperator(prod.predicate, compose2(project, prod.project), prod.ins));
+        if (p instanceof FilterMapOperator) {
+            return new Stream(new FilterMapOperator(p.predicate, compose2(project, p.project), p.ins));
         }
-        if (this._prod instanceof MapOperator) {
-            var prod = this._prod;
-            return new Stream(new MapOperator(compose2(project, prod.project), prod.ins));
+        if (p instanceof MapOperator) {
+            return new Stream(new MapOperator(compose2(project, p.project), p.ins));
         }
         return new Stream(new MapOperator(project, this));
     };
@@ -1018,17 +1022,15 @@ var Stream = (function () {
         return new Stream(new MapToOperator(projectedValue, this));
     };
     Stream.prototype.filter = function (predicate) {
-        if (this._prod instanceof MapOperator) {
-            var prod = this._prod;
-            return new Stream(new FilterMapOperator(predicate, prod.project, prod.ins));
+        var p = this._prod;
+        if (p instanceof MapOperator) {
+            return new Stream(new FilterMapOperator(predicate, p.project, p.ins));
         }
-        if (this._prod instanceof FilterMapOperator) {
-            var prod = this._prod;
-            return new Stream(new FilterMapOperator(compose2(predicate, prod.predicate), prod.project, prod.ins));
+        if (p instanceof FilterMapOperator) {
+            return new Stream(new FilterMapOperator(compose2(predicate, p.predicate), p.project, p.ins));
         }
-        if (this._prod instanceof FilterOperator) {
-            var prod = this._prod;
-            return new Stream(new FilterOperator(compose2(predicate, prod.predicate), prod.ins));
+        if (p instanceof FilterOperator) {
+            return new Stream(new FilterOperator(compose2(predicate, p.predicate), p.ins));
         }
         return new Stream(new FilterOperator(predicate, this));
     };
@@ -1054,13 +1056,15 @@ var Stream = (function () {
         return new Stream(new ReplaceErrorOperator(replace, this));
     };
     Stream.prototype.flatten = function () {
-        return new Stream(this._prod instanceof MapOperator || this._prod instanceof FilterMapOperator ?
-            new MapFlattenOperator(this._prod) :
+        var p = this._prod;
+        return new Stream(p instanceof MapOperator || p instanceof FilterMapOperator ?
+            new MapFlattenOperator(p) :
             new FlattenOperator(this));
     };
     Stream.prototype.flattenConcurrently = function () {
-        return new Stream(this._prod instanceof MapOperator || this._prod instanceof FilterMapOperator ?
-            new MapFlattenConcOperator(this._prod) :
+        var p = this._prod;
+        return new Stream(p instanceof MapOperator || p instanceof FilterMapOperator ?
+            new MapFlattenConcOperator(p) :
             new FlattenConcOperator(this));
     };
     Stream.prototype.merge = function (other) {
