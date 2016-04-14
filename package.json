@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "commit": "git-cz",
-    "lint": "tslint -c tslint.json src/*.ts",
+    "lint": "tslint -c tslint.json src/**/*.ts",
     "premocha": "npm run lib",
     "mocha": "mocha tests/*.ts tests/**/*.ts --require ts-node/register",
     "postmocha": "rm -rf tests/**/*.js",

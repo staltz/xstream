@@ -28,8 +28,7 @@
   ],
   "filesGlob": [
     "typings/main.d.ts",
-    "src/*.ts",
-    "src/extra/*.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",
