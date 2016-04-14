@@ -988,35 +988,38 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _n(t: T): void {
-    const len = this._ils.length;
+    const a = this._ils;
+    const len = a.length;
     if (len === 1) {
-      this._ils[0]._n(t);
+      a[0]._n(t);
     } else {
       for (let i = 0; i < len; i++) {
-        this._ils[i]._n(t);
+        a[i]._n(t);
       }
     }
   }
 
   _e(err: any): void {
-    const len = this._ils.length;
+    const a = this._ils;
+    const len = a.length;
     if (len === 1) {
-      this._ils[0]._e(err);
+      a[0]._e(err);
     } else {
       for (let i = 0; i < len; i++) {
-        this._ils[i]._e(err);
+        a[i]._e(err);
       }
     }
     this._x();
   }
 
   _c(): void {
-    const len = this._ils.length;
+    const a = this._ils;
+    const len = a.length;
     if (len === 1) {
-      this._ils[0]._c();
+      a[0]._c();
     } else {
       for (let i = 0; i < len; i++) {
-        this._ils[i]._c();
+        a[i]._c();
       }
     }
     this._x();
@@ -1050,22 +1053,26 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _add(il: InternalListener<T>): void {
-    this._ils.push(il);
-    if (this._ils.length === 1) {
+    const a = this._ils;
+    a.push(il);
+    if (a.length === 1) {
       if (this._stopID !== empty) {
         clearTimeout(this._stopID);
         this._stopID = empty;
       }
-      if (this._prod) this._prod._start(this);
+      const p = this._prod;
+      if (p) p._start(this);
     }
   }
 
   _remove(il: InternalListener<T>): void {
-    const i = this._ils.indexOf(il);
+    const a = this._ils;
+    const i = a.indexOf(il);
     if (i > -1) {
-      this._ils.splice(i, 1);
-      if (this._prod && this._ils.length <= 0) {
-        this._stopID = setTimeout(() => this._prod._stop());
+      a.splice(i, 1);
+      const p = this._prod;
+      if (p && a.length <= 0) {
+        this._stopID = setTimeout(() => p._stop());
       }
     }
   }
