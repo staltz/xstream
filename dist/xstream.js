@@ -673,6 +673,35 @@ var MapOperator = (function () {
     };
     return MapOperator;
 }());
+var FilterMapOperator = (function () {
+    function FilterMapOperator(predicate, project, ins) {
+        this.predicate = predicate;
+        this.project = project;
+        this.ins = ins;
+        this.out = null;
+    }
+    FilterMapOperator.prototype._start = function (out) {
+        this.out = out;
+        this.ins._add(this);
+    };
+    FilterMapOperator.prototype._stop = function () {
+        this.ins._remove(this);
+        this.out = null;
+    };
+    FilterMapOperator.prototype._n = function (v) {
+        if (this.predicate(v)) {
+            this.out._n(this.project(v));
+        }
+        ;
+    };
+    FilterMapOperator.prototype._e = function (e) {
+        this.out._e(e);
+    };
+    FilterMapOperator.prototype._c = function () {
+        this.out._c();
+    };
+    return FilterMapOperator;
+}());
 var MapToOperator = (function () {
     function MapToOperator(val, ins) {
         this.val = val;
@@ -961,11 +990,15 @@ var Stream = (function () {
      * ```
      *
      * @param {Function} project A function of type `(t: T) => U` that takes event
-     * of type `T` from the input Stream and produces an event of type `U`, to be
-     * emitted on the output Stream.
+     * `t` of type `T` from the input Stream and produces an event of type `U`, to
+     * be emitted on the output Stream.
      * @return {Stream}
      */
     Stream.prototype.map = function (project) {
+        if (this._prod instanceof FilterOperator) {
+            var prod = this._prod;
+            return new Stream(new FilterMapOperator(prod.predicate, project, prod.ins));
+        }
         return new Stream(new MapOperator(project, this));
     };
     /**
