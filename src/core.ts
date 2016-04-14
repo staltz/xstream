@@ -1193,7 +1193,7 @@ export class Stream<T> implements InternalListener<T> {
    * be emitted on the output Stream.
    * @return {Stream}
    */
-  map<U>(project: (t: T) => U): Stream<U> | Stream<T> {
+  map<U>(project: (t: T) => U): Stream<U> {
     if (this._prod instanceof FilterOperator) {
       const prod = (<FilterOperator<T>> this._prod);
       return new Stream<U>(new FilterMapOperator(prod.predicate, project, prod.ins));
