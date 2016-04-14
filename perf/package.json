@@ -5,12 +5,13 @@
   "author": "Andre Staltz <andre+npm@staltz.com> (http://andre.staltz.com/)",
   "license": "MIT",
   "scripts": {
+    "filter-map-fusion": "node ./filter-map-fusion",
     "filter-map-reduce": "node ./filter-map-reduce",
     "flatMap": "node ./flatMap.js",
     "merge": "node ./merge.js",
     "scan": "node ./scan.js",
     "switchMap": "node ./switchMap",
-    "start": "npm run filter-map-reduce && npm run flatMap && npm run merge && npm run scan && npm run switchMap"
+    "start": "npm run filter-map-reduce && npm run filter-map-fusion && npm run flatMap && npm run merge && npm run scan && npm run switchMap"
   },
   "dependencies": {
     "@reactivex/rxjs": "^5.0.0-beta.6",
