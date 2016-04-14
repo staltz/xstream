@@ -807,7 +807,7 @@ class MapFlattenOperator<T> implements InternalProducer<T>, InternalListener<T> 
 }
 
 class MapOperator<T, R> implements Operator<T, R> {
-  private out: Stream<R> = null;
+  protected out: Stream<R> = null;
 
   constructor(public project: (t: T) => R,
               public ins: Stream<T>) {
@@ -840,44 +840,17 @@ class MapOperator<T, R> implements Operator<T, R> {
   }
 }
 
-class FilterMapOperator<T, R> implements Operator<T, R> {
-  private out: Stream<R> = null;
-
+class FilterMapOperator<T, R> extends MapOperator<T, R> {
   constructor(public predicate: (t: T) => boolean,
-              public project: (t: T) => R,
-              public ins: Stream<T>) {
-  }
-
-  _start(out: Stream<R>): void {
-    this.out = out;
-    this.ins._add(this);
-  }
-
-  _stop(): void {
-    this.ins._remove(this);
-    this.out = null;
-  }
-
-  _tryCatch(v: T) {
-    try {
-      this.out._n(this.project(v));
-    } catch (e) {
-      this.out._e(e);
-    }
+              project: (t: T) => R,
+              ins: Stream<T>) {
+    super(project, ins);
   }
 
   _n(v: T) {
     if (this.predicate(v)) {
-      this._tryCatch(v);
+      super._n(v);
     };
-  }
-
-  _e(e: any) {
-    this.out._e(e);
-  }
-
-  _c() {
-    this.out._c();
   }
 }
 
