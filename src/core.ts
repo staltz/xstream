@@ -852,9 +852,17 @@ class FilterMapOperator<T, R> implements Operator<T, R> {
     this.out = null;
   }
 
+  _tryCatch(v: T) {
+    try {
+      this.out._n(this.project(v));
+    } catch (e) {
+      this.out._e(e);
+    }
+  }
+
   _n(v: T) {
     if (this.predicate(v)) {
-      this.out._n(this.project(v));
+      this._tryCatch(v);
     };
   }
 

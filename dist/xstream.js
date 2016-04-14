@@ -688,9 +688,17 @@ var FilterMapOperator = (function () {
         this.ins._remove(this);
         this.out = null;
     };
+    FilterMapOperator.prototype._tryCatch = function (v) {
+        try {
+            this.out._n(this.project(v));
+        }
+        catch (e) {
+            this.out._e(e);
+        }
+    };
     FilterMapOperator.prototype._n = function (v) {
         if (this.predicate(v)) {
-            this.out._n(this.project(v));
+            this._tryCatch(v);
         }
         ;
     };
