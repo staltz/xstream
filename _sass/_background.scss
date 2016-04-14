@@ -1,0 +1,25 @@
+.background {
+  position: fixed;
+  z-index: -100;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-image:
+    linear-gradient(
+      to right,
+      lighten($background-color, 4%) 1%,
+      transparent 2%,
+      transparent 99%,
+      lighten($background-color, 4%) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      lighten($background-color, 4%) 1%,
+      transparent 2%,
+      transparent 99%,
+      lighten($background-color, 4%) 100%
+    );
+  background-attachment: fixed;
+  background-size: 40px 40px;
+}

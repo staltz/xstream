@@ -3,7 +3,7 @@
 - Only 26 core operators and factories
 - Written in TypeScript
 - Approximately 30 kB in size, without minification or gzip
-- On average, faster than RxJS 4, RxJS 5, Kefir, Bacon.js but slower than most.js
+- On average, faster than RxJS 4, Kefir, Bacon.js, as fast as RxJS 5, and slower than most.js
 - Tailored for Cycle.js, or applications with limited use of `subscribe`
 
 # Example
@@ -191,7 +191,7 @@ It's still useful to eventually (asynchronously) stop a Stream's internal Produc
 
 Factories are functions that create Streams, such as `xs.create()`, `xs.periodic()`, etc.
 
-## <a id="create"></a> `create(producer)`
+### <a id="create"></a> `create(producer)`
 
 Creates a new Stream given a Producer.
 
@@ -201,7 +201,7 @@ Creates a new Stream given a Producer.
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -215,7 +215,7 @@ Creates a new MemoryStream given a Producer.
 
 #### Return:
 
-*(MemoryStream)*
+*(MemoryStream)* 
 
 - - -
 
@@ -225,7 +225,7 @@ Creates a Stream that does nothing when started. It never emits any event.
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -260,7 +260,6 @@ Transform each event from the input Stream through a `project` function, to
 get a Stream that emits those transformed events.
 
 Marble diagram:
-
 ```text
 --1---3--5-----7------
    map(i => i * 10)
@@ -274,7 +273,7 @@ be emitted on the output Stream.
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -284,7 +283,6 @@ It's like `map`, but transforms each input event to always the same
 constant value on the output Stream.
 
 Marble diagram:
-
 ```text
 --1---3--5-----7-----
       mapTo(10)
@@ -297,7 +295,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -338,3 +336,4 @@ The Wrong Way. Please try to understand the reactive way before using this
 method. Use it only when you know what you are doing.
 
 - - -
+
