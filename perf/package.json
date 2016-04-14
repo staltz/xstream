@@ -5,23 +5,21 @@
   "author": "Andre Staltz <andre+npm@staltz.com> (http://andre.staltz.com/)",
   "license": "MIT",
   "scripts": {
-    "concatMap": "node ./concatMap.js",
     "filter-map-reduce": "node ./filter-map-reduce",
     "flatMap": "node ./flatMap.js",
     "merge": "node ./merge.js",
     "scan": "node ./scan.js",
-    "skipRepeats": "node ./skipRepeats.js",
-    "zip": "node ./zip.js",
-    "start": "npm run filter-map-reduce && npm run flatMap && npm run concatMap && npm run merge && npm run zip && npm run scan && npm run skipRepeats"
+    "switchMap": "node ./switchMap",
+    "start": "npm run filter-map-reduce && npm run flatMap && npm run merge && npm run scan && npm run switchMap"
   },
   "dependencies": {
-    "@reactivex/rxjs": "^5.0.0-beta.0",
-    "baconjs": "^0.7.82",
+    "@reactivex/rxjs": "^5.0.0-beta.6",
+    "baconjs": "^0.7.84",
     "benchmark": "github:bestiejs/benchmark.js#master",
-    "highland": "^2.5.1",
-    "kefir": "^3.2.0",
-    "lodash": "^3.10.1",
-    "most": "^0.18.1",
-    "rx": "^4.0.8"
+    "highland": "^2.7.4",
+    "kefir": "^3.2.1",
+    "lodash": "^4.11.0",
+    "most": "^0.18.8",
+    "rx": "^4.1.0"
   }
 }

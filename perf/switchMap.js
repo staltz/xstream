@@ -52,8 +52,8 @@ suite
   }, options)
   .add('rx 5', function(deferred) {
     runners.runRx5(deferred,
-      rxjs.Observable.fromArray(a).switchMap(
-        function(x) {return rxjs.Observable.fromArray(x)}).reduce(sum, 0))
+      rxjs.Observable.from(a).switchMap(
+        function(x) {return rxjs.Observable.from(x)}).reduce(sum, 0))
   }, options)
   .add('rx 4', function(deferred) {
     runners.runRx(deferred,

@@ -52,8 +52,8 @@ suite
   }, options)
   .add('rx 5', function(deferred) {
     runners.runRx5(deferred,
-      rxjs.Observable.fromArray(a).flatMap(
-        function(x) {return rxjs.Observable.fromArray(x)}).reduce(sum, 0))
+      rxjs.Observable.from(a).flatMap(
+        function(x) {return rxjs.Observable.from(x)}).reduce(sum, 0))
   }, options)
   .add('rx 4', function(deferred) {
     runners.runRx(deferred, rx.Observable.fromArray(a).flatMap(rx.Observable.fromArray).reduce(sum, 0));
