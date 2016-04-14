@@ -63,8 +63,8 @@ function invoke(f: Function, args: Array<any>) {
   }
 }
 
-function compose2<T>(f1: (t: T) => T, f2: (t: T) => T): (t: T) => T {
-  return function composedFn(arg: T): T {
+function compose2<T, U>(f1: (t: T) => any, f2: (t: T) => any): (t: T) => any {
+  return function composedFn(arg: T): any {
     return f1(f2(arg));
   };
 }
