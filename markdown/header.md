@@ -3,7 +3,7 @@
 - Only 26 core operators and factories
 - Written in TypeScript
 - Approximately 30 kB in size, without minification or gzip
-- On average, faster than RxJS 4, RxJS 5, Kefir, Bacon.js but slower than most.js
+- On average, faster than RxJS 4, Kefir, Bacon.js, as fast as RxJS 5, and slower than most.js
 - Tailored for Cycle.js, or applications with limited use of `subscribe`
 
 # Example
