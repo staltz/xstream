@@ -74,6 +74,7 @@ var xs = require('xstream').default
 - [`map`](#map)
 - [`mapTo`](#mapTo)
 - [`filter`](#filter)
+- [`take`](#take)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -331,6 +332,29 @@ Marble diagram:
 
 - `passes: Function` A function of type `(t: T) +> boolean` that takes an event from the input stream and checks if it passes, by returning a
 boolean.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="take"></a> `take(amount)`
+
+Lets at most `amount` many events from the input stream pass to the output
+stream, then makes the output stream complete.
+
+Marble diagram:
+
+```text
+--a---b--c----d---e--
+    take(3)
+--a---b--c|
+```
+
+#### Arguments:
+
+- `amount: number` How many events to allow from the input stream before completing the output stream.
 
 #### Return:
 

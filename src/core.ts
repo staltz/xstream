@@ -1264,6 +1264,22 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<T>(new FilterOperator(passes, this));
   }
 
+  /**
+   * Lets at most `amount` many events from the input stream pass to the output
+   * stream, then makes the output stream complete.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --a---b--c----d---e--
+   *     take(3)
+   * --a---b--c|
+   * ```
+   *
+   * @param {number} amount How many events to allow from the input stream
+   * before completing the output stream.
+   * @return {Stream}
+   */
   take(amount: number): Stream<T> {
     return new Stream<T>(new TakeOperator(amount, this));
   }
