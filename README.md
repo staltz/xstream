@@ -80,6 +80,7 @@ var xs = require('xstream').default
 - [`startWith`](#startWith)
 - [`endWhen`](#endWhen)
 - [`fold`](#fold)
+- [`replaceError`](#replaceError)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -435,10 +436,11 @@ Marble diagram:
 
 ### <a id="endWhen"></a> `endWhen(other)`
 
-Uses another stream to determine when to complete the current stream. When
-the given `other` stream emits an event or completes, the output stream
-will complete. Before that happens, the output stream will imitate whatever
-happens on the input stream.
+Uses another stream to determine when to complete the current stream.
+
+When the given `other` stream emits an event or completes, the output
+stream will complete. Before that happens, the output stream will imitate
+whatever happens on the input stream.
 
 Marble diagram:
 
@@ -460,7 +462,9 @@ Marble diagram:
 
 ### <a id="fold"></a> `fold(accumulate, seed)`
 
-"Folds" the stream onto itself. Combines events from the past throughout
+"Folds" the stream onto itself.
+
+Combines events from the past throughout
 the entire execution of the input stream, allowing you to accumulate them
 together. It's essentially like `Array.prototype.reduce`.
 
@@ -484,6 +488,36 @@ Marble diagram:
 - `accumulate: Function` A function of type `(acc: R, t: T) => R` that takes the previous accumulated value `acc` and the incoming event from the
 input stream and produces the new accumulated value.
 - `seed` The initial accumulated value, of type `R`.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="replaceError"></a> `replaceError(replace)`
+
+Replaces an error with another stream.
+
+When (and if) an error happens on the input stream, instead of forwarding
+that error to the output stream, *replaceError* will call the `replace`
+function which returns the stream that the output stream will imitate. And,
+in case that new stream also emits an error, `replace` will be called again
+to get another stream to start imitating.
+
+Marble diagram:
+
+```text
+--1---2-----3--4-----X
+  replaceError( () => --10--| )
+--1---2-----3--4--------10--|
+```
+
+#### Arguments:
+
+- `replace: Function` A function of type `(err) => Stream` that takes the error that occured on the input stream or on the previous replacement
+stream and returns a new stream. The output stream will imitate the stream
+that this function returns.
 
 #### Return:
 

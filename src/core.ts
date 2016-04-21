@@ -1343,10 +1343,11 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   /**
-   * Uses another stream to determine when to complete the current stream. When
-   * the given `other` stream emits an event or completes, the output stream
-   * will complete. Before that happens, the output stream will imitate whatever
-   * happens on the input stream.
+   * Uses another stream to determine when to complete the current stream.
+   *
+   * When the given `other` stream emits an event or completes, the output
+   * stream will complete. Before that happens, the output stream will imitate
+   * whatever happens on the input stream.
    *
    * Marble diagram:
    *
@@ -1365,7 +1366,9 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   /**
-   * "Folds" the stream onto itself. Combines events from the past throughout
+   * "Folds" the stream onto itself.
+   *
+   * Combines events from the past throughout
    * the entire execution of the input stream, allowing you to accumulate them
    * together. It's essentially like `Array.prototype.reduce`.
    *
@@ -1394,6 +1397,29 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<R>(new FoldOperator(accumulate, seed, this));
   }
 
+  /**
+   * Replaces an error with another stream.
+   *
+   * When (and if) an error happens on the input stream, instead of forwarding
+   * that error to the output stream, *replaceError* will call the `replace`
+   * function which returns the stream that the output stream will imitate. And,
+   * in case that new stream also emits an error, `replace` will be called again
+   * to get another stream to start imitating.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --1---2-----3--4-----X
+   *   replaceError( () => --10--| )
+   * --1---2-----3--4--------10--|
+   * ```
+   *
+   * @param {Function} replace A function of type `(err) => Stream` that takes
+   * the error that occured on the input stream or on the previous replacement
+   * stream and returns a new stream. The output stream will imitate the stream
+   * that this function returns.
+   * @return {Stream}
+   */
   replaceError(replace: (err: any) => Stream<T>): Stream<T> {
     return new Stream<T>(new ReplaceErrorOperator(replace, this));
   }
