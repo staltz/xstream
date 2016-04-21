@@ -1323,8 +1323,23 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<T>(new LastOperator(this));
   }
 
-  startWith(x: T): Stream<T> {
-    return new Stream<T>(new StartWithOperator(this, x));
+  /**
+   * Prepends the given `initial` value to the sequence of events emitted by the
+   * input stream.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * ---1---2-----3---
+   *   startWith(0)
+   * 0--1---2-----3---
+   * ```
+   *
+   * @param initial The value or event to prepend.
+   * @return {Stream}
+   */
+  startWith(initial: T): Stream<T> {
+    return new Stream<T>(new StartWithOperator(this, initial));
   }
 
   endWhen(other: Stream<any>): Stream<T> {

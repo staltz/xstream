@@ -77,6 +77,7 @@ var xs = require('xstream').default
 - [`take`](#take)
 - [`drop`](#drop)
 - [`last`](#last)
+- [`startWith`](#startWith)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -400,6 +401,29 @@ Marble diagram:
       last()
 -----------------d|
 ```
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="startWith"></a> `startWith(initial)`
+
+Prepends the given `initial` value to the sequence of events emitted by the
+input stream.
+
+Marble diagram:
+
+```text
+---1---2-----3---
+  startWith(0)
+0--1---2-----3---
+```
+
+#### Arguments:
+
+- `initial` The value or event to prepend.
 
 #### Return:
 
