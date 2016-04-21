@@ -73,6 +73,7 @@ var xs = require('xstream').default
 - [`removeListener`](#removeListener)
 - [`map`](#map)
 - [`mapTo`](#mapTo)
+- [`filter`](#filter)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -265,10 +266,11 @@ Removes a Listener from the Stream, assuming the Listener was added to it.
 
 ### <a id="map"></a> `map(project)`
 
-Transform each event from the input Stream through a `project` function, to
-get a Stream that emits those transformed events.
+Transforms each event from the input Stream through a `project` function,
+to get a Stream that emits those transformed events.
 
 Marble diagram:
+
 ```text
 --1---3--5-----7------
    map(i => i * 10)
@@ -292,6 +294,7 @@ It's like `map`, but transforms each input event to always the same
 constant value on the output Stream.
 
 Marble diagram:
+
 ```text
 --1---3--5-----7-----
       mapTo(10)
@@ -301,6 +304,33 @@ Marble diagram:
 #### Arguments:
 
 - `projectedValue` A value to emit on the output Stream whenever the input Stream emits any value.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="filter"></a> `filter(passes)`
+
+Only allows events that pass the test given by the `passes` argument.
+
+Each event from the input stream is given to the `passes` function. If the
+function returns `true`, the event is forwarded to the output stream,
+otherwise it is ignored and not forwarded.
+
+Marble diagram:
+
+```text
+--1---2--3-----4-----5---6--7-8--
+    filter(i => i % 2 === 0)
+------2--------4---------6----8--
+```
+
+#### Arguments:
+
+- `passes: Function` A function of type `(t: T) +> boolean` that takes an event from the input stream and checks if it passes, by returning a
+boolean.
 
 #### Return:
 

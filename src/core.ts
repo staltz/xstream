@@ -438,7 +438,7 @@ class EndWhenOperator<T> implements Operator<T, T> {
 class FilterOperator<T> implements Operator<T, T> {
   private out: Stream<T> = null;
 
-  constructor(public predicate: (t: T) => boolean,
+  constructor(public passes: (t: T) => boolean,
               public ins: Stream<T>) {
   }
 
@@ -454,7 +454,7 @@ class FilterOperator<T> implements Operator<T, T> {
 
   _n(t: T) {
     try {
-      if (this.predicate(t)) this.out._n(t);
+      if (this.passes(t)) this.out._n(t);
     } catch (e) {
       this.out._e(e);
     }
@@ -841,14 +841,14 @@ class MapOperator<T, R> implements Operator<T, R> {
 }
 
 class FilterMapOperator<T, R> extends MapOperator<T, R> {
-  constructor(public predicate: (t: T) => boolean,
+  constructor(public passes: (t: T) => boolean,
               project: (t: T) => R,
               ins: Stream<T>) {
     super(project, ins);
   }
 
   _n(v: T) {
-    if (this.predicate(v)) {
+    if (this.passes(v)) {
       super._n(v);
     };
   }
@@ -1158,10 +1158,11 @@ export class Stream<T> implements InternalListener<T> {
     };
 
   /**
-   * Transform each event from the input Stream through a `project` function, to
-   * get a Stream that emits those transformed events.
+   * Transforms each event from the input Stream through a `project` function,
+   * to get a Stream that emits those transformed events.
    *
    * Marble diagram:
+   *
    * ```text
    * --1---3--5-----7------
    *    map(i => i * 10)
@@ -1177,14 +1178,14 @@ export class Stream<T> implements InternalListener<T> {
     const p = this._prod;
     if (p instanceof FilterOperator) {
       return new Stream<U>(new FilterMapOperator(
-        (<FilterOperator<T>> p).predicate,
+        (<FilterOperator<T>> p).passes,
         project,
         (<FilterOperator<T>> p).ins
       ));
     }
     if (p instanceof FilterMapOperator) {
       return new Stream<U>(new FilterMapOperator(
-        (<FilterMapOperator<T, T>> p).predicate,
+        (<FilterMapOperator<T, T>> p).passes,
         compose2(project, (<FilterMapOperator<T, T>> p).project),
         (<FilterMapOperator<T, T>> p).ins
       ));
@@ -1203,6 +1204,7 @@ export class Stream<T> implements InternalListener<T> {
    * constant value on the output Stream.
    *
    * Marble diagram:
+   *
    * ```text
    * --1---3--5-----7-----
    *       mapTo(10)
@@ -1217,29 +1219,49 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<U>(new MapToOperator(projectedValue, this));
   }
 
-  filter(predicate: (t: T) => boolean): Stream<T> {
+  /**
+   * Only allows events that pass the test given by the `passes` argument.
+   *
+   * Each event from the input stream is given to the `passes` function. If the
+   * function returns `true`, the event is forwarded to the output stream,
+   * otherwise it is ignored and not forwarded.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --1---2--3-----4-----5---6--7-8--
+   *     filter(i => i % 2 === 0)
+   * ------2--------4---------6----8--
+   * ```
+   *
+   * @param {Function} passes A function of type `(t: T) +> boolean` that takes
+   * an event from the input stream and checks if it passes, by returning a
+   * boolean.
+   * @return {Stream}
+   */
+  filter(passes: (t: T) => boolean): Stream<T> {
     const p = this._prod;
     if (p instanceof MapOperator) {
       return new Stream<T>(new FilterMapOperator(
-        predicate,
+        passes,
         (<MapOperator<T, T>> p).project,
         (<MapOperator<T, T>> p).ins
       ));
     }
     if (p instanceof FilterMapOperator) {
       return new Stream<T>(new FilterMapOperator(
-        compose2(predicate, (<FilterMapOperator<T, T>> p).predicate),
+        compose2(passes, (<FilterMapOperator<T, T>> p).passes),
         (<FilterMapOperator<T, T>> p).project,
         (<FilterMapOperator<T, T>> p).ins
       ));
     }
     if (p instanceof FilterOperator) {
       return new Stream<T>(new FilterOperator(
-        compose2(predicate, (<FilterOperator<T>> p).predicate),
+        compose2(passes, (<FilterOperator<T>> p).passes),
         (<FilterOperator<T>> p).ins
       ));
     }
-    return new Stream<T>(new FilterOperator(predicate, this));
+    return new Stream<T>(new FilterOperator(passes, this));
   }
 
   take(amount: number): Stream<T> {
