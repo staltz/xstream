@@ -1342,6 +1342,24 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<T>(new StartWithOperator(this, initial));
   }
 
+  /**
+   * Uses another stream to determine when to complete the current stream. When
+   * the given `other` stream emits an event or completes, the output stream
+   * will complete. Before that happens, the output stream will imitate whatever
+   * happens on the input stream.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * ---1---2-----3--4----5----6---
+   *   endWhen( --------a--b--| )
+   * ---1---2-----3--4--|
+   * ```
+   *
+   * @param other Some other stream that is used to know when should the output
+   * stream of this operator complete.
+   * @return {Stream}
+   */
   endWhen(other: Stream<any>): Stream<T> {
     return new Stream<T>(new EndWhenOperator(other, this));
   }

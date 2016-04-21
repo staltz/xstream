@@ -78,6 +78,7 @@ var xs = require('xstream').default
 - [`drop`](#drop)
 - [`last`](#last)
 - [`startWith`](#startWith)
+- [`endWhen`](#endWhen)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -424,6 +425,31 @@ Marble diagram:
 #### Arguments:
 
 - `initial` The value or event to prepend.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="endWhen"></a> `endWhen(other)`
+
+Uses another stream to determine when to complete the current stream. When
+the given `other` stream emits an event or completes, the output stream
+will complete. Before that happens, the output stream will imitate whatever
+happens on the input stream.
+
+Marble diagram:
+
+```text
+---1---2-----3--4----5----6---
+  endWhen( --------a--b--| )
+---1---2-----3--4--|
+```
+
+#### Arguments:
+
+- `other` Some other stream that is used to know when should the output stream of this operator complete.
 
 #### Return:
 
