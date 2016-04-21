@@ -75,6 +75,7 @@ var xs = require('xstream').default
 - [`mapTo`](#mapTo)
 - [`filter`](#filter)
 - [`take`](#take)
+- [`drop`](#drop)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -341,20 +342,44 @@ boolean.
 
 ### <a id="take"></a> `take(amount)`
 
-Lets at most `amount` many events from the input stream pass to the output
-stream, then makes the output stream complete.
+Lets the first `amount` many events from the input stream pass to the
+output stream, then makes the output stream complete.
 
 Marble diagram:
 
 ```text
 --a---b--c----d---e--
-    take(3)
+   take(3)
 --a---b--c|
 ```
 
 #### Arguments:
 
 - `amount: number` How many events to allow from the input stream before completing the output stream.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="drop"></a> `drop(amount)`
+
+Ignores the first `amount` many events from the input stream, and then
+after that starts forwarding events from the input stream to the output
+stream.
+
+Marble diagram:
+
+```text
+--a---b--c----d---e--
+      drop(3)
+--------------d---e--
+```
+
+#### Arguments:
+
+- `amount: number` How many events to ignore from the input stream before forwarding all events from the input stream to the output stream.
 
 #### Return:
 

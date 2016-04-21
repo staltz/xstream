@@ -1265,14 +1265,14 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   /**
-   * Lets at most `amount` many events from the input stream pass to the output
-   * stream, then makes the output stream complete.
+   * Lets the first `amount` many events from the input stream pass to the
+   * output stream, then makes the output stream complete.
    *
    * Marble diagram:
    *
    * ```text
    * --a---b--c----d---e--
-   *     take(3)
+   *    take(3)
    * --a---b--c|
    * ```
    *
@@ -1284,6 +1284,23 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<T>(new TakeOperator(amount, this));
   }
 
+  /**
+   * Ignores the first `amount` many events from the input stream, and then
+   * after that starts forwarding events from the input stream to the output
+   * stream.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --a---b--c----d---e--
+   *       drop(3)
+   * --------------d---e--
+   * ```
+   *
+   * @param {number} amount How many events to ignore from the input stream
+   * before forwarding all events from the input stream to the output stream.
+   * @return {Stream}
+   */
   drop(amount: number): Stream<T> {
     return new Stream<T>(new DropOperator(amount, this));
   }
