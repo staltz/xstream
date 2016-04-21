@@ -76,6 +76,7 @@ var xs = require('xstream').default
 - [`filter`](#filter)
 - [`take`](#take)
 - [`drop`](#drop)
+- [`last`](#last)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -380,6 +381,25 @@ Marble diagram:
 #### Arguments:
 
 - `amount: number` How many events to ignore from the input stream before forwarding all events from the input stream to the output stream.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="last"></a> `last()`
+
+When the input stream completes, the output stream will emit the last event
+emitted by the input stream, and then will also complete.
+
+Marble diagram:
+
+```text
+--a---b--c--d----|
+      last()
+-----------------d|
+```
 
 #### Return:
 

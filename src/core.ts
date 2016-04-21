@@ -1305,6 +1305,20 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<T>(new DropOperator(amount, this));
   }
 
+  /**
+   * When the input stream completes, the output stream will emit the last event
+   * emitted by the input stream, and then will also complete.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --a---b--c--d----|
+   *       last()
+   * -----------------d|
+   * ```
+   *
+   * @return {Stream}
+   */
   last(): Stream<T> {
     return new Stream<T>(new LastOperator(this));
   }
