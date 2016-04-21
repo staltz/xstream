@@ -79,6 +79,7 @@ var xs = require('xstream').default
 - [`last`](#last)
 - [`startWith`](#startWith)
 - [`endWhen`](#endWhen)
+- [`fold`](#fold)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -450,6 +451,39 @@ Marble diagram:
 #### Arguments:
 
 - `other` Some other stream that is used to know when should the output stream of this operator complete.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="fold"></a> `fold(accumulate, seed)`
+
+"Folds" the stream onto itself. Combines events from the past throughout
+the entire execution of the input stream, allowing you to accumulate them
+together. It's essentially like `Array.prototype.reduce`.
+
+The output stream starts by emitting the `seed` which you give as argument.
+Then, when an event happens on the input stream, it is combined with that
+seed value through the `accumulate` function, and the output value is
+emitted on the output stream. `fold` remembers that output value as `acc`
+("accumulator"), and then when a new input event `t` happens, `acc` will be
+combined with that to produce the new `acc` and so forth.
+
+Marble diagram:
+
+```text
+------1-----1--2----1----1------
+  fold((acc, x) => acc + x, 3)
+3-----4-----5--7----8----9------
+```
+
+#### Arguments:
+
+- `accumulate: Function` A function of type `(acc: R, t: T) => R` that takes the previous accumulated value `acc` and the incoming event from the
+input stream and produces the new accumulated value.
+- `seed` The initial accumulated value, of type `R`.
 
 #### Return:
 

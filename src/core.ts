@@ -1364,8 +1364,34 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<T>(new EndWhenOperator(other, this));
   }
 
-  fold<R>(accumulate: (acc: R, t: T) => R, init: R): Stream<R> {
-    return new Stream<R>(new FoldOperator(accumulate, init, this));
+  /**
+   * "Folds" the stream onto itself. Combines events from the past throughout
+   * the entire execution of the input stream, allowing you to accumulate them
+   * together. It's essentially like `Array.prototype.reduce`.
+   *
+   * The output stream starts by emitting the `seed` which you give as argument.
+   * Then, when an event happens on the input stream, it is combined with that
+   * seed value through the `accumulate` function, and the output value is
+   * emitted on the output stream. `fold` remembers that output value as `acc`
+   * ("accumulator"), and then when a new input event `t` happens, `acc` will be
+   * combined with that to produce the new `acc` and so forth.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * ------1-----1--2----1----1------
+   *   fold((acc, x) => acc + x, 3)
+   * 3-----4-----5--7----8----9------
+   * ```
+   *
+   * @param {Function} accumulate A function of type `(acc: R, t: T) => R` that
+   * takes the previous accumulated value `acc` and the incoming event from the
+   * input stream and produces the new accumulated value.
+   * @param seed The initial accumulated value, of type `R`.
+   * @return {Stream}
+   */
+  fold<R>(accumulate: (acc: R, t: T) => R, seed: R): Stream<R> {
+    return new Stream<R>(new FoldOperator(accumulate, seed, this));
   }
 
   replaceError(replace: (err: any) => Stream<T>): Stream<T> {
