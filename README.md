@@ -87,6 +87,7 @@ var xs = require('xstream').default
 - [`flatten`](#flatten)
 - [`flattenConcurrently`](#flattenConcurrently)
 - [`merge`](#merge)
+- [`compose`](#compose)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -709,6 +710,24 @@ Marble diagram:
 #### Arguments:
 
 - `other: Stream` Another stream to merge together with the input stream.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="compose"></a> `compose(operator)`
+
+Passes the input stream to a custom operator, to produce an output stream.
+
+*compose* is a handy way of using an existing function in a chained style.
+Instead of writing `outStream = f(inStream)` you can write
+`outStream = inStream.compose(f)`.
+
+#### Arguments:
+
+- `operator: Function` A function that takes a stream as input and returns a stream as well.
 
 #### Return:
 

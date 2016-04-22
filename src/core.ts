@@ -1602,6 +1602,17 @@ export class Stream<T> implements InternalListener<T> {
       return Stream.combine(project, ...streams);
     };
 
+  /**
+   * Passes the input stream to a custom operator, to produce an output stream.
+   *
+   * *compose* is a handy way of using an existing function in a chained style.
+   * Instead of writing `outStream = f(inStream)` you can write
+   * `outStream = inStream.compose(f)`.
+   *
+   * @param {Function} operator A function that takes a stream as input and
+   * returns a stream as well.
+   * @return {Stream}
+   */
   compose(operator: (stream: Stream<T>) => Stream<any>): Stream<any> {
     return operator(this);
   }
