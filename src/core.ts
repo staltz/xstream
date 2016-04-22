@@ -1110,6 +1110,13 @@ export class Stream<T> implements InternalListener<T> {
   /**
    * Creates a Stream that does nothing when started. It never emits any event.
    *
+   * Marble diagram:
+   *
+   * ```text
+   *          never
+   * -----------------------
+   * ```
+   *
    * @factory true
    * @return {Stream}
    */
