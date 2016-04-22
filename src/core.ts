@@ -1609,7 +1609,7 @@ export class Stream<T> implements InternalListener<T> {
    * Instead of writing `outStream = f(inStream)` you can write
    * `outStream = inStream.compose(f)`.
    *
-   * @param {Function} operator A function that takes a stream as input and
+   * @param {function} operator a function that takes a stream as input and
    * returns a stream as well.
    * @return {Stream}
    */
@@ -1628,6 +1628,15 @@ export class Stream<T> implements InternalListener<T> {
     return new MemoryStream<T>(this._prod);
   }
 
+  /**
+   * Changes this current stream to imitate the `other` given stream.
+   *
+   * The *imitate* method returns nothing. Instead, it changes the behavior of
+   * the current stream, making it re-emit whatever events are emitted by the
+   * given `other` stream.
+
+   * @param {Stream} other The stream to imitate on the current one.
+   */
   imitate(other: Stream<T>): void {
     other._add(this);
   }

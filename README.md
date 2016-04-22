@@ -89,6 +89,7 @@ var xs = require('xstream').default
 - [`merge`](#merge)
 - [`compose`](#compose)
 - [`remember`](#remember)
+- [`imitate`](#imitate)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -728,7 +729,7 @@ Instead of writing `outStream = f(inStream)` you can write
 
 #### Arguments:
 
-- `operator: Function` A function that takes a stream as input and returns a stream as well.
+- `operator: function` a function that takes a stream as input and returns a stream as well.
 
 #### Return:
 
@@ -745,6 +746,20 @@ added listener will immediately receive that memorised event.
 #### Return:
 
 *(Stream)* 
+
+- - -
+
+### <a id="imitate"></a> `imitate(other)`
+
+Changes this current stream to imitate the `other` given stream.
+
+The *imitate* method returns nothing. Instead, it changes the behavior of
+the current stream, making it re-emit whatever events are emitted by the
+given `other` stream.
+
+#### Arguments:
+
+- `other: Stream` The stream to imitate on the current one.
 
 - - -
 
