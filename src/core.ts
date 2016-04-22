@@ -1425,8 +1425,8 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   /**
-   * Flattens a "stream of streams", handling only one concurrent nested stream
-   * at a time.
+   * Flattens a "stream of streams", handling only one nested stream at a time
+   * (no concurrency).
    *
    * If the input stream is a stream that emits streams, then this operator will
    * return an output stream which is a flat stream: emits regular events. The
@@ -1441,10 +1441,10 @@ export class Stream<T> implements InternalListener<T> {
    * ```text
    * --+--------+---------------
    *   \        \
-   *    \       ---1-----2---3--
+   *    \       ----1----2---3--
    *    --a--b----c----d--------
    *           flatten
-   * -----a--b-----1-----2---3--
+   * -----a--b------1----2---3--
    * ```
    *
    * @return {Stream}
@@ -1457,6 +1457,31 @@ export class Stream<T> implements InternalListener<T> {
     );
   }
 
+  /**
+   * Flattens a "stream of streams", handling multiple concurrent nested streams
+   * simultaneously.
+   *
+   * If the input stream is a stream that emits streams, then this operator will
+   * return an output stream which is a flat stream: emits regular events. The
+   * flattening happens concurrently. It works like this: when the input stream
+   * emits a nested stream, *flattenConcurrently* will start imitating that
+   * nested one. When the next nested stream is emitted on the input stream,
+   * *flattenConcurrently* will also imitate that new one, but will continue to
+   * imitate the previous nested streams as well.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --+--------+---------------
+   *   \        \
+   *    \       ----1----2---3--
+   *    --a--b----c----d--------
+   *     flattenConcurrently
+   * -----a--b----c-1--d-2---3--
+   * ```
+   *
+   * @return {Stream}
+   */
   flattenConcurrently<R, T extends Stream<R>>(): T {
     const p = this._prod;
     return <T> new Stream<R>(p instanceof MapOperator || p instanceof FilterMapOperator ?
