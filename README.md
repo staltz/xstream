@@ -66,6 +66,7 @@ var xs = require('xstream').default
 - [`create`](#create)
 - [`createWithMemory`](#createWithMemory)
 - [`never`](#never)
+- [`merge`](#merge)
 
 ## Methods and Operators
 
@@ -83,6 +84,7 @@ var xs = require('xstream').default
 - [`replaceError`](#replaceError)
 - [`flatten`](#flatten)
 - [`flattenConcurrently`](#flattenConcurrently)
+- [`merge`](#merge)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -241,6 +243,34 @@ Creates a new MemoryStream given a Producer.
 ### <a id="never"></a> `never()`
 
 Creates a Stream that does nothing when started. It never emits any event.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="merge"></a> `merge(stream1, stream2)`
+
+Blends multiple streams together, emitting events from all of them
+concurrently.
+
+*merge* takes multiple streams as arguments, and creates a stream that
+imitates each of the argument streams, in parallel.
+
+Marble diagram:
+
+```text
+--1----2-----3--------4---
+----a-----b----c---d------
+           merge
+--1-a--2--b--3-c---d--4---
+```
+
+#### Arguments:
+
+- `stream1: Stream` A stream to merge together with other streams.
+- `stream2: Stream` A stream to merge together with other streams. Two or more streams may be given as arguments.
 
 #### Return:
 
@@ -580,6 +610,32 @@ Marble diagram:
     flattenConcurrently
 -----a--b----c-1--d-2---3--
 ```
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="merge"></a> `merge(other)`
+
+Blends two streams together, emitting events from both.
+
+*merge* takes an `other` stream and returns an output stream that imitates
+both the input stream and the `other` stream.
+
+Marble diagram:
+
+```text
+--1----2-----3--------4---
+----a-----b----c---d------
+           merge
+--1-a--2--b--3-c---d--4---
+```
+
+#### Arguments:
+
+- `other: Stream` Another stream to merge together with the input stream.
 
 #### Return:
 

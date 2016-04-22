@@ -1147,6 +1147,28 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<number>(new PeriodicProducer(period));
   }
 
+  /**
+   * Blends multiple streams together, emitting events from all of them
+   * concurrently.
+   *
+   * *merge* takes multiple streams as arguments, and creates a stream that
+   * imitates each of the argument streams, in parallel.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --1----2-----3--------4---
+   * ----a-----b----c---d------
+   *            merge
+   * --1-a--2--b--3-c---d--4---
+   * ```
+   *
+   * @factory true
+   * @param {Stream} stream1 A stream to merge together with other streams.
+   * @param {Stream} stream2 A stream to merge together with other streams. Two
+   * or more streams may be given as arguments.
+   * @return {Stream}
+   */
   static merge<T>(...streams: Array<Stream<T>>): Stream<T> {
     return new Stream<T>(new MergeProducer(streams));
   }
@@ -1490,6 +1512,25 @@ export class Stream<T> implements InternalListener<T> {
     );
   }
 
+  /**
+   * Blends two streams together, emitting events from both.
+   *
+   * *merge* takes an `other` stream and returns an output stream that imitates
+   * both the input stream and the `other` stream.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --1----2-----3--------4---
+   * ----a-----b----c---d------
+   *            merge
+   * --1-a--2--b--3-c---d--4---
+   * ```
+   *
+   * @param {Stream} other Another stream to merge together with the input
+   * stream.
+   * @return {Stream}
+   */
   merge(other: Stream<T>): Stream<T> {
     return Stream.merge(this, other);
   }
