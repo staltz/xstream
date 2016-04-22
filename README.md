@@ -67,9 +67,11 @@ var xs = require('xstream').default
 - [`createWithMemory`](#createWithMemory)
 - [`never`](#never)
 - [`merge`](#merge)
+- [`combine`](#combine)
 
 ## Methods and Operators
 
+- [`combine`](#combine)
 - [`addListener`](#addListener)
 - [`removeListener`](#removeListener)
 - [`map`](#map)
@@ -278,10 +280,81 @@ Marble diagram:
 
 - - -
 
+### <a id="combine"></a> `combine(project, stream1, stream2)`
+
+Combines multiple streams together to return a stream whose events are
+calculated from the latest events of each of the input streams.
+
+*combine* remembers the most recent event from each of the input streams.
+When any of the input streams emits an event, that event together with all
+the other saved events are combined in the `project` function which should
+return a value. That value will be emitted on the output stream. It's
+essentially a way of mixing the events from multiple streams according to a
+formula.
+
+Marble diagram:
+
+```text
+--1----2-----3--------4---
+----a-----b-----c--d------
+  combine((x,y) => x+y)
+----1a-2a-2b-3b-3c-3d-4d--
+```
+
+#### Arguments:
+
+- `project: Function` A function of type `(x: T1, y: T2) => R` or similar that takes the most recent events `x` and `y` from the input
+streams and returns a value. The output stream will emit that value. The
+number of arguments for this function should match the number of input
+streams.
+- `stream1: Stream` A stream to combine together with other streams.
+- `stream2: Stream` A stream to combine together with other streams. Two or more streams may be given as arguments.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
 
 # Methods and Operators
 
 Methods are functions attached to a Stream instance, like `stream.addListener()`. Operators are also methods, but return a new Stream, leaving the existing Stream unmodified, except for the fact that it has a child Stream attached as Listener.
+
+### <a id="combine"></a> `combine(project, other)`
+
+Combines multiple streams with the input stream to return a stream whose
+events are calculated from the latest events of each of its input streams.
+
+*combine* remembers the most recent event from each of the input streams.
+When any of the input streams emits an event, that event together with all
+the other saved events are combined in the `project` function which should
+return a value. That value will be emitted on the output stream. It's
+essentially a way of mixing the events from multiple streams according to a
+formula.
+
+Marble diagram:
+
+```text
+--1----2-----3--------4---
+----a-----b-----c--d------
+  combine((x,y) => x+y)
+----1a-2a-2b-3b-3c-3d-4d--
+```
+
+#### Arguments:
+
+- `project: Function` A function of type `(x: T1, y: T2) => R` or similar that takes the most recent events `x` and `y` from the input
+streams and returns a value. The output stream will emit that value. The
+number of arguments for this function should match the number of input
+streams.
+- `other: Stream` Another stream to combine together with the input stream. There may be more of these arguments.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
 
 ### <a id="addListener"></a> `addListener(listener)`
 

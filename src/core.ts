@@ -1173,6 +1173,37 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<T>(new MergeProducer(streams));
   }
 
+  /**
+   * Combines multiple streams together to return a stream whose events are
+   * calculated from the latest events of each of the input streams.
+   *
+   * *combine* remembers the most recent event from each of the input streams.
+   * When any of the input streams emits an event, that event together with all
+   * the other saved events are combined in the `project` function which should
+   * return a value. That value will be emitted on the output stream. It's
+   * essentially a way of mixing the events from multiple streams according to a
+   * formula.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --1----2-----3--------4---
+   * ----a-----b-----c--d------
+   *   combine((x,y) => x+y)
+   * ----1a-2a-2b-3b-3c-3d-4d--
+   * ```
+   *
+   * @factory true
+   * @param {Function} project A function of type `(x: T1, y: T2) => R` or
+   * similar that takes the most recent events `x` and `y` from the input
+   * streams and returns a value. The output stream will emit that value. The
+   * number of arguments for this function should match the number of input
+   * streams.
+   * @param {Stream} stream1 A stream to combine together with other streams.
+   * @param {Stream} stream2 A stream to combine together with other streams.
+   * Two or more streams may be given as arguments.
+   * @return {Stream}
+   */
   static combine: CombineFactorySignature =
     function combine<R>(project: CombineProjectFunction,
                         ...streams: Array<Stream<any>>): Stream<R> {
@@ -1535,6 +1566,35 @@ export class Stream<T> implements InternalListener<T> {
     return Stream.merge(this, other);
   }
 
+  /**
+   * Combines multiple streams with the input stream to return a stream whose
+   * events are calculated from the latest events of each of its input streams.
+   *
+   * *combine* remembers the most recent event from each of the input streams.
+   * When any of the input streams emits an event, that event together with all
+   * the other saved events are combined in the `project` function which should
+   * return a value. That value will be emitted on the output stream. It's
+   * essentially a way of mixing the events from multiple streams according to a
+   * formula.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --1----2-----3--------4---
+   * ----a-----b-----c--d------
+   *   combine((x,y) => x+y)
+   * ----1a-2a-2b-3b-3c-3d-4d--
+   * ```
+   *
+   * @param {Function} project A function of type `(x: T1, y: T2) => R` or
+   * similar that takes the most recent events `x` and `y` from the input
+   * streams and returns a value. The output stream will emit that value. The
+   * number of arguments for this function should match the number of input
+   * streams.
+   * @param {Stream} other Another stream to combine together with the input
+   * stream. There may be more of these arguments.
+   * @return {Stream}
+   */
   combine: CombineInstanceSignature<T> =
     function combine<R>(project: CombineProjectFunction,
                         ...streams: Array<Stream<any>>): Stream<R> {
