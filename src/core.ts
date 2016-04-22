@@ -1189,14 +1189,61 @@ export class Stream<T> implements InternalListener<T> {
     return Stream.fromArray(items);
   }
 
+  /**
+   * Converts an array to a stream. The returned stream will emit synchronously
+   * all the items in the array, and then complete.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * fromArray([1,2,3])
+   * 123|
+   * ```
+   *
+   * @factory true
+   * @param {Array} array The array to be converted as a stream.
+   * @return {Stream}
+   */
   static fromArray<T>(array: Array<T>): Stream<T> {
     return new Stream<T>(new FromArrayProducer(array));
   }
 
+  /**
+   * Converts a promise to a stream. The returned stream will emit the resolved
+   * value of the promise, and then complete. However, if the promise is
+   * rejected, the stream will emit the corresponding error.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * fromPromise( ----42 )
+   * -----------------42|
+   * ```
+   *
+   * @factory true
+   * @param {Promise} promise The promise to be converted as a stream.
+   * @return {Stream}
+   */
   static fromPromise<T>(promise: Promise<T>): Stream<T> {
     return new Stream<T>(new FromPromiseProducer(promise));
   }
 
+  /**
+   * Creates a stream that periodically emits incremental numbers, every
+   * `period` milliseconds.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   *     periodic(1000)
+   * ---0---1---2---3---4---...
+   * ```
+   *
+   * @factory true
+   * @param {number} period The interval in milliseconds to use as a rate of
+   * emission.
+   * @return {Stream}
+   */
   static periodic(period: number): Stream<number> {
     return new Stream<number>(new PeriodicProducer(period));
   }

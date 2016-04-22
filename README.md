@@ -69,6 +69,9 @@ var xs = require('xstream').default
 - [`empty`](#empty)
 - [`throw`](#throw)
 - [`of`](#of)
+- [`fromArray`](#fromArray)
+- [`fromPromise`](#fromPromise)
+- [`periodic`](#periodic)
 - [`merge`](#merge)
 - [`combine`](#combine)
 
@@ -323,6 +326,73 @@ of(1,2,3)
 
 - `a` The first value you want to emit as an event on the stream.
 - `b` The second value you want to emit as an event on the stream. One or more of these values may be given as arguments.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="fromArray"></a> `fromArray(array)`
+
+Converts an array to a stream. The returned stream will emit synchronously
+all the items in the array, and then complete.
+
+Marble diagram:
+
+```text
+fromArray([1,2,3])
+123|
+```
+
+#### Arguments:
+
+- `array: Array` The array to be converted as a stream.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="fromPromise"></a> `fromPromise(promise)`
+
+Converts a promise to a stream. The returned stream will emit the resolved
+value of the promise, and then complete. However, if the promise is
+rejected, the stream will emit the corresponding error.
+
+Marble diagram:
+
+```text
+fromPromise( ----42 )
+-----------------42|
+```
+
+#### Arguments:
+
+- `promise: Promise` The promise to be converted as a stream.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="periodic"></a> `periodic(period)`
+
+Creates a stream that periodically emits incremental numbers, every
+`period` milliseconds.
+
+Marble diagram:
+
+```text
+    periodic(1000)
+---0---1---2---3---4---...
+```
+
+#### Arguments:
+
+- `period: number` The interval in milliseconds to use as a rate of emission.
 
 #### Return:
 
