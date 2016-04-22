@@ -1609,7 +1609,7 @@ export class Stream<T> implements InternalListener<T> {
    * Instead of writing `outStream = f(inStream)` you can write
    * `outStream = inStream.compose(f)`.
    *
-   * @param {function} operator a function that takes a stream as input and
+   * @param {function} operator A function that takes a stream as input and
    * returns a stream as well.
    * @return {Stream}
    */
@@ -1641,6 +1641,31 @@ export class Stream<T> implements InternalListener<T> {
     other._add(this);
   }
 
+  /**
+   * Returns an output stream that identically imitates the input stream, but
+   * also runs a `spy` function fo each event, to help you debug your app.
+   *
+   * *debug* takes a `spy` function as argument, and runs that for each event
+   * happening on the input stream. If you don't provide the `spy` argument,
+   * then *debug* will just `console.log` each event. This helps you to
+   * understand the flow of events through some operator chain.
+   *
+   * Please note that if the output stream has no listeners, then it will not
+   * start, which means `spy` will never run because no actual event happens in
+   * that case.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --1----2-----3-----4--
+   *         debug
+   * --1----2-----3-----4--
+   * ```
+   *
+   * @param {function} spy A function that takes an event as argument, and
+   * returns nothing.
+   * @return {Stream}
+   */
   debug(spy: (t: T) => void = null): Stream<T> {
     return new Stream<T>(new DebugOperator(spy, this));
   }

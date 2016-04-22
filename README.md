@@ -90,6 +90,7 @@ var xs = require('xstream').default
 - [`compose`](#compose)
 - [`remember`](#remember)
 - [`imitate`](#imitate)
+- [`debug`](#debug)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -729,7 +730,7 @@ Instead of writing `outStream = f(inStream)` you can write
 
 #### Arguments:
 
-- `operator: function` a function that takes a stream as input and returns a stream as well.
+- `operator: function` A function that takes a stream as input and returns a stream as well.
 
 #### Return:
 
@@ -760,6 +761,38 @@ given `other` stream.
 #### Arguments:
 
 - `other: Stream` The stream to imitate on the current one.
+
+- - -
+
+### <a id="debug"></a> `debug(spy)`
+
+Returns an output stream that identically imitates the input stream, but
+also runs a `spy` function fo each event, to help you debug your app.
+
+*debug* takes a `spy` function as argument, and runs that for each event
+happening on the input stream. If you don't provide the `spy` argument,
+then *debug* will just `console.log` each event. This helps you to
+understand the flow of events through some operator chain.
+
+Please note that if the output stream has no listeners, then it will not
+start, which means `spy` will never run because no actual event happens in
+that case.
+
+Marble diagram:
+
+```text
+--1----2-----3-----4--
+        debug
+--1----2-----3-----4--
+```
+
+#### Arguments:
+
+- `spy: function` A function that takes an event as argument, and returns nothing.
+
+#### Return:
+
+*(Stream)* 
 
 - - -
 
