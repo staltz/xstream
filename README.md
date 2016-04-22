@@ -81,6 +81,7 @@ var xs = require('xstream').default
 - [`endWhen`](#endWhen)
 - [`fold`](#fold)
 - [`replaceError`](#replaceError)
+- [`flatten`](#flatten)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -518,6 +519,36 @@ Marble diagram:
 - `replace: Function` A function of type `(err) => Stream` that takes the error that occured on the input stream or on the previous replacement
 stream and returns a new stream. The output stream will imitate the stream
 that this function returns.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="flatten"></a> `flatten()`
+
+Flattens a "stream of streams", handling only one concurrent nested stream
+at a time.
+
+If the input stream is a stream that emits streams, then this operator will
+return an output stream which is a flat stream: emits regular events. The
+flattening happens without concurrency. It works like this: when the input
+stream emits a nested stream, *flatten* will start imitating that nested
+one. However, as soon as the next nested stream is emitted on the input
+stream, *flatten* will forget the previous nested one it was imitating, and
+will start imitating the new nested one.
+
+Marble diagram:
+
+```text
+--+--------+---------------
+  \        \
+   \       ---1-----2---3--
+   --a--b----c----d--------
+          flatten
+-----a--b-----1-----2---3--
+```
 
 #### Return:
 

@@ -1424,6 +1424,31 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<T>(new ReplaceErrorOperator(replace, this));
   }
 
+  /**
+   * Flattens a "stream of streams", handling only one concurrent nested stream
+   * at a time.
+   *
+   * If the input stream is a stream that emits streams, then this operator will
+   * return an output stream which is a flat stream: emits regular events. The
+   * flattening happens without concurrency. It works like this: when the input
+   * stream emits a nested stream, *flatten* will start imitating that nested
+   * one. However, as soon as the next nested stream is emitted on the input
+   * stream, *flatten* will forget the previous nested one it was imitating, and
+   * will start imitating the new nested one.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --+--------+---------------
+   *   \        \
+   *    \       ---1-----2---3--
+   *    --a--b----c----d--------
+   *           flatten
+   * -----a--b-----1-----2---3--
+   * ```
+   *
+   * @return {Stream}
+   */
   flatten<R, T extends Stream<R>>(): T {
     const p = this._prod;
     return <T> new Stream<R>(p instanceof MapOperator || p instanceof FilterMapOperator ?
