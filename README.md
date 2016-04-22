@@ -67,6 +67,7 @@ var xs = require('xstream').default
 - [`createWithMemory`](#createWithMemory)
 - [`never`](#never)
 - [`empty`](#empty)
+- [`throw`](#throw)
 - [`merge`](#merge)
 - [`combine`](#combine)
 
@@ -275,6 +276,29 @@ Marble diagram:
 empty
 -|
 ```
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="throw"></a> `throw(error)`
+
+Creates a Stream that immediately emits an "error" notification with the
+value you passed as the `error` argument when the stream starts, and that's
+it.
+
+Marble diagram:
+
+```text
+throw(X)
+-X
+```
+
+#### Arguments:
+
+- `error` The error event to emit on the created stream.
 
 #### Return:
 

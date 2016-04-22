@@ -1145,9 +1145,25 @@ export class Stream<T> implements InternalListener<T> {
     });
   }
 
-  static throw(err: any): Stream<any> {
+  /**
+   * Creates a Stream that immediately emits an "error" notification with the
+   * value you passed as the `error` argument when the stream starts, and that's
+   * it.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * throw(X)
+   * -X
+   * ```
+   *
+   * @factory true
+   * @param error The error event to emit on the created stream.
+   * @return {Stream}
+   */
+  static throw(error: any): Stream<any> {
     return new Stream<any>({
-      _start(il: InternalListener<any>) { il._e(err); },
+      _start(il: InternalListener<any>) { il._e(error); },
       _stop: noop,
     });
   }
