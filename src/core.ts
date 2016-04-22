@@ -1168,6 +1168,23 @@ export class Stream<T> implements InternalListener<T> {
     });
   }
 
+  /**
+   * Creates a Stream that immediately emits the arguments that you give to
+   * *of*, then completes.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * of(1,2,3)
+   * 123|
+   * ```
+   *
+   * @factory true
+   * @param a The first value you want to emit as an event on the stream.
+   * @param b The second value you want to emit as an event on the stream. One
+   * or more of these values may be given as arguments.
+   * @return {Stream}
+   */
   static of<T>(...items: Array<T>): Stream<T> {
     return Stream.fromArray(items);
   }

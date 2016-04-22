@@ -68,6 +68,7 @@ var xs = require('xstream').default
 - [`never`](#never)
 - [`empty`](#empty)
 - [`throw`](#throw)
+- [`of`](#of)
 - [`merge`](#merge)
 - [`combine`](#combine)
 
@@ -299,6 +300,29 @@ throw(X)
 #### Arguments:
 
 - `error` The error event to emit on the created stream.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="of"></a> `of(a, b)`
+
+Creates a Stream that immediately emits the arguments that you give to
+*of*, then completes.
+
+Marble diagram:
+
+```text
+of(1,2,3)
+123|
+```
+
+#### Arguments:
+
+- `a` The first value you want to emit as an event on the stream.
+- `b` The second value you want to emit as an event on the stream. One or more of these values may be given as arguments.
 
 #### Return:
 
