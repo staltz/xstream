@@ -1124,6 +1124,20 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<any>({_start: noop, _stop: noop});
   }
 
+  /**
+   * Creates a Stream that immediately emits the "complete" notification when
+   * started, and that's it.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * empty
+   * -|
+   * ```
+   *
+   * @factory true
+   * @return {Stream}
+   */
   static empty(): Stream<any> {
     return new Stream<any>({
       _start(il: InternalListener<any>) { il._c(); },

@@ -66,6 +66,7 @@ var xs = require('xstream').default
 - [`create`](#create)
 - [`createWithMemory`](#createWithMemory)
 - [`never`](#never)
+- [`empty`](#empty)
 - [`merge`](#merge)
 - [`combine`](#combine)
 
@@ -249,6 +250,31 @@ Creates a new MemoryStream given a Producer.
 ### <a id="never"></a> `never()`
 
 Creates a Stream that does nothing when started. It never emits any event.
+
+Marble diagram:
+
+```text
+         never
+-----------------------
+```
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="empty"></a> `empty()`
+
+Creates a Stream that immediately emits the "complete" notification when
+started, and that's it.
+
+Marble diagram:
+
+```text
+empty
+-|
+```
 
 #### Return:
 
