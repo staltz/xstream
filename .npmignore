@@ -1,0 +1,4 @@
+.ignore/
+_site/
+node_modules/
+.idea/
