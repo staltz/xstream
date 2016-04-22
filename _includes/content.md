@@ -57,13 +57,37 @@ var xs = require('xstream').default
 - [`create`](#create)
 - [`createWithMemory`](#createWithMemory)
 - [`never`](#never)
+- [`empty`](#empty)
+- [`throw`](#throw)
+- [`of`](#of)
+- [`fromArray`](#fromArray)
+- [`fromPromise`](#fromPromise)
+- [`periodic`](#periodic)
+- [`merge`](#merge)
+- [`combine`](#combine)
 
 ## Methods and Operators
 
+- [`combine`](#combine)
 - [`addListener`](#addListener)
 - [`removeListener`](#removeListener)
 - [`map`](#map)
 - [`mapTo`](#mapTo)
+- [`filter`](#filter)
+- [`take`](#take)
+- [`drop`](#drop)
+- [`last`](#last)
+- [`startWith`](#startWith)
+- [`endWhen`](#endWhen)
+- [`fold`](#fold)
+- [`replaceError`](#replaceError)
+- [`flatten`](#flatten)
+- [`flattenConcurrently`](#flattenConcurrently)
+- [`merge`](#merge)
+- [`compose`](#compose)
+- [`remember`](#remember)
+- [`imitate`](#imitate)
+- [`debug`](#debug)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -201,7 +225,7 @@ Creates a new Stream given a Producer.
 
 #### Return:
 
-*(Stream)* 
+*(Stream)*
 
 - - -
 
@@ -215,7 +239,7 @@ Creates a new MemoryStream given a Producer.
 
 #### Return:
 
-*(MemoryStream)* 
+*(MemoryStream)*
 
 - - -
 
@@ -223,9 +247,211 @@ Creates a new MemoryStream given a Producer.
 
 Creates a Stream that does nothing when started. It never emits any event.
 
+Marble diagram:
+
+```text
+         never
+-----------------------
+```
+
 #### Return:
 
-*(Stream)* 
+*(Stream)*
+
+- - -
+
+### <a id="empty"></a> `empty()`
+
+Creates a Stream that immediately emits the "complete" notification when
+started, and that's it.
+
+Marble diagram:
+
+```text
+empty
+-|
+```
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="throw"></a> `throw(error)`
+
+Creates a Stream that immediately emits an "error" notification with the
+value you passed as the `error` argument when the stream starts, and that's
+it.
+
+Marble diagram:
+
+```text
+throw(X)
+-X
+```
+
+#### Arguments:
+
+- `error` The error event to emit on the created stream.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="of"></a> `of(a, b)`
+
+Creates a Stream that immediately emits the arguments that you give to
+*of*, then completes.
+
+Marble diagram:
+
+```text
+of(1,2,3)
+123|
+```
+
+#### Arguments:
+
+- `a` The first value you want to emit as an event on the stream.
+- `b` The second value you want to emit as an event on the stream. One or more of these values may be given as arguments.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="fromArray"></a> `fromArray(array)`
+
+Converts an array to a stream. The returned stream will emit synchronously
+all the items in the array, and then complete.
+
+Marble diagram:
+
+```text
+fromArray([1,2,3])
+123|
+```
+
+#### Arguments:
+
+- `array: Array` The array to be converted as a stream.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="fromPromise"></a> `fromPromise(promise)`
+
+Converts a promise to a stream. The returned stream will emit the resolved
+value of the promise, and then complete. However, if the promise is
+rejected, the stream will emit the corresponding error.
+
+Marble diagram:
+
+```text
+fromPromise( ----42 )
+-----------------42|
+```
+
+#### Arguments:
+
+- `promise: Promise` The promise to be converted as a stream.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="periodic"></a> `periodic(period)`
+
+Creates a stream that periodically emits incremental numbers, every
+`period` milliseconds.
+
+Marble diagram:
+
+```text
+    periodic(1000)
+---0---1---2---3---4---...
+```
+
+#### Arguments:
+
+- `period: number` The interval in milliseconds to use as a rate of emission.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="merge"></a> `merge(stream1, stream2)`
+
+Blends multiple streams together, emitting events from all of them
+concurrently.
+
+*merge* takes multiple streams as arguments, and creates a stream that
+imitates each of the argument streams, in parallel.
+
+Marble diagram:
+
+```text
+--1----2-----3--------4---
+----a-----b----c---d------
+           merge
+--1-a--2--b--3-c---d--4---
+```
+
+#### Arguments:
+
+- `stream1: Stream` A stream to merge together with other streams.
+- `stream2: Stream` A stream to merge together with other streams. Two or more streams may be given as arguments.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="combine"></a> `combine(project, stream1, stream2)`
+
+Combines multiple streams together to return a stream whose events are
+calculated from the latest events of each of the input streams.
+
+*combine* remembers the most recent event from each of the input streams.
+When any of the input streams emits an event, that event together with all
+the other saved events are combined in the `project` function which should
+return a value. That value will be emitted on the output stream. It's
+essentially a way of mixing the events from multiple streams according to a
+formula.
+
+Marble diagram:
+
+```text
+--1----2-----3--------4---
+----a-----b-----c--d------
+  combine((x,y) => x+y)
+----1a-2a-2b-3b-3c-3d-4d--
+```
+
+#### Arguments:
+
+- `project: Function` A function of type `(x: T1, y: T2) => R` or similar that takes the most recent events `x` and `y` from the input
+streams and returns a value. The output stream will emit that value. The
+number of arguments for this function should match the number of input
+streams.
+- `stream1: Stream` A stream to combine together with other streams.
+- `stream2: Stream` A stream to combine together with other streams. Two or more streams may be given as arguments.
+
+#### Return:
+
+*(Stream)*
 
 - - -
 
@@ -233,6 +459,41 @@ Creates a Stream that does nothing when started. It never emits any event.
 # Methods and Operators
 
 Methods are functions attached to a Stream instance, like `stream.addListener()`. Operators are also methods, but return a new Stream, leaving the existing Stream unmodified, except for the fact that it has a child Stream attached as Listener.
+
+### <a id="combine"></a> `combine(project, other)`
+
+Combines multiple streams with the input stream to return a stream whose
+events are calculated from the latest events of each of its input streams.
+
+*combine* remembers the most recent event from each of the input streams.
+When any of the input streams emits an event, that event together with all
+the other saved events are combined in the `project` function which should
+return a value. That value will be emitted on the output stream. It's
+essentially a way of mixing the events from multiple streams according to a
+formula.
+
+Marble diagram:
+
+```text
+--1----2-----3--------4---
+----a-----b-----c--d------
+  combine((x,y) => x+y)
+----1a-2a-2b-3b-3c-3d-4d--
+```
+
+#### Arguments:
+
+- `project: Function` A function of type `(x: T1, y: T2) => R` or similar that takes the most recent events `x` and `y` from the input
+streams and returns a value. The output stream will emit that value. The
+number of arguments for this function should match the number of input
+streams.
+- `other: Stream` Another stream to combine together with the input stream. There may be more of these arguments.
+
+#### Return:
+
+*(Stream)*
+
+- - -
 
 ### <a id="addListener"></a> `addListener(listener)`
 
@@ -256,10 +517,11 @@ Removes a Listener from the Stream, assuming the Listener was added to it.
 
 ### <a id="map"></a> `map(project)`
 
-Transform each event from the input Stream through a `project` function, to
-get a Stream that emits those transformed events.
+Transforms each event from the input Stream through a `project` function,
+to get a Stream that emits those transformed events.
 
 Marble diagram:
+
 ```text
 --1---3--5-----7------
    map(i => i * 10)
@@ -273,7 +535,7 @@ be emitted on the output Stream.
 
 #### Return:
 
-*(Stream)* 
+*(Stream)*
 
 - - -
 
@@ -283,6 +545,7 @@ It's like `map`, but transforms each input event to always the same
 constant value on the output Stream.
 
 Marble diagram:
+
 ```text
 --1---3--5-----7-----
       mapTo(10)
@@ -295,7 +558,376 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)* 
+*(Stream)*
+
+- - -
+
+### <a id="filter"></a> `filter(passes)`
+
+Only allows events that pass the test given by the `passes` argument.
+
+Each event from the input stream is given to the `passes` function. If the
+function returns `true`, the event is forwarded to the output stream,
+otherwise it is ignored and not forwarded.
+
+Marble diagram:
+
+```text
+--1---2--3-----4-----5---6--7-8--
+    filter(i => i % 2 === 0)
+------2--------4---------6----8--
+```
+
+#### Arguments:
+
+- `passes: Function` A function of type `(t: T) +> boolean` that takes an event from the input stream and checks if it passes, by returning a
+boolean.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="take"></a> `take(amount)`
+
+Lets the first `amount` many events from the input stream pass to the
+output stream, then makes the output stream complete.
+
+Marble diagram:
+
+```text
+--a---b--c----d---e--
+   take(3)
+--a---b--c|
+```
+
+#### Arguments:
+
+- `amount: number` How many events to allow from the input stream before completing the output stream.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="drop"></a> `drop(amount)`
+
+Ignores the first `amount` many events from the input stream, and then
+after that starts forwarding events from the input stream to the output
+stream.
+
+Marble diagram:
+
+```text
+--a---b--c----d---e--
+      drop(3)
+--------------d---e--
+```
+
+#### Arguments:
+
+- `amount: number` How many events to ignore from the input stream before forwarding all events from the input stream to the output stream.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="last"></a> `last()`
+
+When the input stream completes, the output stream will emit the last event
+emitted by the input stream, and then will also complete.
+
+Marble diagram:
+
+```text
+--a---b--c--d----|
+      last()
+-----------------d|
+```
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="startWith"></a> `startWith(initial)`
+
+Prepends the given `initial` value to the sequence of events emitted by the
+input stream.
+
+Marble diagram:
+
+```text
+---1---2-----3---
+  startWith(0)
+0--1---2-----3---
+```
+
+#### Arguments:
+
+- `initial` The value or event to prepend.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="endWhen"></a> `endWhen(other)`
+
+Uses another stream to determine when to complete the current stream.
+
+When the given `other` stream emits an event or completes, the output
+stream will complete. Before that happens, the output stream will imitate
+whatever happens on the input stream.
+
+Marble diagram:
+
+```text
+---1---2-----3--4----5----6---
+  endWhen( --------a--b--| )
+---1---2-----3--4--|
+```
+
+#### Arguments:
+
+- `other` Some other stream that is used to know when should the output stream of this operator complete.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="fold"></a> `fold(accumulate, seed)`
+
+"Folds" the stream onto itself.
+
+Combines events from the past throughout
+the entire execution of the input stream, allowing you to accumulate them
+together. It's essentially like `Array.prototype.reduce`.
+
+The output stream starts by emitting the `seed` which you give as argument.
+Then, when an event happens on the input stream, it is combined with that
+seed value through the `accumulate` function, and the output value is
+emitted on the output stream. `fold` remembers that output value as `acc`
+("accumulator"), and then when a new input event `t` happens, `acc` will be
+combined with that to produce the new `acc` and so forth.
+
+Marble diagram:
+
+```text
+------1-----1--2----1----1------
+  fold((acc, x) => acc + x, 3)
+3-----4-----5--7----8----9------
+```
+
+#### Arguments:
+
+- `accumulate: Function` A function of type `(acc: R, t: T) => R` that takes the previous accumulated value `acc` and the incoming event from the
+input stream and produces the new accumulated value.
+- `seed` The initial accumulated value, of type `R`.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="replaceError"></a> `replaceError(replace)`
+
+Replaces an error with another stream.
+
+When (and if) an error happens on the input stream, instead of forwarding
+that error to the output stream, *replaceError* will call the `replace`
+function which returns the stream that the output stream will imitate. And,
+in case that new stream also emits an error, `replace` will be called again
+to get another stream to start imitating.
+
+Marble diagram:
+
+```text
+--1---2-----3--4-----X
+  replaceError( () => --10--| )
+--1---2-----3--4--------10--|
+```
+
+#### Arguments:
+
+- `replace: Function` A function of type `(err) => Stream` that takes the error that occured on the input stream or on the previous replacement
+stream and returns a new stream. The output stream will imitate the stream
+that this function returns.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="flatten"></a> `flatten()`
+
+Flattens a "stream of streams", handling only one nested stream at a time
+(no concurrency).
+
+If the input stream is a stream that emits streams, then this operator will
+return an output stream which is a flat stream: emits regular events. The
+flattening happens without concurrency. It works like this: when the input
+stream emits a nested stream, *flatten* will start imitating that nested
+one. However, as soon as the next nested stream is emitted on the input
+stream, *flatten* will forget the previous nested one it was imitating, and
+will start imitating the new nested one.
+
+Marble diagram:
+
+```text
+--+--------+---------------
+  \        \
+   \       ----1----2---3--
+   --a--b----c----d--------
+          flatten
+-----a--b------1----2---3--
+```
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="flattenConcurrently"></a> `flattenConcurrently()`
+
+Flattens a "stream of streams", handling multiple concurrent nested streams
+simultaneously.
+
+If the input stream is a stream that emits streams, then this operator will
+return an output stream which is a flat stream: emits regular events. The
+flattening happens concurrently. It works like this: when the input stream
+emits a nested stream, *flattenConcurrently* will start imitating that
+nested one. When the next nested stream is emitted on the input stream,
+*flattenConcurrently* will also imitate that new one, but will continue to
+imitate the previous nested streams as well.
+
+Marble diagram:
+
+```text
+--+--------+---------------
+  \        \
+   \       ----1----2---3--
+   --a--b----c----d--------
+    flattenConcurrently
+-----a--b----c-1--d-2---3--
+```
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="merge"></a> `merge(other)`
+
+Blends two streams together, emitting events from both.
+
+*merge* takes an `other` stream and returns an output stream that imitates
+both the input stream and the `other` stream.
+
+Marble diagram:
+
+```text
+--1----2-----3--------4---
+----a-----b----c---d------
+           merge
+--1-a--2--b--3-c---d--4---
+```
+
+#### Arguments:
+
+- `other: Stream` Another stream to merge together with the input stream.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="compose"></a> `compose(operator)`
+
+Passes the input stream to a custom operator, to produce an output stream.
+
+*compose* is a handy way of using an existing function in a chained style.
+Instead of writing `outStream = f(inStream)` you can write
+`outStream = inStream.compose(f)`.
+
+#### Arguments:
+
+- `operator: function` A function that takes a stream as input and returns a stream as well.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="remember"></a> `remember()`
+
+Returns an output stream that imitates the input stream, but also remembers
+the most recent event that happens on the input stream, so that a newly
+added listener will immediately receive that memorised event.
+
+#### Return:
+
+*(Stream)*
+
+- - -
+
+### <a id="imitate"></a> `imitate(other)`
+
+Changes this current stream to imitate the `other` given stream.
+
+The *imitate* method returns nothing. Instead, it changes the behavior of
+the current stream, making it re-emit whatever events are emitted by the
+given `other` stream.
+
+#### Arguments:
+
+- `other: Stream` The stream to imitate on the current one.
+
+- - -
+
+### <a id="debug"></a> `debug(spy)`
+
+Returns an output stream that identically imitates the input stream, but
+also runs a `spy` function fo each event, to help you debug your app.
+
+*debug* takes a `spy` function as argument, and runs that for each event
+happening on the input stream. If you don't provide the `spy` argument,
+then *debug* will just `console.log` each event. This helps you to
+understand the flow of events through some operator chain.
+
+Please note that if the output stream has no listeners, then it will not
+start, which means `spy` will never run because no actual event happens in
+that case.
+
+Marble diagram:
+
+```text
+--1----2-----3-----4--
+        debug
+--1----2-----3-----4--
+```
+
+#### Arguments:
+
+- `spy: function` A function that takes an event as argument, and returns nothing.
+
+#### Return:
+
+*(Stream)*
 
 - - -
 
@@ -336,4 +968,3 @@ The Wrong Way. Please try to understand the reactive way before using this
 method. Use it only when you know what you are doing.
 
 - - -
-
