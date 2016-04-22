@@ -1617,6 +1617,13 @@ export class Stream<T> implements InternalListener<T> {
     return operator(this);
   }
 
+  /**
+   * Returns an output stream that imitates the input stream, but also remembers
+   * the most recent event that happens on the input stream, so that a newly
+   * added listener will immediately receive that memorised event.
+   *
+   * @return {Stream}
+   */
   remember(): Stream<T> {
     return new MemoryStream<T>(this._prod);
   }

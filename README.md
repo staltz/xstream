@@ -88,6 +88,7 @@ var xs = require('xstream').default
 - [`flattenConcurrently`](#flattenConcurrently)
 - [`merge`](#merge)
 - [`compose`](#compose)
+- [`remember`](#remember)
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
@@ -728,6 +729,18 @@ Instead of writing `outStream = f(inStream)` you can write
 #### Arguments:
 
 - `operator: Function` A function that takes a stream as input and returns a stream as well.
+
+#### Return:
+
+*(Stream)* 
+
+- - -
+
+### <a id="remember"></a> `remember()`
+
+Returns an output stream that imitates the input stream, but also remembers
+the most recent event that happens on the input stream, so that a newly
+added listener will immediately receive that memorised event.
 
 #### Return:
 
