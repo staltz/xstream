@@ -4,7 +4,7 @@
 - Written in TypeScript
 - Approximately 30 kB in size, without minification or gzip
 - On average, faster than RxJS 4, Kefir, Bacon.js, as fast as RxJS 5, and slower than most.js
-- Tailored for Cycle.js, or applications with limited use of `subscribe`
+- Tailored for [Cycle.js](http://cycle.js.org), or applications with limited use of `subscribe`
 
 # Example
 
@@ -968,3 +968,15 @@ The Wrong Way. Please try to understand the reactive way before using this
 method. Use it only when you know what you are doing.
 
 - - -
+
+# FAQ
+
+**Q: What's the difference between xstream and RxJS?**
+
+A: Read this [blog post](http://staltz.com/why-we-built-xstream.html) on the topic.
+
+-----
+
+Acknowledgements: *xstream* is built by [staltz](https://github.com/staltz) and [TylorS](https://github.com/tylors).
+
+License: MIT
