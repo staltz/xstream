@@ -1,4 +1,4 @@
-import {Promise} from '~es6-promise/dist/es6-promise';
+import {Promise} from 'es6-promise';
 
 const empty = {};
 function noop() {}
