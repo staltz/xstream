@@ -16,7 +16,7 @@ __  _____| |_ _ __ ___  __ _ _ __ ___
 - Tailored for [Cycle.js](http://cycle.js.org), or applications with limited use of `subscribe`
 
 ![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.js.svg)
-![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.js.svg?compression=gzip)
+![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.min.js.svg?compression=gzip)
 
 # Example
 
