@@ -6,6 +6,9 @@
 - On average, faster than RxJS 4, Kefir, Bacon.js, as fast as RxJS 5, and slower than most.js
 - Tailored for [Cycle.js](http://cycle.js.org), or applications with limited use of `subscribe`
 
+![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.js.svg)
+![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.js.svg?compression=gzip)
+
 # Example
 
 ```js
