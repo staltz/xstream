@@ -1,9 +1,10 @@
 {
   "name": "xstream",
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {},
+  "ambientDependencies": {
     "es6-promise": "registry:npm/es6-promise#3.0.0+20160211003958"
   },
-  "devDependencies": {},
   "ambientDevDependencies": {
     "mocha": "github:DefinitelyTyped/DefinitelyTyped/mocha/mocha.d.ts#d6dd320291705694ba8e1a79497a908e9f5e6617",
     "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#20e1eb9616922d382d918cc5a21870a9dbe255f5"
