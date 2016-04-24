@@ -128,6 +128,7 @@ var FromArrayProducer = (function () {
     };
     return FromArrayProducer;
 }());
+exports.FromArrayProducer = FromArrayProducer;
 var FromPromiseProducer = (function () {
     function FromPromiseProducer(p) {
         this.p = p;
@@ -152,6 +153,7 @@ var FromPromiseProducer = (function () {
     };
     return FromPromiseProducer;
 }());
+exports.FromPromiseProducer = FromPromiseProducer;
 var MergeProducer = (function () {
     function MergeProducer(streams) {
         this.streams = streams;
@@ -186,6 +188,7 @@ var MergeProducer = (function () {
     };
     return MergeProducer;
 }());
+exports.MergeProducer = MergeProducer;
 var PeriodicProducer = (function () {
     function PeriodicProducer(period) {
         this.period = period;
@@ -205,6 +208,7 @@ var PeriodicProducer = (function () {
     };
     return PeriodicProducer;
 }());
+exports.PeriodicProducer = PeriodicProducer;
 var DebugOperator = (function () {
     function DebugOperator(spy, ins) {
         if (spy === void 0) { spy = null; }
@@ -242,6 +246,7 @@ var DebugOperator = (function () {
     };
     return DebugOperator;
 }());
+exports.DebugOperator = DebugOperator;
 var DropOperator = (function () {
     function DropOperator(max, ins) {
         this.max = max;
@@ -270,6 +275,7 @@ var DropOperator = (function () {
     };
     return DropOperator;
 }());
+exports.DropOperator = DropOperator;
 var OtherListener = (function () {
     function OtherListener(out, op) {
         this.out = out;
@@ -319,6 +325,7 @@ var EndWhenOperator = (function () {
     };
     return EndWhenOperator;
 }());
+exports.EndWhenOperator = EndWhenOperator;
 var FilterOperator = (function () {
     function FilterOperator(passes, ins) {
         this.passes = passes;
@@ -350,6 +357,7 @@ var FilterOperator = (function () {
     };
     return FilterOperator;
 }());
+exports.FilterOperator = FilterOperator;
 var FCInner = (function () {
     function FCInner(out, op) {
         this.out = out;
@@ -494,6 +502,7 @@ var FoldOperator = (function () {
     };
     return FoldOperator;
 }());
+exports.FoldOperator = FoldOperator;
 var LastOperator = (function () {
     function LastOperator(ins) {
         this.ins = ins;
@@ -530,6 +539,7 @@ var LastOperator = (function () {
     };
     return LastOperator;
 }());
+exports.LastOperator = LastOperator;
 var MFCInner = (function () {
     function MFCInner(out, op) {
         this.out = out;
@@ -583,6 +593,7 @@ var MapFlattenConcOperator = (function () {
     };
     return MapFlattenConcOperator;
 }());
+exports.MapFlattenConcOperator = MapFlattenConcOperator;
 var MFInner = (function () {
     function MFInner(out, op) {
         this.out = out;
@@ -648,6 +659,7 @@ var MapFlattenOperator = (function () {
     };
     return MapFlattenOperator;
 }());
+exports.MapFlattenOperator = MapFlattenOperator;
 var MapOperator = (function () {
     function MapOperator(project, ins) {
         this.project = project;
@@ -678,6 +690,7 @@ var MapOperator = (function () {
     };
     return MapOperator;
 }());
+exports.MapOperator = MapOperator;
 var FilterMapOperator = (function (_super) {
     __extends(FilterMapOperator, _super);
     function FilterMapOperator(passes, project, ins) {
@@ -692,6 +705,7 @@ var FilterMapOperator = (function (_super) {
     };
     return FilterMapOperator;
 }(MapOperator));
+exports.FilterMapOperator = FilterMapOperator;
 var MapToOperator = (function () {
     function MapToOperator(val, ins) {
         this.val = val;
@@ -717,6 +731,7 @@ var MapToOperator = (function () {
     };
     return MapToOperator;
 }());
+exports.MapToOperator = MapToOperator;
 var ReplaceErrorOperator = (function () {
     function ReplaceErrorOperator(fn, ins) {
         this.fn = fn;
@@ -748,6 +763,7 @@ var ReplaceErrorOperator = (function () {
     };
     return ReplaceErrorOperator;
 }());
+exports.ReplaceErrorOperator = ReplaceErrorOperator;
 var StartWithOperator = (function () {
     function StartWithOperator(ins, value) {
         this.ins = ins;
@@ -765,6 +781,7 @@ var StartWithOperator = (function () {
     };
     return StartWithOperator;
 }());
+exports.StartWithOperator = StartWithOperator;
 var TakeOperator = (function () {
     function TakeOperator(max, ins) {
         this.max = max;
@@ -800,6 +817,7 @@ var TakeOperator = (function () {
     };
     return TakeOperator;
 }());
+exports.TakeOperator = TakeOperator;
 var Stream = (function () {
     function Stream(producer) {
         this._stopID = empty;
