@@ -203,7 +203,7 @@ class CombineProducer<R> implements InternalProducer<R> {
   }
 }
 
-class FromArrayProducer<T> implements InternalProducer<T> {
+export class FromArrayProducer<T> implements InternalProducer<T> {
   constructor(public a: Array<T>) {
   }
 
@@ -219,7 +219,7 @@ class FromArrayProducer<T> implements InternalProducer<T> {
   }
 }
 
-class FromPromiseProducer<T> implements InternalProducer<T> {
+export class FromPromiseProducer<T> implements InternalProducer<T> {
   public on: boolean = false;
 
   constructor(public p: Promise<T>) {
@@ -248,7 +248,7 @@ class FromPromiseProducer<T> implements InternalProducer<T> {
   }
 }
 
-class MergeProducer<T> implements InternalProducer<T>, InternalListener<T> {
+export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T> {
   private out: InternalListener<T> = emptyListener;
   private ac: number; // ac is activeCount, starts initialized
 
@@ -288,7 +288,7 @@ class MergeProducer<T> implements InternalProducer<T>, InternalListener<T> {
   }
 }
 
-class PeriodicProducer implements InternalProducer<number> {
+export class PeriodicProducer implements InternalProducer<number> {
   private intervalID: any = -1;
   private i: number = 0;
 
@@ -308,7 +308,7 @@ class PeriodicProducer implements InternalProducer<number> {
   }
 }
 
-class DebugOperator<T> implements Operator<T, T> {
+export class DebugOperator<T> implements Operator<T, T> {
   private out: Stream<T> = null;
 
   constructor(public spy: (t: T) => any = null,
@@ -347,7 +347,7 @@ class DebugOperator<T> implements Operator<T, T> {
   }
 }
 
-class DropOperator<T> implements Operator<T, T> {
+export class DropOperator<T> implements Operator<T, T> {
   private out: Stream<T> = null;
   private dropped: number = 0;
 
@@ -397,7 +397,7 @@ class OtherListener<T> implements InternalListener<any> {
   }
 }
 
-class EndWhenOperator<T> implements Operator<T, T> {
+export class EndWhenOperator<T> implements Operator<T, T> {
   private out: Stream<T> = null;
   private oli: InternalListener<any> = emptyListener; // oli = other listener
 
@@ -435,7 +435,7 @@ class EndWhenOperator<T> implements Operator<T, T> {
   }
 }
 
-class FilterOperator<T> implements Operator<T, T> {
+export class FilterOperator<T> implements Operator<T, T> {
   private out: Stream<T> = null;
 
   constructor(public passes: (t: T) => boolean,
@@ -594,7 +594,7 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
   }
 }
 
-class FoldOperator<T, R> implements Operator<T, R> {
+export class FoldOperator<T, R> implements Operator<T, R> {
   private out: Stream<R> = null;
   private acc: R; // initialized as seed
 
@@ -633,7 +633,7 @@ class FoldOperator<T, R> implements Operator<T, R> {
   }
 }
 
-class LastOperator<T> implements Operator<T, T> {
+export class LastOperator<T> implements Operator<T, T> {
   private out: Stream<T> = null;
   private has: boolean = false;
   private val: T = <T> empty;
@@ -691,7 +691,7 @@ class MFCInner<T> implements InternalListener<T> {
   }
 }
 
-class MapFlattenConcOperator<T> implements InternalProducer<T>, InternalListener<T> {
+export class MapFlattenConcOperator<T> implements InternalProducer<T>, InternalListener<T> {
   private active: number = 1; // number of outers and inners that have not yet ended
   private out: Stream<T> = null;
 
@@ -752,7 +752,7 @@ class MFInner<T> implements InternalListener<T> {
   }
 }
 
-class MapFlattenOperator<T> implements InternalProducer<T>, InternalListener<T> {
+export class MapFlattenOperator<T> implements InternalProducer<T>, InternalListener<T> {
   public curr: Stream<T> = null; // Current inner Stream
   private inner: InternalListener<T> = null; // Current inner InternalListener
   private open: boolean = true;
@@ -806,7 +806,7 @@ class MapFlattenOperator<T> implements InternalProducer<T>, InternalListener<T> 
   }
 }
 
-class MapOperator<T, R> implements Operator<T, R> {
+export class MapOperator<T, R> implements Operator<T, R> {
   protected out: Stream<R> = null;
 
   constructor(public project: (t: T) => R,
@@ -840,7 +840,7 @@ class MapOperator<T, R> implements Operator<T, R> {
   }
 }
 
-class FilterMapOperator<T, R> extends MapOperator<T, R> {
+export class FilterMapOperator<T, R> extends MapOperator<T, R> {
   constructor(public passes: (t: T) => boolean,
               project: (t: T) => R,
               ins: Stream<T>) {
@@ -854,7 +854,7 @@ class FilterMapOperator<T, R> extends MapOperator<T, R> {
   }
 }
 
-class MapToOperator<T, R> implements Operator<T, R> {
+export class MapToOperator<T, R> implements Operator<T, R> {
   private out: Stream<R> = null;
 
   constructor(public val: R,
@@ -884,7 +884,7 @@ class MapToOperator<T, R> implements Operator<T, R> {
   }
 }
 
-class ReplaceErrorOperator<T> implements Operator<T, T> {
+export class ReplaceErrorOperator<T> implements Operator<T, T> {
   private out: Stream<T> = <Stream<T>> empty;
 
   constructor(public fn: (err: any) => Stream<T>,
@@ -919,7 +919,7 @@ class ReplaceErrorOperator<T> implements Operator<T, T> {
   }
 }
 
-class StartWithOperator<T> implements InternalProducer<T> {
+export class StartWithOperator<T> implements InternalProducer<T> {
   private out: InternalListener<T> = emptyListener;
 
   constructor(public ins: Stream<T>,
@@ -938,7 +938,7 @@ class StartWithOperator<T> implements InternalProducer<T> {
   }
 }
 
-class TakeOperator<T> implements Operator<T, T> {
+export class TakeOperator<T> implements Operator<T, T> {
   private out: Stream<T> = null;
   private taken: number = 0;
 
