@@ -104,7 +104,7 @@ describe('Stream.prototype.flattenConcurrently', () => {
       stream.addListener({
         next: () => done('next should not be called'),
         error: (err) => {
-          assert.strictEqual(err.message, 'x.toLowerCase is not a function');
+          assert.notStrictEqual(err.message.match(/is not a function$/), null);
           done();
         },
         complete: () => {

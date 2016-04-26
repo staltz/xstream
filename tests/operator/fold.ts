@@ -33,7 +33,7 @@ describe('Stream.prototype.fold', () => {
       },
       error: (err) => {
         assert.equal(expected.length, 0);
-        assert.strictEqual(err.message, 'x.toLowerCase is not a function');
+        assert.notStrictEqual(err.message.match(/is not a function$/), null);
         done();
       },
       complete: () => {

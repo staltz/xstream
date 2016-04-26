@@ -119,7 +119,7 @@ describe('Stream.prototype.replaceError', () => {
     stream.addListener({
       next: (s: string) => done('next should not be called'),
       error: (err) => {
-        assert.strictEqual(err.message, 'err.toLowerCase is not a function');
+        assert.notStrictEqual(err.message.match(/is not a function$/), null);
         done();
       },
       complete: () => {
