@@ -107,8 +107,6 @@ var xs = require('xstream').default
 
 # Overview
 
-<!-- share-code-between-examples -->
-
 XStream has four fundamental types: Stream, Listener, Producer, and MemoryStream.
 
 ## Stream
@@ -146,12 +144,14 @@ var listener = {
 
 And this is how you would attach that Listener to a Stream:
 
+<!-- skip-example -->
 ```js
 stream.addListener(listener)
 ```
 
 And when you think the Listener is done, you can remove it from the Stream:
 
+<!-- skip-example -->
 ```js
 stream.removeListener(listener)
 ```

@@ -1,4 +1,4 @@
-var xstream = require('.').default;
+var xstream = require('./lib/index').default;
 
 function noop () {}
 
@@ -22,4 +22,3 @@ module.exports = {
     }
   }
 }
-
