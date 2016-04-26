@@ -6,6 +6,10 @@
 - On average, faster than RxJS 4, Kefir, Bacon.js, as fast as RxJS 5, and slower than most.js
 - Tailored for [Cycle.js](http://cycle.js.org), or applications with limited use of `subscribe`
 
+![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.js.svg)
+![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.min.js.svg?compression=gzip)
+[![Build Status](https://travis-ci.org/staltz/xstream.svg?branch=master)](https://travis-ci.org/staltz/xstream)
+
 # Example
 
 ```js
@@ -123,7 +127,7 @@ var listener = {
   error: (err) => {
     console.error('The Stream gave me an error: ', err);
   },
-  completed: () => {
+  complete: () => {
     console.log('The Stream told me it is done.');
   },
 }
@@ -131,12 +135,14 @@ var listener = {
 
 And this is how you would attach that Listener to a Stream:
 
+<!-- skip-example -->
 ```js
 stream.addListener(listener)
 ```
 
 And when you think the Listener is done, you can remove it from the Stream:
 
+<!-- skip-example -->
 ```js
 stream.removeListener(listener)
 ```
@@ -150,7 +156,7 @@ Events from a Stream must come from somewhere, right? That's why we need Produce
 Because Streams are Listeners, if you give a Stream as the Listener in `start(stream)`, essentially the Producer is now generating events that will be broadcast on the Stream. Nice, huh? Now a bunch of listeners can be attached to the Stream and they can all get those events originally coming from the Producer. That's why `xs.create(producer)` receives a Producer to be the heart of a new Stream. Check this out:
 
 ```js
-var intervalProducer = {
+var producer = {
   start: function (listener) {
     this.id = setInterval(() => listener.next('yo'), 1000)
   },
@@ -192,6 +198,7 @@ What matters for stopping the Producer is `stream.removeListener`. When the last
 
 The reason the Producer is not suddenly (synchronously) stopped, is that it is often necessary to swap the single listener of a Stream, but still keep its ongoing execution. For instance:
 
+<!-- skip-example -->
 ```js
 var listenerA = {/* ... */}
 var listenerB = {/* ... */}
@@ -977,6 +984,23 @@ A: Read this [blog post](http://staltz.com/why-we-built-xstream.html) on the top
 
 -----
 
-Acknowledgements: *xstream* is built by [staltz](https://github.com/staltz) and [TylorS](https://github.com/tylors).
+**Acknowledgements:** *xstream* is built by [staltz](https://github.com/staltz) and [TylorS](https://github.com/tylors).
 
-License: MIT
+**License:** MIT
+
+# CHANGELOG
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/staltz/xstream/compare/v1.0.1...v1.1.0) (2016-04-26)
+
+
+### Bug Fixes
+
+* **core:** export all operator classes ([10ef8f3](https://github.com/staltz/xstream/commit/10ef8f3))
+* **package:** fix TS dependency on es6-promise, and bump ([4c8adb8](https://github.com/staltz/xstream/commit/4c8adb8))
+* **package.json:** add typings field, bump to 1.0.4 ([bffd84b](https://github.com/staltz/xstream/commit/bffd84b))
+* **typings:** fix usage of ambient es6-promise ([6b4ae8e](https://github.com/staltz/xstream/commit/6b4ae8e))
+* **typings:** make es6-promise an ambient dep, and bump ([49edd74](https://github.com/staltz/xstream/commit/49edd74))
+
+### Features
+
+* **extra:** implement new flattenSequentially() extra operator ([4a6e63e](https://github.com/staltz/xstream/commit/4a6e63e))
