@@ -1037,6 +1037,18 @@ export class Stream<T> implements InternalListener<T> {
    * @param {Listener<T>} listener
    */
   addListener(listener: Listener<T>): void {
+    if (typeof listener.next !== 'function') {
+      throw new Error('addListener requires a next function.');
+    }
+
+    if (typeof listener.error !== 'function') {
+      throw new Error('addListener requires an error function.');
+    }
+
+    if (typeof listener.complete !== 'function') {
+      throw new Error('addListener requires a complete function.');
+    }
+
     (<InternalListener<T>> (<any> listener))._n = listener.next;
     (<InternalListener<T>> (<any> listener))._e = listener.error;
     (<InternalListener<T>> (<any> listener))._c = listener.complete;
