@@ -1000,7 +1000,6 @@ export class Stream<T> implements InternalListener<T> {
     (<InternalListener<T>> (<any> listener))._n = listener.next;
     (<InternalListener<T>> (<any> listener))._e = listener.error;
     (<InternalListener<T>> (<any> listener))._c = listener.complete;
-    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1009,7 +1008,6 @@ export class Stream<T> implements InternalListener<T> {
    * @param {Listener<T>} listener
    */
   removeListener(listener: Listener<T>): void {
-    throw new Error("Not implemented yet");
   }
 
   _add(il: InternalListener<T>): void {
@@ -1027,7 +1025,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static create<T>(producer?: Producer<T>): Stream<T> {
-    throw new Error("Not implemented yet");
+    return new Stream();
   }
 
   /**
@@ -1074,7 +1072,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static empty(): Stream<any> {
-    throw new Error("Not implemented yet");
+    return new Stream();
   }
 
   /**

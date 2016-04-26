@@ -43,6 +43,6 @@ export class DropRepeatsOperator<T> implements Operator<T, T> {
 
 export default function dropRepeats<T>(isEqual: (x: T, y: T) => boolean = null): (ins: Stream<T>) => Stream<T> {
   return function dropRepeatsOperator(ins: Stream<T>): Stream<T> {
-    return new Stream<T>(new DropRepeatsOperator(isEqual, ins));
+    throw new Error('Not implemented yet');
   };
 }

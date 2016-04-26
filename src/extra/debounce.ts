@@ -47,7 +47,7 @@ class DebounceOperator<T> implements Operator<T, T> {
 }
 
 export default function debounce<T>(period: number): (ins: Stream<T>) => Stream<T> {
-  return function debounceOperator(ins: Stream<T>) {
-    return new Stream<T>(new DebounceOperator(period, ins));
+  return function debounceOperator(ins: Stream<T>): Stream<T> {
+    throw new Error('Not implemented yet');
   };
 }
