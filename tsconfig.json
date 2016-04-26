@@ -22,6 +22,7 @@
     "src/extra/debounce.ts",
     "src/extra/delay.ts",
     "src/extra/dropRepeats.ts",
+    "src/extra/flattenSequentially.ts",
     "src/extra/fromEvent.ts",
     "src/extra/pairwise.ts",
     "src/index.ts"
