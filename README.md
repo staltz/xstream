@@ -135,7 +135,7 @@ var listener = {
   error: (err) => {
     console.error('The Stream gave me an error: ', err);
   },
-  completed: () => {
+  complete: () => {
     console.log('The Stream told me it is done.');
   },
 }
@@ -162,7 +162,7 @@ Events from a Stream must come from somewhere, right? That's why we need Produce
 Because Streams are Listeners, if you give a Stream as the Listener in `start(stream)`, essentially the Producer is now generating events that will be broadcast on the Stream. Nice, huh? Now a bunch of listeners can be attached to the Stream and they can all get those events originally coming from the Producer. That's why `xs.create(producer)` receives a Producer to be the heart of a new Stream. Check this out:
 
 ```js
-var intervalProducer = {
+var producer = {
   start: function (listener) {
     this.id = setInterval(() => listener.next('yo'), 1000)
   },
@@ -204,6 +204,7 @@ What matters for stopping the Producer is `stream.removeListener`. When the last
 
 The reason the Producer is not suddenly (synchronously) stopped, is that it is often necessary to swap the single listener of a Stream, but still keep its ongoing execution. For instance:
 
+<!-- skip-example -->
 ```js
 var listenerA = {/* ... */}
 var listenerB = {/* ... */}
