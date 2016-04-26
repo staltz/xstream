@@ -24,5 +24,5 @@ export class DOMEventProducer implements InternalProducer<Event> {
 export default function fromEvent(node: EventTarget,
                                   eventType: string,
                                   useCapture: boolean = false): Stream<Event> {
-  return new Stream<Event>(new DOMEventProducer(node, eventType, useCapture));
+  throw new Error('Not implemented yet');
 }

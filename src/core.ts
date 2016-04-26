@@ -978,57 +978,17 @@ export class TakeOperator<T> implements Operator<T, T> {
 }
 
 export class Stream<T> implements InternalListener<T> {
-  private _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
-  private _stopID: any = empty;
-  private _prod: InternalProducer<T>;
-
-  constructor(producer: InternalProducer<T>) {
-    this._prod = producer;
-    this._ils = [];
-  }
 
   _n(t: T): void {
-    const a = this._ils;
-    const len = a.length;
-    if (len === 1) {
-      a[0]._n(t);
-    } else {
-      for (let i = 0; i < len; i++) {
-        a[i]._n(t);
-      }
-    }
   }
 
   _e(err: any): void {
-    const a = this._ils;
-    const len = a.length;
-    if (len === 1) {
-      a[0]._e(err);
-    } else {
-      for (let i = 0; i < len; i++) {
-        a[i]._e(err);
-      }
-    }
-    this._x();
   }
 
   _c(): void {
-    const a = this._ils;
-    const len = a.length;
-    if (len === 1) {
-      a[0]._c();
-    } else {
-      for (let i = 0; i < len; i++) {
-        a[i]._c();
-      }
-    }
-    this._x();
   }
 
-  _x(): void { // tear down logic, after error or complete
-    if (this._ils.length === 0) return;
-    if (this._prod) this._prod._stop();
-    this._ils = [];
+  _x(): void {
   }
 
   /**
@@ -1040,7 +1000,6 @@ export class Stream<T> implements InternalListener<T> {
     (<InternalListener<T>> (<any> listener))._n = listener.next;
     (<InternalListener<T>> (<any> listener))._e = listener.error;
     (<InternalListener<T>> (<any> listener))._c = listener.complete;
-    this._add(<InternalListener<T>> (<any> listener));
   }
 
   /**
@@ -1049,32 +1008,12 @@ export class Stream<T> implements InternalListener<T> {
    * @param {Listener<T>} listener
    */
   removeListener(listener: Listener<T>): void {
-    this._remove(<InternalListener<T>> (<any> listener));
   }
 
   _add(il: InternalListener<T>): void {
-    const a = this._ils;
-    a.push(il);
-    if (a.length === 1) {
-      if (this._stopID !== empty) {
-        clearTimeout(this._stopID);
-        this._stopID = empty;
-      }
-      const p = this._prod;
-      if (p) p._start(this);
-    }
   }
 
   _remove(il: InternalListener<T>): void {
-    const a = this._ils;
-    const i = a.indexOf(il);
-    if (i > -1) {
-      a.splice(i, 1);
-      const p = this._prod;
-      if (p && a.length <= 0) {
-        this._stopID = setTimeout(() => p._stop());
-      }
-    }
   }
 
   /**
@@ -1086,10 +1025,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static create<T>(producer?: Producer<T>): Stream<T> {
-    if (producer) {
-      internalizeProducer(producer); // mutates the input
-    }
-    return new Stream(<InternalProducer<T>> (<any> producer));
+    return new Stream();
   }
 
   /**
@@ -1101,10 +1037,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {MemoryStream}
    */
   static createWithMemory<T>(producer?: Producer<T>): MemoryStream<T> {
-    if (producer) {
-      internalizeProducer(producer); // mutates the input
-    }
-    return new MemoryStream<T>(<InternalProducer<T>> (<any> producer));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1121,7 +1054,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static never(): Stream<any> {
-    return new Stream<any>({_start: noop, _stop: noop});
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1139,10 +1072,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static empty(): Stream<any> {
-    return new Stream<any>({
-      _start(il: InternalListener<any>) { il._c(); },
-      _stop: noop,
-    });
+    return new Stream();
   }
 
   /**
@@ -1162,10 +1092,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static throw(error: any): Stream<any> {
-    return new Stream<any>({
-      _start(il: InternalListener<any>) { il._e(error); },
-      _stop: noop,
-    });
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1186,7 +1113,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static of<T>(...items: Array<T>): Stream<T> {
-    return Stream.fromArray(items);
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1205,7 +1132,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static fromArray<T>(array: Array<T>): Stream<T> {
-    return new Stream<T>(new FromArrayProducer(array));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1225,7 +1152,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static fromPromise<T>(promise: Promise<T>): Stream<T> {
-    return new Stream<T>(new FromPromiseProducer(promise));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1245,7 +1172,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static periodic(period: number): Stream<number> {
-    return new Stream<number>(new PeriodicProducer(period));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1271,7 +1198,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static merge<T>(...streams: Array<Stream<T>>): Stream<T> {
-    return new Stream<T>(new MergeProducer(streams));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1308,7 +1235,7 @@ export class Stream<T> implements InternalListener<T> {
   static combine: CombineFactorySignature =
     function combine<R>(project: CombineProjectFunction,
                         ...streams: Array<Stream<any>>): Stream<R> {
-      return new Stream<R>(new CombineProducer<R>(project, streams));
+      throw new Error("Not implemented yet");
     };
 
   /**
@@ -1329,28 +1256,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   map<U>(project: (t: T) => U): Stream<U> {
-    const p = this._prod;
-    if (p instanceof FilterOperator) {
-      return new Stream<U>(new FilterMapOperator(
-        (<FilterOperator<T>> p).passes,
-        project,
-        (<FilterOperator<T>> p).ins
-      ));
-    }
-    if (p instanceof FilterMapOperator) {
-      return new Stream<U>(new FilterMapOperator(
-        (<FilterMapOperator<T, T>> p).passes,
-        compose2(project, (<FilterMapOperator<T, T>> p).project),
-        (<FilterMapOperator<T, T>> p).ins
-      ));
-    }
-    if (p instanceof MapOperator) {
-      return new Stream<U>(new MapOperator(
-        compose2(project, (<MapOperator<T, T>> p).project),
-        (<MapOperator<T, T>> p).ins
-      ));
-    }
-    return new Stream<U>(new MapOperator(project, this));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1370,7 +1276,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   mapTo<U>(projectedValue: U): Stream<U> {
-    return new Stream<U>(new MapToOperator(projectedValue, this));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1394,28 +1300,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   filter(passes: (t: T) => boolean): Stream<T> {
-    const p = this._prod;
-    if (p instanceof MapOperator) {
-      return new Stream<T>(new FilterMapOperator(
-        passes,
-        (<MapOperator<T, T>> p).project,
-        (<MapOperator<T, T>> p).ins
-      ));
-    }
-    if (p instanceof FilterMapOperator) {
-      return new Stream<T>(new FilterMapOperator(
-        compose2(passes, (<FilterMapOperator<T, T>> p).passes),
-        (<FilterMapOperator<T, T>> p).project,
-        (<FilterMapOperator<T, T>> p).ins
-      ));
-    }
-    if (p instanceof FilterOperator) {
-      return new Stream<T>(new FilterOperator(
-        compose2(passes, (<FilterOperator<T>> p).passes),
-        (<FilterOperator<T>> p).ins
-      ));
-    }
-    return new Stream<T>(new FilterOperator(passes, this));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1435,7 +1320,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   take(amount: number): Stream<T> {
-    return new Stream<T>(new TakeOperator(amount, this));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1456,7 +1341,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   drop(amount: number): Stream<T> {
-    return new Stream<T>(new DropOperator(amount, this));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1474,7 +1359,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   last(): Stream<T> {
-    return new Stream<T>(new LastOperator(this));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1493,7 +1378,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   startWith(initial: T): Stream<T> {
-    return new Stream<T>(new StartWithOperator(this, initial));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1516,7 +1401,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   endWhen(other: Stream<any>): Stream<T> {
-    return new Stream<T>(new EndWhenOperator(other, this));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1548,7 +1433,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   fold<R>(accumulate: (acc: R, t: T) => R, seed: R): Stream<R> {
-    return new Stream<R>(new FoldOperator(accumulate, seed, this));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1575,7 +1460,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   replaceError(replace: (err: any) => Stream<T>): Stream<T> {
-    return new Stream<T>(new ReplaceErrorOperator(replace, this));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1604,11 +1489,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   flatten<R, T extends Stream<R>>(): T {
-    const p = this._prod;
-    return <T> new Stream<R>(p instanceof MapOperator || p instanceof FilterMapOperator ?
-      new MapFlattenOperator(<MapOperator<R, Stream<R>>> <any> p) :
-      new FlattenOperator(<Stream<Stream<R>>> <any> this)
-    );
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1637,11 +1518,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   flattenConcurrently<R, T extends Stream<R>>(): T {
-    const p = this._prod;
-    return <T> new Stream<R>(p instanceof MapOperator || p instanceof FilterMapOperator ?
-      new MapFlattenConcOperator(<MapOperator<R, Stream<R>>> <any> p) :
-      new FlattenConcOperator(<Stream<Stream<R>>> <any> this)
-    );
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1664,7 +1541,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   merge(other: Stream<T>): Stream<T> {
-    return Stream.merge(this, other);
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1699,8 +1576,7 @@ export class Stream<T> implements InternalListener<T> {
   combine: CombineInstanceSignature<T> =
     function combine<R>(project: CombineProjectFunction,
                         ...streams: Array<Stream<any>>): Stream<R> {
-      streams.unshift(this);
-      return Stream.combine(project, ...streams);
+      throw new Error("Not implemented yet");
     };
 
   /**
@@ -1715,7 +1591,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   compose(operator: (stream: Stream<T>) => Stream<any>): Stream<any> {
-    return operator(this);
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1726,7 +1602,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   remember(): Stream<T> {
-    return new MemoryStream<T>(this._prod);
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1739,7 +1615,7 @@ export class Stream<T> implements InternalListener<T> {
    * @param {Stream} other The stream to imitate on the current one.
    */
   imitate(other: Stream<T>): void {
-    other._add(this);
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1768,7 +1644,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   debug(spy: (t: T) => void = null): Stream<T> {
-    return new Stream<T>(new DebugOperator(spy, this));
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1782,7 +1658,7 @@ export class Stream<T> implements InternalListener<T> {
    * this Stream.
    */
   shamefullySendNext(value: T) {
-    this._n(value);
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1796,7 +1672,7 @@ export class Stream<T> implements InternalListener<T> {
    * this Stream.
    */
   shamefullySendError(error: any) {
-    this._e(error);
+    throw new Error("Not implemented yet");
   }
 
   /**
@@ -1807,27 +1683,18 @@ export class Stream<T> implements InternalListener<T> {
    * method. Use it only when you know what you are doing.
    */
   shamefullySendComplete() {
-    this._c();
+    throw new Error("Not implemented yet");
   }
 
 }
 
 export class MemoryStream<T> extends Stream<T> {
-  private _val: any;
-  private _has: boolean = false;
-  constructor(producer: InternalProducer<T>) {
-    super(producer);
-  }
-
   _n(x: T) {
-    this._val = x;
-    this._has = true;
-    super._n(x);
+    throw new Error("Not implemented yet");
   }
 
   _add(listener: InternalListener<T>): void {
-    if (this._has) { listener._n(this._val); }
-    super._add(listener);
+    throw new Error("Not implemented yet");
   }
 }
 

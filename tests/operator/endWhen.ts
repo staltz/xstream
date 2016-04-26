@@ -2,6 +2,7 @@ import xs from '../../src/index';
 import delay from '../../src/extra/delay';
 import * as assert from 'assert';
 
+/*
 describe('Stream.prototype.endWhen', () => {
   it('should complete the stream when another stream emits next', (done) => {
     const source = xs.periodic(50);
@@ -39,3 +40,4 @@ describe('Stream.prototype.endWhen', () => {
     });
   });
 });
+*/

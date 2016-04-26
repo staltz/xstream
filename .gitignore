@@ -43,3 +43,7 @@ typings/
 
 # Editors
 .idea/
+
+# Generated dev symbol mappings
+src/**/*.js.map
+tests/**/*.js.map

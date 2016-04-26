@@ -2,6 +2,7 @@ import xs from '../../src/index';
 import delay from '../../src/extra/delay';
 import * as assert from 'assert';
 
+/*
 describe('delay (extra)', () => {
   it('should delay periodic events by a given time period', (done) => {
     const stream = xs.periodic(100).take(3).compose(delay(200));
@@ -47,3 +48,4 @@ describe('delay (extra)', () => {
     }, 150);
   });
 });
+*/

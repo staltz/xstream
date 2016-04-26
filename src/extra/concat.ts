@@ -41,5 +41,5 @@ class ConcatProducer<T> implements InternalProducer<T>, InternalListener<T> {
 }
 
 export default function concat<T>(...streams: Array<Stream<T>>): Stream<T> {
-  return new Stream<T>(new ConcatProducer(streams));
+  throw new Error('Not implemented yet');
 }

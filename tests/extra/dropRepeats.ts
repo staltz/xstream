@@ -2,6 +2,7 @@ import xs, {Stream} from '../../src/index';
 import dropRepeats from '../../src/extra/dropRepeats';
 import * as assert from 'assert';
 
+/*
 describe('dropRepeats (extra)', () => {
   it('should drop consecutive duplicate numbers (as events)', (done) => {
     const stream = xs.of(1, 2, 1, 1, 1, 2, 3, 4, 3, 3).compose(dropRepeats());
@@ -36,3 +37,4 @@ describe('dropRepeats (extra)', () => {
     });
   });
 });
+*/

@@ -3,6 +3,7 @@ import fromEvent from '../../src/extra/fromEvent';
 import * as assert from 'assert';
 function noop() {};
 
+/*
 class FakeEventTarget implements EventTarget {
   public handler: EventListener;
   public event: string;
@@ -103,3 +104,4 @@ describe('fromEvent (extra)', () => {
     target.emit(2);
   });
 });
+*/

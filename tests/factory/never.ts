@@ -1,5 +1,6 @@
 import xs from '../../src/index';
 
+/*
 describe('xs.never()', () => {
   it('should create a stream with 0 events never ends', (done) => {
     const stream = xs.never();
@@ -14,3 +15,4 @@ describe('xs.never()', () => {
     setTimeout(function() { stream.removeListener(listener); done(); }, 1000);
   });
 });
+*/

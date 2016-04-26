@@ -38,7 +38,7 @@ describe('Stream', () => {
     assert.equal(typeof stream.imitate, 'function');
     assert.equal(typeof stream.debug, 'function');
   });
-
+/*
   it('should be createable giving a custom producer object', (done) => {
     const expected = [10, 20, 30];
     let listenerGotEnd: boolean = false;
@@ -314,5 +314,5 @@ describe('Stream', () => {
     assert.equal(on, false);
     assert.equal(expected2.length, 0);
     done();
-  });
+  });*/
 });
