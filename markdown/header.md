@@ -8,6 +8,7 @@
 
 ![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.js.svg)
 ![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.min.js.svg?compression=gzip)
+[![Build Status](https://travis-ci.org/staltz/xstream.svg?branch=master)](https://travis-ci.org/staltz/xstream)
 
 # Example
 

@@ -100,6 +100,7 @@ What matters for stopping the Producer is `stream.removeListener`. When the last
 
 The reason the Producer is not suddenly (synchronously) stopped, is that it is often necessary to swap the single listener of a Stream, but still keep its ongoing execution. For instance:
 
+<!-- skip-example -->
 ```js
 var listenerA = {/* ... */}
 var listenerB = {/* ... */}

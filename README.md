@@ -17,6 +17,7 @@ __  _____| |_ _ __ ___  __ _ _ __ ___
 
 ![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.js.svg)
 ![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.min.js.svg?compression=gzip)
+[![Build Status](https://travis-ci.org/staltz/xstream.svg?branch=master)](https://travis-ci.org/staltz/xstream)
 
 # Example
 
@@ -105,6 +106,8 @@ var xs = require('xstream').default
 - [`shamefullySendComplete`](#shamefullySendComplete)
 
 # Overview
+
+<!-- share-code-between-examples -->
 
 XStream has four fundamental types: Stream, Listener, Producer, and MemoryStream.
 
