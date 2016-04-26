@@ -1,6 +1,7 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
+/*
 describe('Stream.prototype.merge', () => {
   it('should merge OR-style another stream with the primary stream', (done) => {
     const stream = xs.periodic(100).take(2)
@@ -35,3 +36,4 @@ describe('Stream.prototype.merge', () => {
     });
   });
 });
+*/

@@ -2,6 +2,7 @@ import xs from '../../src/index';
 import concat from '../../src/extra/concat';
 import * as assert from 'assert';
 
+/*
 describe('concat (extra)', () => {
   it('should concatenate two synchronous short streams together', (done) => {
     const stream1 = xs.of(1, 2, 3);
@@ -58,3 +59,4 @@ describe('concat (extra)', () => {
     });
   });
 });
+*/

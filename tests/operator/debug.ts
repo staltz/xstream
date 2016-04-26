@@ -1,6 +1,7 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
+/*
 describe('Stream.prototype.debug', () => {
   it('should allow inspecting the operator chain', (done) => {
     const expected = [0, 1, 2];
@@ -38,3 +39,4 @@ describe('Stream.prototype.debug', () => {
     });
   });
 });
+*/

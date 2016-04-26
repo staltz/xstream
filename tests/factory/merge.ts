@@ -1,6 +1,7 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
+/*
 describe('xs.merge', () => {
   it('should merge OR-style two streams together', (done) => {
     const stream = xs.merge(
@@ -37,3 +38,4 @@ describe('xs.merge', () => {
     });
   });
 });
+*/

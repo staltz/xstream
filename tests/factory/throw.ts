@@ -1,6 +1,7 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
+/*
 describe('xs.throw()', function() {
   it('should create a stream with just one error emission', (done) => {
     const stream = xs.throw(new Error('not nice'));
@@ -16,3 +17,4 @@ describe('xs.throw()', function() {
     });
   });
 });
+*/

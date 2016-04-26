@@ -2,6 +2,7 @@ import {Promise} from 'es6-promise';
 import xs from '../../src/index';
 import * as assert from 'assert';
 
+/*
 describe('xs.fromPromise', () => {
   it('should convert a resolved promise to a stream', (done) => {
     const stream = xs.fromPromise(Promise.resolve('yes'));
@@ -33,3 +34,4 @@ describe('xs.fromPromise', () => {
     });
   });
 });
+*/

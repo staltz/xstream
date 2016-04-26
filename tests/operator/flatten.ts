@@ -1,6 +1,7 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
+/*
 describe('Stream.prototype.flatten', () => {
   describe('with map', () => {
     it('should expand each periodic event with 3 sync events', (done) => {
@@ -115,3 +116,4 @@ describe('Stream.prototype.flatten', () => {
     });
   });
 });
+*/

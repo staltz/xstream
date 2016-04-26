@@ -2,6 +2,7 @@ import xs, {Listener, Producer} from '../../src/index';
 import debounce from '../../src/extra/debounce';
 import * as assert from 'assert';
 
+/*
 describe('debounce (extra)', () => {
   it('should delay events until a period of silence has passed', (done) => {
     const producer: Producer<number> = {
@@ -28,3 +29,4 @@ describe('debounce (extra)', () => {
     stream.addListener(listener);
   });
 });
+*/
