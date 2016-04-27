@@ -8,3 +8,10 @@ lib/
 markdown/
 node_modules/
 typings/
+extra/
+core.d.ts
+core.js
+core.js.map
+index.d.ts
+index.js
+index.js.map
