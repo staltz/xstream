@@ -324,7 +324,8 @@ describe('Stream', () => {
       try {
         stream.addListener(listener);
       } catch (e) {
-        assert.equal(e.message, 'addListener requires a next function.')
+        assert.equal(e.message, 'stream.addListener() requires all three ' +
+        'next, error, and complete functions.');
         done();
       }
     });
@@ -338,7 +339,8 @@ describe('Stream', () => {
       try {
         stream.addListener(listener);
       } catch (e) {
-        assert.equal(e.message, 'addListener requires an error function.')
+        assert.equal(e.message, 'stream.addListener() requires all three ' +
+        'next, error, and complete functions.');
         done();
       }
     });
@@ -353,7 +355,8 @@ describe('Stream', () => {
       try {
         stream.addListener(listener);
       } catch (e) {
-        assert.equal(e.message, 'addListener requires a complete function.')
+        assert.equal(e.message, 'stream.addListener() requires all three ' + 
+        'next, error, and complete functions.');
         done();
       }
     });
@@ -367,7 +370,8 @@ describe('Stream', () => {
       try {
         stream.addListener(listener);
       } catch (e) {
-        assert.equal(e.message, 'addListener requires a next function.')
+        assert.equal(e.message, 'stream.addListener() requires all three ' +
+        'next, error, and complete functions.');
         done();
       }
     });
