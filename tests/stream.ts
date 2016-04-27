@@ -315,4 +315,61 @@ describe('Stream', () => {
     assert.equal(expected2.length, 0);
     done();
   });
+
+  describe('addListener', () => {
+    it('throws a helpful error if you forget the next function', (done) => {
+      const stream = xs.empty();
+      const listener = <Listener<Number>> <any> {};
+
+      try {
+        stream.addListener(listener);
+      } catch (e) {
+        assert.equal(e.message, 'addListener requires a next function.')
+        done();
+      }
+    });
+
+    it('throws a helpful error if you forget the error function', (done) => {
+      const stream = xs.empty();
+      const listener = <Listener<Number>> <any> {
+        next: (x: any) => {}
+      };
+
+      try {
+        stream.addListener(listener);
+      } catch (e) {
+        assert.equal(e.message, 'addListener requires an error function.')
+        done();
+      }
+    });
+
+    it('throws a helpful error if you forget the complete function', (done) => {
+      const stream = xs.empty();
+      const listener = <Listener<Number>> <any> {
+        next: (x: any) => {},
+        error: (err: any) => {}
+      };
+
+      try {
+        stream.addListener(listener);
+      } catch (e) {
+        assert.equal(e.message, 'addListener requires a complete function.')
+        done();
+      }
+    });
+
+    it('throws a helpful error if you pass a non function value as the next function', (done) => {
+      const stream = xs.empty();
+      const listener = <Listener<Number>> <any> {
+        next: undefined
+      };
+
+      try {
+        stream.addListener(listener);
+      } catch (e) {
+        assert.equal(e.message, 'addListener requires a next function.')
+        done();
+      }
+    });
+  });
 });
