@@ -1,12 +1,12 @@
 {
   "name": "xstream",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "An extremely intuitive, small, and fast functional reactive stream library for JavaScript",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
     "commit": "git-cz",
-    "changelog": "conventional-changelog -p angular -o CHANGELOG.md",
+    "changelog": "conventional-changelog --infile CHANGELOG.md --same-file --release-count 0 --preset angular",
     "lint": "tslint -c tslint.json src/**/*.ts",
     "premocha": "npm run lib",
     "mocha": "mocha tests/*.ts tests/**/*.ts --require ts-node/register",

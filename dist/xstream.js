@@ -880,6 +880,12 @@ var Stream = (function () {
     };
     
     Stream.prototype.addListener = function (listener) {
+        if (typeof listener.next !== 'function'
+            || typeof listener.error !== 'function'
+            || typeof listener.complete !== 'function') {
+            throw new Error('stream.addListener() requires all three next, error, ' +
+                'and complete functions.');
+        }
         listener._n = listener.next;
         listener._e = listener.error;
         listener._c = listener.complete;
