@@ -1,7 +1,6 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
-/*
 describe('Stream.prototype.fold', () => {
   it('should accumulating a value over time', (done) => {
     const stream = xs.periodic(50).take(4).fold((x: number, y: number) => x + y, 0);
@@ -43,4 +42,3 @@ describe('Stream.prototype.fold', () => {
     });
   });
 });
-*/

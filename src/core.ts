@@ -754,44 +754,28 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
   }
 }
 
-export class FoldOperator<T, R> implements Operator<T, R> {
-  private out: Stream<R> = null;
-  private acc: R; // initialized as seed
-
-  constructor(public f: (acc: R, t: T) => R,
-              public seed: R,
-              public ins: Stream<T>) {
-    this.acc = seed;
+class Fold<A, B> extends Combinator<A, B> {
+  constructor(source: Source<A>, private acc: (s: B, a: A) => B, private seed: B) {
+    super(source);
   }
-
-  _start(out: Stream<R>): void {
-    this.out = out;
-    out._n(this.acc);
-    this.ins._add(this);
+  run(next: Sink<B, any>) {
+    return new FoldSink(next, this.acc, this.seed);
   }
-
-  _stop(): void {
-    this.ins._remove(this);
-    this.out = null;
-    this.acc = this.seed;
-  }
-
-  _n(t: T) {
-    try {
-      this.out._n(this.acc = this.f(this.acc, t));
-    } catch (e) {
-      this.out._e(e);
-    }
-  }
-
-  _e(err: any) {
-    this.out._e(err);
-  }
-
-  _c() {
-    this.out._c();
+  started(sink: Sink<A, B>) {
+    (sink as FoldSink<A, B>).s.next(this.seed);
   }
 }
+
+class FoldSink<A, B> extends BaseSink<A, B> {
+  constructor(sink: Sink<B, any>, private acc: (s: B, a: A) => B, private val: B) {
+    super(sink);
+  }
+  next(x: A): void {
+    const acc = this.acc;
+    this.s.next(this.val = acc(this.val, x));
+  }
+}
+
 
 class Last<A, B> extends Combinator<A, A> {
   constructor(source: Source<A>) {
@@ -1168,7 +1152,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   static create<T>(producer?: Producer<T>): Stream<T> {
-    return new Stream();
+    return new Stream(null);
   }
 
   /**
@@ -1215,7 +1199,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   static empty(): Stream<any> {
-    return new Stream();
+    return new Stream(null);
   }
 
   /**
@@ -1576,7 +1560,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   fold<R>(accumulate: (acc: R, t: T) => R, seed: R): Stream<R> {
-    throw new Error("Not implemented yet");
+    return new Stream(new Fold(this.source, accumulate, seed));
   }
 
   /**
