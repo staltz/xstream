@@ -49,6 +49,7 @@ export interface Sink<A, B> {
   next(x: A): void;
   end(err: any): void;
   cleanup(): void;
+  handlers(): Array<Sink<any, any>>;
 }
 
 // Source is same as Producer, just using different name to avoid conflicts for now
@@ -70,6 +71,16 @@ abstract class BaseSink<A, B> implements Sink<A, B> {
   }
   cleanup(): void {
     this.s = null;
+  }
+  handlers(): Array<Sink<any, any>> {
+    return this.s.handlers();
+  }
+}
+
+function handleError(err: any, sink: Sink<any, any>): void {
+  const handlers = sink.handlers(), n = handlers.length;
+  for (let i = 0; i < n; i++) {
+    handlers[i].end(err);
   }
 }
 
@@ -187,7 +198,11 @@ class Observer<T> implements Sink<T, T> {
     !this.c && this.lis.next(x);
   }
   end(err: any): void {
-    err !== none ? this.lis.error(err) : this.lis.complete();
+    try {
+      err !== none ? this.lis.error(err) : this.lis.complete();  
+    } catch (e) {
+      console.error(e);
+    }
     this.lis = null; 
     this.c = true;
     // end signal might arrive before the startup completed, thus we must check
@@ -200,6 +215,9 @@ class Observer<T> implements Sink<T, T> {
   cleanup(): void { 
     this.source = null;
     this.lis = null;
+  }
+  handlers(): Array<Sink<any, any>> {
+    return [ this ];
   }
 }
 
@@ -378,12 +396,19 @@ export class FromArrayProducer<T> implements Source<T> {
   
   start(sink: Sink<T, any>) {
     this.active = true;
-    let i: number, arr = this.a, n = arr.length;
-    for (i = 0; i < n && this.active; i++) {
-      sink.next(arr[i]);
+    function produce(self: FromArrayProducer<T>) {
+      let i: number, arr = self.a, n = arr.length;
+      for (i = 0; i < n && self.active; i++) {
+        sink.next(arr[i]);
+      } 
+      self.active && sink.end(none);
+      self.active = false;  
     }
-    this.active && sink.end(none);
-    this.active = false;
+    try {
+      produce(this);
+    } catch (err) {
+      handleError(err, sink);
+    }
   }
   
   stop(sink: Sink<T, any>) {
@@ -463,15 +488,17 @@ export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T
 class PeriodicProducer implements Source<number> {
   private iid: any = -1;    // interval id
   private i: number = 0;
-  private sink: Sink<number, any>;
-
-  constructor(private period: number) { 
-    this.sink = null;
-  }
+  
+  constructor(private period: number) { }
 
   start<T>(sink: Sink<number, T>): void {
-    this.sink = sink;
-    this.iid = setInterval(() => this.sink.next(this.i++), this.period);
+    this.iid = setInterval(() => {
+      try {
+        sink.next(this.i++); 
+      } catch(err) {
+        handleError(err, sink);
+      }
+    }, this.period);
   }
   stop<T>(sink: Sink<number, any>): void {
     this.iid !== -1 && clearTimeout(this.iid);
