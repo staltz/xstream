@@ -1,7 +1,6 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
-/*
 describe('Stream.prototype.filter', () => {
   it('should filter in only even numbers from an input stream', (done) => {
     const stream = xs.periodic(50).filter(i => i % 2 === 0);
@@ -45,7 +44,6 @@ describe('Stream.prototype.filter', () => {
     stream.addListener({
       next: (x: number) => {
         assert.strictEqual(x, expected.shift());
-        assert.strictEqual(stream['_prod']['out'], stream);
       },
       error: (err: any) => done(err),
       complete: () => {
@@ -54,8 +52,6 @@ describe('Stream.prototype.filter', () => {
     });
 
     assert.strictEqual(completeCalled, true);
-    assert.strictEqual(stream['_prod']['out'], null);
     done();
   });
 });
-*/

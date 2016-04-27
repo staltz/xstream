@@ -607,39 +607,8 @@ export class EndWhenOperator<T> implements Operator<T, T> {
   }
 }
 
-export class FilterOperator<T> implements Operator<T, T> {
-  private out: Stream<T> = null;
 
-  constructor(public passes: (t: T) => boolean,
-              public ins: Stream<T>) {
-  }
 
-  _start(out: Stream<T>): void {
-    this.out = out;
-    this.ins._add(this);
-  }
-
-  _stop(): void {
-    this.ins._remove(this);
-    this.out = null;
-  }
-
-  _n(t: T) {
-    try {
-      if (this.passes(t)) this.out._n(t);
-    } catch (e) {
-      this.out._e(e);
-    }
-  }
-
-  _e(err: any) {
-    this.out._e(err);
-  }
-
-  _c() {
-    this.out._c();
-  }
-}
 
 class FCInner<T> implements InternalListener<T> {
   constructor(private out: Stream<T>,
@@ -694,6 +663,25 @@ export class FlattenConcOperator<T> implements Operator<Stream<T>, T> {
 
   _c() {
     this.less();
+  }
+}
+
+class Filter<A, B> extends Combinator<A, A> {
+  constructor(source: Source<A>, private pred: (x: A) => boolean) {
+    super(source);
+  }
+  run(next: Sink<A, any>) {
+    return new FilterSink(next, this.pred);
+  }
+}
+
+class FilterSink<A> extends BaseSink<A, A> {
+  constructor(sink: Sink<A, any>, private pred: (x: A) => boolean) {
+    super(sink);
+  }
+  next(x: A): void {
+    const p = this.pred;
+    p(x) && this.s.next(x);
   }
 }
 
@@ -1477,7 +1465,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   filter(passes: (t: T) => boolean): Stream<T> {
-    throw new Error("Not implemented yet");
+    return new Stream(new Filter(this.source, passes));
   }
 
   /**
