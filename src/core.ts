@@ -460,22 +460,22 @@ export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T
   }
 }
 
-export class PeriodicProducer implements InternalProducer<number> {
-  private intervalID: any = -1;
+class PeriodicProducer implements Source<number> {
+  private iid: any = -1;    // interval id
   private i: number = 0;
+  private sink: Sink<number, any>;
 
-  constructor(public period: number) {
+  constructor(private period: number) { 
+    this.sink = null;
   }
 
-  _start(stream: InternalListener<number>): void {
-    const self = this;
-    function intervalHandler() { stream._n(self.i++); }
-    this.intervalID = setInterval(intervalHandler, this.period);
+  start<T>(sink: Sink<number, T>): void {
+    this.sink = sink;
+    this.iid = setInterval(() => this.sink.next(this.i++), this.period);
   }
-
-  _stop(): void {
-    if (this.intervalID !== -1) clearInterval(this.intervalID);
-    this.intervalID = -1;
+  stop<T>(sink: Sink<number, any>): void {
+    this.iid !== -1 && clearTimeout(this.iid);
+    this.iid = -1;
     this.i = 0;
   }
 }
@@ -1342,7 +1342,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   static periodic(period: number): Stream<number> {
-    throw new Error("Not implemented yet");
+    return new Stream(ident(new PeriodicProducer(period)));
   }
 
   /**
