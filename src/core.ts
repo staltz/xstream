@@ -116,6 +116,31 @@ abstract class Combinator<A, B> implements Source<B> {
     
   }
 }
+
+// this identity combinator is needed for our sources (producers) so that
+// we can wrap the producers and don't need to think about their multicasting
+class Identity<A> extends Combinator<A, A> {
+  constructor(source: Source<A>) {
+    super(source);
+  }
+  run(next: Sink<A, any>) {
+    return new IdentitySink(next);
+  }
+}
+
+class IdentitySink<A> extends BaseSink<A, A> {
+  constructor(sink: Sink<A, any>) {
+    super(sink);
+  }
+  next(x: A) {
+    this.s.next(x);
+  }
+}
+
+function ident<T>(source: Source<T>): Source<T> {
+  return new Identity(source);
+}
+
 // mutates the input
 function internalizeProducer<T>(producer: Producer<T>) {
   (<InternalProducer<T>> (<any> producer))._start =
