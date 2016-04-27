@@ -9,7 +9,7 @@ describe('Stream.prototype.last', () => {
       next: (x: number) => {
         assert.equal(x, expected.shift());
       },
-      error: done.fail,
+      error: done,
       complete: () => {
         assert.equal(expected.length, 0);
         stream.removeListener(listener);

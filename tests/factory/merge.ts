@@ -12,7 +12,7 @@ describe('xs.merge', () => {
       next: (x) => {
         assert.equal(x, expected.shift());
       },
-      error: done.fail,
+      error: done,
       complete: () => {
         assert.equal(expected.length, 0);
         done();
@@ -29,7 +29,7 @@ describe('xs.merge', () => {
       next: (x) => {
         assert.equal(x, expected.shift());
       },
-      error: done.fail,
+      error: done,
       complete: () => {
         assert.equal(expected.length, 0);
         done();

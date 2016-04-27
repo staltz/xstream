@@ -10,7 +10,7 @@ describe('xs.of', () => {
       next: (x: string) => {
         assert.equal(x, expected.shift());
       },
-      error: done.fail,
+      error: done,
       complete: () => {
         assert.equal(expected.length, 0);
         done();

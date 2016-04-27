@@ -13,8 +13,8 @@ describe('Stream.prototype.drop', () => {
           done();
         }
       },
-      error: done.fail,
-      complete: done.fail,
+      error: done,
+      complete: () => done('complete should not be called'),
     };
     stream.addListener(listener);
   });

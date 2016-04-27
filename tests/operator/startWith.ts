@@ -9,7 +9,7 @@ describe('Stream.prototype.startWith', () => {
       next(x: any) {
         assert.strictEqual(x, 1);
       },
-      error: done.fail,
+      error: done,
       complete: done
     });
   });
