@@ -12,6 +12,7 @@
     "mocha": "mocha tests/*.ts tests/**/*.ts --require ts-node/register",
     "postmocha": "rm -rf tests/**/*.js",
     "test": "npm run lint && npm run mocha && npm run doctest",
+    "doctest": "markdown-doctest",
     "prelib": "rm -rf lib/ && mkdirp lib/ && typings install",
     "lib": "tsc",
     "prepage-content": "npm run changelog",
@@ -22,8 +23,12 @@
     "postdist": "uglifyjs dist/xstream.js -o dist/xstream.min.js",
     "start": "npm install && npm prune",
     "prepublish": "npm run lib",
-    "preversion": "npm run readme && npm run dist",
-    "doctest": "markdown-doctest"
+    "preversion": "npm test",
+    "version": "npm run readme && npm run dist && git add -A",
+    "postversion": "git push origin master && git push origin --tags && npm publish",
+    "release-patch": "npm version patch -m \"chore(package): release new version\"",
+    "release-minor": "npm version minor -m \"chore(package): release new version\"",
+    "release-major": "npm version major -m \"chore(package): release new version\""
   },
   "repository": {
     "type": "git",
@@ -56,6 +61,9 @@
     "typings": "^0.7.9",
     "uglify-js": "^2.6.2",
     "validate-commit-msg": "^2.4.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "config": {
     "commitizen": {
