@@ -68,7 +68,7 @@ describe('fromEvent (extra)', () => {
       next(x: any) {
         assert.strictEqual(x, expected.shift());
       },
-      error: done.fail,
+      error: done,
       complete: () => {
         assert.strictEqual(expected.length, 0);
         done();
@@ -89,7 +89,7 @@ describe('fromEvent (extra)', () => {
 
     stream.take(1).addListener({
       next(x) {},
-      error: done.fail,
+      error: done,
       complete() {
         setTimeout(() => {
           assert.strictEqual('test', target.removedEvent);
