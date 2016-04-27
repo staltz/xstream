@@ -370,19 +370,24 @@ class CombineProducer<R> implements InternalProducer<R> {
   }
 }
 
-export class FromArrayProducer<T> implements InternalProducer<T> {
-  constructor(public a: Array<T>) {
+export class FromArrayProducer<T> implements Source<T> {
+  private active: boolean;
+  constructor(private a: Array<T>) {
+    this.active = false;
   }
-
-  _start(out: InternalListener<T>): void {
-    const a = this.a;
-    for (let i = 0, l = a.length; i < l; i++) {
-      out._n(a[i]);
+  
+  start(sink: Sink<T, any>) {
+    this.active = true;
+    let i: number, arr = this.a, n = arr.length;
+    for (i = 0; i < n && this.active; i++) {
+      sink.next(arr[i]);
     }
-    out._c();
+    this.active && sink.end(none);
+    this.active = false;
   }
-
-  _stop(): void {
+  
+  stop(sink: Sink<T, any>) {
+    this.active = false;
   }
 }
 
@@ -1278,7 +1283,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   static of<T>(...items: Array<T>): Stream<T> {
-    throw new Error("Not implemented yet");
+    return Stream.fromArray(items);
   }
 
   /**
@@ -1297,7 +1302,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   static fromArray<T>(array: Array<T>): Stream<T> {
-    throw new Error("Not implemented yet");
+    return new Stream(ident(new FromArrayProducer(array)));
   }
 
   /**
