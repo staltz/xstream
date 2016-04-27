@@ -1,7 +1,6 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
-/*
 describe('Stream.prototype.map', () => {
   it('should transform values from input stream to output stream', (done) => {
     const stream = xs.periodic(100).map(i => 10 * i).take(3);
@@ -45,7 +44,6 @@ describe('Stream.prototype.map', () => {
     stream.addListener({
       next: (x: number) => {
         assert.strictEqual(x, expected.shift());
-        assert.strictEqual(stream['_prod']['out'], stream);
       },
       error: (err: any) => done(err),
       complete: () => {
@@ -54,7 +52,6 @@ describe('Stream.prototype.map', () => {
     });
 
     assert.strictEqual(completeCalled, true);
-    assert.strictEqual(stream['_prod']['out'], null);
     done();
   });
 
@@ -66,7 +63,6 @@ describe('Stream.prototype.map', () => {
     stream.addListener({
       next: (x: string) => {
         assert.strictEqual(x, expected.shift());
-        assert.strictEqual(stream['_prod']['out'], stream);
       },
       error: (err: any) => {
         errorCalled = true;
@@ -78,8 +74,6 @@ describe('Stream.prototype.map', () => {
 
     assert.strictEqual(errorCalled, true);
     assert.strictEqual(expected.length, 0);
-    assert.strictEqual(stream['_prod']['out'], null);
     done();
   });
 });
-*/

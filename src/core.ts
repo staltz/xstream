@@ -840,6 +840,8 @@ class MFCInner<T> implements InternalListener<T> {
   }
 }
 
+export interface MapOperator<A, B> extends Operator<A, B> {}
+
 export class MapFlattenConcOperator<T> implements InternalProducer<T>, InternalListener<T> {
   private active: number = 1; // number of outers and inners that have not yet ended
   private out: Stream<T> = null;
@@ -849,11 +851,11 @@ export class MapFlattenConcOperator<T> implements InternalProducer<T>, InternalL
 
   _start(out: Stream<T>): void {
     this.out = out;
-    this.mapOp.ins._add(this);
+    //this.mapOp.ins._add(this);
   }
 
   _stop(): void {
-    this.mapOp.ins._remove(this);
+    //this.mapOp.ins._remove(this);
     this.active = 1;
     this.out = null;
   }
@@ -867,7 +869,7 @@ export class MapFlattenConcOperator<T> implements InternalProducer<T>, InternalL
   _n(v: T) {
     this.active++;
     try {
-      this.mapOp.project(v)._add(new MFCInner(this.out, this));
+      //this.mapOp.project(v)._add(new MFCInner(this.out, this));
     } catch (e) {
       this.out._e(e);
     }
@@ -901,6 +903,7 @@ class MFInner<T> implements InternalListener<T> {
   }
 }
 
+
 export class MapFlattenOperator<T> implements InternalProducer<T>, InternalListener<T> {
   public curr: Stream<T> = null; // Current inner Stream
   private inner: InternalListener<T> = null; // Current inner InternalListener
@@ -912,11 +915,11 @@ export class MapFlattenOperator<T> implements InternalProducer<T>, InternalListe
 
   _start(out: Stream<T>): void {
     this.out = out;
-    this.mapOp.ins._add(this);
+    //this.mapOp.ins._add(this);
   }
 
   _stop(): void {
-    this.mapOp.ins._remove(this);
+    //this.mapOp.ins._remove(this);
     this.curr = null;
     this.inner = null;
     this.open = true;
@@ -939,7 +942,7 @@ export class MapFlattenOperator<T> implements InternalProducer<T>, InternalListe
   _n(v: T) {
     this.cut();
     try {
-      (this.curr = this.mapOp.project(v))._add(this.inner = new MFInner(this.out, this));
+      //(this.curr = this.mapOp.project(v))._add(this.inner = new MFInner(this.out, this));
     } catch (e) {
       this.out._e(e);
     }
@@ -955,53 +958,28 @@ export class MapFlattenOperator<T> implements InternalProducer<T>, InternalListe
   }
 }
 
-export class MapOperator<T, R> implements Operator<T, R> {
-  protected out: Stream<R> = null;
-
-  constructor(public project: (t: T) => R,
-              public ins: Stream<T>) {
+class Map<A, B> extends Combinator<A, B> {
+  private fn: (x: A) => B;
+  constructor(source: Source<A>, fn: (x: A) => B) {
+    super(source);
+    this.fn = fn;
   }
-
-  _start(out: Stream<R>): void {
-    this.out = out;
-    this.ins._add(this);
-  }
-
-  _stop(): void {
-    this.ins._remove(this);
-    this.out = null;
-  }
-
-  _n(t: T) {
-    try {
-      this.out._n(this.project(t));
-    } catch (e) {
-      this.out._e(e);
-    }
-  }
-
-  _e(err: any) {
-    this.out._e(err);
-  }
-
-  _c() {
-    this.out._c();
+  run(next: Sink<B, any>) {
+    return new MapSink(next, this.fn);
   }
 }
 
-export class FilterMapOperator<T, R> extends MapOperator<T, R> {
-  constructor(public passes: (t: T) => boolean,
-              project: (t: T) => R,
-              ins: Stream<T>) {
-    super(project, ins);
+class MapSink<A, B> extends BaseSink<A, B> {
+  constructor(sink: Sink<B, any>, private fn: (x: A) => B) {
+    super(sink);
   }
-
-  _n(v: T) {
-    if (this.passes(v)) {
-      super._n(v);
-    };
+  next(x: A): void {
+    const f = this.fn;
+    this.s.next(f(x));
   }
 }
+
+
 
 export class MapToOperator<T, R> implements Operator<T, R> {
   private out: Stream<R> = null;
@@ -1421,7 +1399,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   map<U>(project: (t: T) => U): Stream<U> {
-    throw new Error("Not implemented yet");
+    return new Stream(new Map(this.source, project));
   }
 
   /**
