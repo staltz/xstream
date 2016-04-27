@@ -1,7 +1,6 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
-/*
 describe('Stream.prototype.take', () => {
   it('should allow specifying max amount to take from input stream', (done) => {
     const stream = xs.periodic(50).take(4)
@@ -20,4 +19,3 @@ describe('Stream.prototype.take', () => {
     stream.addListener(listener);
   });
 });
-*/

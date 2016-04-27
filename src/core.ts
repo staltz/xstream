@@ -1110,42 +1110,37 @@ export class StartWithOperator<T> implements InternalProducer<T> {
   }
 }
 
-export class TakeOperator<T> implements Operator<T, T> {
-  private out: Stream<T> = null;
-  private taken: number = 0;
-
-  constructor(public max: number,
-              public ins: Stream<T>) {
+class Take<A, B> extends Combinator<A, A> {
+  private n: number;
+  constructor(source: Source<A>, n: number) {
+    super(source);
+    this.n = Math.max(0, n);
   }
-
-  _start(out: Stream<T>): void {
-    this.out = out;
-    this.ins._add(this);
+  run(next: Sink<A, any>) {
+    return new TakeSink(next, this.n);
   }
-
-  _stop(): void {
-    this.ins._remove(this);
-    this.out = null;
-    this.taken = 0;
+  started(sink: Sink<A, B>) {
+    this.n === 0 && sink.end(none);
   }
+}
 
-  _n(t: T) {
-    const out = this.out;
-    if (this.taken++ < this.max - 1) {
-      out._n(t);
-    } else {
-      out._n(t);
-      out._c();
-      this._stop();
+class TakeSink<A> extends BaseSink<A, A> {
+  private n: number;
+  constructor(sink: Sink<A, any>, n: number) {
+    super(sink);
+    this.n = n;
+  }
+  next(x: A): void {
+    switch (this.n) {
+      case 0: return;
+      case 1:
+        this.n--;
+        this.s.next(x);
+        this.s.end(none);
+        return;
+      default:
+        this.n-- && this.s.next(x);
     }
-  }
-
-  _e(err: any) {
-    this.out._e(err);
-  }
-
-  _c() {
-    this.out._c();
   }
 }
 
@@ -1513,7 +1508,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   take(amount: number): Stream<T> {
-    throw new Error("Not implemented yet");
+    return new Stream(new Take(this.source, amount));
   }
 
   /**
