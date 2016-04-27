@@ -1,7 +1,6 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
-/*
 describe('xs.fromArray', () => {
   it('should convert an array to a stream', (done) => {
     const stream = xs.fromArray([10, 20, 30, 40, 50])
@@ -20,4 +19,3 @@ describe('xs.fromArray', () => {
     });
   });
 });
-*/

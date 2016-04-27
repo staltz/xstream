@@ -522,6 +522,34 @@ class PeriodicProducer implements Source<number> {
   }
 }
 
+class CustomProducer<A> implements Source<A> {
+  private lis: Listener<A>;
+  private sink: Sink<A, any>;
+  constructor(private prod: Producer<A>) { 
+    this.sink = null;
+    this.lis = {
+      next: x => {
+        const s = this.sink;
+        try {
+          s && s.next(x);
+        } catch (err) {
+          handleError(err, s);
+        }
+      },
+      complete: () => this.sink && this.sink.end(none),
+      error: err => this.sink && this.sink.end(err)
+    };
+  }
+  start<B>(sink: Sink<A, B>): void {
+    this.sink = sink;
+    this.prod.start(this.lis);
+  }
+  stop<B>(sink: Sink<A, B>): void {
+    this.sink = null;
+    this.prod.stop();
+  }
+}
+
 export class DebugOperator<T> implements Operator<T, T> {
   private out: Stream<T> = null;
 
@@ -1223,7 +1251,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   static create<T>(producer?: Producer<T>): Stream<T> {
-    return new Stream(null);
+    return !producer ? Stream.empty() : new Stream(ident(new CustomProducer(producer)));
   }
 
   /**
@@ -1252,7 +1280,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   static never(): Stream<any> {
-    throw new Error("Not implemented yet");
+    return Stream.create({start: noop, stop: noop});
   }
 
   /**
@@ -1270,7 +1298,10 @@ export class Stream<T> {
    * @return {Stream}
    */
   static empty(): Stream<any> {
-    return new Stream(null);
+    return Stream.create({
+      start: lis => lis.complete(),
+      stop: noop
+    });
   }
 
   /**
@@ -1290,7 +1321,10 @@ export class Stream<T> {
    * @return {Stream}
    */
   static throw(error: any): Stream<any> {
-    throw new Error("Not implemented yet");
+    return Stream.create({
+      start: lis => lis.error(error),
+      stop: noop
+    });
   }
 
   /**
