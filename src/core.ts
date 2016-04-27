@@ -1,7 +1,10 @@
 import {Promise} from 'es6-promise';
 
+const none = {}; 
 const empty = {};
+
 function noop() {}
+
 
 export interface InternalListener<T> {
   _n: (v: T) => void;
@@ -39,6 +42,80 @@ export interface Listener<T> {
   complete: () => void;
 }
 
+
+
+
+export interface Sink<A, B> {
+  next(x: A): void;
+  end(err: any): void;
+  cleanup(): void;
+}
+
+// Source is same as Producer, just using different name to avoid conflicts for now
+export interface Source<A> {
+  start<T> (sink: Sink<A, T>): void;
+  stop<T> (sink: Sink<A, T>): void;
+}
+
+
+abstract class BaseSink<A, B> implements Sink<A, B> {
+  s: Sink<B, any>
+  constructor(sink: Sink<B, any>) {
+    this.s = sink;
+  }
+  abstract next(x: A): void 
+  
+  end(err: any): void {
+    this.s.end(err);
+  }
+  cleanup(): void {}
+}
+
+// Note that combinator is not actually operator because it doesn't do any calculation.
+// The purpose of combinator is just to combine operators and ensure that their
+// lifecycle is managed correctly
+abstract class Combinator<A, B> implements Source<B> {
+  source: Source<A>;
+  sink: Sink<A, B>;
+  next: Array<Sink<B, any>>;
+  
+  constructor(source: Source<A>) {
+    this.source = source;
+    this.sink = null;
+    this.next = [];
+  }
+  
+  abstract run(next: Sink<B, any>): Sink<A, B>
+  
+  start(next: Sink<B, any>): void {
+    if (this.sink === null) {
+      const s = this.sink = this.run(next);
+      this.next.push(next);
+      this.source.start(s);
+      // the combinator might already be stopped (-> this.sink == null) so we must check 
+      // it before invoking our started hook
+      this.sink && this.started(this.sink);
+    } else {
+      throw new Error("multicast not implemented yet")
+    }
+  }
+  
+  stop(sink: Sink<B, any>): void {
+    if (this.next.length === 1) {
+      const s = this.sink;
+      this.next = [];
+      this.sink = null;
+      s.cleanup();
+      this.source.stop(s);
+    } else {
+      throw new Error("multicast not implemented yet")
+    }
+  }
+  
+  started(sink: Sink<A, B>): void {
+    
+  }
+}
 // mutates the input
 function internalizeProducer<T>(producer: Producer<T>) {
   (<InternalProducer<T>> (<any> producer))._start =
@@ -977,20 +1054,18 @@ export class TakeOperator<T> implements Operator<T, T> {
   }
 }
 
-export class Stream<T> implements InternalListener<T> {
 
-  _n(t: T): void {
+declare type Subscription <T> = {
+  listener: Listener<T>;
+  observer: Observer<T>;
+}
+
+export class Stream<T> {
+  private _subs: Array<Subscription<T>>;
+  constructor(private source: Source<T>) {
+    this._subs = [];
   }
-
-  _e(err: any): void {
-  }
-
-  _c(): void {
-  }
-
-  _x(): void {
-  }
-
+ 
   /**
    * Adds a Listener to the Stream.
    *
