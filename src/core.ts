@@ -68,7 +68,9 @@ abstract class BaseSink<A, B> implements Sink<A, B> {
   end(err: any): void {
     this.s.end(err);
   }
-  cleanup(): void {}
+  cleanup(): void {
+    this.s = null;
+  }
 }
 
 // Note that combinator is not actually operator because it doesn't do any calculation.
@@ -105,16 +107,14 @@ abstract class Combinator<A, B> implements Source<B> {
       const s = this.sink;
       this.next = [];
       this.sink = null;
-      s.cleanup();
       this.source.stop(s);
+      s.cleanup();
     } else {
       throw new Error("multicast not implemented yet")
     }
   }
   
-  started(sink: Sink<A, B>): void {
-    
-  }
+  started(sink: Sink<A, B>): void { }
 }
 
 // this identity combinator is needed for our sources (producers) so that
