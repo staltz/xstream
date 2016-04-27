@@ -1,4 +1,4 @@
-var xstream = require('./lib/index').default;
+var xstream = require('./index').default;
 
 function noop () {}
 

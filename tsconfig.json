@@ -9,7 +9,7 @@
     "module": "commonjs",
     "noEmitHelpers": false,
     "target": "ES5",
-    "outDir": "lib/"
+    "outDir": "./"
   },
   "formatCodeOptions": {
     "indentSize": 2,

@@ -1,4 +1,4 @@
-var xs = require('../lib/index').default;
+var xs = require('../index').default;
 
 var stream = xs.periodic(1000)
   .take(10)

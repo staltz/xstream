@@ -1,5 +1,5 @@
 var Benchmark = require('benchmark');
-var xs = require('../lib/index').default;
+var xs = require('../index').default;
 var most = require('most');
 var rx = require('rx');
 var rxjs = require('@reactivex/rxjs')

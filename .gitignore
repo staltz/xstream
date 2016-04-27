@@ -23,8 +23,16 @@ coverage
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
 
+# Generated code
+core.d.ts
+core.js
+core.js.map
+index.d.ts
+index.js
+index.js.map
+extra/
+
 # Generated directories
-lib/
 .sass-cache/
 _site/
 

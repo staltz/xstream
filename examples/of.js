@@ -1,4 +1,4 @@
-var xs = require('../lib/index').default;
+var xs = require('../index').default;
 
 var stream = xs.of(10, 20, 30, 40, 41, 42);
 
