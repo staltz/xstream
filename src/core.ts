@@ -805,42 +805,31 @@ export class FoldOperator<T, R> implements Operator<T, R> {
   }
 }
 
-export class LastOperator<T> implements Operator<T, T> {
-  private out: Stream<T> = null;
-  private has: boolean = false;
-  private val: T = <T> empty;
-
-  constructor(public ins: Stream<T>) {
+class Last<A, B> extends Combinator<A, A> {
+  constructor(source: Source<A>) {
+    super(source);
   }
-
-  _start(out: Stream<T>): void {
-    this.out = out;
-    this.ins._add(this);
+  run(next: Sink<A, any>) {
+    return new LastSink(next);
   }
+}
 
-  _stop(): void {
-    this.ins._remove(this);
-    this.out = null;
-    this.has = false;
-    this.val = <T> empty;
+class LastSink<A> extends BaseSink<A, A> {
+  private val: A;
+  constructor(sink: Sink<A, any>) {
+    super(sink);
+    this.val = none as A;
   }
-
-  _n(t: T) {
-    this.has = true;
-    this.val = t;
+  next(x: A): void {
+    this.val = x;
   }
-
-  _e(err: any) {
-    this.out._e(err);
-  }
-
-  _c() {
-    const out = this.out;
-    if (this.has) {
-      out._n(this.val);
-      out._c();
+  end(err: any): void {
+    if (err !== none) {
+      this.s.end(err);
     } else {
-      out._e('TODO show proper error');
+      let v: A;
+      (v = this.val) !== none && this.s.next(v);
+      this.s && this.s.end(none);
     }
   }
 }
@@ -1547,7 +1536,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   last(): Stream<T> {
-    throw new Error("Not implemented yet");
+    return new Stream(new Last(this.source));
   }
 
   /**

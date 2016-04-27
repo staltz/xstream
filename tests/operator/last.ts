@@ -1,7 +1,6 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
-/*
 describe('Stream.prototype.last', () => {
   it('should emit only the last value from a stream', (done) => {
     const expected = [50];
@@ -20,4 +19,3 @@ describe('Stream.prototype.last', () => {
     stream.addListener(listener);
   });
 });
-*/
