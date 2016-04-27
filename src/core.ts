@@ -5,6 +5,20 @@ const empty = {};
 
 function noop() {}
 
+class Deferred { 
+  private t: any
+  constructor(task: () => void) {
+    this.t = setTimeout(task, 0);
+  }
+  cancel() {
+    let t: any;
+    (t = this.t) && clearTimeout(t) && (this.t = null);
+  }
+}
+
+function defer(task: () => void): Deferred {
+  return new Deferred(task);
+}
 
 export interface InternalListener<T> {
   _n: (v: T) => void;
@@ -186,13 +200,14 @@ class Observer<T> implements Sink<T, T> {
     // Stop is called only ONCE (when user removes listener). However, subscription might be
     // completed before that, hence activity check 
     if (!this.a) return; 
-    this.c = true;        // ensure that this observer don't emit next events anymore
+    // ensure that this observer don't emit next events anymore
+    this.c = true;        
     // we don't need to care about this deferred task anymore
-    setTimeout(() => {
+    defer(() => {
       if (!this.a) return;
       this.a && this.source.stop(this)
       this.a = false;
-    }, 0);
+    });
   }
   next(x: T): void {
     !this.c && this.lis.next(x);
@@ -1022,40 +1037,69 @@ export class MapToOperator<T, R> implements Operator<T, R> {
   }
 }
 
-export class ReplaceErrorOperator<T> implements Operator<T, T> {
-  private out: Stream<T> = <Stream<T>> empty;
-
-  constructor(public fn: (err: any) => Stream<T>,
-              public ins: Stream<T>) {
+class ReplaceErrorUnicast<A, B> extends Combinator<A, A> {
+  constructor(source: Source<A>, private fn: (err: any) => Stream<A>) {
+    super(source);
   }
-
-  _start(out: Stream<T>): void {
-    this.out = out;
-    this.ins._add(this);
+  run(next: Sink<A, any>) {
+    return new ReplaceErrorSink(next, this.source, this.fn);
   }
-
-  _stop(): void {
-    this.ins._remove(this);
-    this.out = null;
-  }
-
-  _n(t: T) {
-    this.out._n(t);
-  }
-
-  _e(err: any) {
-    try {
-      this.ins._remove(this);
-      (this.ins = this.fn(err))._add(this);
-    } catch (e) {
-      this.out._e(e);
-    }
-  }
-
-  _c() {
-    this.out._c();
+  stop(_: Sink<A, B>) {
+    const s = this.sink as ReplaceErrorSink<A>;
+    this.next = [];
+    this.sink = null;
+    s.cleanup();
   }
 }
+
+class ReplaceError<A, B> extends Combinator<A, A> {
+  constructor(source: Source<A>, fn: (err: any) => Stream<A>) {
+    super(new ReplaceErrorUnicast(source, fn));
+  }
+  run(next: Sink<A, any>) {
+    return next;
+  }
+}
+
+class ReplaceErrorSink<A> extends BaseSink<A, A> {
+  private d: Deferred;
+  constructor(sink: Sink<A, any>, private source: Source<A>, private fn: (err: any) => Stream<A>) {
+    super(sink);
+    this.d = null;
+  }
+  next(x: A): void {
+    this.s.next(x);
+  }
+  end(err: any): void {
+    if (err === none) {
+      this.s.end(none);
+    } else {
+      this.source.stop(this);
+      this.source = null;
+      try {
+        const next = this.fn(err).source;
+        this.d && this.d.cancel();
+        this.d = defer(() => {
+          this.d = null;
+          (this.source = next).start(this);
+        });
+      } catch (err) {
+        this.s.end(err);
+      }
+    }
+  }
+  cleanup(): void {
+    const src = this.source;
+    this.d && this.d.cancel() && (this.d = null);
+    this.source = null;
+    src && src.stop(this);
+    super.cleanup();
+  }
+  handlers(): Array<Sink<any, any>> {
+    return [ this ];
+  }
+}
+
 
 export class StartWithOperator<T> implements InternalProducer<T> {
   private out: InternalListener<T> = emptyListener;
@@ -1118,7 +1162,7 @@ declare type Subscription <T> = {
 
 export class Stream<T> {
   private _subs: Array<Subscription<T>>;
-  constructor(private source: Source<T>) {
+  constructor(public source: Source<T>) {
     this._subs = [];
   }
  
@@ -1614,7 +1658,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   replaceError(replace: (err: any) => Stream<T>): Stream<T> {
-    throw new Error("Not implemented yet");
+    return new Stream(new ReplaceError(this.source, replace));
   }
 
   /**

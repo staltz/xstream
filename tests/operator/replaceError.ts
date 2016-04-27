@@ -1,7 +1,6 @@
 import xs, {Producer} from '../../src/index';
 import * as assert from 'assert';
 
-/*
 describe('Stream.prototype.replaceError', () => {
   it('should replace a single error with an array stream', (done) => {
     const source = xs.of<any>('a', 'b', 'c', 2, 'd').map(i => i.toLowerCase());
@@ -129,4 +128,3 @@ describe('Stream.prototype.replaceError', () => {
     });
   });
 });
-*/
