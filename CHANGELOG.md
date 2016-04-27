@@ -1,3 +1,19 @@
+<a name="2.0.0"></a>
+# [2.0.0](https://github.com/staltz/xstream/compare/v1.1.1...v2.0.0) (2016-04-27)
+
+
+### Bug Fixes
+
+* **package:** put extra operators in xstream/extra ([2735a74](https://github.com/staltz/xstream/commit/2735a74))
+
+
+### BREAKING CHANGES
+
+* package: Import extra operators from xstream/extra/the-operator-you-want not from
+xstream/lib/extra/the-operator-you-want
+
+
+
 <a name="1.1.1"></a>
 ## [1.1.1](https://github.com/staltz/xstream/compare/v1.1.0...v1.1.1) (2016-04-27)
 
