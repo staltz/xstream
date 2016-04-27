@@ -1167,9 +1167,12 @@ export class Stream<T> {
    * @param {Listener<T>} listener
    */
   addListener(listener: Listener<T>): void {
-    (<InternalListener<T>> (<any> listener))._n = listener.next;
-    (<InternalListener<T>> (<any> listener))._e = listener.error;
-    (<InternalListener<T>> (<any> listener))._c = listener.complete;
+    const s: Subscription<T> = {
+      listener,
+      observer: new Observer(this.source, listener)
+    };
+    this._subs.push(s);
+    s.observer.start();
   }
 
   /**
@@ -1178,6 +1181,26 @@ export class Stream<T> {
    * @param {Listener<T>} listener
    */
   removeListener(listener: Listener<T>): void {
+    for (let i = 0; i < this._subs.length; i++) {
+      const s = this._subs[i];
+      if (s.listener === listener) {
+        s.observer.stop();
+        this._subs.splice(i, 1);
+        return;
+      }
+    }
+  }
+  
+  _n(t: T): void {
+  }
+
+  _e(err: any): void {
+  }
+
+  _c(): void {
+  }
+
+  _x(): void {
   }
 
   _add(il: InternalListener<T>): void {
