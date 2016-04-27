@@ -141,6 +141,71 @@ function ident<T>(source: Source<T>): Source<T> {
   return new Identity(source);
 }
 
+
+// Observer is the last step that is 100% in our control in our subscription 
+// chain. Its task is to ensure that subscriptions are disposed immediately if 
+// the underlying producer ends/errors and to defer disposal if dispose is called
+// by the userland code (listener)
+class Observer<T> implements Sink<T, T> {
+  private lis: Listener<T>;
+  private source: Source<T>;
+  private c: boolean;   // completed
+  private a: boolean;   // activated
+  constructor(source: Source<T>, l: Listener<T>) {
+    this.c = this.a = false;
+    this.lis = l;
+    this.source = source;
+  }
+  // Start is called only once during Observer's lifecycle, hence we're not doing
+  // any futher checks
+  start(): void {
+    this.source.start(this);
+    if (this.c) {
+      // Subscription might complete synchronously right after start, so we must
+      // handle disposal in this case 
+      this.source.stop(this);
+      this.source = null;
+    } else {
+      // Otherwise the subscription is still on - let's mark it active so that the 
+      // observer can deal the disposal when the subscription ends
+      this.a = true;
+    }
+  }
+  stop(): void {
+    // Stop is called only ONCE (when user removes listener). However, subscription might be
+    // completed before that, hence activity check 
+    if (!this.a) return; 
+    this.c = true;        // ensure that this observer don't emit next events anymore
+    // we don't need to care about this deferred task anymore
+    setTimeout(() => {
+      if (!this.a) return;
+      this.a && this.source.stop(this)
+      this.a = false;
+    }, 0);
+  }
+  next(x: T): void {
+    !this.c && this.lis.next(x);
+  }
+  end(err: any): void {
+    err !== none ? this.lis.error(err) : this.lis.complete();
+    this.lis = null; 
+    this.c = true;
+    // end signal might arrive before the startup completed, thus we must check
+    // the active status here before stopping the producer
+    if (this.a) {
+      this.a = false;
+      this.source.stop(this);
+    }
+  }
+  cleanup(): void { 
+    this.source = null;
+    this.lis = null;
+  }
+}
+
+
+
+
 // mutates the input
 function internalizeProducer<T>(producer: Producer<T>) {
   (<InternalProducer<T>> (<any> producer))._start =
