@@ -952,13 +952,14 @@ export class TakeOperator<T> implements Operator<T, T> {
   }
 
   _stop(): void {
-    this.ins._remove(this);
+    setTimeout(() => { this.ins._remove(this); }, 0);
     this.out = null;
     this.taken = 0;
   }
 
   _n(t: T) {
     const out = this.out;
+    if (!out) return;
     if (this.taken++ < this.max - 1) {
       out._n(t);
     } else {
@@ -969,11 +970,15 @@ export class TakeOperator<T> implements Operator<T, T> {
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const out = this.out;
+    if (!out) return;
+    out._e(err);
   }
 
   _c() {
-    this.out._c();
+    const out = this.out;
+    if (!out) return;
+    out._c();
   }
 }
 

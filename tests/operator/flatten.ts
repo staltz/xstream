@@ -1,4 +1,4 @@
-import xs from '../../src/index';
+import xs, {Stream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.flatten', () => {
@@ -22,14 +22,14 @@ describe('Stream.prototype.flatten', () => {
     });
 
     it('should expand 3 sync events as a periodic, only last one passes', (done) => {
-      const stream = xs.fromArray([0, 1, 2])
+      const stream = xs.fromArray([1, 2, 3])
         .map(i => xs.periodic(100 * i).take(2).map(x => `${i}${x}`))
         .flatten();
       // ---x---x---x---x---x---x
-      // ---00--01
-      // -------10------11
-      // -----------20----------21
-      const expected = ['20', '21'];
+      // ---10--11
+      // -------20------21
+      // -----------30----------31
+      const expected = ['30', '31'];
       const listener = {
         next: (x: number) => {
           assert.equal(x, expected.shift());

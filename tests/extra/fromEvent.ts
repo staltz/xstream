@@ -64,18 +64,16 @@ describe('fromEvent (extra)', () => {
 
     let expected = [1, 2, 3];
 
-    const listener = {
-      next(x: any) {
+    stream.addListener({
+      next: (x: any) => {
         assert.strictEqual(x, expected.shift());
       },
-      error: done,
+      error: (err: any) => done(err),
       complete: () => {
         assert.strictEqual(expected.length, 0);
         done();
       }
-    };
-
-    stream.addListener(listener);
+    });
 
     target.emit(1);
     target.emit(2);
@@ -88,8 +86,8 @@ describe('fromEvent (extra)', () => {
     const stream = fromEvent(target, 'test', true);
 
     stream.take(1).addListener({
-      next(x) {},
-      error: done,
+      next: (x) => {},
+      error: (err: any) => done(err),
       complete() {
         setTimeout(() => {
           assert.strictEqual('test', target.removedEvent);

@@ -41,14 +41,14 @@ describe('flattenSequentially (extra)', () => {
     });
 
     it('should expand 3 sync events as a periodic each', (done) => {
-      const stream = xs.of(0, 1, 2)
+      const stream = xs.of(1, 2, 3)
         .map(i => xs.periodic(100 * i).take(2).map(x => `${i}${x}`))
         .compose(flattenSequentially());
       // ---x---x---x---x---x---x
-      // ---00--01
-      //         -------10------11
-      //                         -----------20----------21
-      const expected = ['00', '01', '10', '11', '20', '21'];
+      // ---10--11
+      //         -------20------21
+      //                         -----------30----------31
+      const expected = ['10', '11', '20', '21', '30', '31'];
       const listener = {
         next: (x: number) => {
           assert.equal(x, expected.shift());

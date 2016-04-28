@@ -11,11 +11,11 @@ describe('Stream.prototype.endWhen', () => {
 
     stream.addListener({
       next: (x: number) => {
-        assert.equal(x, expected.shift());
+        assert.strictEqual(x, expected.shift());
       },
       error: (err: any) => done(err),
       complete: () => {
-        assert.equal(expected.length, 0);
+        assert.strictEqual(expected.length, 0);
         done();
       },
     });
@@ -29,11 +29,11 @@ describe('Stream.prototype.endWhen', () => {
 
     stream.addListener({
       next: (x: number) => {
-        assert.equal(x, expected.shift());
+        assert.strictEqual(x, expected.shift());
       },
       error: (err: any) => done(err),
       complete: () => {
-        assert.equal(expected.length, 0);
+        assert.strictEqual(expected.length, 0);
         done();
       },
     });
