@@ -989,6 +989,20 @@ A: Read this [blog post](http://staltz.com/why-we-built-xstream.html) on the top
 **License:** MIT
 
 # CHANGELOG
+<a name="2.0.2"></a>
+## [2.0.2](https://github.com/staltz/xstream/compare/v2.0.1...v2.0.2) (2016-04-28)
+
+
+### Bug Fixes
+
+* **filter:** fix filter fusion logic. ([8c417f9](https://github.com/staltz/xstream/commit/8c417f9))
+
+### Performance Improvements
+
+* **Stream:** improve way of fixing ils array concurrency ([accd2d0](https://github.com/staltz/xstream/commit/accd2d0))
+
+
+
 <a name="2.0.1"></a>
 ## [2.0.1](https://github.com/staltz/xstream/compare/v2.0.0...v2.0.1) (2016-04-28)
 
