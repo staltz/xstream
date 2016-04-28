@@ -3,6 +3,15 @@ import {Promise} from 'es6-promise';
 const empty = {};
 function noop() {}
 
+function copy<T>(a: Array<T>): Array<T> {
+  const l = a.length;
+  const b = Array(l);
+  for (let i = 0; i < l; ++i) {
+    b[i] = a[i];
+  }
+  return b;
+}
+
 export interface InternalListener<T> {
   _n: (v: T) => void;
   _e: (err: any) => void;
@@ -952,7 +961,7 @@ export class TakeOperator<T> implements Operator<T, T> {
   }
 
   _stop(): void {
-    setTimeout(() => { this.ins._remove(this); }, 0);
+    this.ins._remove(this);
     this.out = null;
     this.taken = 0;
   }
@@ -994,38 +1003,32 @@ export class Stream<T> implements InternalListener<T> {
 
   _n(t: T): void {
     const a = this._ils;
-    const len = a.length;
-    if (len === 1) {
-      a[0]._n(t);
-    } else {
-      for (let i = 0; i < len; i++) {
-        a[i]._n(t);
-      }
+    const L = a.length;
+    if (L == 1) a[0]._n(t);
+    else {
+      const b = copy(a);
+      for (let i = 0; i < L; i++) b[i]._n(t);
     }
   }
 
   _e(err: any): void {
     const a = this._ils;
-    const len = a.length;
-    if (len === 1) {
-      a[0]._e(err);
-    } else {
-      for (let i = 0; i < len; i++) {
-        a[i]._e(err);
-      }
+    const L = a.length;
+    if (L == 1) a[0]._e(err);
+    else {
+      const b = copy(a);
+      for (let i = 0; i < L; i++) b[i]._e(err);
     }
     this._x();
   }
 
   _c(): void {
     const a = this._ils;
-    const len = a.length;
-    if (len === 1) {
-      a[0]._c();
-    } else {
-      for (let i = 0; i < len; i++) {
-        a[i]._c();
-      }
+    const L = a.length;
+    if (L == 1) a[0]._c();
+    else {
+      const b = copy(a);
+      for (let i = 0; i < L; i++) b[i]._c();
     }
     this._x();
   }
