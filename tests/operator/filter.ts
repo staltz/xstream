@@ -56,4 +56,26 @@ describe('Stream.prototype.filter', () => {
     assert.strictEqual(stream['_prod']['out'], null);
     done();
   });
+
+  it('should allow multiple filters to be fused', (done) => {
+    const isEven = (x: number) => x % 2 === 0;
+    const isGreaterThan5 = (x: number) => x > 5;
+
+    const stream = xs.of(1, 2, 3, 4, 5, 6, 7, 8)
+      .filter(isEven)
+      .filter(isGreaterThan5);
+
+    const expected = [6, 8];
+
+    stream.addListener({
+      next(x: number) {
+        assert.strictEqual(x, expected.shift());
+      },
+      error: (err: any) => done(err),
+      complete() {
+        assert.strictEqual(expected.length, 0);
+        done();
+      }
+    });
+  });
 });
