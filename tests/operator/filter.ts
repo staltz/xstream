@@ -58,8 +58,8 @@ describe('Stream.prototype.filter', () => {
   });
 
   it('should allow multiple filters to be fused', (done) => {
-    const isEven = x => x % 2 === 0;
-    const isGreaterThan5 = x => x > 5;
+    const isEven = (x: number) => x % 2 === 0;
+    const isGreaterThan5 = (x: number) => x > 5;
 
     const stream = xs.of(1, 2, 3, 4, 5, 6, 7, 8)
       .filter(isEven)
