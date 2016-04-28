@@ -232,7 +232,7 @@ Creates a new Stream given a Producer.
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -246,7 +246,7 @@ Creates a new MemoryStream given a Producer.
 
 #### Return:
 
-*(MemoryStream)*
+*(MemoryStream)* 
 
 - - -
 
@@ -263,7 +263,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -281,7 +281,7 @@ empty
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -304,7 +304,7 @@ throw(X)
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -327,7 +327,7 @@ of(1,2,3)
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -349,7 +349,7 @@ fromArray([1,2,3])
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -372,7 +372,7 @@ fromPromise( ----42 )
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -394,7 +394,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -422,7 +422,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -458,7 +458,7 @@ streams.
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -498,7 +498,7 @@ streams.
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -542,7 +542,7 @@ be emitted on the output Stream.
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -565,7 +565,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -592,7 +592,7 @@ boolean.
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -615,7 +615,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -639,7 +639,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -658,7 +658,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -681,7 +681,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -707,7 +707,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -742,7 +742,7 @@ input stream and produces the new accumulated value.
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -772,7 +772,7 @@ that this function returns.
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -802,7 +802,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -832,7 +832,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -858,7 +858,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -876,7 +876,7 @@ Instead of writing `outStream = f(inStream)` you can write
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -888,7 +888,7 @@ added listener will immediately receive that memorised event.
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -934,7 +934,7 @@ Marble diagram:
 
 #### Return:
 
-*(Stream)*
+*(Stream)* 
 
 - - -
 
@@ -989,6 +989,16 @@ A: Read this [blog post](http://staltz.com/why-we-built-xstream.html) on the top
 **License:** MIT
 
 # CHANGELOG
+<a name="2.0.1"></a>
+## [2.0.1](https://github.com/staltz/xstream/compare/v2.0.0...v2.0.1) (2016-04-28)
+
+
+### Bug Fixes
+
+* **take:** fix take() behavior when stopping ([438fc0f](https://github.com/staltz/xstream/commit/438fc0f))
+
+
+
 <a name="2.0.0"></a>
 # [2.0.0](https://github.com/staltz/xstream/compare/v1.1.1...v2.0.0) (2016-04-27)
 
@@ -1133,3 +1143,6 @@ xstream/lib/extra/the-operator-you-want
 ### Reverts
 
 * **takeUntil:** revert takeUntil implementation ([6f62fc1](https://github.com/staltz/xstream/commit/6f62fc1))
+
+
+
