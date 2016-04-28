@@ -57,13 +57,15 @@ export interface Listener<T> {
 }
 
 
-
+export interface ErrorHandler {
+  error(err: any): void;
+}
 
 export interface Sink<A, B> {
   next(x: A): void;
-  end(err: any): void;
+  end(): void;
   cleanup(): void;
-  handlers(): Array<Sink<any, any>>;
+  handler(): ErrorHandler;
 }
 
 // Source is same as Producer, just using different name to avoid conflicts for now
@@ -80,22 +82,19 @@ abstract class BaseSink<A, B> implements Sink<A, B> {
   }
   abstract next(x: A): void 
   
-  end(err: any): void {
-    this.s.end(err);
+  end(): void {
+    this.s.end();
   }
   cleanup(): void {
     this.s = null;
   }
-  handlers(): Array<Sink<any, any>> {
-    return this.s.handlers();
+  handler(): ErrorHandler {
+    return this.s.handler();
   }
 }
 
 function handleError(err: any, sink: Sink<any, any>): void {
-  const handlers = sink.handlers(), n = handlers.length;
-  for (let i = 0; i < n; i++) {
-    handlers[i].end(err);
-  }
+  sink.handler().error(err);
 }
 
 // Note that combinator is not actually operator because it doesn't do any calculation.
@@ -171,7 +170,7 @@ function ident<T>(source: Source<T>): Source<T> {
 // chain. Its task is to ensure that subscriptions are disposed immediately if 
 // the underlying producer ends/errors and to defer disposal if dispose is called
 // by the userland code (listener)
-class Observer<T> implements Sink<T, T> {
+class Observer<T> implements Sink<T, T>, ErrorHandler {
   private lis: Listener<T>;
   private source: Source<T>;
   private c: boolean;   // completed
@@ -212,12 +211,23 @@ class Observer<T> implements Sink<T, T> {
   next(x: T): void {
     !this.c && this.lis.next(x);
   }
-  end(err: any): void {
+  error(err: any) {
     try {
-      err !== none ? this.lis.error(err) : this.lis.complete();  
+      this.lis.error(err);
     } catch (e) {
       console.error(e);
     }
+    this._stop();
+  }
+  end(): void {
+    try {
+      this.lis.complete();
+    } catch (e) {
+      console.error(e);
+    }
+    this._stop();
+  }
+  _stop(): void {
     this.lis = null; 
     this.c = true;
     // end signal might arrive before the startup completed, thus we must check
@@ -231,8 +241,8 @@ class Observer<T> implements Sink<T, T> {
     this.source = null;
     this.lis = null;
   }
-  handlers(): Array<Sink<any, any>> {
-    return [ this ];
+  handler(): ErrorHandler {
+    return this;
   }
 }
 
@@ -416,7 +426,7 @@ export class FromArrayProducer<T> implements Source<T> {
       for (i = 0; i < n && self.active; i++) {
         sink.next(arr[i]);
       } 
-      self.active && sink.end(none);
+      self.active && sink.end();
       self.active = false;  
     }
     try {
@@ -536,8 +546,8 @@ class CustomProducer<A> implements Source<A> {
           handleError(err, s);
         }
       },
-      complete: () => this.sink && this.sink.end(none),
-      error: err => this.sink && this.sink.end(err)
+      complete: () => this.sink && this.sink.end(),
+      error: err => this.sink && handleError(err, this.sink)
     };
   }
   start<B>(sink: Sink<A, B>): void {
@@ -865,14 +875,10 @@ class LastSink<A> extends BaseSink<A, A> {
   next(x: A): void {
     this.val = x;
   }
-  end(err: any): void {
-    if (err !== none) {
-      this.s.end(err);
-    } else {
-      let v: A;
-      (v = this.val) !== none && this.s.next(v);
-      this.s && this.s.end(none);
-    }
+  end(): void {
+    let v: A;
+    (v = this.val) !== none && this.s.next(v);
+    this.s && this.s.end();
   }
 }
 
@@ -1065,6 +1071,8 @@ export class MapToOperator<T, R> implements Operator<T, R> {
   }
 }
 
+// we know that this combinator is always unicast so we can override the stop
+// function without knowing anything about multicast or its implementation details
 class ReplaceErrorUnicast<A, B> extends Combinator<A, A> {
   constructor(source: Source<A>, private fn: (err: any) => Stream<A>) {
     super(source);
@@ -1089,31 +1097,24 @@ class ReplaceError<A, B> extends Combinator<A, A> {
   }
 }
 
-class ReplaceErrorSink<A> extends BaseSink<A, A> {
+class ReplaceErrorSink<A> extends IdentitySink<A> implements ErrorHandler {
   private d: Deferred;
   constructor(sink: Sink<A, any>, private source: Source<A>, private fn: (err: any) => Stream<A>) {
     super(sink);
     this.d = null;
   }
-  next(x: A): void {
-    this.s.next(x);
-  }
-  end(err: any): void {
-    if (err === none) {
-      this.s.end(none);
-    } else {
-      this.source.stop(this);
-      this.source = null;
-      try {
-        const next = this.fn(err).source;
-        this.d && this.d.cancel();
-        this.d = defer(() => {
-          this.d = null;
-          (this.source = next).start(this);
-        });
-      } catch (err) {
-        this.s.end(err);
-      }
+  error(err: any): void {
+    this.source.stop(this);
+    this.source = null;
+    try {
+      const next = this.fn(err).source;
+      this.d && this.d.cancel();
+      this.d = defer(() => {
+        this.d = null;
+        (this.source = next).start(this);
+      });
+    } catch (err) {
+      handleError(err, this.s);
     }
   }
   cleanup(): void {
@@ -1123,8 +1124,8 @@ class ReplaceErrorSink<A> extends BaseSink<A, A> {
     src && src.stop(this);
     super.cleanup();
   }
-  handlers(): Array<Sink<any, any>> {
-    return [ this ];
+  handler(): ErrorHandler {
+    return this;
   }
 }
 
@@ -1158,7 +1159,7 @@ class Take<A, B> extends Combinator<A, A> {
     return new TakeSink(next, this.n);
   }
   started(sink: Sink<A, B>) {
-    this.n === 0 && sink.end(none);
+    this.n === 0 && sink.end();
   }
 }
 
@@ -1174,7 +1175,7 @@ class TakeSink<A> extends BaseSink<A, A> {
       case 1:
         this.n--;
         this.s.next(x);
-        this.s.end(none);
+        this.s.end();
         return;
       default:
         this.n-- && this.s.next(x);
