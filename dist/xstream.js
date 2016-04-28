@@ -7,6 +7,14 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var empty = {};
 function noop() { }
+function copy(a) {
+    var l = a.length;
+    var b = Array(l);
+    for (var i = 0; i < l; ++i) {
+        b[i] = a[i];
+    }
+    return b;
+}
 var emptyListener = {
     _n: noop,
     _e: noop,
@@ -37,6 +45,11 @@ function invoke(f, args) {
 function compose2(f1, f2) {
     return function composedFn(arg) {
         return f1(f2(arg));
+    };
+}
+function and(f1, f2) {
+    return function andFn(t) {
+        return f1(t) && f2(t);
     };
 }
 var CombineListener = (function () {
@@ -794,8 +807,7 @@ var TakeOperator = (function () {
         this.ins._add(this);
     };
     TakeOperator.prototype._stop = function () {
-        var _this = this;
-        setTimeout(function () { _this.ins._remove(_this); }, 0);
+        this.ins._remove(this);
         this.out = null;
         this.taken = 0;
     };
@@ -844,39 +856,36 @@ var Stream = (function () {
     }
     Stream.prototype._n = function (t) {
         var a = this._ils;
-        var len = a.length;
-        if (len === 1) {
+        var L = a.length;
+        if (L == 1)
             a[0]._n(t);
-        }
         else {
-            for (var i = 0; i < len; i++) {
-                a[i]._n(t);
-            }
+            var b = copy(a);
+            for (var i = 0; i < L; i++)
+                b[i]._n(t);
         }
     };
     Stream.prototype._e = function (err) {
         var a = this._ils;
-        var len = a.length;
-        if (len === 1) {
+        var L = a.length;
+        if (L == 1)
             a[0]._e(err);
-        }
         else {
-            for (var i = 0; i < len; i++) {
-                a[i]._e(err);
-            }
+            var b = copy(a);
+            for (var i = 0; i < L; i++)
+                b[i]._e(err);
         }
         this._x();
     };
     Stream.prototype._c = function () {
         var a = this._ils;
-        var len = a.length;
-        if (len === 1) {
+        var L = a.length;
+        if (L == 1)
             a[0]._c();
-        }
         else {
-            for (var i = 0; i < len; i++) {
-                a[i]._c();
-            }
+            var b = copy(a);
+            for (var i = 0; i < L; i++)
+                b[i]._c();
         }
         this._x();
     };
@@ -1009,14 +1018,8 @@ var Stream = (function () {
     
     Stream.prototype.filter = function (passes) {
         var p = this._prod;
-        if (p instanceof MapOperator) {
-            return new Stream(new FilterMapOperator(passes, p.project, p.ins));
-        }
-        if (p instanceof FilterMapOperator) {
-            return new Stream(new FilterMapOperator(compose2(passes, p.passes), p.project, p.ins));
-        }
         if (p instanceof FilterOperator) {
-            return new Stream(new FilterOperator(compose2(passes, p.passes), p.ins));
+            return new Stream(new FilterOperator(and(passes, p.passes), p.ins));
         }
         return new Stream(new FilterOperator(passes, this));
     };
