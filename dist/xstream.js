@@ -794,12 +794,15 @@ var TakeOperator = (function () {
         this.ins._add(this);
     };
     TakeOperator.prototype._stop = function () {
-        this.ins._remove(this);
+        var _this = this;
+        setTimeout(function () { _this.ins._remove(_this); }, 0);
         this.out = null;
         this.taken = 0;
     };
     TakeOperator.prototype._n = function (t) {
         var out = this.out;
+        if (!out)
+            return;
         if (this.taken++ < this.max - 1) {
             out._n(t);
         }
@@ -810,10 +813,16 @@ var TakeOperator = (function () {
         }
     };
     TakeOperator.prototype._e = function (err) {
-        this.out._e(err);
+        var out = this.out;
+        if (!out)
+            return;
+        out._e(err);
     };
     TakeOperator.prototype._c = function () {
-        this.out._c();
+        var out = this.out;
+        if (!out)
+            return;
+        out._c();
     };
     return TakeOperator;
 }());
