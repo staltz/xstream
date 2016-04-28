@@ -78,6 +78,12 @@ function compose2<T, U>(f1: (t: T) => any, f2: (t: T) => any): (t: T) => any {
   };
 }
 
+function and<T>(f1: (t: T) => boolean, f2: (t: T) => boolean): (t: T) => boolean {
+  return function andFn(t: T): boolean {
+    return f1(t) && f2(t);
+  };
+}
+
 export interface CombineProjectFunction {
   <T1, T2, R>(v1: T1, v2: T2): R;
   <T1, T2, T3, R>(v1: T1, v2: T2, v3: T3): R;
@@ -1409,23 +1415,9 @@ export class Stream<T> implements InternalListener<T> {
    */
   filter(passes: (t: T) => boolean): Stream<T> {
     const p = this._prod;
-    if (p instanceof MapOperator) {
-      return new Stream<T>(new FilterMapOperator(
-        passes,
-        (<MapOperator<T, T>> p).project,
-        (<MapOperator<T, T>> p).ins
-      ));
-    }
-    if (p instanceof FilterMapOperator) {
-      return new Stream<T>(new FilterMapOperator(
-        compose2(passes, (<FilterMapOperator<T, T>> p).passes),
-        (<FilterMapOperator<T, T>> p).project,
-        (<FilterMapOperator<T, T>> p).ins
-      ));
-    }
     if (p instanceof FilterOperator) {
       return new Stream<T>(new FilterOperator(
-        compose2(passes, (<FilterOperator<T>> p).passes),
+        and(passes, (<FilterOperator<T>> p).passes),
         (<FilterOperator<T>> p).ins
       ));
     }
