@@ -1107,6 +1107,10 @@ export class Stream<T> implements InternalListener<T> {
    */
   static create<T>(producer?: Producer<T>): Stream<T> {
     if (producer) {
+      if (typeof producer.start !== 'function'
+      || typeof producer.stop !== 'function') {
+        throw new Error('producer requires both start and stop functions');
+      }
       internalizeProducer(producer); // mutates the input
     }
     return new Stream(<InternalProducer<T>> (<any> producer));

@@ -316,6 +316,22 @@ describe('Stream', () => {
     done();
   });
 
+  describe('create', () => {
+    it('throws a helpful error if you pass an incomplete producer', (done) => {
+      try {
+        const incompleteProducer = <Producer<any>> <any> {
+          start: () => {},
+          stop: undefined
+        };
+
+        xs.create(incompleteProducer);
+      } catch (e) {
+        assert.equal(e.message, 'producer requires both start and stop functions');
+        done();
+      }
+    });
+  });
+
   describe('addListener', () => {
     it('throws a helpful error if you forget the next function', (done) => {
       const stream = xs.empty();
