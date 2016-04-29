@@ -1089,11 +1089,16 @@ export class Stream<T> implements InternalListener<T> {
     const a = this._ils;
     const i = a.indexOf(il);
     if (i > -1) {
-      a.splice(i, 1);
-      const p = this._prod;
-      if (p && a.length <= 0) {
-        this._stopID = setTimeout(() => p._stop());
-      }
+      il._n = noop;
+      il._e = noop;
+      il._c = noop;
+      setTimeout(() => {
+        a.splice(i, 1);
+        const p = this._prod;
+        if (p && a.length <= 0) {
+          p._stop();
+        }
+      });
     }
   }
 
