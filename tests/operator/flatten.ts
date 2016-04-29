@@ -4,11 +4,12 @@ import * as assert from 'assert';
 describe('Stream.prototype.flatten', () => {
   describe('with map', () => {
     it('should expand each periodic event with 3 sync events', (done) => {
-      const stream = xs.periodic(100).take(3)
-        .map(i => xs.of(1 + i, 2 + i, 3 + i))
-        .flatten();
+      const source: Stream<Stream<number>> = xs.periodic(100).take(3)
+        .map((i: number) => xs.of(1 + i, 2 + i, 3 + i));
+      const stream: Stream<number> = source.flatten();
       const expected = [1, 2, 3, 2, 3, 4, 3, 4, 5];
-      const listener = {
+
+      stream.addListener({
         next: (x: number) => {
           assert.equal(x, expected.shift());
         },
@@ -17,8 +18,7 @@ describe('Stream.prototype.flatten', () => {
           assert.equal(expected.length, 0);
           done();
         }
-      };
-      stream.addListener(listener);
+      });
     });
 
     it('should expand 3 sync events as a periodic, only last one passes', (done) => {
