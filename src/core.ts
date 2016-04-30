@@ -1010,8 +1010,7 @@ export class Stream<T> implements InternalListener<T> {
   _n(t: T): void {
     const a = this._ils;
     const L = a.length;
-    if (L == 1) a[0]._n(t);
-    else {
+    if (L == 1) a[0]._n(t); else {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._n(t);
     }
@@ -1020,8 +1019,7 @@ export class Stream<T> implements InternalListener<T> {
   _e(err: any): void {
     const a = this._ils;
     const L = a.length;
-    if (L == 1) a[0]._e(err);
-    else {
+    if (L == 1) a[0]._e(err); else {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._e(err);
     }
@@ -1031,8 +1029,7 @@ export class Stream<T> implements InternalListener<T> {
   _c(): void {
     const a = this._ils;
     const L = a.length;
-    if (L == 1) a[0]._c();
-    else {
+    if (L == 1) a[0]._c(); else {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._c();
     }
