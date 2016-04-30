@@ -989,6 +989,16 @@ A: Read this [blog post](http://staltz.com/why-we-built-xstream.html) on the top
 **License:** MIT
 
 # CHANGELOG
+<a name="2.1.1"></a>
+## [2.1.1](https://github.com/staltz/xstream/compare/v2.1.0...v2.1.1) (2016-04-30)
+
+
+### Bug Fixes
+
+* **remember:** build safety against map+map fusion ([079602c](https://github.com/staltz/xstream/commit/079602c))
+
+
+
 <a name="2.1.0"></a>
 # [2.1.0](https://github.com/staltz/xstream/compare/v2.0.2...v2.1.0) (2016-04-30)
 
