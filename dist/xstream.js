@@ -1079,7 +1079,11 @@ var Stream = (function () {
     };
     
     Stream.prototype.remember = function () {
-        return new MemoryStream(this._prod);
+        var _this = this;
+        return new MemoryStream({
+            _start: function (il) { _this._prod._start(il); },
+            _stop: function () { _this._prod._stop(); },
+        });
     };
     
     Stream.prototype.imitate = function (other) {
