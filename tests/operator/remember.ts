@@ -22,4 +22,41 @@ describe('Stream.prototype.remember', () => {
       });
     }, 125);
   });
+
+  it('should not be ruined by map+map fusion optimizations', (done) => {
+    let expectedA = [10];
+    let expectedB = [10];
+
+    const source = xs.never().endWhen(xs.periodic(300))
+      .fold((acc, x) => acc + x, 10)
+      .map(x => x)
+      .remember();
+
+    // WOULD make a map+map fusion if remember()
+    // would just use its parent producer.
+    const streamA = source.map(x => x);
+
+    const streamB = source
+      .debug(x => { assert.strictEqual(x, expectedB.shift()); })
+
+    streamA.addListener({
+      next: (x: number) => {
+        assert.strictEqual(x, expectedA.shift());
+      },
+      error: noop,
+      complete: noop,
+    });
+
+    setTimeout(() => {
+      streamB.addListener({
+        next: noop,
+        error: done,
+        complete: () => {
+          assert.strictEqual(expectedA.length, 0);
+          assert.strictEqual(expectedB.length, 0);
+          done();
+        }
+      });
+    }, 100);
+  });
 });

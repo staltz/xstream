@@ -1738,7 +1738,10 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   remember(): Stream<T> {
-    return new MemoryStream<T>(this._prod);
+    return new MemoryStream<T>({
+      _start: (il: InternalListener<T>) => { this._prod._start(il); },
+      _stop: () => { this._prod._stop(); },
+    });
   }
 
   /**
