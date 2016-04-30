@@ -92,6 +92,7 @@ export interface ErrorHandler {
   error(err: any): void;
 }
 
+// generic unicast sink
 export interface Sink<A, B> {
   next(x: A): void;
   end(): void;
@@ -99,18 +100,24 @@ export interface Sink<A, B> {
   handler(): ErrorHandler;
 }
 
-// Source is same as Producer, just using different name to avoid conflicts for now
+// multicast capable sink interface
+export interface MSink<A, B> extends Sink<A, B> {
+  s: Sink<B, any>;
+}
+
+// source without multicasting
 export interface Source<A> {
   start<T> (sink: Sink<A, T>): void;
   stop<T> (sink: Sink<A, T>): void;
 }
 
-
-abstract class BaseSink<A, B> implements Sink<A, B> {
-  s: Sink<B, any>
+// basic abstract multicast-capable sink
+abstract class MCastSink<A, B> implements MSink<A, B> {
+  s: Sink<B, any>;
   constructor(sink: Sink<B, any>) {
     this.s = sink;
   }
+  
   abstract next(x: A): void 
   
   end(): void {
@@ -786,7 +793,7 @@ class Filter<A, B> extends Combinator<A, A> {
   }
 }
 
-class FilterSink<A> extends BaseSink<A, A> {
+class FilterSink<A> extends MCastSink<A, A> {
   constructor(sink: Sink<A, any>, private pred: (x: A) => boolean) {
     super(sink);
   }
@@ -877,7 +884,7 @@ class Fold<A, B> extends Combinator<A, B> {
   }
 }
 
-class FoldSink<A, B> extends BaseSink<A, B> {
+class FoldSink<A, B> extends MCastSink<A, B> {
   constructor(sink: Sink<B, any>, private acc: (s: B, a: A) => B, private val: B) {
     super(sink);
   }
@@ -897,7 +904,7 @@ class Last<A, B> extends Combinator<A, A> {
   }
 }
 
-class LastSink<A> extends BaseSink<A, A> {
+class LastSink<A> extends MCastSink<A, A> {
   private val: A;
   constructor(sink: Sink<A, any>) {
     super(sink);
@@ -1060,7 +1067,7 @@ class Map<A, B> extends Combinator<A, B> {
   }
 }
 
-class MapSink<A, B> extends BaseSink<A, B> {
+class MapSink<A, B> extends MCastSink<A, B> {
   constructor(sink: Sink<B, any>, private fn: (x: A) => B) {
     super(sink);
   }
@@ -1194,7 +1201,7 @@ class Take<A, B> extends Combinator<A, A> {
   }
 }
 
-class TakeSink<A> extends BaseSink<A, A> {
+class TakeSink<A> extends MCastSink<A, A> {
   private n: number;
   constructor(sink: Sink<A, any>, n: number) {
     super(sink);
