@@ -131,6 +131,17 @@ abstract class MCastSink<A, B> implements MSink<A, B> {
   }
 }
 
+// basic multicast-capable identity sink 
+class IdentitySink<A> extends MCastSink<A, A> {
+  constructor(sink: Sink<A, any>) {
+    super(sink);
+  }
+  next(x: A) {
+    this.s.next(x);
+  }
+}
+
+
 function handleError(err: any, sink: Sink<any, any>): void {
   sink.handler().error(err);
 }
@@ -229,27 +240,20 @@ export abstract class Combinator<A, B> implements Source<B> {
 
 // this identity combinator is needed for our sources (producers) so that
 // we can wrap the producers and don't need to think about their multicasting
-class Identity<A> extends Combinator<A, A> {
+class MulticastedIdentity<A> extends Combinator<A, A> {
   constructor(source: Source<A>) {
     super(source);
   }
-  run(next: Sink<A, any>) {
+  run(next: MSink<A, any>) {
     return new IdentitySink(next);
   }
 }
 
-class IdentitySink<A> extends BaseSink<A, A> {
-  constructor(sink: Sink<A, any>) {
-    super(sink);
-  }
-  next(x: A) {
-    this.s.next(x);
-  }
+function multicast<A>(source: Source<A>): Combinator<A, A> {
+  return new MulticastedIdentity(source);
 }
 
-function ident<T>(source: Source<T>): Source<T> {
-  return new Identity(source);
-}
+
 
 
 // Observer is the last step that is 100% in our control in our subscription 
@@ -1340,7 +1344,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   static create<T>(producer?: Producer<T>): Stream<T> {
-    return !producer ? Stream.empty() : new Stream(ident(new CustomProducer(producer)));
+    return !producer ? Stream.empty() : new Stream(multicast(new CustomProducer(producer)));
   }
 
   /**
@@ -1453,7 +1457,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   static fromArray<T>(array: Array<T>): Stream<T> {
-    return new Stream(ident(new FromArrayProducer(array)));
+    return new Stream(multicast(new FromArrayProducer(array)));
   }
 
   /**
@@ -1493,7 +1497,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   static periodic(period: number): Stream<number> {
-    return new Stream(ident(new PeriodicProducer(period)));
+    return new Stream(multicast(new PeriodicProducer(period)));
   }
 
   /**
