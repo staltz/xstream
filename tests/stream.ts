@@ -38,7 +38,6 @@ describe('Stream', () => {
     assert.equal(typeof stream.imitate, 'function');
     assert.equal(typeof stream.debug, 'function');
   });
-/*
   it('should be createable giving a custom producer object', (done) => {
     const expected = [10, 20, 30];
     let listenerGotEnd: boolean = false;
@@ -70,7 +69,7 @@ describe('Stream', () => {
     });
   });
 
-  it('should allow using shamefullySend* methods', (done) => {
+  /*it('should allow using shamefullySend* methods', (done) => {
     const expected = [10, 20, 30];
     let listenerGotEnd: boolean = false;
 
@@ -94,8 +93,8 @@ describe('Stream', () => {
     assert.equal(expected.length, 0);
     assert.equal(listenerGotEnd, true);
     done();
-  });
-
+  });*/
+/*
   it('should allow being imitated by a proxy Stream', (done) => {
     const stream = xs.periodic(100).take(3);
     const proxyStream = xs.create();
@@ -116,7 +115,7 @@ describe('Stream', () => {
 
     proxyStream.imitate(stream);
   });
-
+*/
   it('should be possible to addListener and removeListener with 1 listener', (done) => {
     const stream = xs.periodic(100);
     const expected = [0, 1, 2];
@@ -314,5 +313,5 @@ describe('Stream', () => {
     assert.equal(on, false);
     assert.equal(expected2.length, 0);
     done();
-  });*/
+  });
 });
