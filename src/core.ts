@@ -1736,9 +1736,9 @@ export class Stream<T> implements InternalListener<T> {
    * the most recent event that happens on the input stream, so that a newly
    * added listener will immediately receive that memorised event.
    *
-   * @return {Stream}
+   * @return {MemoryStream}
    */
-  remember(): Stream<T> {
+  remember(): MemoryStream<T> {
     return new MemoryStream<T>({
       _start: (il: InternalListener<T>) => { this._prod._start(il); },
       _stop: () => { this._prod._stop(); },
