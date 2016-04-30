@@ -1268,7 +1268,7 @@ declare type Subscription <T> = {
 
 export class Stream<T> {
   private _subs: Array<Subscription<T>>;
-  constructor(public source: Source<T>) {
+  constructor(public source: Combinator<any, T>) {
     this._subs = [];
   }
  
