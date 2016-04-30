@@ -274,57 +274,48 @@ class Observer<T> implements Sink<T, T>, ErrorHandler {
   // any futher checks
   start(): void {
     this.source.start(this);
+    this.a = true;
     if (this.c) {
-      // Subscription might complete synchronously right after start, so we must
-      // handle disposal in this case 
-      this.source.stop(this);
-      this.source = null;
-    } else {
-      // Otherwise the subscription is still on - let's mark it active so that the 
-      // observer can deal the disposal when the subscription ends
-      this.a = true;
+      this._stop();
     }
   }
   stop(): void {
-    // Stop is called only ONCE (when user removes listener). However, subscription might be
-    // completed before that, hence activity check 
     if (!this.a) return; 
-    // ensure that this observer don't emit next events anymore
     this.c = true;        
-    // we don't need to care about this deferred task anymore
     defer(() => {
-      if (!this.a) return;
-      this.a && this.source.stop(this)
-      this.a = false;
+      this._stop();
     });
   }
   next(x: T): void {
     !this.c && this.lis.next(x);
   }
   error(err: any) {
+    const lis = this.lis;
+    this.c = true;
+    this._stop();
     try {
-      this.lis.error(err);
+      lis.error(err);
     } catch (e) {
       console.error(e);
     }
-    this._stop();
   }
   end(): void {
+    const lis = this.lis;
+    this.c = true;
+    this._stop();
     try {
-      this.lis.complete();
+      lis.complete();
     } catch (e) {
       console.error(e);
     }
-    this._stop();
   }
   _stop(): void {
-    this.lis = null; 
-    this.c = true;
     // end signal might arrive before the startup completed, thus we must check
     // the active status here before stopping the producer
     if (this.a) {
       this.a = false;
       this.source.stop(this);
+      this.cleanup();
     }
   }
   cleanup(): void { 
