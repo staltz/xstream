@@ -5,20 +5,33 @@ const empty = {};
 
 function noop() {}
 
-class Deferred { 
-  private t: any
-  constructor(task: () => void) {
-    this.t = setTimeout(task, 0);
-  }
-  cancel() {
-    let t: any;
-    (t = this.t) && clearTimeout(t) && (this.t = null);
-  }
+
+function times <T>(n: number, fn: (i: number) => T) {
+  return Array.apply(null, {length: n}).map((_:any, i: number) => fn(i))
 }
 
-function defer(task: () => void): Deferred {
-  return new Deferred(task);
+function remove<T>(arr: Array<T>, x: T): number {
+  let i: number, n = arr.length;
+  for (i = 0; i < n; i++) {
+    if (arr[i] === x) {
+      arr.splice(i, 1);
+      return n - 1;
+    }
+  }
+  return n;
 }
+
+// fast invoke table
+const iTable = times(10, i => 
+  eval(`(function invoke${i}(f, x) { return f(${times(i, i => "x["+i+"]").join(",")}); })`))
+
+function invokeF<A>(f: (...args: Array<any>) => A, x: Array<any>): A {
+  const n = x.length;
+  return n < 10 ? iTable[n](f, x) : f.apply(null, x);
+}
+
+
+
 
 export interface InternalListener<T> {
   _n: (v: T) => void;
@@ -54,6 +67,24 @@ export interface Listener<T> {
   next: (x: T) => void;
   error: (err: any) => void;
   complete: () => void;
+}
+
+
+
+// class for easy deferred task creation and calcelation
+class Deferred { 
+  private t: any
+  constructor(task: () => void) {
+    this.t = setTimeout(task, 0);
+  }
+  cancel() {
+    let t: any;
+    (t = this.t) && clearTimeout(t) && (this.t = null);
+  }
+}
+
+function defer(task: () => void): Deferred {
+  return new Deferred(task);
 }
 
 
