@@ -19,6 +19,24 @@ describe('xs.combine', () => {
     });
   });
 
+  it('should have correct TypeScript signature', (done) => {
+    const stream1 = xs.create<string>({
+      start: listener => {},
+      stop: () => {}
+    });
+
+    const stream2 = xs.create<string>({
+      start: listener => {},
+      stop: () => {}
+    });
+
+    const combined = xs.combine(
+      (a, b) => a.slice(2) + b.slice(2),
+      stream1, stream2
+    );
+    done();
+  });
+
   it('should complete only when all member streams have completed', (done) => {
     const stream1 = xs.periodic(30).take(1);
     const stream2 = xs.periodic(50).take(4);
