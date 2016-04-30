@@ -940,6 +940,10 @@ var Stream = (function () {
     
     Stream.create = function (producer) {
         if (producer) {
+            if (typeof producer.start !== 'function'
+                || typeof producer.stop !== 'function') {
+                throw new Error('producer requires both start and stop functions');
+            }
             internalizeProducer(producer); 
         }
         return new Stream(producer);
