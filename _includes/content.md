@@ -989,6 +989,16 @@ A: Read this [blog post](http://staltz.com/why-we-built-xstream.html) on the top
 **License:** MIT
 
 # CHANGELOG
+<a name="2.1.2"></a>
+## [2.1.2](https://github.com/staltz/xstream/compare/v2.1.1...v2.1.2) (2016-04-30)
+
+
+### Bug Fixes
+
+* **combine:** fix CombineFactorySignature ([c65bd0b](https://github.com/staltz/xstream/commit/c65bd0b))
+
+
+
 <a name="2.1.1"></a>
 ## [2.1.1](https://github.com/staltz/xstream/compare/v2.1.0...v2.1.1) (2016-04-30)
 
