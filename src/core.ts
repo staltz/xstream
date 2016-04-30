@@ -1613,11 +1613,12 @@ export class Stream<T> implements InternalListener<T> {
    *
    * @return {Stream}
    */
-  flatten<R, T extends Stream<R>>(): T {
+  flatten<R>(): T {
     const p = this._prod;
-    return <T> new Stream<R>(p instanceof MapOperator || p instanceof FilterMapOperator ?
-      new MapFlattenOperator(<MapOperator<R, Stream<R>>> <any> p) :
-      new FlattenOperator(<Stream<Stream<R>>> <any> this)
+    return <T> <any> new Stream<R>(
+      p instanceof MapOperator || p instanceof FilterMapOperator ?
+        new MapFlattenOperator(<MapOperator<R, Stream<R>>> <any> p) :
+        new FlattenOperator(<Stream<Stream<R>>> <any> this)
     );
   }
 

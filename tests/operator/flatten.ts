@@ -1,4 +1,4 @@
-import xs, {Stream} from '../../src/index';
+import xs, {Stream, Listener} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.flatten', () => {
@@ -21,6 +21,22 @@ describe('Stream.prototype.flatten', () => {
       });
     });
 
+    it('should return a flat stream with correct TypeScript types', (done) => {
+      const streamStrings: Stream<string> = Stream.create({
+        start: (listener: Listener<string>) => {},
+        stop: () => {}
+      });
+
+      const streamBooleans: Stream<boolean> = Stream.create({
+        start: (listener: Listener<boolean>) => {},
+        stop: () => {}
+      });
+
+      // Type checked by the compiler. Without Stream<boolean> it does not compile.
+      const flat: Stream<boolean> = streamStrings.map(x => streamBooleans).flatten();
+      done();
+    });
+
     it('should expand 3 sync events as a periodic, only last one passes', (done) => {
       const stream = xs.fromArray([1, 2, 3])
         .map(i => xs.periodic(100 * i).take(2).map(x => `${i}${x}`))
@@ -30,8 +46,9 @@ describe('Stream.prototype.flatten', () => {
       // -------20------21
       // -----------30----------31
       const expected = ['30', '31'];
-      const listener = {
-        next: (x: number) => {
+
+      stream.addListener({
+        next: (x: string) => {
           assert.equal(x, expected.shift());
         },
         error: (err: any) => done(err),
@@ -39,8 +56,7 @@ describe('Stream.prototype.flatten', () => {
           assert.equal(expected.length, 0);
           done();
         }
-      };
-      stream.addListener(listener);
+      });
     });
 
     it('should expand 3 async events as a periodic each', (done) => {
@@ -54,8 +70,9 @@ describe('Stream.prototype.flatten', () => {
       //      ----10--11--12
       //           ------------20-----------21----------22
       const expected = ['00', '10', '20', '21', '22'];
-      const listener = {
-        next: (x: number) => {
+
+      stream.addListener({
+        next: (x: string) => {
           assert.equal(x, expected.shift());
         },
         error: (err: any) => done(err),
@@ -63,8 +80,7 @@ describe('Stream.prototype.flatten', () => {
           assert.equal(expected.length, 0);
           done();
         }
-      };
-      stream.addListener(listener);
+      });
     });
 
     it('should expand 3 async events as a periodic each, no optimization', (done) => {
@@ -80,8 +96,9 @@ describe('Stream.prototype.flatten', () => {
       //           ------------20-----------21----------22
 
       const expected = ['00', '10', '20', '21', '22'];
-      const listener = {
-        next: (x: number) => {
+
+      stream.addListener({
+        next: (x: string) => {
           assert.equal(x, expected.shift());
         },
         error: (err: any) => done(err),
@@ -89,8 +106,7 @@ describe('Stream.prototype.flatten', () => {
           assert.equal(expected.length, 0);
           done();
         }
-      };
-      stream.addListener(listener);
+      });
     });
 
     it('should propagate user mistakes in project as errors', (done) => {
