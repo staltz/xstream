@@ -1124,15 +1124,15 @@ var MemoryStream = (function (_super) {
         this._has = false;
     }
     MemoryStream.prototype._n = function (x) {
-        this._val = x;
+        this._v = x;
         this._has = true;
         _super.prototype._n.call(this, x);
     };
-    MemoryStream.prototype._add = function (listener) {
+    MemoryStream.prototype._add = function (il) {
         if (this._has) {
-            listener._n(this._val);
+            il._n(this._v);
         }
-        _super.prototype._add.call(this, listener);
+        _super.prototype._add.call(this, il);
     };
     return MemoryStream;
 }(Stream));
