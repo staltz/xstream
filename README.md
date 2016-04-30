@@ -897,7 +897,7 @@ added listener will immediately receive that memorised event.
 
 #### Return:
 
-*(Stream)* 
+*(MemoryStream)* 
 
 - - -
 
