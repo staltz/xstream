@@ -104,7 +104,7 @@ function runXStream(deferred, xstream) {
   xstream.addListener({
     next: noop,
     complete: function() {
-      deferred.resolve();
+      setImmediate(() => deferred.resolve());
     },
     error: function(e) {
       deferred.benchmark.emit({ type: 'error', error: e });
