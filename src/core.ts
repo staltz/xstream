@@ -1154,29 +1154,19 @@ export class MapToOperator<T, R> implements Operator<T, R> {
   }
 }
 
-// we know that this combinator is always unicast so we can override the stop
-// function without knowing anything about multicast or its implementation details
-class ReplaceErrorUnicast<A, B> extends Combinator<A, A> {
-  constructor(source: Source<A>, private fn: (err: any) => Stream<A>) {
-    super(source);
+// this must be always unicast => wrap with ident(...)
+class ReplaceErrorSource<A> implements Source<A> {
+  private sink: ReplaceErrorSink<A>;
+  constructor(private source: Source<A>, private fn: (err: any) => Stream<A>) {
+    this.sink = null;
   }
-  run(next: Sink<A, any>) {
-    return new ReplaceErrorSink(next, this.source, this.fn);
+  start(next: Sink<A, any>) {
+    this.source.start(this.sink = new ReplaceErrorSink(next, this.source, this.fn));
   }
-  stop(_: Sink<A, B>) {
-    const s = this.sink as ReplaceErrorSink<A>;
-    this.next = [];
+  stop(next: Sink<A, any>) {
+    const s = this.sink;
     this.sink = null;
     s.cleanup();
-  }
-}
-
-class ReplaceError<A, B> extends Combinator<A, A> {
-  constructor(source: Source<A>, fn: (err: any) => Stream<A>) {
-    super(new ReplaceErrorUnicast(source, fn));
-  }
-  run(next: Sink<A, any>) {
-    return next;
   }
 }
 
@@ -1231,6 +1221,10 @@ export class StartWithOperator<T> implements InternalProducer<T> {
     this.out = null;
   }
 }
+
+
+
+
 
 class Take<A, B> extends Combinator<A, A> {
   private n: number;
@@ -1776,7 +1770,7 @@ export class Stream<T> {
    * @return {Stream}
    */
   replaceError(replace: (err: any) => Stream<T>): Stream<T> {
-    return new Stream(new ReplaceError(this.source, replace));
+    return new Stream(multicast(new ReplaceErrorSource(this.source, replace)));
   }
 
   /**
