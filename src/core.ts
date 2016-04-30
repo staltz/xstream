@@ -848,6 +848,10 @@ class FilterSink<A> extends MCastSink<A, A> {
   }
 }
 
+
+
+
+
 class FInner<T> implements InternalListener<T> {
   constructor(private out: Stream<T>,
               private op: FlattenOperator<T>) {
@@ -866,6 +870,90 @@ class FInner<T> implements InternalListener<T> {
     this.op.less();
   }
 }
+
+// this assumes that it's always unicast => must be wrapped with indent(...)
+class Flatten<A> extends Combinator<A, A> {
+  constructor(source: Source<Stream<A>>) {
+    super(new FlattenSource(source));
+  }
+  run(next: Sink<A, any>) {
+    return new FInnerSink(next);
+  }
+}
+
+class FlattenSource<A> implements Source<A> {
+  private sink: Sink<Stream<A>, A>;
+  constructor(private source: Source<Stream<A>>) {
+    this.sink = null;
+  }
+  start<B>(sink: Sink<A, B>) {
+    this.source.start(this.sink = new FlattenSink(sink as FInnerSink<A>));
+  }
+  stop<B>(sink: Sink<A, A>) {
+    const s = this.sink;
+    this.sink = null;
+    this.source.stop(s);
+    s.cleanup();
+  }
+}
+
+class FlattenSink<A> extends MCastSink<Stream<A>, A> {
+  d: Deferred;
+  src: Source<A>;
+  a: boolean;     // active
+  constructor(sink: Sink<A, any>) {
+    super(sink);
+    (sink as FInnerSink<A>).outer = this;
+    this.src = null;
+    this.a = true;
+    this.d = null;
+  }
+  next(x: Stream<A>): void {
+    const next = x.source;
+    this.d && this.d.cancel();
+    this.d = defer(() => this._next(next));
+  }
+  _next(next: Source<A>) {
+     const src = this.src, same = next === src;
+     src && !same && src.stop(this.s as FInnerSink<A>);
+     this.src = null;
+     (this.src = next) && !same && next.start(this.s as FInnerSink<A>);
+  }
+  end(): void {
+    this.a = false;
+    !this.src && !this.d && this.s.end() 
+  }
+  cleanup() {
+    const d = this.d, src = this.src;
+    this.src = this.d = null;
+    d && d.cancel();
+    src && src.stop(this.s as FInnerSink<A>);
+    super.cleanup();
+  }
+}
+
+class FInnerSink<A> extends IdentitySink<A> {
+  outer: FlattenSink<A>;
+  constructor(sink: Sink<A, any>) {
+    super(sink);
+  }
+  end(): void {
+    const o = this.outer
+    if (o.a) {
+      o.src && o.src.stop(this);
+      o.src = null;
+    } else {
+      this.s.end();
+    }
+  }
+  cleanup() {
+    this.outer = null;
+    super.cleanup();
+  }
+}
+
+
+
 
 export class FlattenOperator<T> implements Operator<Stream<T>, T> {
   public curr: Stream<T> = null; // Current inner Stream
@@ -917,11 +1005,13 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
   }
 }
 
+
+
 class Fold<A, B> extends Combinator<A, B> {
   constructor(source: Source<A>, private acc: (s: B, a: A) => B, private seed: B) {
     super(source);
   }
-  run(next: Sink<B, any>) {
+  run(next: MSink<B, any>) {
     return new FoldSink(next, this.acc, this.seed);
   }
   started(sink: Sink<A, B>) {
@@ -938,6 +1028,7 @@ class FoldSink<A, B> extends MCastSink<A, B> {
     this.s.next(this.val = acc(this.val, x));
   }
 }
+
 
 
 class Last<A, B> extends Combinator<A, A> {
@@ -964,6 +1055,9 @@ class LastSink<A> extends MCastSink<A, A> {
     this.s && this.s.end();
   }
 }
+
+
+
 
 class MFCInner<T> implements InternalListener<T> {
   constructor(private out: Stream<T>,
@@ -1101,13 +1195,15 @@ export class MapFlattenOperator<T> implements InternalProducer<T>, InternalListe
   }
 }
 
+
+
 class Map<A, B> extends Combinator<A, B> {
   private fn: (x: A) => B;
   constructor(source: Source<A>, fn: (x: A) => B) {
     super(source);
     this.fn = fn;
   }
-  run(next: Sink<B, any>) {
+  run(next: MSink<B, any>) {
     return new MapSink(next, this.fn);
   }
 }
@@ -1259,6 +1355,8 @@ class TakeSink<A> extends MCastSink<A, A> {
     }
   }
 }
+
+
 
 
 declare type Subscription <T> = {
@@ -1798,8 +1896,8 @@ export class Stream<T> {
    *
    * @return {Stream}
    */
-  flatten<R, T extends Stream<R>>(): T {
-    throw new Error("Not implemented yet");
+  flatten<R, T extends Stream<R>>(): Stream<R> {
+    return new Stream(new Flatten(this.source as any));
   }
 
   /**
