@@ -1,7 +1,6 @@
 import xs from '../../src/index';
 import * as assert from 'assert';
 
-/*
 describe('xs.combine', () => {
   it('should combine AND-style two streams together', (done) => {
     const stream1 = xs.periodic(100).take(2);
@@ -56,4 +55,3 @@ describe('xs.combine', () => {
     });
   });
 });
-*/

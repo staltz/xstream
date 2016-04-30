@@ -71,6 +71,12 @@ export interface Listener<T> {
 
 
 
+// indexed value type
+interface Indexed<T> {
+  i: number;
+  x: T;
+}
+
 // class for easy deferred task creation and calcelation
 class Deferred { 
   private t: any
@@ -412,6 +418,78 @@ export interface CombineInstanceSignature<T> {
     stream5: Stream<T5>): Stream<R>;
   <R>(project: (...args: Array<any>) => R, ...streams: Array<Stream<any>>): Stream<R>;
 }
+
+
+class CombineSource implements Source<Indexed<any>> {
+  private sinks: Array<IdxSink<any>>;
+  constructor(private sources: Array<Source<any>>) {
+    this.sinks = null;
+  }
+  start<B>(sink: Sink<Indexed<any>, any>): void {
+    let sources = this.sources, n = sources.length, idxs: IdxSink<any> = null;
+    this.sinks = [];
+    for (let i = 0; i < n && this.sinks; i++) {
+      idxs = new IdxSink(sink, i);
+      this.sinks.push(idxs);
+      sources[i].start(idxs);
+    }
+  }
+  stop<B>(sink: Sink<Indexed<any>, B>): void {
+    const s = this.sinks, n = s.length, sources = this.sources;
+    this.sinks = null;
+    for (let i = 0; i < n; i++) sources[i].stop(s[i]);
+  }
+}
+
+class Combine<A> extends Combinator<Indexed<any>, A> {
+  private n: number;
+  constructor(sources: Array<Source<any>>, private fn: (...args: Array<any>) => A) {
+    super(new CombineSource(sources));
+    this.n = sources.length;
+  }
+  run(sink: Sink<A, any>) {
+    return new CombineSink(sink, this.fn, this.n);
+  }
+}
+
+
+class IdxSink<A> extends MCastSink<A, Indexed<A>> {
+  constructor(sink: Sink<Indexed<A>, any>, private i: number) {
+    super(sink);
+  }
+  next(x: A) {
+    this.s.next({i: this.i, x});
+  }
+}
+
+
+class CombineSink<A> extends MCastSink<Indexed<any>, A> {
+  vals: Array<any>;
+  nEnd: number;       // number of streams that still needs to end
+  nVal: number;       // number of streams still waiting for initial value
+  constructor(sink: Sink<A, any>, private fn: (...args: Array<any>) => A, n: number) {
+    super(sink);
+    const vals = this.vals = Array(n);
+    this.nEnd = this.nVal = n;
+    for (let i = 0; i < n; i++) vals[i] = none;
+  }
+  next(x: Indexed<A>) {
+    const i = x.i, val = this.vals[i], f = this.fn;
+    const left = (val === none && --this.nVal) || this.nVal;
+    this.vals[i] = x.x;
+    left === 0 && this.s.next(invokeF(f, this.vals));
+  }
+  end(): void {
+    if (--this.nEnd === 0) {
+      this.s.end();
+    }
+  }
+  cleanup() {
+    this.vals = null;
+    super.cleanup();
+  }
+}
+
 
 class CombineListener<T> implements InternalListener<T> {
   constructor(private i: number,
@@ -1366,8 +1444,10 @@ declare type Subscription <T> = {
 
 export class Stream<T> {
   private _subs: Array<Subscription<T>>;
-  constructor(public source: Combinator<any, T>) {
+  public source: Combinator<any, T>;
+  constructor(src: Combinator<any, T>) {
     this._subs = [];
+    this.source = src;
   }
  
   /**
@@ -1643,7 +1723,7 @@ export class Stream<T> {
   static combine: CombineFactorySignature =
     function combine<R>(project: CombineProjectFunction,
                         ...streams: Array<Stream<any>>): Stream<R> {
-      throw new Error("Not implemented yet");
+      return new Stream(new Combine<R>(streams.map(s => s.source), project));
     };
 
   /**
@@ -1984,7 +2064,7 @@ export class Stream<T> {
   combine: CombineInstanceSignature<T> =
     function combine<R>(project: CombineProjectFunction,
                         ...streams: Array<Stream<any>>): Stream<R> {
-      throw new Error("Not implemented yet");
+      return Stream.combine(project, this, ...streams);                    
     };
 
   /**
