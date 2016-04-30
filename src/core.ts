@@ -135,44 +135,92 @@ function handleError(err: any, sink: Sink<any, any>): void {
   sink.handler().error(err);
 }
 
+function safeNext<T>(s: Sink<T, any>, x: T): void {
+  try {
+    s.next(x);  
+  } catch (err) {
+    handleError(err, s);
+  }
+}
+
+// table for optimized safe multicast next functions 
+const mcastTable = times(10, i => 
+  eval(`(function mcast${i}(h,s,n,x) { var i=${i}; try{ ${times(i, i => "s[--i].next(x);").join("")} }catch(e){h(e,s[i]);i>0&&n[i](h,s,n,x);} })`));
+
+function multicastN<T>(x: T, s: Array<any>) {
+  let n = s.length, i: number;
+  for (i = 0; i < n; i++) safeNext(s[i], x);
+} 
+
+// sink that does multicasting and error reporting in safe ways
+class MulticastingSink<A, B> implements Sink<A, B>, ErrorHandler {
+  private n: number;
+  constructor(private sinks: Array<Sink<A, B>>) {
+    this.n = this.sinks.length;
+  }
+  next(x: A) {
+    this.n < 10 ? mcastTable[this.n](handleError, this.sinks, mcastTable, x) 
+      : multicastN(x, this.sinks);
+  }
+  end() {
+    let s = this.sinks, n = s.length, i: number;
+    for(i = 0; i < n; i++) s[i].end(); 
+  }
+  error(err: any) {
+    let s = this.sinks, n = s.length, i: number;
+    for(i = 0; i < n; i++) handleError(err, s[i]); 
+  }
+  cleanup() {
+    this.sinks = null;
+  }
+  handler(): ErrorHandler {
+    return this;
+  }
+}
+
 // Note that combinator is not actually operator because it doesn't do any calculation.
 // The purpose of combinator is just to combine operators and ensure that their
-// lifecycle is managed correctly
-abstract class Combinator<A, B> implements Source<B> {
+// lifecycle is managed correctly. Combinators also deal multicasting
+export abstract class Combinator<A, B> implements Source<B> {
   source: Source<A>;
-  sink: Sink<A, B>;
-  next: Array<Sink<B, any>>;
+  sink: MSink<A, B>;
+  sinks: Array<Sink<B, any>>;
   
   constructor(source: Source<A>) {
     this.source = source;
     this.sink = null;
-    this.next = [];
+    this.sinks = [];
   }
   
-  abstract run(next: Sink<B, any>): Sink<A, B>
+  abstract run(next: Sink<B, any>): MSink<A, B>
   
   start(next: Sink<B, any>): void {
+    this.sinks.push(next);
     if (this.sink === null) {
       const s = this.sink = this.run(next);
-      this.next.push(next);
       this.source.start(s);
       // the combinator might already be stopped (-> this.sink == null) so we must check 
       // it before invoking our started hook
       this.sink && this.started(this.sink);
     } else {
-      throw new Error("multicast not implemented yet")
+      const s = this.sink
+      s.s = new MulticastingSink(this.sinks.slice());
     }
   }
   
   stop(sink: Sink<B, any>): void {
-    if (this.next.length === 1) {
-      const s = this.sink;
-      this.next = [];
+    const left = remove(this.sinks, sink);
+    const s = this.sink;
+    if (left === 0) {
       this.sink = null;
       this.source.stop(s);
       s.cleanup();
+    } else if (left === 1) {
+      s.s.cleanup();
+      s.s = this.sinks[0];
     } else {
-      throw new Error("multicast not implemented yet")
+      s.s.cleanup();
+      s.s = new MulticastingSink(this.sinks.slice());
     }
   }
   
@@ -784,11 +832,13 @@ export class FlattenConcOperator<T> implements Operator<Stream<T>, T> {
   }
 }
 
+
+
 class Filter<A, B> extends Combinator<A, A> {
   constructor(source: Source<A>, private pred: (x: A) => boolean) {
     super(source);
   }
-  run(next: Sink<A, any>) {
+  run(next: MSink<A, any>) {
     return new FilterSink(next, this.pred);
   }
 }
