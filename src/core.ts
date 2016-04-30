@@ -1829,21 +1829,21 @@ export class Stream<T> implements InternalListener<T> {
 }
 
 export class MemoryStream<T> extends Stream<T> {
-  private _val: any;
+  private _v: T;
   private _has: boolean = false;
   constructor(producer: InternalProducer<T>) {
     super(producer);
   }
 
   _n(x: T) {
-    this._val = x;
+    this._v = x;
     this._has = true;
     super._n(x);
   }
 
-  _add(listener: InternalListener<T>): void {
-    if (this._has) { listener._n(this._val); }
-    super._add(listener);
+  _add(il: InternalListener<T>): void {
+    if (this._has) { il._n(this._v); }
+    super._add(il);
   }
 }
 
