@@ -127,4 +127,35 @@ describe('Stream.prototype.replaceError', () => {
       },
     });
   });
+  
+  it('should support retry for async stream', (done) => {
+    const expected = ['hi'];
+    let id: any = null, i = 0;
+    const response = xs.create({
+      start: function (p) {
+        id = setTimeout(() => { 
+          if (i++ === 0) {
+            p.error(new Error('oops'));
+          } else {
+            p.next('hi');
+            p.complete();
+          } 
+        }, 10);
+      },
+      stop: function () { 
+        id && clearTimeout(id); 
+      }
+    })
+ 
+    response.replaceError(() => response).addListener({
+      next: x => {
+        assert.equal(x, expected.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      }
+    })
+  })
 });
