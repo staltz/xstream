@@ -969,7 +969,7 @@ class Flatten<A> extends Combinator<A, A> {
 }
 
 class FlattenSource<A> implements Source<A> {
-  private sink: Sink<Stream<A>, A>;
+  private sink: FlattenSink<A>;
   constructor(private source: Source<Stream<A>>) {
     this.sink = null;
   }
@@ -984,13 +984,14 @@ class FlattenSource<A> implements Source<A> {
   }
 }
 
-class FlattenSink<A> extends MCastSink<Stream<A>, A> {
+class FlattenSink<A> implements Sink<Stream<A>, A> {
+  s: FInnerSink<A>;
   d: Deferred;
   src: Source<A>;
   a: boolean;     // active
-  constructor(sink: Sink<A, any>) {
-    super(sink);
-    (sink as FInnerSink<A>).outer = this;
+  constructor(sink: FInnerSink<A>) {
+    this.s = sink;
+    sink.outer = this;
     this.src = null;
     this.a = true;
     this.d = null;
@@ -1002,9 +1003,9 @@ class FlattenSink<A> extends MCastSink<Stream<A>, A> {
   }
   _next(next: Source<A>) {
      const src = this.src, same = next === src;
-     src && !same && src.stop(this.s as FInnerSink<A>);
+     src && !same && src.stop(this.s);
      this.src = null;
-     (this.src = next) && !same && next.start(this.s as FInnerSink<A>);
+     (this.src = next) && !same && next.start(this.s);
   }
   end(): void {
     this.a = false;
@@ -1014,8 +1015,10 @@ class FlattenSink<A> extends MCastSink<Stream<A>, A> {
     const d = this.d, src = this.src;
     this.src = this.d = null;
     d && d.cancel();
-    src && src.stop(this.s as FInnerSink<A>);
-    super.cleanup();
+    src && src.stop(this.s);
+  }
+  handler() {
+    return this.s.handler();
   }
 }
 
