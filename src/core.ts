@@ -25,9 +25,9 @@ function remove<T>(arr: Array<T>, x: T): number {
 const iTable = times(10, i => 
   eval(`(function invoke${i}(f, x) { return f(${times(i, i => "x["+i+"]").join(",")}); })`))
 
-function invokeF<A>(f: (...args: Array<any>) => A, x: Array<any>): A {
-  const n = x.length;
-  return n < 10 ? iTable[n](f, x) : f.apply(null, x);
+
+function invokeN<A>(f: (...args: Array<any>) => A, x: Array<any>): A {
+  return f.apply(null, x);
 }
 
 
@@ -162,22 +162,22 @@ function safeNext<T>(s: Sink<T, any>, x: T): void {
 
 // table for optimized safe multicast next functions 
 const mcastTable = times(10, i => 
-  eval(`(function mcast${i}(h,s,n,x) { var i=${i}; try{ ${times(i, i => "s[--i].next(x);").join("")} }catch(e){h(e,s[i]);i>0&&n[i](h,s,n,x);} })`));
+  eval(`(function mcast${i}(s,x,h,t) { var i=${i}; try{${times(i, i => "s[--i].next(x);").join("")}}catch(e){h(e,s[i]);i>0&&t[i](s,x,h,t);} })`));
 
-function multicastN<T>(x: T, s: Array<any>) {
+function multicastN<T>(s: Array<Sink<T, any>>, x: T) {
   let n = s.length, i: number;
   for (i = 0; i < n; i++) safeNext(s[i], x);
 } 
 
 // sink that does multicasting and error reporting in safe ways
 class MulticastingSink<A, B> implements Sink<A, B>, ErrorHandler {
-  private n: number;
+  private fn: (sinks: Array<Sink<A, any>>, x: A, handler: (err: any, s: Sink<A, B>) => void, table: Array<any>) => void; 
   constructor(private sinks: Array<Sink<A, B>>) {
-    this.n = this.sinks.length;
+    this.fn = this.sinks.length < 10 ? mcastTable[this.sinks.length] : multicastN;
   }
   next(x: A) {
-    this.n < 10 ? mcastTable[this.n](handleError, this.sinks, mcastTable, x) 
-      : multicastN(x, this.sinks);
+    const mnext = this.fn 
+    mnext(this.sinks, x, handleError, mcastTable);
   }
   end() {
     let s = this.sinks, n = s.length, i: number;
@@ -467,17 +467,22 @@ class CombineSink<A> extends MCastSink<Indexed<any>, A> {
   vals: Array<any>;
   nEnd: number;       // number of streams that still needs to end
   nVal: number;       // number of streams still waiting for initial value
+  invoke: (f: (...args: Array<any>) => A, vals: Array<any>) => A;   
+  
   constructor(sink: Sink<A, any>, private fn: (...args: Array<any>) => A, n: number) {
     super(sink);
     const vals = this.vals = Array(n);
     this.nEnd = this.nVal = n;
-    for (let i = 0; i < n; i++) vals[i] = none;
+    this.invoke = n < 10 ? iTable[n] : invokeN;
+    for (let i = 0; i < n; i++) {
+      vals[i] = none;
+    }
   }
   next(x: Indexed<A>) {
-    const i = x.i, val = this.vals[i], f = this.fn;
-    const left = (val === none && --this.nVal) || this.nVal;
+    const i = x.i, val = this.vals[i], f = this.fn, invoke = this.invoke;
+    const left = !this.nVal ? 0 : val === none ? --this.nVal : this.nVal;
     this.vals[i] = x.x;
-    left === 0 && this.s.next(invokeF(f, this.vals));
+    left === 0 && this.s.next(invoke(f, this.vals));
   }
   end(): void {
     if (--this.nEnd === 0) {
