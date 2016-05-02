@@ -143,51 +143,55 @@ export interface CombineInstanceSignature<T> {
 
 class CombineListener<T> implements InternalListener<T> {
   constructor(private i: number,
-              private prod: CombineProducer<T>) {
-    prod.proxies.push(this);
+              private p: CombineProducer<T>) {
+    p.ils.push(this);
   }
 
   _n(t: T): void {
-    const prod = this.prod;
-    const vals = prod.vals;
-    prod.hasVal[this.i] = true;
+    const p = this.p;
+    if (!p.out) return;
+    const vals = p.vals;
+    p.hasVal[this.i] = true;
     vals[this.i] = t;
-    if (!prod.ready) {
-      prod.up();
+    if (!p.ready) {
+      p.up();
     }
-    if (prod.ready) {
+    if (p.ready) {
       try {
-        prod.out._n(invoke(prod.project, vals));
+        p.out._n(invoke(p.project, vals));
       } catch (e) {
-        prod.out._e(e);
+        p.out._e(e);
       }
     }
   }
 
   _e(err: any): void {
-    this.prod.out._e(err);
+    const out = this.p.out;
+    if (!out) return;
+    out._e(err);
   }
 
   _c(): void {
-    const prod = this.prod;
-    if (--prod.ac === 0) {
-      prod.out._c();
+    const p = this.p;
+    if (!p.out) return;
+    if (--p.ac === 0) {
+      p.out._c();
     }
   }
 }
 
 class CombineProducer<R> implements InternalProducer<R> {
   public out: InternalListener<R> = emptyListener;
-  public ac: number; // ac is activeCount
-  public proxies: Array<CombineListener<any>> = [];
+  public ils: Array<CombineListener<any>> = [];
   public ready: boolean = false;
   public hasVal: Array<boolean>;
   public vals: Array<any>;
+  public ac: number; // ac is activeCount
 
   constructor(public project: CombineProjectFunction,
               public streams: Array<Stream<any>>) {
-    this.vals = new Array(streams.length);
     this.hasVal = new Array(streams.length);
+    this.vals = new Array(streams.length);
     this.ac = streams.length;
   }
 
@@ -211,14 +215,14 @@ class CombineProducer<R> implements InternalProducer<R> {
   _stop(): void {
     const streams = this.streams;
     for (let i = streams.length - 1; i >= 0; i--) {
-      streams[i]._remove(this.proxies[i]);
+      streams[i]._remove(this.ils[i]);
     }
     this.out = null;
-    this.ac = streams.length;
-    this.proxies = [];
+    this.ils = [];
     this.ready = false;
-    this.vals = new Array(streams.length);
     this.hasVal = new Array(streams.length);
+    this.vals = new Array(streams.length);
+    this.ac = streams.length;
   }
 }
 

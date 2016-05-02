@@ -1,4 +1,4 @@
-import xs from '../../src/index';
+import xs, {Stream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('xs.combine', () => {
@@ -69,6 +69,62 @@ describe('xs.combine', () => {
       },
       complete: () => {
         done('complete should not be called');
+      },
+    });
+  });
+
+  it('should not break future listeners when CombineProducer tears down', (done) => {
+    //     --0--1-2--|  innerA
+    //     ---0---1--|  innerB
+    // ----0----1-2--|  outer
+    const innerA = xs.create<number>();
+    const innerB = xs.create<number>();
+    const outer = xs.create<number>();
+    const arrayInners: Array<Stream<number>> = [];
+    const stream = outer
+      .map(x => {
+        return xs.combine(
+          (...args: Array<number>) => '' + x + args.join(''),
+          ...arrayInners
+        );
+      })
+      .flatten();
+    const expected = ['00'];
+
+    setTimeout(() => {
+      arrayInners.push(innerA);
+      outer.shamefullySendNext(0);
+    }, 100);
+    setTimeout(() => {
+      innerA.shamefullySendNext(0)
+    }, 150);
+    setTimeout(() => {
+      innerB.shamefullySendNext(0)
+    }, 175);
+    setTimeout(() => {
+      arrayInners.push(innerB);
+      outer.shamefullySendNext(1);
+      innerA.shamefullySendNext(1);
+    }, 200);
+    setTimeout(() => {
+      innerA.shamefullySendNext(2);
+      outer.shamefullySendNext(2);
+      innerB.shamefullySendNext(1)
+    }, 250);
+    setTimeout(() => {
+      innerA.shamefullySendComplete();
+      innerB.shamefullySendComplete();
+      outer.shamefullySendComplete();
+    }, 550);
+
+    stream.addListener({
+      next: (x: string) => {
+        assert.equal(x, expected.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
       },
     });
   });
