@@ -73,6 +73,22 @@ describe('xs.combine', () => {
     });
   });
 
+  it('should handle a group of zero streams', (done) => {
+    const stream = xs.combine<string>(() => 'hi');
+    let expected = ['hi'];
+
+    stream.addListener({
+      next: (x) => {
+        assert.equal(x, expected.shift());
+      },
+      error: done,
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      },
+    });
+  });
+
   it('should not break future listeners when CombineProducer tears down', (done) => {
     //     --0--1-2--|  innerA
     //     ---0---1--|  innerB
@@ -96,10 +112,10 @@ describe('xs.combine', () => {
       outer.shamefullySendNext(0);
     }, 100);
     setTimeout(() => {
-      innerA.shamefullySendNext(0)
+      innerA.shamefullySendNext(0);
     }, 150);
     setTimeout(() => {
-      innerB.shamefullySendNext(0)
+      innerB.shamefullySendNext(0);
     }, 175);
     setTimeout(() => {
       arrayInners.push(innerB);
@@ -109,7 +125,7 @@ describe('xs.combine', () => {
     setTimeout(() => {
       innerA.shamefullySendNext(2);
       outer.shamefullySendNext(2);
-      innerB.shamefullySendNext(1)
+      innerB.shamefullySendNext(1);
     }, 250);
     setTimeout(() => {
       innerA.shamefullySendComplete();

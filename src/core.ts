@@ -206,9 +206,12 @@ class CombineProducer<R> implements InternalProducer<R> {
 
   _start(out: InternalListener<R>): void {
     this.out = out;
-    const streams = this.streams;
-    for (let i = streams.length - 1; i >= 0; i--) {
-      streams[i]._add(new CombineListener(i, this));
+    const s = this.streams;
+    const L = s.length;
+    if (L == 0) this.zero(out); else {
+      for (let i = 0; i < L; i++) {
+        s[i]._add(new CombineListener(i, this));
+      }
     }
   }
 
@@ -223,6 +226,15 @@ class CombineProducer<R> implements InternalProducer<R> {
     this.hasVal = new Array(streams.length);
     this.vals = new Array(streams.length);
     this.ac = streams.length;
+  }
+
+  zero(out: InternalListener<R>): void {
+    try {
+      out._n(this.project<R>());
+      out._c();
+    } catch (e) {
+      out._e(e);
+    }
   }
 }
 
