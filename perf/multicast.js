@@ -44,25 +44,25 @@ function xlater(s) {
 suite
   .add('xstream', function(deferred) {
     var xs1 = xlater(xs.fromArray(a));
-    var xs2 = xs1;
-    var xs3 = xs1;
-    var xs4 = xs1;
+    var xs2 = xs1.map(x => x + 1);
+    var xs3 = xs1.map(x => x + 2);
+    var xs4 = xs1.map(x => x + 3);
     runners.runXStream(deferred,
       xs.combine(addAll, xs1, xs2, xs3, xs4));
   }, options)
   .add('most', function(deferred) {
     var m1 = most.just(most.from(a)).delay(0).switch().multicast();
-    var m2 = m1;
-    var m3 = m1;
-    var m4 = m1;
+    var m2 = m1.map(x => x + 1);
+    var m3 = m1.map(x => x + 2);
+    var m4 = m1.map(x => x + 3);
     runners.runMost(deferred, 
       most.combineArray(addAll, [m1, m2, m3, m4]).drain());
   }, options)
   .add('rx 5', function(deferred) {
     var rx1 = rxjs.Observable.of(rxjs.Observable.from(a)).delay(0).switchMap(x => x).share();
-    var rx2 = rx1;
-    var rx3 = rx1;
-    var rx4 = rx1;
+    var rx2 = rx1.map(x => x + 1);
+    var rx3 = rx1.map(x => x + 2);
+    var rx4 = rx1.map(x => x + 3);
     runners.runRx5(deferred,
       rxjs.Observable.combineLatest(rx1, rx2, rx3, rx4, addAll));
   }, options);
