@@ -114,9 +114,14 @@ var CombineProducer = (function () {
     };
     CombineProducer.prototype._start = function (out) {
         this.out = out;
-        var streams = this.streams;
-        for (var i = streams.length - 1; i >= 0; i--) {
-            streams[i]._add(new CombineListener(i, this));
+        var s = this.streams;
+        var L = s.length;
+        if (L == 0)
+            this.zero(out);
+        else {
+            for (var i = 0; i < L; i++) {
+                s[i]._add(new CombineListener(i, this));
+            }
         }
     };
     CombineProducer.prototype._stop = function () {
@@ -130,6 +135,15 @@ var CombineProducer = (function () {
         this.hasVal = new Array(streams.length);
         this.vals = new Array(streams.length);
         this.ac = streams.length;
+    };
+    CombineProducer.prototype.zero = function (out) {
+        try {
+            out._n(this.project());
+            out._c();
+        }
+        catch (e) {
+            out._e(e);
+        }
     };
     return CombineProducer;
 }());
@@ -175,25 +189,27 @@ var FromPromiseProducer = (function () {
 }());
 exports.FromPromiseProducer = FromPromiseProducer;
 var MergeProducer = (function () {
-    function MergeProducer(streams) {
-        this.streams = streams;
+    function MergeProducer(s) {
+        this.s = s;
         this.out = emptyListener;
-        this.ac = streams.length;
+        this.ac = s.length;
     }
     MergeProducer.prototype._start = function (out) {
         this.out = out;
-        var streams = this.streams;
-        for (var i = streams.length - 1; i >= 0; i--) {
-            streams[i]._add(this);
+        var s = this.s;
+        var L = s.length;
+        for (var i = 0; i < L; i++) {
+            s[i]._add(this);
         }
     };
     MergeProducer.prototype._stop = function () {
-        var streams = this.streams;
-        for (var i = streams.length - 1; i >= 0; i--) {
-            streams[i]._remove(this);
+        var s = this.s;
+        var L = s.length;
+        for (var i = 0; i < L; i++) {
+            s[i]._remove(this);
         }
         this.out = null;
-        this.ac = streams.length;
+        this.ac = L;
     };
     MergeProducer.prototype._n = function (t) {
         this.out._n(t);
