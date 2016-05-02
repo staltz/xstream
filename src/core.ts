@@ -287,25 +287,27 @@ export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T
   private out: InternalListener<T> = emptyListener;
   private ac: number; // ac is activeCount, starts initialized
 
-  constructor(public streams: Array<Stream<T>>) {
-    this.ac = streams.length;
+  constructor(public s: Array<Stream<T>>) {
+    this.ac = s.length;
   }
 
   _start(out: InternalListener<T>): void {
     this.out = out;
-    const streams = this.streams;
-    for (let i = streams.length - 1; i >= 0; i--) {
-      streams[i]._add(this);
+    const s = this.s;
+    const L = s.length;
+    for (let i = 0; i < L; i++) {
+      s[i]._add(this);
     }
   }
 
   _stop(): void {
-    const streams = this.streams;
-    for (let i = streams.length - 1; i >= 0; i--) {
-      streams[i]._remove(this);
+    const s = this.s;
+    const L = s.length;
+    for (let i = 0; i < L; i++) {
+      s[i]._remove(this);
     }
     this.out = null;
-    this.ac = streams.length;
+    this.ac = L;
   }
 
   _n(t: T) {
