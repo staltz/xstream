@@ -59,21 +59,15 @@ var CombineListener = (function () {
         p.ils.push(this);
     }
     CombineListener.prototype._n = function (t) {
-        var p = this.p;
-        if (!p.out)
+        var p = this.p, out = p.out;
+        if (!out)
             return;
-        var vals = p.vals;
-        p.hasVal[this.i] = true;
-        vals[this.i] = t;
-        if (!p.ready) {
-            p.up();
-        }
-        if (p.ready) {
+        if (p.up(t, this.i)) {
             try {
-                p.out._n(invoke(p.project, vals));
+                out._n(invoke(p.project, p.vals));
             }
             catch (e) {
-                p.out._e(e);
+                out._e(e);
             }
         }
     };
@@ -99,42 +93,40 @@ var CombineProducer = (function () {
         this.streams = streams;
         this.out = emptyListener;
         this.ils = [];
-        this.ready = false;
-        this.hasVal = new Array(streams.length);
-        this.vals = new Array(streams.length);
-        this.ac = streams.length;
-    }
-    CombineProducer.prototype.up = function () {
-        for (var i = this.hasVal.length - 1; i >= 0; i--) {
-            if (!this.hasVal[i]) {
-                return;
-            }
+        var n = this.ac = this.left = streams.length;
+        var vals = this.vals = new Array(n);
+        for (var i = 0; i < n; i++) {
+            vals[i] = empty;
         }
-        this.ready = true;
+    }
+    CombineProducer.prototype.up = function (t, i) {
+        var v = this.vals[i];
+        var left = !this.left ? 0 : v === empty ? --this.left : this.left;
+        this.vals[i] = t;
+        return left === 0;
     };
     CombineProducer.prototype._start = function (out) {
         this.out = out;
         var s = this.streams;
-        var L = s.length;
-        if (L == 0)
+        var n = s.length;
+        if (n === 0)
             this.zero(out);
         else {
-            for (var i = 0; i < L; i++) {
+            for (var i = 0; i < n; i++) {
                 s[i]._add(new CombineListener(i, this));
             }
         }
     };
     CombineProducer.prototype._stop = function () {
-        var streams = this.streams;
-        for (var i = streams.length - 1; i >= 0; i--) {
-            streams[i]._remove(this.ils[i]);
+        var s = this.streams;
+        var n = this.ac = this.left = s.length;
+        var vals = this.vals = new Array(n);
+        for (var i = 0; i < n; i++) {
+            s[i]._remove(this.ils[i]);
+            vals[i] = empty;
         }
         this.out = null;
         this.ils = [];
-        this.ready = false;
-        this.hasVal = new Array(streams.length);
-        this.vals = new Array(streams.length);
-        this.ac = streams.length;
     };
     CombineProducer.prototype.zero = function (out) {
         try {
