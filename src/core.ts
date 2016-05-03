@@ -148,19 +148,13 @@ class CombineListener<T> implements InternalListener<T> {
   }
 
   _n(t: T): void {
-    const p = this.p;
-    if (!p.out) return;
-    const vals = p.vals;
-    p.hasVal[this.i] = true;
-    vals[this.i] = t;
-    if (!p.ready) {
-      p.up();
-    }
-    if (p.ready) {
+    const p = this.p, out = p.out;
+    if (!out) return;
+    if (p.up(t, this.i)) {
       try {
-        p.out._n(invoke(p.project, vals));
+        out._n(invoke(p.project, p.vals));
       } catch (e) {
-        p.out._e(e);
+        out._e(e);
       }
     }
   }
@@ -183,49 +177,47 @@ class CombineListener<T> implements InternalListener<T> {
 class CombineProducer<R> implements InternalProducer<R> {
   public out: InternalListener<R> = emptyListener;
   public ils: Array<CombineListener<any>> = [];
-  public ready: boolean = false;
-  public hasVal: Array<boolean>;
+  public ac: number; // ac is "active count", num of streams still not completed
+  public left: number; // number of streams that still need to emit a value
   public vals: Array<any>;
-  public ac: number; // ac is activeCount
 
   constructor(public project: CombineProjectFunction,
               public streams: Array<Stream<any>>) {
-    this.hasVal = new Array(streams.length);
-    this.vals = new Array(streams.length);
-    this.ac = streams.length;
+    const n = this.ac = this.left = streams.length;
+    const vals = this.vals = new Array(n);
+    for (let i = 0; i < n; i++) {
+      vals[i] = empty;
+    }
   }
 
-  up(): void {
-    for (let i = this.hasVal.length - 1; i >= 0; i--) {
-      if (!this.hasVal[i]) {
-        return;
-      }
-    }
-    this.ready = true;
+  up(t: any, i: number): boolean {
+    const v = this.vals[i];
+    const left = !this.left ? 0 : v === empty ? --this.left : this.left;
+    this.vals[i] = t;
+    return left === 0;
   }
 
   _start(out: InternalListener<R>): void {
     this.out = out;
     const s = this.streams;
-    const L = s.length;
-    if (L == 0) this.zero(out); else {
-      for (let i = 0; i < L; i++) {
+    const n = s.length;
+    if (n === 0) this.zero(out); else {
+      for (let i = 0; i < n; i++) {
         s[i]._add(new CombineListener(i, this));
       }
     }
   }
 
   _stop(): void {
-    const streams = this.streams;
-    for (let i = streams.length - 1; i >= 0; i--) {
-      streams[i]._remove(this.ils[i]);
+    const s = this.streams;
+    const n = this.ac = this.left = s.length;
+    const vals = this.vals = new Array(n);
+    for (let i = 0; i < n; i++) {
+      s[i]._remove(this.ils[i]);
+      vals[i] = empty;
     }
     this.out = null;
     this.ils = [];
-    this.ready = false;
-    this.hasVal = new Array(streams.length);
-    this.vals = new Array(streams.length);
-    this.ac = streams.length;
   }
 
   zero(out: InternalListener<R>): void {
