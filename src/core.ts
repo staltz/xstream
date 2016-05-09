@@ -141,7 +141,7 @@ export interface CombineInstanceSignature<T> {
   <R>(project: (...args: Array<any>) => R, ...streams: Array<Stream<any>>): Stream<R>;
 }
 
-class CombineListener<T> implements InternalListener<T> {
+export class CombineListener<T> implements InternalListener<T> {
   constructor(private i: number,
               private p: CombineProducer<T>) {
     p.ils.push(this);
@@ -174,7 +174,7 @@ class CombineListener<T> implements InternalListener<T> {
   }
 }
 
-class CombineProducer<R> implements InternalProducer<R> {
+export class CombineProducer<R> implements InternalProducer<R> {
   public out: InternalListener<R> = emptyListener;
   public ils: Array<CombineListener<any>> = [];
   public ac: number; // ac is "active count", num of streams still not completed
@@ -279,13 +279,13 @@ export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T
   private out: InternalListener<T> = emptyListener;
   private ac: number; // ac is activeCount, starts initialized
 
-  constructor(public s: Array<Stream<T>>) {
-    this.ac = s.length;
+  constructor(public streams: Array<Stream<T>>) {
+    this.ac = streams.length;
   }
 
   _start(out: InternalListener<T>): void {
     this.out = out;
-    const s = this.s;
+    const s = this.streams;
     const L = s.length;
     for (let i = 0; i < L; i++) {
       s[i]._add(this);
@@ -293,7 +293,7 @@ export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T
   }
 
   _stop(): void {
-    const s = this.s;
+    const s = this.streams;
     const L = s.length;
     for (let i = 0; i < L; i++) {
       s[i]._remove(this);
