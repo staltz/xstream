@@ -1,6 +1,7 @@
 import {Operator, Stream} from '../core';
 
 class PairwiseOperator<T> implements Operator<T, [T, T]> {
+  public type = 'pairwise';
   private val: T = null;
   private has: boolean = false;
   private out: Stream<[T, T]> = null;

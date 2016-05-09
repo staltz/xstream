@@ -1,6 +1,7 @@
 import {Stream, InternalProducer, InternalListener} from '../core';
 
 export class DOMEventProducer implements InternalProducer<Event> {
+  public type = 'fromEvent';
   private listener: EventListener;
 
   constructor(private node: EventTarget,

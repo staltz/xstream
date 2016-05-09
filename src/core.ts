@@ -35,6 +35,7 @@ export interface Operator<T, R> extends InternalProducer<R>, InternalListener<T>
   _n: (v: T) => void;
   _e: (err: any) => void;
   _c: () => void;
+  type: string;
 }
 
 export interface Producer<T> {
@@ -175,6 +176,7 @@ export class CombineListener<T> implements InternalListener<T> {
 }
 
 export class CombineProducer<R> implements InternalProducer<R> {
+  public type = 'combine';
   public out: InternalListener<R> = emptyListener;
   public ils: Array<CombineListener<any>> = [];
   public ac: number; // ac is "active count", num of streams still not completed
@@ -231,6 +233,7 @@ export class CombineProducer<R> implements InternalProducer<R> {
 }
 
 export class FromArrayProducer<T> implements InternalProducer<T> {
+  public type = 'fromArray';
   constructor(public a: Array<T>) {
   }
 
@@ -247,6 +250,7 @@ export class FromArrayProducer<T> implements InternalProducer<T> {
 }
 
 export class FromPromiseProducer<T> implements InternalProducer<T> {
+  public type = 'fromPromise';
   public on: boolean = false;
 
   constructor(public p: Promise<T>) {
@@ -276,6 +280,7 @@ export class FromPromiseProducer<T> implements InternalProducer<T> {
 }
 
 export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T> {
+  public type = 'merge';
   private out: InternalListener<T> = emptyListener;
   private ac: number; // ac is activeCount, starts initialized
 
@@ -318,6 +323,7 @@ export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T
 }
 
 export class PeriodicProducer implements InternalProducer<number> {
+  public type = 'periodic';
   private intervalID: any = -1;
   private i: number = 0;
 
@@ -338,6 +344,7 @@ export class PeriodicProducer implements InternalProducer<number> {
 }
 
 export class DebugOperator<T> implements Operator<T, T> {
+  public type = 'debug';
   private out: Stream<T> = null;
 
   constructor(public spy: (t: T) => any = null,
@@ -377,6 +384,7 @@ export class DebugOperator<T> implements Operator<T, T> {
 }
 
 export class DropOperator<T> implements Operator<T, T> {
+  public type = 'drop';
   private out: Stream<T> = null;
   private dropped: number = 0;
 
@@ -427,6 +435,7 @@ class OtherIL<T> implements InternalListener<any> {
 }
 
 export class EndWhenOperator<T> implements Operator<T, T> {
+  public type = 'endWhen';
   private out: Stream<T> = null;
   private oil: InternalListener<any> = emptyListener; // oil = other InternalListener
 
@@ -465,6 +474,7 @@ export class EndWhenOperator<T> implements Operator<T, T> {
 }
 
 export class FilterOperator<T> implements Operator<T, T> {
+  public type = 'filter';
   private out: Stream<T> = null;
 
   constructor(public passes: (t: T) => boolean,
@@ -517,6 +527,7 @@ class FCIL<T> implements InternalListener<T> {
 }
 
 export class FlattenConcOperator<T> implements Operator<Stream<T>, T> {
+  public type = 'flattenConcurrently';
   private active: number = 1; // number of outers and inners that have not yet ended
   private out: Stream<T> = null;
 
@@ -574,6 +585,7 @@ class FIL<T> implements InternalListener<T> {
 }
 
 export class FlattenOperator<T> implements Operator<Stream<T>, T> {
+  public type = 'flatten';
   public inner: Stream<T> = null; // Current inner Stream
   private il: InternalListener<T> = null; // Current inner InternalListener
   private open: boolean = true;
@@ -616,6 +628,7 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
 }
 
 export class FoldOperator<T, R> implements Operator<T, R> {
+  public type = 'fold';
   private out: Stream<R> = null;
   private acc: R; // initialized as seed
 
@@ -655,6 +668,7 @@ export class FoldOperator<T, R> implements Operator<T, R> {
 }
 
 export class LastOperator<T> implements Operator<T, T> {
+  public type = 'last';
   private out: Stream<T> = null;
   private has: boolean = false;
   private val: T = <T> empty;
@@ -713,6 +727,7 @@ class MFCIL<T> implements InternalListener<T> {
 }
 
 export class MapFlattenConcOperator<T> implements InternalProducer<T>, InternalListener<T> {
+  public type = 'map+flattenConcurrently';
   private active: number = 1; // number of outers and inners that have not yet ended
   private out: Stream<T> = null;
 
@@ -774,6 +789,7 @@ class MFIL<T> implements InternalListener<T> {
 }
 
 export class MapFlattenOperator<T> implements InternalProducer<T>, InternalListener<T> {
+  public type = 'map+flatten';
   public inner: Stream<T> = null; // Current inner Stream
   private il: InternalListener<T> = null; // Current inner InternalListener
   private open: boolean = true;
@@ -822,6 +838,7 @@ export class MapFlattenOperator<T> implements InternalProducer<T>, InternalListe
 }
 
 export class MapOperator<T, R> implements Operator<T, R> {
+  public type = 'map';
   protected out: Stream<R> = null;
 
   constructor(public project: (t: T) => R,
@@ -856,6 +873,7 @@ export class MapOperator<T, R> implements Operator<T, R> {
 }
 
 export class FilterMapOperator<T, R> extends MapOperator<T, R> {
+  public type = 'filter+map';
   constructor(public passes: (t: T) => boolean,
               project: (t: T) => R,
               ins: Stream<T>) {
@@ -870,6 +888,7 @@ export class FilterMapOperator<T, R> extends MapOperator<T, R> {
 }
 
 export class MapToOperator<T, R> implements Operator<T, R> {
+  public type = 'mapTo';
   private out: Stream<R> = null;
 
   constructor(public val: R,
@@ -900,6 +919,7 @@ export class MapToOperator<T, R> implements Operator<T, R> {
 }
 
 export class ReplaceErrorOperator<T> implements Operator<T, T> {
+  public type = 'replaceError';
   private out: Stream<T> = <Stream<T>> empty;
 
   constructor(public fn: (err: any) => Stream<T>,
@@ -935,6 +955,7 @@ export class ReplaceErrorOperator<T> implements Operator<T, T> {
 }
 
 export class StartWithOperator<T> implements InternalProducer<T> {
+  public type = 'startWith';
   private out: InternalListener<T> = emptyListener;
 
   constructor(public ins: Stream<T>,
@@ -954,6 +975,7 @@ export class StartWithOperator<T> implements InternalProducer<T> {
 }
 
 export class TakeOperator<T> implements Operator<T, T> {
+  public type = 'take';
   private out: Stream<T> = null;
   private taken: number = 0;
 

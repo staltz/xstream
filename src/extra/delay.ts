@@ -1,6 +1,7 @@
 import {Operator, Stream} from '../core';
 
 class DelayOperator<T> implements Operator<T, T> {
+  public type = 'delay';
   private out: Stream<T> = null;
 
   constructor(public dt: number,
