@@ -1,3 +1,17 @@
+<a name="2.3.0"></a>
+# [2.3.0](https://github.com/staltz/xstream/compare/v2.2.1...v2.3.0) (2016-05-09)
+
+
+### Bug Fixes
+
+* **combine:** fix combine() to export its Producer class ([700a129](https://github.com/staltz/xstream/commit/700a129))
+
+### Features
+
+* **operators:** add type metadata string to all operators/producers ([a734fd4](https://github.com/staltz/xstream/commit/a734fd4))
+
+
+
 <a name="2.2.1"></a>
 ## [2.2.1](https://github.com/staltz/xstream/compare/v2.2.0...v2.2.1) (2016-05-03)
 

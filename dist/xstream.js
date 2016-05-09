@@ -87,10 +87,12 @@ var CombineListener = (function () {
     };
     return CombineListener;
 }());
+exports.CombineListener = CombineListener;
 var CombineProducer = (function () {
     function CombineProducer(project, streams) {
         this.project = project;
         this.streams = streams;
+        this.type = 'combine';
         this.out = emptyListener;
         this.ils = [];
         var n = this.ac = this.left = streams.length;
@@ -139,9 +141,11 @@ var CombineProducer = (function () {
     };
     return CombineProducer;
 }());
+exports.CombineProducer = CombineProducer;
 var FromArrayProducer = (function () {
     function FromArrayProducer(a) {
         this.a = a;
+        this.type = 'fromArray';
     }
     FromArrayProducer.prototype._start = function (out) {
         var a = this.a;
@@ -158,6 +162,7 @@ exports.FromArrayProducer = FromArrayProducer;
 var FromPromiseProducer = (function () {
     function FromPromiseProducer(p) {
         this.p = p;
+        this.type = 'fromPromise';
         this.on = false;
     }
     FromPromiseProducer.prototype._start = function (out) {
@@ -181,21 +186,22 @@ var FromPromiseProducer = (function () {
 }());
 exports.FromPromiseProducer = FromPromiseProducer;
 var MergeProducer = (function () {
-    function MergeProducer(s) {
-        this.s = s;
+    function MergeProducer(streams) {
+        this.streams = streams;
+        this.type = 'merge';
         this.out = emptyListener;
-        this.ac = s.length;
+        this.ac = streams.length;
     }
     MergeProducer.prototype._start = function (out) {
         this.out = out;
-        var s = this.s;
+        var s = this.streams;
         var L = s.length;
         for (var i = 0; i < L; i++) {
             s[i]._add(this);
         }
     };
     MergeProducer.prototype._stop = function () {
-        var s = this.s;
+        var s = this.streams;
         var L = s.length;
         for (var i = 0; i < L; i++) {
             s[i]._remove(this);
@@ -220,6 +226,7 @@ exports.MergeProducer = MergeProducer;
 var PeriodicProducer = (function () {
     function PeriodicProducer(period) {
         this.period = period;
+        this.type = 'periodic';
         this.intervalID = -1;
         this.i = 0;
     }
@@ -242,6 +249,7 @@ var DebugOperator = (function () {
         if (spy === void 0) { spy = null; }
         this.spy = spy;
         this.ins = ins;
+        this.type = 'debug';
         this.out = null;
     }
     DebugOperator.prototype._start = function (out) {
@@ -279,6 +287,7 @@ var DropOperator = (function () {
     function DropOperator(max, ins) {
         this.max = max;
         this.ins = ins;
+        this.type = 'drop';
         this.out = null;
         this.dropped = 0;
     }
@@ -325,6 +334,7 @@ var EndWhenOperator = (function () {
         ins) {
         this.o = o;
         this.ins = ins;
+        this.type = 'endWhen';
         this.out = null;
         this.oil = emptyListener; 
     }
@@ -358,6 +368,7 @@ var FilterOperator = (function () {
     function FilterOperator(passes, ins) {
         this.passes = passes;
         this.ins = ins;
+        this.type = 'filter';
         this.out = null;
     }
     FilterOperator.prototype._start = function (out) {
@@ -405,6 +416,7 @@ var FCIL = (function () {
 var FlattenConcOperator = (function () {
     function FlattenConcOperator(ins) {
         this.ins = ins;
+        this.type = 'flattenConcurrently';
         this.active = 1; 
         this.out = null;
     }
@@ -455,6 +467,7 @@ var FIL = (function () {
 var FlattenOperator = (function () {
     function FlattenOperator(ins) {
         this.ins = ins;
+        this.type = 'flatten';
         this.inner = null; 
         this.il = null; 
         this.open = true;
@@ -496,6 +509,7 @@ var FoldOperator = (function () {
         this.f = f;
         this.seed = seed;
         this.ins = ins;
+        this.type = 'fold';
         this.out = null;
         this.acc = seed;
     }
@@ -529,6 +543,7 @@ exports.FoldOperator = FoldOperator;
 var LastOperator = (function () {
     function LastOperator(ins) {
         this.ins = ins;
+        this.type = 'last';
         this.out = null;
         this.has = false;
         this.val = empty;
@@ -582,6 +597,7 @@ var MFCIL = (function () {
 var MapFlattenConcOperator = (function () {
     function MapFlattenConcOperator(mapOp) {
         this.mapOp = mapOp;
+        this.type = 'map+flattenConcurrently';
         this.active = 1; 
         this.out = null;
     }
@@ -637,6 +653,7 @@ var MFIL = (function () {
 var MapFlattenOperator = (function () {
     function MapFlattenOperator(mapOp) {
         this.mapOp = mapOp;
+        this.type = 'map+flatten';
         this.inner = null; 
         this.il = null; 
         this.open = true;
@@ -683,6 +700,7 @@ var MapOperator = (function () {
     function MapOperator(project, ins) {
         this.project = project;
         this.ins = ins;
+        this.type = 'map';
         this.out = null;
     }
     MapOperator.prototype._start = function (out) {
@@ -715,6 +733,7 @@ var FilterMapOperator = (function (_super) {
     function FilterMapOperator(passes, project, ins) {
         _super.call(this, project, ins);
         this.passes = passes;
+        this.type = 'filter+map';
     }
     FilterMapOperator.prototype._n = function (v) {
         if (this.passes(v)) {
@@ -729,6 +748,7 @@ var MapToOperator = (function () {
     function MapToOperator(val, ins) {
         this.val = val;
         this.ins = ins;
+        this.type = 'mapTo';
         this.out = null;
     }
     MapToOperator.prototype._start = function (out) {
@@ -755,6 +775,7 @@ var ReplaceErrorOperator = (function () {
     function ReplaceErrorOperator(fn, ins) {
         this.fn = fn;
         this.ins = ins;
+        this.type = 'replaceError';
         this.out = empty;
     }
     ReplaceErrorOperator.prototype._start = function (out) {
@@ -787,6 +808,7 @@ var StartWithOperator = (function () {
     function StartWithOperator(ins, value) {
         this.ins = ins;
         this.value = value;
+        this.type = 'startWith';
         this.out = emptyListener;
     }
     StartWithOperator.prototype._start = function (out) {
@@ -805,6 +827,7 @@ var TakeOperator = (function () {
     function TakeOperator(max, ins) {
         this.max = max;
         this.ins = ins;
+        this.type = 'take';
         this.out = null;
         this.taken = 0;
     }
