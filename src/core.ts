@@ -18,7 +18,7 @@ export interface InternalListener<T> {
   _c: () => void;
 }
 
-const emptyListener: InternalListener<any> = {
+export const emptyListener: InternalListener<any> = {
   _n: noop,
   _e: noop,
   _c: noop,
