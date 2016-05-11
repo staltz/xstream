@@ -1024,7 +1024,7 @@ export class Stream<T> implements InternalListener<T> {
   private _stopID: any = empty;
   private _prod: InternalProducer<T>;
 
-  constructor(producer: InternalProducer<T>) {
+  constructor(producer?: InternalProducer<T>) {
     this._prod = producer;
     this._ils = [];
   }

@@ -26,6 +26,7 @@
     "src/extra/flattenSequentially.ts",
     "src/extra/fromEvent.ts",
     "src/extra/pairwise.ts",
+    "src/extra/split.ts",
     "src/index.ts"
   ],
   "filesGlob": [
