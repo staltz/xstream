@@ -30,12 +30,13 @@ export interface InternalProducer<T> {
 }
 
 export interface Operator<T, R> extends InternalProducer<R>, InternalListener<T> {
+  type: string;
+  ins: Stream<T>;
   _start: (out: Stream<R>) => void;
   _stop: () => void;
   _n: (v: T) => void;
   _e: (err: any) => void;
   _c: () => void;
-  type: string;
 }
 
 export interface Producer<T> {
@@ -708,13 +709,13 @@ export class LastOperator<T> implements Operator<T, T> {
   }
 }
 
-class MFCIL<T> implements InternalListener<T> {
-  constructor(private out: Stream<T>,
-              private op: MapFlattenConcOperator<T>) {
+class MFCIL<R> implements InternalListener<R> {
+  constructor(private out: Stream<R>,
+              private op: MapFlattenConcOperator<any, R>) {
   }
 
-  _n(t: T) {
-    this.out._n(t);
+  _n(r: R) {
+    this.out._n(r);
   }
 
   _e(err: any) {
@@ -726,15 +727,17 @@ class MFCIL<T> implements InternalListener<T> {
   }
 }
 
-export class MapFlattenConcOperator<T> implements InternalProducer<T>, InternalListener<T> {
+export class MapFlattenConcOperator<T, R> implements Operator<T, R> {
   public type = 'map+flattenConcurrently';
+  public ins: Stream<T>;
   private active: number = 1; // number of outers and inners that have not yet ended
-  private out: Stream<T> = null;
+  private out: Stream<R> = null;
 
-  constructor(public mapOp: MapOperator<T, Stream<T>>) {
+  constructor(public mapOp: MapOperator<T, Stream<R>>) {
+    this.ins = mapOp.ins;
   }
 
-  _start(out: Stream<T>): void {
+  _start(out: Stream<R>): void {
     this.out = out;
     this.mapOp.ins._add(this);
   }
@@ -769,13 +772,13 @@ export class MapFlattenConcOperator<T> implements InternalProducer<T>, InternalL
   }
 }
 
-class MFIL<T> implements InternalListener<T> {
-  constructor(private out: Stream<T>,
-              private op: MapFlattenOperator<T>) {
+class MFIL<R> implements InternalListener<R> {
+  constructor(private out: Stream<R>,
+              private op: MapFlattenOperator<any, R>) {
   }
 
-  _n(t: T) {
-    this.out._n(t);
+  _n(r: R) {
+    this.out._n(r);
   }
 
   _e(err: any) {
@@ -788,17 +791,19 @@ class MFIL<T> implements InternalListener<T> {
   }
 }
 
-export class MapFlattenOperator<T> implements InternalProducer<T>, InternalListener<T> {
+export class MapFlattenOperator<T, R> implements Operator<T, R> {
   public type = 'map+flatten';
-  public inner: Stream<T> = null; // Current inner Stream
-  private il: InternalListener<T> = null; // Current inner InternalListener
+  public ins: Stream<T>;
+  public inner: Stream<R> = null; // Current inner Stream
+  private il: InternalListener<R> = null; // Current inner InternalListener
   private open: boolean = true;
-  private out: Stream<T> = null;
+  private out: Stream<R> = null;
 
-  constructor(public mapOp: MapOperator<T, Stream<T>>) {
+  constructor(public mapOp: MapOperator<T, Stream<R>>) {
+    this.ins = mapOp.ins;
   }
 
-  _start(out: Stream<T>): void {
+  _start(out: Stream<R>): void {
     this.out = out;
     this.mapOp.ins._add(this);
   }
@@ -1636,7 +1641,7 @@ export class Stream<T> implements InternalListener<T> {
     const p = this._prod;
     return <T> <any> new Stream<R>(
       p instanceof MapOperator || p instanceof FilterMapOperator ?
-        new MapFlattenOperator(<MapOperator<R, Stream<R>>> <any> p) :
+        new MapFlattenOperator(<MapOperator<any, Stream<R>>> <any> p) :
         new FlattenOperator(<Stream<Stream<R>>> <any> this)
     );
   }
@@ -1670,7 +1675,7 @@ export class Stream<T> implements InternalListener<T> {
     const p = this._prod;
     return <T> <any> new Stream<R>(
       p instanceof MapOperator || p instanceof FilterMapOperator ?
-        new MapFlattenConcOperator(<MapOperator<R, Stream<R>>> <any> p) :
+        new MapFlattenConcOperator(<MapOperator<any, Stream<R>>> <any> p) :
         new FlattenConcOperator(<Stream<Stream<R>>> <any> this)
     );
   }

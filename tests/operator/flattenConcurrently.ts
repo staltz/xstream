@@ -21,6 +21,15 @@ describe('Stream.prototype.flattenConcurrently', () => {
       });
     });
 
+    it('should have an ins field as metadata', (done) => {
+      const source: Stream<number> = xs.periodic(100).take(3)
+      const stream: Stream<number> = source
+        .map((i: number) => xs.of(1 + i, 2 + i, 3 + i))
+        .flattenConcurrently();
+      assert.strictEqual(stream['_prod']['ins'], source);
+      done();
+    });
+
     it('should return a flat stream with correct TypeScript types', (done) => {
       const streamStrings: Stream<string> = Stream.create({
         start: (listener: Listener<string>) => {},
