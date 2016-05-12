@@ -15,7 +15,7 @@ function copy(a) {
     }
     return b;
 }
-var emptyListener = {
+exports.emptyListener = {
     _n: noop,
     _e: noop,
     _c: noop,
@@ -93,7 +93,7 @@ var CombineProducer = (function () {
         this.project = project;
         this.streams = streams;
         this.type = 'combine';
-        this.out = emptyListener;
+        this.out = exports.emptyListener;
         this.ils = [];
         var n = this.ac = this.left = streams.length;
         var vals = this.vals = new Array(n);
@@ -189,7 +189,7 @@ var MergeProducer = (function () {
     function MergeProducer(streams) {
         this.streams = streams;
         this.type = 'merge';
-        this.out = emptyListener;
+        this.out = exports.emptyListener;
         this.ac = streams.length;
     }
     MergeProducer.prototype._start = function (out) {
@@ -336,7 +336,7 @@ var EndWhenOperator = (function () {
         this.ins = ins;
         this.type = 'endWhen';
         this.out = null;
-        this.oil = emptyListener; 
+        this.oil = exports.emptyListener; 
     }
     EndWhenOperator.prototype._start = function (out) {
         this.out = out;
@@ -583,8 +583,8 @@ var MFCIL = (function () {
         this.out = out;
         this.op = op;
     }
-    MFCIL.prototype._n = function (t) {
-        this.out._n(t);
+    MFCIL.prototype._n = function (r) {
+        this.out._n(r);
     };
     MFCIL.prototype._e = function (err) {
         this.out._e(err);
@@ -600,6 +600,7 @@ var MapFlattenConcOperator = (function () {
         this.type = 'map+flattenConcurrently';
         this.active = 1; 
         this.out = null;
+        this.ins = mapOp.ins;
     }
     MapFlattenConcOperator.prototype._start = function (out) {
         this.out = out;
@@ -638,8 +639,8 @@ var MFIL = (function () {
         this.out = out;
         this.op = op;
     }
-    MFIL.prototype._n = function (t) {
-        this.out._n(t);
+    MFIL.prototype._n = function (r) {
+        this.out._n(r);
     };
     MFIL.prototype._e = function (err) {
         this.out._e(err);
@@ -658,6 +659,7 @@ var MapFlattenOperator = (function () {
         this.il = null; 
         this.open = true;
         this.out = null;
+        this.ins = mapOp.ins;
     }
     MapFlattenOperator.prototype._start = function (out) {
         this.out = out;
@@ -809,7 +811,7 @@ var StartWithOperator = (function () {
         this.ins = ins;
         this.value = value;
         this.type = 'startWith';
-        this.out = emptyListener;
+        this.out = exports.emptyListener;
     }
     StartWithOperator.prototype._start = function (out) {
         this.out = out;

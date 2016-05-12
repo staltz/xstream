@@ -998,6 +998,21 @@ A: Read this [blog post](http://staltz.com/why-we-built-xstream.html) on the top
 **License:** MIT
 
 # CHANGELOG
+<a name="2.4.0"></a>
+# [2.4.0](https://github.com/staltz/xstream/compare/v2.3.0...v2.4.0) (2016-05-12)
+
+
+### Bug Fixes
+
+* **flatten:** add ins field as metadata to flatten ([cbc1f8b](https://github.com/staltz/xstream/commit/cbc1f8b))
+
+### Features
+
+* **extra:** implement new extra operator: dropUntil ([e06d502](https://github.com/staltz/xstream/commit/e06d502))
+* **extra:** implement new extra operator: split ([84742e8](https://github.com/staltz/xstream/commit/84742e8))
+
+
+
 <a name="2.3.0"></a>
 # [2.3.0](https://github.com/staltz/xstream/compare/v2.2.1...v2.3.0) (2016-05-09)
 
