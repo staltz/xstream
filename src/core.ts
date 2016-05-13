@@ -962,43 +962,6 @@ export class FilterMapOperator<T, R> extends MapOperator<T, R> {
   }
 }
 
-export class MapToOperator<T, R> implements Operator<T, R> {
-  public type = 'mapTo';
-  private out: Stream<R> = null;
-
-  constructor(public val: R,
-              public ins: Stream<T>) {
-  }
-
-  _start(out: Stream<R>): void {
-    this.out = out;
-    this.ins._add(this);
-  }
-
-  _stop(): void {
-    this.ins._remove(this);
-    this.out = null;
-  }
-
-  _n(t: T) {
-    const u = this.out;
-    if (!u) return;
-    u._n(this.val);
-  }
-
-  _e(err: any) {
-    const u = this.out;
-    if (!u) return;
-    u._e(err);
-  }
-
-  _c() {
-    const u = this.out;
-    if (!u) return;
-    u._c();
-  }
-}
-
 export class ReplaceErrorOperator<T> implements Operator<T, T> {
   public type = 'replaceError';
   private out: Stream<T> = <Stream<T>> empty;
@@ -1500,7 +1463,10 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   mapTo<U>(projectedValue: U): Stream<U> {
-    return new Stream<U>(new MapToOperator(projectedValue, this));
+    const s = this.map(() => projectedValue);
+    const op: Operator<T, U> = <Operator<T, U>> s._prod;
+    op.type = op.type.replace('map', 'mapTo');
+    return s;
   }
 
   /**

@@ -18,4 +18,10 @@ describe('Stream.prototype.mapTo', () => {
     };
     stream.addListener(listener);
   });
+
+  it('should have \'type\' metadata on the operator producer', (done) => {
+    const stream = xs.periodic(100).mapTo(10);
+    assert.strictEqual(stream['_prod']['type'], 'mapTo');
+    done();
+  });
 });
