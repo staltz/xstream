@@ -210,14 +210,23 @@ var MergeProducer = (function () {
         this.ac = L;
     };
     MergeProducer.prototype._n = function (t) {
-        this.out._n(t);
+        var u = this.out;
+        if (!u)
+            return;
+        u._n(t);
     };
     MergeProducer.prototype._e = function (err) {
-        this.out._e(err);
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
     };
     MergeProducer.prototype._c = function () {
         if (--this.ac === 0) {
-            this.out._c();
+            var u = this.out;
+            if (!u)
+                return;
+            u._c();
         }
     };
     return MergeProducer;
@@ -261,24 +270,34 @@ var DebugOperator = (function () {
         this.out = null;
     };
     DebugOperator.prototype._n = function (t) {
-        if (this.spy) {
+        var u = this.out;
+        if (!u)
+            return;
+        var spy = this.spy;
+        if (spy) {
             try {
-                this.spy(t);
+                spy(t);
             }
             catch (e) {
-                this.out._e(e);
+                u._e(e);
             }
         }
         else {
             console.log(t);
         }
-        this.out._n(t);
+        u._n(t);
     };
     DebugOperator.prototype._e = function (err) {
-        this.out._e(err);
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
     };
     DebugOperator.prototype._c = function () {
-        this.out._c();
+        var u = this.out;
+        if (!u)
+            return;
+        u._c();
     };
     return DebugOperator;
 }());
@@ -301,14 +320,23 @@ var DropOperator = (function () {
         this.dropped = 0;
     };
     DropOperator.prototype._n = function (t) {
+        var u = this.out;
+        if (!u)
+            return;
         if (this.dropped++ >= this.max)
-            this.out._n(t);
+            u._n(t);
     };
     DropOperator.prototype._e = function (err) {
-        this.out._e(err);
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
     };
     DropOperator.prototype._c = function () {
-        this.out._c();
+        var u = this.out;
+        if (!u)
+            return;
+        u._c();
     };
     return DropOperator;
 }());
@@ -350,13 +378,22 @@ var EndWhenOperator = (function () {
         this.oil = null;
     };
     EndWhenOperator.prototype.end = function () {
-        this.out._c();
+        var u = this.out;
+        if (!u)
+            return;
+        u._c();
     };
     EndWhenOperator.prototype._n = function (t) {
-        this.out._n(t);
+        var u = this.out;
+        if (!u)
+            return;
+        u._n(t);
     };
     EndWhenOperator.prototype._e = function (err) {
-        this.out._e(err);
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
     };
     EndWhenOperator.prototype._c = function () {
         this.end();
@@ -380,19 +417,28 @@ var FilterOperator = (function () {
         this.out = null;
     };
     FilterOperator.prototype._n = function (t) {
+        var u = this.out;
+        if (!u)
+            return;
         try {
             if (this.passes(t))
-                this.out._n(t);
+                u._n(t);
         }
         catch (e) {
-            this.out._e(e);
+            u._e(e);
         }
     };
     FilterOperator.prototype._e = function (err) {
-        this.out._e(err);
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
     };
     FilterOperator.prototype._c = function () {
-        this.out._c();
+        var u = this.out;
+        if (!u)
+            return;
+        u._c();
     };
     return FilterOperator;
 }());
@@ -431,15 +477,24 @@ var FlattenConcOperator = (function () {
     };
     FlattenConcOperator.prototype.less = function () {
         if (--this.active === 0) {
-            this.out._c();
+            var u = this.out;
+            if (!u)
+                return;
+            u._c();
         }
     };
     FlattenConcOperator.prototype._n = function (s) {
+        var u = this.out;
+        if (!u)
+            return;
         this.active++;
-        s._add(new FCIL(this.out, this));
+        s._add(new FCIL(u, this));
     };
     FlattenConcOperator.prototype._e = function (err) {
-        this.out._e(err);
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
     };
     FlattenConcOperator.prototype._c = function () {
         this.less();
@@ -485,17 +540,26 @@ var FlattenOperator = (function () {
         this.out = null;
     };
     FlattenOperator.prototype.less = function () {
+        var u = this.out;
+        if (!u)
+            return;
         if (!this.open && !this.inner)
-            this.out._c();
+            u._c();
     };
     FlattenOperator.prototype._n = function (s) {
+        var u = this.out;
+        if (!u)
+            return;
         var _a = this, inner = _a.inner, il = _a.il;
         if (inner && il)
             inner._remove(il);
-        (this.inner = s)._add(this.il = new FIL(this.out, this));
+        (this.inner = s)._add(this.il = new FIL(u, this));
     };
     FlattenOperator.prototype._e = function (err) {
-        this.out._e(err);
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
     };
     FlattenOperator.prototype._c = function () {
         this.open = false;
@@ -524,18 +588,27 @@ var FoldOperator = (function () {
         this.acc = this.seed;
     };
     FoldOperator.prototype._n = function (t) {
+        var u = this.out;
+        if (!u)
+            return;
         try {
-            this.out._n(this.acc = this.f(this.acc, t));
+            u._n(this.acc = this.f(this.acc, t));
         }
         catch (e) {
-            this.out._e(e);
+            u._e(e);
         }
     };
     FoldOperator.prototype._e = function (err) {
-        this.out._e(err);
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
     };
     FoldOperator.prototype._c = function () {
-        this.out._c();
+        var u = this.out;
+        if (!u)
+            return;
+        u._c();
     };
     return FoldOperator;
 }());
@@ -563,16 +636,21 @@ var LastOperator = (function () {
         this.val = t;
     };
     LastOperator.prototype._e = function (err) {
-        this.out._e(err);
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
     };
     LastOperator.prototype._c = function () {
-        var out = this.out;
+        var u = this.out;
+        if (!u)
+            return;
         if (this.has) {
-            out._n(this.val);
-            out._c();
+            u._n(this.val);
+            u._c();
         }
         else {
-            out._e('TODO show proper error');
+            u._e('TODO show proper error');
         }
     };
     return LastOperator;
@@ -597,9 +675,9 @@ var MFCIL = (function () {
 var MapFlattenConcOperator = (function () {
     function MapFlattenConcOperator(mapOp) {
         this.mapOp = mapOp;
-        this.type = 'map+flattenConcurrently';
         this.active = 1; 
         this.out = null;
+        this.type = mapOp.type + "+flattenConcurrently";
         this.ins = mapOp.ins;
     }
     MapFlattenConcOperator.prototype._start = function (out) {
@@ -613,20 +691,29 @@ var MapFlattenConcOperator = (function () {
     };
     MapFlattenConcOperator.prototype.less = function () {
         if (--this.active === 0) {
-            this.out._c();
+            var u = this.out;
+            if (!u)
+                return;
+            u._c();
         }
     };
     MapFlattenConcOperator.prototype._n = function (v) {
+        var u = this.out;
+        if (!u)
+            return;
         this.active++;
         try {
-            this.mapOp.project(v)._add(new MFCIL(this.out, this));
+            this.mapOp.project(v)._add(new MFCIL(u, this));
         }
         catch (e) {
-            this.out._e(e);
+            u._e(e);
         }
     };
     MapFlattenConcOperator.prototype._e = function (err) {
-        this.out._e(err);
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
     };
     MapFlattenConcOperator.prototype._c = function () {
         this.less();
@@ -654,11 +741,11 @@ var MFIL = (function () {
 var MapFlattenOperator = (function () {
     function MapFlattenOperator(mapOp) {
         this.mapOp = mapOp;
-        this.type = 'map+flatten';
         this.inner = null; 
         this.il = null; 
         this.open = true;
         this.out = null;
+        this.type = mapOp.type + "+flatten";
         this.ins = mapOp.ins;
     }
     MapFlattenOperator.prototype._start = function (out) {
@@ -674,22 +761,31 @@ var MapFlattenOperator = (function () {
     };
     MapFlattenOperator.prototype.less = function () {
         if (!this.open && !this.inner) {
-            this.out._c();
+            var u = this.out;
+            if (!u)
+                return;
+            u._c();
         }
     };
     MapFlattenOperator.prototype._n = function (v) {
+        var u = this.out;
+        if (!u)
+            return;
         var _a = this, inner = _a.inner, il = _a.il;
         if (inner && il)
             inner._remove(il);
         try {
-            (this.inner = this.mapOp.project(v))._add(this.il = new MFIL(this.out, this));
+            (this.inner = this.mapOp.project(v))._add(this.il = new MFIL(u, this));
         }
         catch (e) {
-            this.out._e(e);
+            u._e(e);
         }
     };
     MapFlattenOperator.prototype._e = function (err) {
-        this.out._e(err);
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
     };
     MapFlattenOperator.prototype._c = function () {
         this.open = false;
@@ -714,18 +810,27 @@ var MapOperator = (function () {
         this.out = null;
     };
     MapOperator.prototype._n = function (t) {
+        var u = this.out;
+        if (!u)
+            return;
         try {
-            this.out._n(this.project(t));
+            u._n(this.project(t));
         }
         catch (e) {
-            this.out._e(e);
+            u._e(e);
         }
     };
     MapOperator.prototype._e = function (err) {
-        this.out._e(err);
+        var u = this.out;
+        if (!u)
+            return;
+        u._e(err);
     };
     MapOperator.prototype._c = function () {
-        this.out._c();
+        var u = this.out;
+        if (!u)
+            return;
+        u._c();
     };
     return MapOperator;
 }());
@@ -746,33 +851,6 @@ var FilterMapOperator = (function (_super) {
     return FilterMapOperator;
 }(MapOperator));
 exports.FilterMapOperator = FilterMapOperator;
-var MapToOperator = (function () {
-    function MapToOperator(val, ins) {
-        this.val = val;
-        this.ins = ins;
-        this.type = 'mapTo';
-        this.out = null;
-    }
-    MapToOperator.prototype._start = function (out) {
-        this.out = out;
-        this.ins._add(this);
-    };
-    MapToOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.out = null;
-    };
-    MapToOperator.prototype._n = function (t) {
-        this.out._n(this.val);
-    };
-    MapToOperator.prototype._e = function (err) {
-        this.out._e(err);
-    };
-    MapToOperator.prototype._c = function () {
-        this.out._c();
-    };
-    return MapToOperator;
-}());
-exports.MapToOperator = MapToOperator;
 var ReplaceErrorOperator = (function () {
     function ReplaceErrorOperator(fn, ins) {
         this.fn = fn;
@@ -789,19 +867,28 @@ var ReplaceErrorOperator = (function () {
         this.out = null;
     };
     ReplaceErrorOperator.prototype._n = function (t) {
-        this.out._n(t);
+        var u = this.out;
+        if (!u)
+            return;
+        u._n(t);
     };
     ReplaceErrorOperator.prototype._e = function (err) {
+        var u = this.out;
+        if (!u)
+            return;
         try {
             this.ins._remove(this);
             (this.ins = this.fn(err))._add(this);
         }
         catch (e) {
-            this.out._e(e);
+            u._e(e);
         }
     };
     ReplaceErrorOperator.prototype._c = function () {
-        this.out._c();
+        var u = this.out;
+        if (!u)
+            return;
+        u._c();
     };
     return ReplaceErrorOperator;
 }());
@@ -843,29 +930,29 @@ var TakeOperator = (function () {
         this.taken = 0;
     };
     TakeOperator.prototype._n = function (t) {
-        var out = this.out;
-        if (!out)
+        var u = this.out;
+        if (!u)
             return;
         if (this.taken++ < this.max - 1) {
-            out._n(t);
+            u._n(t);
         }
         else {
-            out._n(t);
-            out._c();
+            u._n(t);
+            u._c();
             this._stop();
         }
     };
     TakeOperator.prototype._e = function (err) {
-        var out = this.out;
-        if (!out)
+        var u = this.out;
+        if (!u)
             return;
-        out._e(err);
+        u._e(err);
     };
     TakeOperator.prototype._c = function () {
-        var out = this.out;
-        if (!out)
+        var u = this.out;
+        if (!u)
             return;
-        out._c();
+        u._c();
     };
     return TakeOperator;
 }());
@@ -1048,7 +1135,10 @@ var Stream = (function () {
     };
     
     Stream.prototype.mapTo = function (projectedValue) {
-        return new Stream(new MapToOperator(projectedValue, this));
+        var s = this.map(function () { return projectedValue; });
+        var op = s._prod;
+        op.type = op.type.replace('map', 'mapTo');
+        return s;
     };
     
     Stream.prototype.filter = function (passes) {
