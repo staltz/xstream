@@ -766,7 +766,7 @@ Marble diagram:
 
 #### Arguments:
 
-- `replace: Function` A function of type `(err) => Stream` that takes the error that occured on the input stream or on the previous replacement
+- `replace: Function` A function of type `(err) => Stream` that takes the error that occurred on the input stream or on the previous replacement
 stream and returns a new stream. The output stream will imitate the stream
 that this function returns.
 
@@ -989,6 +989,17 @@ A: Read this [blog post](http://staltz.com/why-we-built-xstream.html) on the top
 **License:** MIT
 
 # CHANGELOG
+<a name="2.4.1"></a>
+## [2.4.1](https://github.com/staltz/xstream/compare/v2.4.0...v2.4.1) (2016-05-13)
+
+
+### Bug Fixes
+
+* **operators:** add safety check against nulls for next() etc ([5d433c3](https://github.com/staltz/xstream/commit/5d433c3))
+* **operators:** improve *type* metadata for operators with fusion ([fb1e81c](https://github.com/staltz/xstream/commit/fb1e81c))
+
+
+
 <a name="2.4.0"></a>
 # [2.4.0](https://github.com/staltz/xstream/compare/v2.3.0...v2.4.0) (2016-05-12)
 
