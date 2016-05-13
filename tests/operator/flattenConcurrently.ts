@@ -141,6 +141,41 @@ describe('Stream.prototype.flattenConcurrently', () => {
     });
   });
 
+  describe('with filter+map fusion', () => {
+    it('should execute the predicate, the projection, and the flattening', (done) => {
+      let predicateCallCount = 0;
+      let projectCallCount = 0;
+
+      const stream = xs.periodic(140).take(3)
+        .filter(i => {
+          predicateCallCount += 1;
+          return i % 2 === 0;
+        })
+        .map(i => {
+          projectCallCount += 1;
+          return xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`);
+        })
+        .flattenConcurrently();
+      // ---x---x---x---x---x---x---x---x---x---x---x---x
+      // ---00--01--02
+      //           ------------20-----------21----------22
+      const expected = ['00', '01', '02', '20', '21', '22'];
+
+      stream.addListener({
+        next: (x: string) => {
+          assert.equal(x, expected.shift());
+        },
+        error: (err: any) => done(err),
+        complete: () => {
+          assert.equal(expected.length, 0);
+          assert.equal(predicateCallCount, 3);
+          assert.equal(projectCallCount, 2);
+          done();
+        }
+      });
+    });
+  });
+
   describe('with mapTo', () => {
     it('should have the correct \'type\' metadata on the operator producer', (done) => {
       const source: Stream<Stream<number>> = xs.periodic(100).take(3)
