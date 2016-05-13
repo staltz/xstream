@@ -139,4 +139,14 @@ describe('Stream.prototype.flatten', () => {
       });
     });
   });
+  
+  describe('with mapTo', () => {
+    it('should have the correct \'type\' metadata on the operator producer', (done) => {
+      const source: Stream<Stream<number>> = xs.periodic(100).take(3)
+        .mapTo(xs.of(1, 2, 3));
+      const stream: Stream<number> = source.flatten();
+      assert.strictEqual(stream['_prod']['type'], 'mapTo+flatten');
+      done();
+    });
+  });
 });

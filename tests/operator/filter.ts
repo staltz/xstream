@@ -78,4 +78,24 @@ describe('Stream.prototype.filter', () => {
       }
     });
   });
+
+  it('should should have filter+map fusion metadata', (done) => {
+    const isEven = (x: number) => x % 2 === 0;
+    const stream = xs.of(1, 2, 3, 4, 5, 6, 7, 8)
+      .filter(isEven)
+      .map(x => 10 * x);
+
+    assert.strictEqual(stream['_prod']['type'], 'filter+map');
+    done();
+  });
+
+  it('should should have filter+mapTo fusion metadata', (done) => {
+    const isEven = (x: number) => x % 2 === 0;
+    const stream = xs.of(1, 2, 3, 4, 5, 6, 7, 8)
+      .filter(isEven)
+      .mapTo(10);
+
+    assert.strictEqual(stream['_prod']['type'], 'filter+mapTo');
+    done();
+  });
 });

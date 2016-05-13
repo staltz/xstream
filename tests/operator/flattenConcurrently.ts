@@ -140,4 +140,14 @@ describe('Stream.prototype.flattenConcurrently', () => {
       });
     });
   });
+
+  describe('with mapTo', () => {
+    it('should have the correct \'type\' metadata on the operator producer', (done) => {
+      const source: Stream<Stream<number>> = xs.periodic(100).take(3)
+        .mapTo(xs.of(1, 2, 3));
+      const stream: Stream<number> = source.flattenConcurrently();
+      assert.strictEqual(stream['_prod']['type'], 'mapTo+flattenConcurrently');
+      done();
+    });
+  });
 });

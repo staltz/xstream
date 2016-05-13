@@ -780,12 +780,13 @@ class MFCIL<R> implements InternalListener<R> {
 }
 
 export class MapFlattenConcOperator<T, R> implements Operator<T, R> {
-  public type = 'map+flattenConcurrently';
+  public type: string;
   public ins: Stream<T>;
   private active: number = 1; // number of outers and inners that have not yet ended
   private out: Stream<R> = null;
 
   constructor(public mapOp: MapOperator<T, Stream<R>>) {
+    this.type = `${mapOp.type}+flattenConcurrently`;
     this.ins = mapOp.ins;
   }
 
@@ -850,7 +851,7 @@ class MFIL<R> implements InternalListener<R> {
 }
 
 export class MapFlattenOperator<T, R> implements Operator<T, R> {
-  public type = 'map+flatten';
+  public type: string;
   public ins: Stream<T>;
   public inner: Stream<R> = null; // Current inner Stream
   private il: InternalListener<R> = null; // Current inner InternalListener
@@ -858,6 +859,7 @@ export class MapFlattenOperator<T, R> implements Operator<T, R> {
   private out: Stream<R> = null;
 
   constructor(public mapOp: MapOperator<T, Stream<R>>) {
+    this.type = `${mapOp.type}+flatten`;
     this.ins = mapOp.ins;
   }
 
