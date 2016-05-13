@@ -1603,7 +1603,7 @@ export class Stream<T> implements InternalListener<T> {
    * ```
    *
    * @param {Function} replace A function of type `(err) => Stream` that takes
-   * the error that occured on the input stream or on the previous replacement
+   * the error that occurred on the input stream or on the previous replacement
    * stream and returns a new stream. The output stream will imitate the stream
    * that this function returns.
    * @return {Stream}
