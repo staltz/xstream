@@ -1179,14 +1179,14 @@ var Stream = (function () {
     
     Stream.prototype.flatten = function () {
         var p = this._prod;
-        return new Stream(p instanceof MapOperator || p instanceof FilterMapOperator ?
+        return new Stream(p instanceof MapOperator && !(p instanceof FilterMapOperator) ?
             new MapFlattenOperator(p) :
             new FlattenOperator(this));
     };
     
     Stream.prototype.flattenConcurrently = function () {
         var p = this._prod;
-        return new Stream(p instanceof MapOperator || p instanceof FilterMapOperator ?
+        return new Stream(p instanceof MapOperator && !(p instanceof FilterMapOperator) ?
             new MapFlattenConcOperator(p) :
             new FlattenConcOperator(this));
     };
