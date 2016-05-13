@@ -309,16 +309,22 @@ export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T
   }
 
   _n(t: T) {
-    this.out._n(t);
+    const u = this.out;
+    if (!u) return;
+    u._n(t);
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
     if (--this.ac === 0) {
-      this.out._c();
+      const u = this.out;
+      if (!u) return;
+      u._c();
     }
   }
 }
@@ -363,24 +369,31 @@ export class DebugOperator<T> implements Operator<T, T> {
   }
 
   _n(t: T) {
-    if (this.spy) {
+    const u = this.out;
+    if (!u) return;
+    const spy = this.spy;
+    if (spy) {
       try {
-        this.spy(t);
+        spy(t);
       } catch (e) {
-        this.out._e(e);
+        u._e(e);
       }
     } else {
       console.log(t);
     }
-    this.out._n(t);
+    u._n(t);
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
-    this.out._c();
+    const u = this.out;
+    if (!u) return;
+    u._c();
   }
 }
 
@@ -405,15 +418,21 @@ export class DropOperator<T> implements Operator<T, T> {
   }
 
   _n(t: T) {
-    if (this.dropped++ >= this.max) this.out._n(t);
+    const u = this.out;
+    if (!u) return;
+    if (this.dropped++ >= this.max) u._n(t);
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
-    this.out._c();
+    const u = this.out;
+    if (!u) return;
+    u._c();
   }
 }
 
@@ -458,15 +477,21 @@ export class EndWhenOperator<T> implements Operator<T, T> {
   }
 
   end(): void {
-    this.out._c();
+    const u = this.out;
+    if (!u) return;
+    u._c();
   }
 
   _n(t: T) {
-    this.out._n(t);
+    const u = this.out;
+    if (!u) return;
+    u._n(t);
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
@@ -493,19 +518,25 @@ export class FilterOperator<T> implements Operator<T, T> {
   }
 
   _n(t: T) {
+    const u = this.out;
+    if (!u) return;
     try {
-      if (this.passes(t)) this.out._n(t);
+      if (this.passes(t)) u._n(t);
     } catch (e) {
-      this.out._e(e);
+      u._e(e);
     }
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
-    this.out._c();
+    const u = this.out;
+    if (!u) return;
+    u._c();
   }
 }
 
@@ -548,17 +579,23 @@ export class FlattenConcOperator<T> implements Operator<Stream<T>, T> {
 
   less(): void {
     if (--this.active === 0) {
-      this.out._c();
+      const u = this.out;
+      if (!u) return;
+      u._c();
     }
   }
 
   _n(s: Stream<T>) {
+    const u = this.out;
+    if (!u) return;
     this.active++;
-    s._add(new FCIL(this.out, this));
+    s._add(new FCIL(u, this));
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
@@ -609,17 +646,23 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
   }
 
   less(): void {
-    if (!this.open && !this.inner) this.out._c();
+    const u = this.out;
+    if (!u) return;
+    if (!this.open && !this.inner) u._c();
   }
 
   _n(s: Stream<T>) {
+    const u = this.out;
+    if (!u) return;
     const {inner, il} = this;
     if (inner && il) inner._remove(il);
-    (this.inner = s)._add(this.il = new FIL(this.out, this));
+    (this.inner = s)._add(this.il = new FIL(u, this));
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
@@ -652,19 +695,25 @@ export class FoldOperator<T, R> implements Operator<T, R> {
   }
 
   _n(t: T) {
+    const u = this.out;
+    if (!u) return;
     try {
-      this.out._n(this.acc = this.f(this.acc, t));
+      u._n(this.acc = this.f(this.acc, t));
     } catch (e) {
-      this.out._e(e);
+      u._e(e);
     }
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
-    this.out._c();
+    const u = this.out;
+    if (!u) return;
+    u._c();
   }
 }
 
@@ -695,16 +744,19 @@ export class LastOperator<T> implements Operator<T, T> {
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
-    const out = this.out;
+    const u = this.out;
+    if (!u) return;
     if (this.has) {
-      out._n(this.val);
-      out._c();
+      u._n(this.val);
+      u._c();
     } else {
-      out._e('TODO show proper error');
+      u._e('TODO show proper error');
     }
   }
 }
@@ -750,21 +802,27 @@ export class MapFlattenConcOperator<T, R> implements Operator<T, R> {
 
   less(): void {
     if (--this.active === 0) {
-      this.out._c();
+      const u = this.out;
+      if (!u) return;
+      u._c();
     }
   }
 
   _n(v: T) {
+    const u = this.out;
+    if (!u) return;
     this.active++;
     try {
-      this.mapOp.project(v)._add(new MFCIL(this.out, this));
+      this.mapOp.project(v)._add(new MFCIL(u, this));
     } catch (e) {
-      this.out._e(e);
+      u._e(e);
     }
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
@@ -818,22 +876,28 @@ export class MapFlattenOperator<T, R> implements Operator<T, R> {
 
   less(): void {
     if (!this.open && !this.inner) {
-      this.out._c();
+      const u = this.out;
+      if (!u) return;
+      u._c();
     }
   }
 
   _n(v: T) {
+    const u = this.out;
+    if (!u) return;
     const {inner, il} = this;
     if (inner && il) inner._remove(il);
     try {
-      (this.inner = this.mapOp.project(v))._add(this.il = new MFIL(this.out, this));
+      (this.inner = this.mapOp.project(v))._add(this.il = new MFIL(u, this));
     } catch (e) {
-      this.out._e(e);
+      u._e(e);
     }
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
@@ -861,19 +925,25 @@ export class MapOperator<T, R> implements Operator<T, R> {
   }
 
   _n(t: T) {
+    const u = this.out;
+    if (!u) return;
     try {
-      this.out._n(this.project(t));
+      u._n(this.project(t));
     } catch (e) {
-      this.out._e(e);
+      u._e(e);
     }
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
-    this.out._c();
+    const u = this.out;
+    if (!u) return;
+    u._c();
   }
 }
 
@@ -911,15 +981,21 @@ export class MapToOperator<T, R> implements Operator<T, R> {
   }
 
   _n(t: T) {
-    this.out._n(this.val);
+    const u = this.out;
+    if (!u) return;
+    u._n(this.val);
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
-    this.out._c();
+    const u = this.out;
+    if (!u) return;
+    u._c();
   }
 }
 
@@ -942,20 +1018,26 @@ export class ReplaceErrorOperator<T> implements Operator<T, T> {
   }
 
   _n(t: T) {
-    this.out._n(t);
+    const u = this.out;
+    if (!u) return;
+    u._n(t);
   }
 
   _e(err: any) {
+    const u = this.out;
+    if (!u) return;
     try {
       this.ins._remove(this);
       (this.ins = this.fn(err))._add(this);
     } catch (e) {
-      this.out._e(e);
+      u._e(e);
     }
   }
 
   _c() {
-    this.out._c();
+    const u = this.out;
+    if (!u) return;
+    u._c();
   }
 }
 
@@ -1000,27 +1082,27 @@ export class TakeOperator<T> implements Operator<T, T> {
   }
 
   _n(t: T) {
-    const out = this.out;
-    if (!out) return;
+    const u = this.out;
+    if (!u) return;
     if (this.taken++ < this.max - 1) {
-      out._n(t);
+      u._n(t);
     } else {
-      out._n(t);
-      out._c();
+      u._n(t);
+      u._c();
       this._stop();
     }
   }
 
   _e(err: any) {
-    const out = this.out;
-    if (!out) return;
-    out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
-    const out = this.out;
-    if (!out) return;
-    out._c();
+    const u = this.out;
+    if (!u) return;
+    u._c();
   }
 }
 
