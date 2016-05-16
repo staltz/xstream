@@ -1,10 +1,27 @@
+# Extra operators and factories
+
+The following are standalone stream operators and stream factories that may be separately imported and utilized in your project.
+To use an extra operator (e.g. `delay`), import it as such:
+
+```js
+import xs from 'xstream'
+import delay from 'xstream/extra/delay'
+
+const inputStream = xs.of(1, 2, 3, 4)
+const outputStream = inputStream.compose(delay(500))
+```
+
+To import and use an extra factory (e.g. `fromEvent`), import it as such:
+
+```js
+import fromEvent from 'xstream/extra/fromEvent'
+
+const clickStream = fromEvent(document, 'click')
+```
+
 <? docfiles.forEach(function(doc) { ?>
-  # Methods and Operators
-
-  Methods are functions attached to a Stream instance, like `stream.addListener()`. Operators are also methods, but return a new Stream, leaving the existing Stream unmodified, except for the fact that it has a child Stream attached as Listener.
-
   <? doc.javadoc.forEach(function(comment) { ?>
-    <? if (!comment.ignore && comment.name && comment.raw.tags.findIndex(o => o.type === 'factory') === -1) { ?>
+    <? if (!comment.ignore && comment.name) { ?>
       <? if (comment.isMethod || comment.isFunction) { ?>
         ### <a id="<?= comment.name ?>"></a> `<?= comment.name ?>(<?= comment.paramStr ?>)`
       <? } else { ?>

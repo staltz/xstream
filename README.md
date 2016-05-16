@@ -239,9 +239,7 @@ Creates a new Stream given a Producer.
 
 - `producer: Producer` An optional Producer that dictates how to start, generate events, and stop the Stream.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -253,9 +251,7 @@ Creates a new MemoryStream given a Producer.
 
 - `producer: Producer` An optional Producer that dictates how to start, generate events, and stop the Stream.
 
-#### Return:
-
-*(MemoryStream)* 
+#### Returns:  MemoryStream 
 
 - - -
 
@@ -270,9 +266,7 @@ Marble diagram:
 -----------------------
 ```
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -288,9 +282,7 @@ empty
 -|
 ```
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -311,9 +303,7 @@ throw(X)
 
 - `error` The error event to emit on the created stream.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -334,9 +324,7 @@ of(1,2,3)
 - `a` The first value you want to emit as an event on the stream.
 - `b` The second value you want to emit as an event on the stream. One or more of these values may be given as arguments.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -356,9 +344,7 @@ fromArray([1,2,3])
 
 - `array: Array` The array to be converted as a stream.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -379,9 +365,7 @@ fromPromise( ----42 )
 
 - `promise: Promise` The promise to be converted as a stream.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -401,9 +385,7 @@ Marble diagram:
 
 - `period: number` The interval in milliseconds to use as a rate of emission.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -429,9 +411,7 @@ Marble diagram:
 - `stream1: Stream` A stream to merge together with other streams.
 - `stream2: Stream` A stream to merge together with other streams. Two or more streams may be given as arguments.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -465,9 +445,7 @@ streams.
 - `stream1: Stream` A stream to combine together with other streams.
 - `stream2: Stream` A stream to combine together with other streams. Two or more streams may be given as arguments.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -505,9 +483,7 @@ number of arguments for this function should match the number of input
 streams.
 - `other: Stream` Another stream to combine together with the input stream. There may be more of these arguments.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -549,9 +525,7 @@ Marble diagram:
 - `project: Function` A function of type `(t: T) => U` that takes event `t` of type `T` from the input Stream and produces an event of type `U`, to
 be emitted on the output Stream.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -572,9 +546,7 @@ Marble diagram:
 
 - `projectedValue` A value to emit on the output Stream whenever the input Stream emits any value.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -599,9 +571,7 @@ Marble diagram:
 - `passes: Function` A function of type `(t: T) +> boolean` that takes an event from the input stream and checks if it passes, by returning a
 boolean.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -622,9 +592,7 @@ Marble diagram:
 
 - `amount: number` How many events to allow from the input stream before completing the output stream.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -646,9 +614,7 @@ Marble diagram:
 
 - `amount: number` How many events to ignore from the input stream before forwarding all events from the input stream to the output stream.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -665,9 +631,7 @@ Marble diagram:
 -----------------d|
 ```
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -688,9 +652,7 @@ Marble diagram:
 
 - `initial` The value or event to prepend.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -714,9 +676,7 @@ Marble diagram:
 
 - `other` Some other stream that is used to know when should the output stream of this operator complete.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -749,9 +709,7 @@ Marble diagram:
 input stream and produces the new accumulated value.
 - `seed` The initial accumulated value, of type `R`.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -779,9 +737,7 @@ Marble diagram:
 stream and returns a new stream. The output stream will imitate the stream
 that this function returns.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -809,9 +765,7 @@ Marble diagram:
 -----a--b------1----2---3--
 ```
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -839,9 +793,7 @@ Marble diagram:
 -----a--b----c-1--d-2---3--
 ```
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -865,9 +817,7 @@ Marble diagram:
 
 - `other: Stream` Another stream to merge together with the input stream.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -883,9 +833,7 @@ Instead of writing `outStream = f(inStream)` you can write
 
 - `operator: function` A function that takes a stream as input and returns a stream as well.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -895,9 +843,7 @@ Returns an output stream that imitates the input stream, but also remembers
 the most recent event that happens on the input stream, so that a newly
 added listener will immediately receive that memorised event.
 
-#### Return:
-
-*(MemoryStream)* 
+#### Returns:  MemoryStream 
 
 - - -
 
@@ -941,9 +887,7 @@ Marble diagram:
 
 - `spy: function` A function that takes an event as argument, and returns nothing.
 
-#### Return:
-
-*(Stream)* 
+#### Returns:  Stream 
 
 - - -
 
@@ -982,6 +926,69 @@ Forces the Stream to emit the "completed" event to its listeners.
 As the name indicates, if you use this, you are most likely doing something
 The Wrong Way. Please try to understand the reactive way before using this
 method. Use it only when you know what you are doing.
+
+- - -
+
+# Extra operators and factories
+
+The following are standalone stream operators and stream factories that may be separately imported and utilized in your project.
+To use an extra operator (e.g. `delay`), import it as such:
+
+```js
+import xs from 'xstream'
+import delay from 'xstream/extra/delay'
+
+const inputStream = xs.of(1, 2, 3, 4)
+const outputStream = inputStream.compose(delay(500))
+```
+
+To import and use an extra factory (e.g. `fromEvent`), import it as such:
+
+```js
+import fromEvent from 'xstream/extra/fromEvent'
+
+const clickStream = fromEvent(document, 'click')
+```
+
+### <a id="concat"></a> `concat(stream1, stream2)`
+
+Puts one stream after the other. *concat* is a factory that takes multiple
+streams as arguments, and starts the `n+1`-th stream only when the `n`-th
+stream has completed. It concatenates those streams together.
+
+Marble diagram:
+
+```text
+--1--2---3---4-|
+...............--a-b-c--d-|
+          concat
+--1--2---3---4---a-b-c--d-|
+```
+
+Example:
+
+```js
+import concat from 'xstream/extra/concat'
+
+const streamA = xs.of('a', 'b', 'c')
+const streamB = xs.of(10, 20, 30)
+const streamC = xs.of('X', 'Y', 'Z')
+
+const outputStream = concat(streamA, streamB, streamC)
+
+outputStream.addListener({
+  next: (x) => console.log(x),
+  error: (err) => console.error(err),
+  complete: () => console.log('concat completed'),
+})
+```
+
+#### Arguments:
+
+- `stream1: Stream` A stream to concatenate together with other streams.
+- `stream2: Stream` A stream to concatenate together with other streams. Two or more streams may be given as arguments.
+
+#### Returns:  Stream 
 
 - - -
 

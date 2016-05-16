@@ -28,10 +28,7 @@
       <? } ?>
 
       <? if (comment.returnTags.length > 0) { ?>
-        #### Return:
-        <? comment.returnTags.forEach(function(returnTag) { ?>
-          *(<?= returnTag.joinedTypes ?>)* <?= returnTag.description ?>
-        <? }) ?>
+        #### Returns: <? comment.returnTags.forEach(function(returnTag) { ?> <?= returnTag.joinedTypes ?> <?= returnTag.description ?><? }) ?>
       <? } ?>
       - - -
     <? } ?>
