@@ -22,10 +22,10 @@ class DebounceOperator<T> implements Operator<T, T> {
     this.id = null;
   }
 
-  clearTimer() {
+  clearInterval() {
     const id = this.id;
     if (id !== null) {
-      clearTimeout(id);
+      clearInterval(id);
     }
     this.id = null;
   }
@@ -34,21 +34,24 @@ class DebounceOperator<T> implements Operator<T, T> {
     const u = this.out;
     if (!u) return;
     this.value = t;
-    this.clearTimer();
-    this.id = setTimeout(() => u._n(t), this.dt);
+    this.clearInterval();
+    this.id = setInterval(() => {
+      this.clearInterval();
+      u._n(t);
+    }, this.dt);
   }
 
   _e(err: any) {
     const u = this.out;
     if (!u) return;
-    this.clearTimer();
+    this.clearInterval();
     u._e(err);
   }
 
   _c() {
     const u = this.out;
     if (!u) return;
-    this.clearTimer();
+    this.clearInterval();
     u._c();
   }
 }
