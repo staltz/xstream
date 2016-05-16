@@ -1,3 +1,17 @@
+<a name="2.4.3"></a>
+## [2.4.3](https://github.com/staltz/xstream/compare/v2.4.2...v2.4.3) (2016-05-16)
+
+
+### Bug Fixes
+
+* **extra:** add safety check against nulls for next() etc ([cf82a8b](https://github.com/staltz/xstream/commit/cf82a8b))
+
+### Performance Improvements
+
+* **debounce:** improve debounce speed/rate ([8bf7903](https://github.com/staltz/xstream/commit/8bf7903))
+
+
+
 <a name="2.4.2"></a>
 ## [2.4.2](https://github.com/staltz/xstream/compare/v2.4.1...v2.4.2) (2016-05-13)
 
