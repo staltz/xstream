@@ -23,20 +23,26 @@ class ConcatProducer<T> implements InternalProducer<T>, InternalListener<T> {
   }
 
   _n(t: T) {
-    this.out._n(t);
+    const u = this.out;
+    if (!u) return;
+    u._n(t);
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
+    const u = this.out;
+    if (!u) return;
     const streams = this.streams;
     streams[this.i]._remove(this);
     if (++this.i < streams.length) {
       streams[this.i]._add(this);
     } else {
-      this.out._c();
+      u._c();
     }
   }
 }

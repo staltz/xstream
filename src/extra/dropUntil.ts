@@ -48,17 +48,23 @@ export class DropUntilOperator<T> implements Operator<T, T> {
   }
 
   _n(t: T) {
+    const u = this.out;
+    if (!u) return;
     if (!this.on) return;
-    this.out._n(t);
+    u._n(t);
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
+    const u = this.out;
+    if (!u) return;
     this.up();
-    this.out._c();
+    u._c();
   }
 }
 

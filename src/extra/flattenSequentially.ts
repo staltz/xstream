@@ -53,22 +53,28 @@ export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
   }
 
   _n(s: Stream<T>) {
+    const u = this.out;
+    if (!u) return;
     if (this.active) {
       this.seq.push(s);
     } else {
       this.active = true;
-      s._add(new FSInner(this.out, this));
+      s._add(new FSInner(u, this));
     }
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
+    const u = this.out;
+    if (!u) return;
     this.open = false;
     if (this.seq.length === 0) {
-      this.out._c();
+      u._c();
     }
   }
 }

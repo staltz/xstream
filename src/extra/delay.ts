@@ -19,25 +19,28 @@ class DelayOperator<T> implements Operator<T, T> {
   }
 
   _n(t: T) {
-    const self = this;
+    const u = this.out;
+    if (!u) return;
     const id = setInterval(() => {
-      self.out._n(t);
+      u._n(t);
       clearInterval(id);
     }, this.dt);
   }
 
   _e(err: any) {
-    const self = this;
+    const u = this.out;
+    if (!u) return;
     const id = setInterval(() => {
-      self.out._e(err);
+      u._e(err);
       clearInterval(id);
     }, this.dt);
   }
 
   _c() {
-    const self = this;
+    const u = this.out;
+    if (!u) return;
     const id = setInterval(() => {
-      self.out._c();
+      u._c();
       clearInterval(id);
     }, this.dt);
   }

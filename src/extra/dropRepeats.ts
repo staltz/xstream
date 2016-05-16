@@ -26,19 +26,25 @@ export class DropRepeatsOperator<T> implements Operator<T, T> {
   }
 
   _n(t: T) {
+    const u = this.out;
+    if (!u) return;
     const v = this.v;
     if (v === empty || !this.isEq(t, v)) {
-      this.out._n(t);
+      u._n(t);
     }
     this.v = t;
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
-    this.out._c();
+    const u = this.out;
+    if (!u) return;
+    u._c();
   }
 }
 

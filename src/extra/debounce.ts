@@ -31,19 +31,25 @@ class DebounceOperator<T> implements Operator<T, T> {
   }
 
   _n(t: T) {
+    const u = this.out;
+    if (!u) return;
     this.value = t;
     this.clearTimer();
-    this.id = setTimeout(() => this.out._n(this.value), this.dt);
+    this.id = setTimeout(() => u._n(t), this.dt);
   }
 
   _e(err: any) {
+    const u = this.out;
+    if (!u) return;
     this.clearTimer();
-    this.out._e(err);
+    u._e(err);
   }
 
   _c() {
+    const u = this.out;
+    if (!u) return;
     this.clearTimer();
-    this.out._c();
+    u._c();
   }
 }
 

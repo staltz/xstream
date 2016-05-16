@@ -22,19 +22,25 @@ class PairwiseOperator<T> implements Operator<T, [T, T]> {
   }
 
   _n(t: T) {
+    const u = this.out;
+    if (!u) return;
     if (this.has) {
-      this.out._n([this.val, t]);
+      u._n([this.val, t]);
     }
     this.val = t;
     this.has = true;
   }
 
   _e(err: any) {
-    this.out._e(err);
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
   }
 
   _c() {
-    this.out._c();
+    const u = this.out;
+    if (!u) return;
+    u._c();
   }
 }
 
