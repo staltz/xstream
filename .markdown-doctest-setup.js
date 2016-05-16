@@ -10,6 +10,8 @@ module.exports = {
   globals: {
     xs: xstream,
     stream: xstream.empty(),
+    A: xstream.never(),
+    B: xstream.never(),
     setInterval: noop,
     console: {
       log: noop,
