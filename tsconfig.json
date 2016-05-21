@@ -24,6 +24,7 @@
     "src/extra/dropRepeats.ts",
     "src/extra/dropUntil.ts",
     "src/extra/flattenSequentially.ts",
+    "src/extra/fromDiagram.ts",
     "src/extra/fromEvent.ts",
     "src/extra/pairwise.ts",
     "src/extra/split.ts",

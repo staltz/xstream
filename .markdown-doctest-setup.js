@@ -35,6 +35,7 @@ module.exports = {
     'xstream/extra/fromEvent': require('./extra/fromEvent').default,
     'xstream/extra/delay': require('./extra/delay').default,
     'xstream/extra/concat': require('./extra/concat').default,
+    'xstream/extra/fromDiagram': require('./extra/fromDiagram').default,
   },
 
   globals: {
