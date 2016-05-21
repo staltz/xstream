@@ -353,9 +353,16 @@ export class PeriodicProducer implements InternalProducer<number> {
 export class DebugOperator<T> implements Operator<T, T> {
   public type = 'debug';
   private out: Stream<T> = null;
+  private s: (t: T) => any = null; // spy
+  private l: string = null; // label
 
-  constructor(public spy: (t: T) => any = null,
+  constructor(arg: string | ((t: T) => any),
               public ins: Stream<T>) {
+    if (typeof arg === 'string') {
+      this.l = arg;
+    } else {
+      this.s = arg;
+    }
   }
 
   _start(out: Stream<T>): void {
@@ -371,13 +378,15 @@ export class DebugOperator<T> implements Operator<T, T> {
   _n(t: T) {
     const u = this.out;
     if (!u) return;
-    const spy = this.spy;
-    if (spy) {
+    const s = this.s, l = this.l;
+    if (s) {
       try {
-        spy(t);
+        s(t);
       } catch (e) {
         u._e(e);
       }
+    } else if (l) {
+      console.log(l + ': ' + t);
     } else {
       console.log(t);
     }
@@ -1852,12 +1861,13 @@ export class Stream<T> implements InternalListener<T> {
    * --1----2-----3-----4--
    * ```
    *
-   * @param {function} spy A function that takes an event as argument, and
-   * returns nothing.
+   * @param {function} labelOrSpy A string to use as the label when printing
+   * debug information on the console, or a 'spy' function that takes an event
+   * as argument, and does not need to return anything.
    * @return {Stream}
    */
-  debug(spy: (t: T) => void = null): Stream<T> {
-    return new Stream<T>(new DebugOperator(spy, this));
+  debug(labelOrSpy?: string | ((t: T) => void)): Stream<T> {
+    return new Stream<T>(new DebugOperator(labelOrSpy, this));
   }
 
   /**
