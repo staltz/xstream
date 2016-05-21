@@ -992,6 +992,62 @@ outputStream.addListener({
 
 - - -
 
+### <a id="fromDiagram"></a> `fromDiagram(diagram, options)`
+
+Creates a real stream out of an ASCII drawing of a stream. Each string
+character represents an amount of time passed (by default, 20 milliseconds).
+`-` characters represent nothing special, `|` is a symbol to mark the
+completion of the stream, `#` is an error on the stream, and any other
+character is a "next" event.
+
+Example:
+
+```js
+import fromDiagram from 'xstream/extra/fromDiagram'
+
+const stream = fromDiagram('--a--b---c-d--|')
+
+stream.addListener({
+  next: (x) => console.log(x),
+  error: (err) => console.error(err),
+  complete: () => console.log('concat completed'),
+})
+```
+
+The character `a` represent emission of the event `'a'`, a string. If you
+want to emit something else than a string, you need to provide those values
+in the options argument.
+
+Example:
+
+```js
+import fromDiagram from 'xstream/extra/fromDiagram'
+
+const stream = fromDiagram('--a--b---c-d--|', {
+  values: {a: 10, b: 20, c: 30, d: 40}
+})
+
+stream.addListener({
+  next: (x) => console.log(x),
+  error: (err) => console.error(err),
+  complete: () => console.log('concat completed'),
+})
+```
+
+That way, the stream will emit the numbers 10, 20, 30, 40. The `options`
+argument may also take `timeUnit`, a number to configure how many
+milliseconds does each represents, and `errorValue`, a value to send out as
+the error which `#` represents.
+
+#### Arguments:
+
+- `diagram: string` A string representing a timeline of values, error, or complete notifications that should happen on the output stream.
+- `options` An options object that allows you to configure some additional details of the creation of the stream.
+
+#### Returns:  Stream 
+
+- - -
+
 # FAQ
 
 **Q: What's the difference between xstream and RxJS?**
@@ -1020,6 +1076,16 @@ And can be interpreted/read as "when a `B` event happens, remember it and map it
 **License:** MIT
 
 # CHANGELOG
+<a name="2.5.0"></a>
+# [2.5.0](https://github.com/staltz/xstream/compare/v2.4.3...v2.5.0) (2016-05-21)
+
+
+### Features
+
+* **extra:** add new extra factory fromDiagram ([d6c4ae5](https://github.com/staltz/xstream/commit/d6c4ae5))
+
+
+
 <a name="2.4.3"></a>
 ## [2.4.3](https://github.com/staltz/xstream/compare/v2.4.2...v2.4.3) (2016-05-16)
 
