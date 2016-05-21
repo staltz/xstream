@@ -254,12 +254,18 @@ var PeriodicProducer = (function () {
 }());
 exports.PeriodicProducer = PeriodicProducer;
 var DebugOperator = (function () {
-    function DebugOperator(spy, ins) {
-        if (spy === void 0) { spy = null; }
-        this.spy = spy;
+    function DebugOperator(arg, ins) {
         this.ins = ins;
         this.type = 'debug';
         this.out = null;
+        this.s = null; 
+        this.l = null; 
+        if (typeof arg === 'string') {
+            this.l = arg;
+        }
+        else {
+            this.s = arg;
+        }
     }
     DebugOperator.prototype._start = function (out) {
         this.out = out;
@@ -273,14 +279,17 @@ var DebugOperator = (function () {
         var u = this.out;
         if (!u)
             return;
-        var spy = this.spy;
-        if (spy) {
+        var s = this.s, l = this.l;
+        if (s) {
             try {
-                spy(t);
+                s(t);
             }
             catch (e) {
                 u._e(e);
             }
+        }
+        else if (l) {
+            console.log(l + ': ' + t);
         }
         else {
             console.log(t);
@@ -1211,9 +1220,8 @@ var Stream = (function () {
         other._add(this);
     };
     
-    Stream.prototype.debug = function (spy) {
-        if (spy === void 0) { spy = null; }
-        return new Stream(new DebugOperator(spy, this));
+    Stream.prototype.debug = function (labelOrSpy) {
+        return new Stream(new DebugOperator(labelOrSpy, this));
     };
     
     Stream.prototype.shamefullySendNext = function (value) {

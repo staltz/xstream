@@ -861,7 +861,7 @@ given `other` stream.
 
 - - -
 
-### <a id="debug"></a> `debug(spy)`
+### <a id="debug"></a> `debug(labelOrSpy)`
 
 Returns an output stream that identically imitates the input stream, but
 also runs a `spy` function fo each event, to help you debug your app.
@@ -885,7 +885,8 @@ Marble diagram:
 
 #### Arguments:
 
-- `spy: function` A function that takes an event as argument, and returns nothing.
+- `labelOrSpy: function` A string to use as the label when printing debug information on the console, or a 'spy' function that takes an event
+as argument, and does not need to return anything.
 
 #### Returns:  Stream 
 
@@ -1076,6 +1077,16 @@ And can be interpreted/read as "when a `B` event happens, remember it and map it
 **License:** MIT
 
 # CHANGELOG
+<a name="2.6.0"></a>
+# [2.6.0](https://github.com/staltz/xstream/compare/v2.5.0...v2.6.0) (2016-05-21)
+
+
+### Features
+
+* **debug:** add support for label argument to debug() ([9231851](https://github.com/staltz/xstream/commit/9231851))
+
+
+
 <a name="2.5.0"></a>
 # [2.5.0](https://github.com/staltz/xstream/compare/v2.4.3...v2.5.0) (2016-05-21)
 

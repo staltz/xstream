@@ -1,3 +1,13 @@
+<a name="2.6.0"></a>
+# [2.6.0](https://github.com/staltz/xstream/compare/v2.5.0...v2.6.0) (2016-05-21)
+
+
+### Features
+
+* **debug:** add support for label argument to debug() ([9231851](https://github.com/staltz/xstream/commit/9231851))
+
+
+
 <a name="2.5.0"></a>
 # [2.5.0](https://github.com/staltz/xstream/compare/v2.4.3...v2.5.0) (2016-05-21)
 
