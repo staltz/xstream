@@ -1263,6 +1263,10 @@ var MemoryStream = (function (_super) {
         }
         _super.prototype._add.call(this, il);
     };
+    MemoryStream.prototype._x = function () {
+        this._has = false;
+        _super.prototype._x.call(this);
+    };
     return MemoryStream;
 }(Stream));
 exports.MemoryStream = MemoryStream;
