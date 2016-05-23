@@ -1068,6 +1068,16 @@ And can be interpreted/read as "when a `B` event happens, remember it and map it
 **License:** MIT
 
 # CHANGELOG
+<a name="2.6.1"></a>
+## [2.6.1](https://github.com/staltz/xstream/compare/v2.6.0...v2.6.1) (2016-05-23)
+
+
+### Bug Fixes
+
+* **MemoryStream:** fix tear down logic to reset memory ([524d68e](https://github.com/staltz/xstream/commit/524d68e)), closes [#36](https://github.com/staltz/xstream/issues/36)
+
+
+
 <a name="2.6.0"></a>
 # [2.6.0](https://github.com/staltz/xstream/compare/v2.5.0...v2.6.0) (2016-05-21)
 
