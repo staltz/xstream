@@ -1928,6 +1928,11 @@ export class MemoryStream<T> extends Stream<T> {
     if (this._has) { il._n(this._v); }
     super._add(il);
   }
+
+  _x(): void {
+    this._has = false;
+    super._x();
+  }
 }
 
 export default Stream;

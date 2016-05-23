@@ -112,4 +112,44 @@ describe('MemoryStream', () => {
       done();
     }, 400);
   });
+
+  it('should reset completely after it has completed', (done) => {
+    const stream = xs.createWithMemory({
+      start(listener: Listener<number>) {
+        listener.next(1);
+        listener.next(2);
+        listener.next(3);
+        listener.complete();
+      },
+      stop() {},
+    });
+
+    const expected1 = [1, 2, 3];
+    let completed1 = false;
+    const expected2 = [1, 2, 3];
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.equal(x, expected1.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        completed1 = true;
+      },
+    });
+
+    assert.strictEqual(expected1.length, 0);
+    assert.strictEqual(completed1, true);
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.equal(x, expected2.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.strictEqual(expected2.length, 0);
+        done();
+      },
+    });
+  });
 });
