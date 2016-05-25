@@ -1,3 +1,13 @@
+<a name="2.6.2"></a>
+## [2.6.2](https://github.com/staltz/xstream/compare/v2.6.1...v2.6.2) (2016-05-25)
+
+
+### Bug Fixes
+
+* **debug:** improve printing of objects from debug() ([9cf630b](https://github.com/staltz/xstream/commit/9cf630b)), closes [#38](https://github.com/staltz/xstream/issues/38)
+
+
+
 <a name="2.6.1"></a>
 ## [2.6.1](https://github.com/staltz/xstream/compare/v2.6.0...v2.6.1) (2016-05-23)
 

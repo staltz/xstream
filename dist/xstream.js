@@ -289,7 +289,7 @@ var DebugOperator = (function () {
             }
         }
         else if (l) {
-            console.log(l + ': ' + t);
+            console.log(l + ':', t);
         }
         else {
             console.log(t);
