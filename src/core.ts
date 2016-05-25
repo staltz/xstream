@@ -386,7 +386,7 @@ export class DebugOperator<T> implements Operator<T, T> {
         u._e(e);
       }
     } else if (l) {
-      console.log(l + ': ' + t);
+      console.log(l + ':', t);
     } else {
       console.log(t);
     }
