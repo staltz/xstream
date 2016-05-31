@@ -16,7 +16,7 @@
     "tabSize": 2
   },
   "files": [
-    "typings/main.d.ts",
+    "typings/index.d.ts",
     "src/core.ts",
     "src/extra/concat.ts",
     "src/extra/debounce.ts",
@@ -31,7 +31,7 @@
     "src/index.ts"
   ],
   "filesGlob": [
-    "typings/main.d.ts",
+    "typings/index.d.ts",
     "src/**/*.ts"
   ],
   "exclude": [
