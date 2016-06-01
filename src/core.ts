@@ -1212,6 +1212,17 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   /**
+   * Creates a new MimicStream, which can `imitate` another Stream. Only a
+   * MimicStream has the `imitate()` method.
+   *
+   * @factory true
+   * @return {MimicStream}
+   */
+  static createMimic<T>(): MimicStream<T> {
+    return new MimicStream<T>();
+  }
+
+  /**
    * Creates a Stream that does nothing when started. It never emits any event.
    *
    * Marble diagram:
@@ -1828,19 +1839,6 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   /**
-   * Changes this current stream to imitate the `other` given stream.
-   *
-   * The *imitate* method returns nothing. Instead, it changes the behavior of
-   * the current stream, making it re-emit whatever events are emitted by the
-   * given `other` stream.
-
-   * @param {Stream} other The stream to imitate on the current one.
-   */
-  imitate(other: Stream<T>): void {
-    other._add(this);
-  }
-
-  /**
    * Returns an output stream that identically imitates the input stream, but
    * also runs a `spy` function fo each event, to help you debug your app.
    *
@@ -1908,7 +1906,38 @@ export class Stream<T> implements InternalListener<T> {
   shamefullySendComplete() {
     this._c();
   }
+}
 
+export class MimicStream<T> extends Stream<T> {
+  private _target: Stream<T>;
+  constructor() {
+    super();
+  }
+
+  _add(il: InternalListener<T>): void {
+    const t = this._target;
+    if (!t) return;
+    t._add(il);
+  }
+
+  _remove(il: InternalListener<T>): void {
+    const t = this._target;
+    if (!t) return;
+    t._remove(il);
+  }
+
+  /**
+   * Changes this current MimicStream to imitate the `other` given stream.
+   *
+   * The *imitate* method returns nothing. Instead, it changes the behavior of
+   * the current stream, making it re-emit whatever events are emitted by the
+   * given `other` stream.
+   *
+   * @param {Stream} other The stream to imitate on the current one.
+   */
+  imitate(other: Stream<T>): void {
+    this._target = other;
+  }
 }
 
 export class MemoryStream<T> extends Stream<T> {

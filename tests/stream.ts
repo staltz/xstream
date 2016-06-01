@@ -5,6 +5,7 @@ describe('Stream', () => {
   it('should have all the core static operators', () => {
     assert.equal(typeof xs.create, 'function');
     assert.equal(typeof xs.createWithMemory, 'function');
+    assert.equal(typeof xs.createMimic, 'function');
     assert.equal(typeof xs.never, 'function');
     assert.equal(typeof xs.empty, 'function');
     assert.equal(typeof xs.throw, 'function');
@@ -35,7 +36,6 @@ describe('Stream', () => {
     assert.equal(typeof stream.combine, 'function');
     assert.equal(typeof stream.compose, 'function');
     assert.equal(typeof stream.remember, 'function');
-    assert.equal(typeof stream.imitate, 'function');
     assert.equal(typeof stream.debug, 'function');
   });
 
@@ -94,27 +94,6 @@ describe('Stream', () => {
     assert.equal(expected.length, 0);
     assert.equal(listenerGotEnd, true);
     done();
-  });
-
-  it('should allow being imitated by a proxy Stream', (done) => {
-    const stream = xs.periodic(100).take(3);
-    const proxyStream = xs.create();
-
-    const expected = [1, 2];
-    setTimeout(() => {
-      proxyStream.addListener({
-        next: (x: string) => {
-          assert.equal(x, expected.shift());
-        },
-        error: (err: any) => done(err),
-        complete: () => {
-          assert.equal(expected.length, 0);
-          done();
-        },
-      });
-    }, 130);
-
-    proxyStream.imitate(stream);
   });
 
   it('should be possible to addListener and removeListener with 1 listener', (done) => {

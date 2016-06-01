@@ -20,27 +20,6 @@ describe('MemoryStream', () => {
     stream.shamefullySendComplete();
   });
 
-  it('should allow being imitated by a proxy Stream', (done) => {
-    const stream = xs.periodic(100).take(3);
-    const proxyStream = xs.createWithMemory();
-
-    const expected = [0, 1, 2];
-    setTimeout(() => {
-      proxyStream.addListener({
-        next: (x: string) => {
-          assert.equal(x, expected.shift());
-        },
-        error: (err: any) => done(err),
-        complete: () => {
-          assert.equal(expected.length, 0);
-          done();
-        },
-      });
-    }, 130);
-
-    proxyStream.imitate(stream);
-  });
-
   it('should be createable giving a custom producer object', (done) => {
     const expected = [10, 20, 30];
     let listenerGotEnd: boolean = false;
