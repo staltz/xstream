@@ -24,6 +24,7 @@
     "src/extra/dropRepeats.ts",
     "src/extra/dropUntil.ts",
     "src/extra/flattenSequentially.ts",
+    "src/extra/flattenConcurrently.ts",
     "src/extra/fromDiagram.ts",
     "src/extra/fromEvent.ts",
     "src/extra/pairwise.ts",
@@ -33,10 +34,6 @@
   "filesGlob": [
     "typings/index.d.ts",
     "src/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "tests"
   ],
   "atom": {
     "rewriteTsconfig": true

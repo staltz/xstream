@@ -1,12 +1,13 @@
 import xs, {Stream, Listener} from '../../src/index';
+import flattenConcurrently from '../../src/extra/flattenConcurrently';
 import * as assert from 'assert';
 
-describe('Stream.prototype.flattenConcurrently', () => {
+describe('flattenConcurrently (extra)', () => {
   describe('with map', () => {
     it('should expand each periodic event with 3 sync events', (done) => {
       const stream = xs.periodic(100).take(3)
         .map(i => xs.of(1 + i, 2 + i, 3 + i))
-        .flattenConcurrently();
+        .compose(flattenConcurrently);
       const expected = [1, 2, 3, 2, 3, 4, 3, 4, 5];
 
       stream.addListener({
@@ -19,15 +20,6 @@ describe('Stream.prototype.flattenConcurrently', () => {
           done();
         },
       });
-    });
-
-    it('should have an ins field as metadata', (done) => {
-      const source: Stream<number> = xs.periodic(100).take(3)
-      const stream: Stream<number> = source
-        .map((i: number) => xs.of(1 + i, 2 + i, 3 + i))
-        .flattenConcurrently();
-      assert.strictEqual(stream['_prod']['ins'], source);
-      done();
     });
 
     it('should return a flat stream with correct TypeScript types', (done) => {
@@ -43,14 +35,14 @@ describe('Stream.prototype.flattenConcurrently', () => {
 
       // Type checked by the compiler. Without Stream<boolean> it does not compile.
       const flat: Stream<boolean> = streamStrings.map(x => streamBooleans)
-        .flattenConcurrently();
+        .compose(flattenConcurrently);
       done();
     });
 
     it('should expand 3 sync events as a periodic each', (done) => {
       const stream = xs.of(0, 1, 2)
         .map(i => xs.periodic(100 * i).take(2).map(x => `${i}${x}`))
-        .flattenConcurrently();
+        .compose(flattenConcurrently);
       // ---x---x---x---x---x---x
       // ---00--01
       // -------10------11
@@ -74,7 +66,7 @@ describe('Stream.prototype.flattenConcurrently', () => {
         .map(i =>
           xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
         )
-        .flattenConcurrently();
+        .compose(flattenConcurrently);
       // ---x---x---x---x---x---x---x---x---x---x---x---x
       // ---00--01--02
       //      ----10--11--12
@@ -99,7 +91,7 @@ describe('Stream.prototype.flattenConcurrently', () => {
           xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
         )
         .filter(() => true) // breaks the optimization map+flattenConcurrently
-        .flattenConcurrently();
+        .compose(flattenConcurrently);
       // ---x---x---x---x---x---x---x---x---x---x---x---x
       // ---00--01--02
       //      ----10--11--12
@@ -126,7 +118,7 @@ describe('Stream.prototype.flattenConcurrently', () => {
           const y = (<string> <any> x).toLowerCase();
           return xs.of(y);
         }
-      ).flattenConcurrently();
+          ).compose(flattenConcurrently);
 
       stream.addListener({
         next: () => done('next should not be called'),
@@ -155,7 +147,7 @@ describe('Stream.prototype.flattenConcurrently', () => {
           projectCallCount += 1;
           return xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`);
         })
-        .flattenConcurrently();
+        .compose(flattenConcurrently);
       // ---x---x---x---x---x---x---x---x---x---x---x---x
       // ---00--01--02
       //           ------------20-----------21----------22
@@ -173,16 +165,6 @@ describe('Stream.prototype.flattenConcurrently', () => {
           done();
         }
       });
-    });
-  });
-
-  describe('with mapTo', () => {
-    it('should have the correct \'type\' metadata on the operator producer', (done) => {
-      const source: Stream<Stream<number>> = xs.periodic(100).take(3)
-        .mapTo(xs.of(1, 2, 3));
-      const stream: Stream<number> = source.flattenConcurrently();
-      assert.strictEqual(stream['_prod']['type'], 'mapTo+flattenConcurrently');
-      done();
     });
   });
 });
