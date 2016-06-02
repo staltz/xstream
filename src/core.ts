@@ -1762,7 +1762,9 @@ export class MimicStream<T> extends Stream<T> {
   }
 
   /**
-   * Changes this current MimicStream to imitate the `other` given stream.
+   * This method exists only on a MimicStream, which is created through
+   * `xs.createMimic()`. `imitate` changes this current MimicStream to imitate
+   * the `other` given stream.
    *
    * The *imitate* method returns nothing. Instead, it changes the behavior of
    * the current stream, making it re-emit whatever events are emitted by the
