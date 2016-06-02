@@ -13,4 +13,29 @@ describe('Stream.prototype.startWith', () => {
       complete: done
     });
   });
+
+  it('should return a stream with memory by default', (done) => {
+    const stream = xs.periodic(100).take(3).startWith(1);
+
+    const expected1 = [1, 0, 1, 2];
+    const expected2 = [0, 1, 2];
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.strictEqual(expected1.shift(), x);
+      },
+      error: done,
+      complete: () => void 0
+    });
+
+    setTimeout(() => {
+      stream.addListener({
+      next: (x: number) => {
+        assert.strictEqual(expected2.shift(), x);
+      },
+      error: done,
+      complete: () => done()
+    });
+    }, 150)
+  });
 });

@@ -41,4 +41,29 @@ describe('Stream.prototype.fold', () => {
       },
     });
   });
+
+  it('should return a stream with memory by default', (done) => {
+    const stream = xs.periodic(100).take(3).fold((x: number, y: number) => x + y, 0);
+
+    const expected1 = [0, 0, 1, 3];
+    const expected2 = [0, 1, 3];
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.strictEqual(expected1.shift(), x);
+      },
+      error: done,
+      complete: () => void 0
+    });
+
+    setTimeout(() => {
+      stream.addListener({
+      next: (x: number) => {
+        assert.strictEqual(expected2.shift(), x);
+      },
+      error: done,
+      complete: () => done()
+    });
+    }, 150)
+  });
 });

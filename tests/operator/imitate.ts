@@ -37,6 +37,16 @@ describe('MimicStream.prototype.imitate', () => {
     proxyStream.imitate(stream);
   });
 
+  it('should throw and error if given a stream with Memory', () => {
+    const proxy = xs.createMimic<number>();
+
+    const real = xs.of(1).remember();
+
+    assert.throws(() => {
+      proxy.imitate(real);
+    });
+  });
+
 //   it('should link the given stream to the mimic stream', (done) => {
 //     const stream = xs.periodic(50).take(3);
 //     const proxyStream = xs.createMimic<number>();
