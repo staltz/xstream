@@ -7,7 +7,7 @@ describe('flattenSequentially (extra)', () => {
     it('should expand each periodic event with 3 sync events', (done) => {
       const stream = xs.periodic(100).take(3)
         .map(i => xs.of(1 + i, 2 + i, 3 + i))
-        .compose(flattenSequentially());
+        .compose(flattenSequentially);
       const expected = [1, 2, 3, 2, 3, 4, 3, 4, 5];
       const listener = {
         next: (x: number) => {
@@ -25,7 +25,7 @@ describe('flattenSequentially (extra)', () => {
     it('should expand each sync event as a periodic stream and concatenate', (done) => {
       const stream = xs.of(1, 2, 3)
         .map(i => xs.periodic(100).take(3).map(x => `${i}${x}`))
-        .compose(flattenSequentially());
+        .compose(flattenSequentially);
       const expected = ['10', '11', '12', '20', '21', '22', '30', '31', '32'];
       const listener = {
         next: (x: number) => {
@@ -43,7 +43,7 @@ describe('flattenSequentially (extra)', () => {
     it('should expand 3 sync events as a periodic each', (done) => {
       const stream = xs.of(1, 2, 3)
         .map(i => xs.periodic(100 * i).take(2).map(x => `${i}${x}`))
-        .compose(flattenSequentially());
+        .compose(flattenSequentially);
       // ---x---x---x---x---x---x
       // ---10--11
       //         -------20------21
@@ -67,7 +67,7 @@ describe('flattenSequentially (extra)', () => {
         .map(i =>
           xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
         )
-        .compose(flattenSequentially());
+        .compose(flattenSequentially);
       // ---x---x---x---x---x---x---x---x---x---x---x---x
       // ---00--01--02
       //             ----10--11--12
@@ -91,7 +91,7 @@ describe('flattenSequentially (extra)', () => {
           xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
         )
         .filter(() => true) // breaks an optimization map+flattenSequentially
-        .compose(flattenSequentially());
+        .compose(flattenSequentially);
       // ---x---x---x---x---x---x---x---x---x---x---x---x
       // ---00--01--02
       //             ----10--11--12
@@ -118,7 +118,7 @@ describe('flattenSequentially (extra)', () => {
           const y = (<string> <any> x).toLowerCase();
           return xs.of(y);
         }
-      ).compose(flattenSequentially());
+      ).compose(flattenSequentially);
 
       stream.addListener({
         next: () => done('next should not be called'),

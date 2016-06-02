@@ -79,8 +79,6 @@ export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
   }
 }
 
-export default function flattenSequentially<T>(): (ins: Stream<Stream<T>>) => Stream<T> {
-  return function flattenSequentiallyOperator(ins: Stream<Stream<T>>): Stream<T> {
-    return new Stream<T>(new FlattenSeqOperator(ins));
-  };
+export default function flattenSequentially<T>(ins: Stream<Stream<T>>): Stream<T> {
+  return new Stream<T>(new FlattenSeqOperator(ins));
 }

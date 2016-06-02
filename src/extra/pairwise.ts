@@ -44,8 +44,6 @@ class PairwiseOperator<T> implements Operator<T, [T, T]> {
   }
 }
 
-export default function pairwise<T>(): (ins: Stream<T>) => Stream<[T, T]> {
-  return function pairwiseOperator(ins: Stream<T>): Stream<[T, T]> {
-    return new Stream<[T, T]>(new PairwiseOperator(ins));
-  };
+export default function pairwiseOperator<T>(ins: Stream<T>): Stream<[T, T]> {
+  return new Stream<[T, T]>(new PairwiseOperator(ins));
 }

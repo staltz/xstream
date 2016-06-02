@@ -4,7 +4,7 @@ import * as assert from 'assert';
 
 describe('pairwise (extra)', () => {
   it('should group consecutive pairs as arrays', (done) => {
-    const stream = xs.of(1, 2, 3, 4, 5, 6).compose(pairwise());
+    const stream = xs.of(1, 2, 3, 4, 5, 6).compose(pairwise);
     const expected = [
       [1, 2],
       [2, 3],
