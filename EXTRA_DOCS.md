@@ -91,6 +91,36 @@ Marble diagram:
 
 - - -
 
+### <a id="flattenSequentially"></a> `flattenSequentially()`
+
+Flattens a "stream of streams", handling only one nested stream at a time,
+with no concurrency, but does not drop nested streams like `flatten` does.
+
+If the input stream is a stream that emits streams, then this operator will
+return an output stream which is a flat stream: emits regular events. The
+flattening happens sequentially and without concurrency. It works like this:
+when the input stream emits a nested stream, *flattenSequentially* will start
+imitating that nested one. When the next nested stream is emitted on the
+input stream, *flattenSequentially* will keep that in a buffer, and only
+start imitating it once the previous nested stream completes.
+
+In essence, `flattenSequentially` concatenates all nested streams.
+
+Marble diagram:
+
+```text
+--+--------+-------------------------
+  \        \
+   \       ----1----2---3--|
+   --a--b----c----d--|
+         flattenSequentially
+-----a--b----c----d------1----2---3--
+```
+
+#### Returns:  Stream 
+
+- - -
+
 ### <a id="fromDiagram"></a> `fromDiagram(diagram, options)`
 
 Creates a real stream out of an ASCII drawing of a stream. Each string
