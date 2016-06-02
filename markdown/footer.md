@@ -1,3 +1,7 @@
+# Extra operators and factories
+
+The operators and factories listed above are the core functions. `xstream` has plenty of extra operators, [documented here](./EXTRA_DOCS.md).
+
 # FAQ
 
 **Q: What's the difference between xstream and RxJS?**
