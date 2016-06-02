@@ -1,3 +1,3 @@
-import {Stream, MemoryStream, MimicStream, Listener, Producer, Operator} from './core';
-export {Stream, MemoryStream, MimicStream, Listener, Producer, Operator};
+import {Stream, MimicStream, Listener, Producer, Operator} from './core';
+export {Stream, MimicStream, Listener, Producer, Operator};
 export default Stream;

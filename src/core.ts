@@ -953,6 +953,9 @@ export class Stream<T> implements InternalListener<T> {
   private _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
   private _stopID: any = empty;
   private _prod: InternalProducer<T>;
+  private _v: T = void 0;
+  private _has: boolean = false;
+  private _memory: boolean = false;
 
   constructor(producer?: InternalProducer<T>) {
     this._prod = producer;
@@ -960,6 +963,8 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _n(t: T): void {
+    this._v = t;
+    this._has = true;
     const a = this._ils;
     const L = a.length;
     if (L == 1) a[0]._n(t); else {
@@ -979,6 +984,7 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _c(): void {
+    this._has = false;
     const a = this._ils;
     const L = a.length;
     if (L == 1) a[0]._c(); else {
@@ -1022,6 +1028,7 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _add(il: InternalListener<T>): void {
+    if (this._memory && this._has) il._n(this._v);
     const a = this._ils;
     a.push(il);
     if (a.length === 1) {
@@ -1073,11 +1080,8 @@ export class Stream<T> implements InternalListener<T> {
    * start, generate events, and stop the Stream.
    * @return {MemoryStream}
    */
-  static createWithMemory<T>(producer?: Producer<T>): MemoryStream<T> {
-    if (producer) {
-      internalizeProducer(producer); // mutates the input
-    }
-    return new MemoryStream<T>(<InternalProducer<T>> (<any> producer));
+  static createWithMemory<T>(producer?: Producer<T>): Stream<T> {
+    return this.create(producer).remember();
   }
 
   /**
@@ -1314,21 +1318,21 @@ export class Stream<T> implements InternalListener<T> {
    */
   map<U>(project: (t: T) => U): Stream<U> {
     const p = this._prod;
-    if (p instanceof FilterOperator) {
+    if (p instanceof FilterOperator && !this._memory) {
       return new Stream<U>(new FilterMapOperator(
         (<FilterOperator<T>> p).passes,
         project,
         (<FilterOperator<T>> p).ins
       ));
     }
-    if (p instanceof FilterMapOperator) {
+    if (p instanceof FilterMapOperator && !this._memory) {
       return new Stream<U>(new FilterMapOperator(
         (<FilterMapOperator<T, T>> p).passes,
         compose2(project, (<FilterMapOperator<T, T>> p).project),
         (<FilterMapOperator<T, T>> p).ins
       ));
     }
-    if (p instanceof MapOperator) {
+    if (p instanceof MapOperator && !this._memory) {
       return new Stream<U>(new MapOperator(
         compose2(project, (<MapOperator<T, T>> p).project),
         (<MapOperator<T, T>> p).ins
@@ -1666,11 +1670,9 @@ export class Stream<T> implements InternalListener<T> {
    *
    * @return {MemoryStream}
    */
-  remember(): MemoryStream<T> {
-    return new MemoryStream<T>({
-      _start: (il: InternalListener<T>) => { this._prod._start(il); },
-      _stop: () => { this._prod._stop(); },
-    });
+  remember(): Stream<T> {
+    this._memory = true;
+    return this;
   }
 
   /**
@@ -1774,30 +1776,6 @@ export class MimicStream<T> extends Stream<T> {
    */
   imitate(other: Stream<T>): void {
     this._target = other;
-  }
-}
-
-export class MemoryStream<T> extends Stream<T> {
-  private _v: T;
-  private _has: boolean = false;
-  constructor(producer: InternalProducer<T>) {
-    super(producer);
-  }
-
-  _n(x: T) {
-    this._v = x;
-    this._has = true;
-    super._n(x);
-  }
-
-  _add(il: InternalListener<T>): void {
-    if (this._has) { il._n(this._v); }
-    super._add(il);
-  }
-
-  _x(): void {
-    this._has = false;
-    super._x();
   }
 }
 
