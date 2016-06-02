@@ -131,4 +131,36 @@ describe('MemoryStream', () => {
       },
     });
   });
+
+  it('should continue to be a stream with memory when operators are used', (done) => {
+    const stream = xs.periodic(100).remember().take(3);
+
+    const mappedStream = stream.map((x: number) => x * 2);
+
+    const expected1 = [0, 2, 4];
+    const expected2 = [0, 2, 4];
+
+    mappedStream.addListener({
+      next: (x: number) => {
+        assert.strictEqual(x, expected1.shift());
+      },
+      error: (e: any) => void 0,
+      complete: () => {
+        assert.strictEqual(expected1.length, 0);
+      }
+    });
+
+    setTimeout(() => {
+      mappedStream.addListener({
+      next: (x: number) => {
+        assert.strictEqual(x, expected2.shift());
+      },
+      error: (e: any) => void 0,
+      complete: () => {
+        assert.strictEqual(expected2.length, 0);
+        done();
+      }
+    });
+    }, 80);
+  });
 });
