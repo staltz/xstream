@@ -452,81 +452,22 @@ var FilterOperator = (function () {
     return FilterOperator;
 }());
 exports.FilterOperator = FilterOperator;
-var FCIL = (function () {
-    function FCIL(out, op) {
+var FlattenListener = (function () {
+    function FlattenListener(out, op) {
         this.out = out;
         this.op = op;
     }
-    FCIL.prototype._n = function (t) {
+    FlattenListener.prototype._n = function (t) {
         this.out._n(t);
     };
-    FCIL.prototype._e = function (err) {
+    FlattenListener.prototype._e = function (err) {
         this.out._e(err);
     };
-    FCIL.prototype._c = function () {
-        this.op.less();
-    };
-    return FCIL;
-}());
-var FlattenConcOperator = (function () {
-    function FlattenConcOperator(ins) {
-        this.ins = ins;
-        this.type = 'flattenConcurrently';
-        this.active = 1; 
-        this.out = null;
-    }
-    FlattenConcOperator.prototype._start = function (out) {
-        this.out = out;
-        this.ins._add(this);
-    };
-    FlattenConcOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.active = 1;
-        this.out = null;
-    };
-    FlattenConcOperator.prototype.less = function () {
-        if (--this.active === 0) {
-            var u = this.out;
-            if (!u)
-                return;
-            u._c();
-        }
-    };
-    FlattenConcOperator.prototype._n = function (s) {
-        var u = this.out;
-        if (!u)
-            return;
-        this.active++;
-        s._add(new FCIL(u, this));
-    };
-    FlattenConcOperator.prototype._e = function (err) {
-        var u = this.out;
-        if (!u)
-            return;
-        u._e(err);
-    };
-    FlattenConcOperator.prototype._c = function () {
-        this.less();
-    };
-    return FlattenConcOperator;
-}());
-exports.FlattenConcOperator = FlattenConcOperator;
-var FIL = (function () {
-    function FIL(out, op) {
-        this.out = out;
-        this.op = op;
-    }
-    FIL.prototype._n = function (t) {
-        this.out._n(t);
-    };
-    FIL.prototype._e = function (err) {
-        this.out._e(err);
-    };
-    FIL.prototype._c = function () {
+    FlattenListener.prototype._c = function () {
         this.op.inner = null;
         this.op.less();
     };
-    return FIL;
+    return FlattenListener;
 }());
 var FlattenOperator = (function () {
     function FlattenOperator(ins) {
@@ -562,7 +503,7 @@ var FlattenOperator = (function () {
         var _a = this, inner = _a.inner, il = _a.il;
         if (inner && il)
             inner._remove(il);
-        (this.inner = s)._add(this.il = new FIL(u, this));
+        (this.inner = s)._add(this.il = new FlattenListener(u, this));
     };
     FlattenOperator.prototype._e = function (err) {
         var u = this.out;
@@ -665,87 +606,22 @@ var LastOperator = (function () {
     return LastOperator;
 }());
 exports.LastOperator = LastOperator;
-var MFCIL = (function () {
-    function MFCIL(out, op) {
+var MapFlattenInner = (function () {
+    function MapFlattenInner(out, op) {
         this.out = out;
         this.op = op;
     }
-    MFCIL.prototype._n = function (r) {
+    MapFlattenInner.prototype._n = function (r) {
         this.out._n(r);
     };
-    MFCIL.prototype._e = function (err) {
+    MapFlattenInner.prototype._e = function (err) {
         this.out._e(err);
     };
-    MFCIL.prototype._c = function () {
-        this.op.less();
-    };
-    return MFCIL;
-}());
-var MapFlattenConcOperator = (function () {
-    function MapFlattenConcOperator(mapOp) {
-        this.mapOp = mapOp;
-        this.active = 1; 
-        this.out = null;
-        this.type = mapOp.type + "+flattenConcurrently";
-        this.ins = mapOp.ins;
-    }
-    MapFlattenConcOperator.prototype._start = function (out) {
-        this.out = out;
-        this.mapOp.ins._add(this);
-    };
-    MapFlattenConcOperator.prototype._stop = function () {
-        this.mapOp.ins._remove(this);
-        this.active = 1;
-        this.out = null;
-    };
-    MapFlattenConcOperator.prototype.less = function () {
-        if (--this.active === 0) {
-            var u = this.out;
-            if (!u)
-                return;
-            u._c();
-        }
-    };
-    MapFlattenConcOperator.prototype._n = function (v) {
-        var u = this.out;
-        if (!u)
-            return;
-        this.active++;
-        try {
-            this.mapOp.project(v)._add(new MFCIL(u, this));
-        }
-        catch (e) {
-            u._e(e);
-        }
-    };
-    MapFlattenConcOperator.prototype._e = function (err) {
-        var u = this.out;
-        if (!u)
-            return;
-        u._e(err);
-    };
-    MapFlattenConcOperator.prototype._c = function () {
-        this.less();
-    };
-    return MapFlattenConcOperator;
-}());
-exports.MapFlattenConcOperator = MapFlattenConcOperator;
-var MFIL = (function () {
-    function MFIL(out, op) {
-        this.out = out;
-        this.op = op;
-    }
-    MFIL.prototype._n = function (r) {
-        this.out._n(r);
-    };
-    MFIL.prototype._e = function (err) {
-        this.out._e(err);
-    };
-    MFIL.prototype._c = function () {
+    MapFlattenInner.prototype._c = function () {
         this.op.inner = null;
         this.op.less();
     };
-    return MFIL;
+    return MapFlattenInner;
 }());
 var MapFlattenOperator = (function () {
     function MapFlattenOperator(mapOp) {
@@ -784,7 +660,7 @@ var MapFlattenOperator = (function () {
         if (inner && il)
             inner._remove(il);
         try {
-            (this.inner = this.mapOp.project(v))._add(this.il = new MFIL(u, this));
+            (this.inner = this.mapOp.project(v))._add(this.il = new MapFlattenInner(u, this));
         }
         catch (e) {
             u._e(e);
@@ -1083,6 +959,10 @@ var Stream = (function () {
         return new MemoryStream(producer);
     };
     
+    Stream.createMimic = function () {
+        return new MimicStream();
+    };
+    
     Stream.never = function () {
         return new Stream({ _start: noop, _stop: noop });
     };
@@ -1193,13 +1073,6 @@ var Stream = (function () {
             new FlattenOperator(this));
     };
     
-    Stream.prototype.flattenConcurrently = function () {
-        var p = this._prod;
-        return new Stream(p instanceof MapOperator && !(p instanceof FilterMapOperator) ?
-            new MapFlattenConcOperator(p) :
-            new FlattenConcOperator(this));
-    };
-    
     Stream.prototype.merge = function (other) {
         return Stream.merge(this, other);
     };
@@ -1214,10 +1087,6 @@ var Stream = (function () {
             _start: function (il) { _this._prod._start(il); },
             _stop: function () { _this._prod._stop(); },
         });
-    };
-    
-    Stream.prototype.imitate = function (other) {
-        other._add(this);
     };
     
     Stream.prototype.debug = function (labelOrSpy) {
@@ -1246,6 +1115,30 @@ var Stream = (function () {
     return Stream;
 }());
 exports.Stream = Stream;
+var MimicStream = (function (_super) {
+    __extends(MimicStream, _super);
+    function MimicStream() {
+        _super.call(this);
+    }
+    MimicStream.prototype._add = function (il) {
+        var t = this._target;
+        if (!t)
+            return;
+        t._add(il);
+    };
+    MimicStream.prototype._remove = function (il) {
+        var t = this._target;
+        if (!t)
+            return;
+        t._remove(il);
+    };
+    
+    MimicStream.prototype.imitate = function (other) {
+        this._target = other;
+    };
+    return MimicStream;
+}(Stream));
+exports.MimicStream = MimicStream;
 var MemoryStream = (function (_super) {
     __extends(MemoryStream, _super);
     function MemoryStream(producer) {
@@ -1278,6 +1171,7 @@ exports.default = Stream;
 var core_1 = require('./core');
 exports.Stream = core_1.Stream;
 exports.MemoryStream = core_1.MemoryStream;
+exports.MimicStream = core_1.MimicStream;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = core_1.Stream;
 

@@ -899,7 +899,9 @@ method. Use it only when you know what you are doing.
 
 ### <a id="imitate"></a> `imitate(other)`
 
-Changes this current MimicStream to imitate the `other` given stream.
+This method exists only on a MimicStream, which is created through
+`xs.createMimic()`. `imitate` changes this current MimicStream to imitate
+the `other` given stream.
 
 The *imitate* method returns nothing. Instead, it changes the behavior of
 the current stream, making it re-emit whatever events are emitted by the
@@ -943,6 +945,31 @@ And can be interpreted/read as "when a `B` event happens, remember it and map it
 **License:** MIT
 
 # CHANGELOG
+<a name="3.0.0"></a>
+# [3.0.0](https://github.com/staltz/xstream/compare/v2.6.2...v3.0.0) (2016-06-02)
+
+
+### Bug Fixes
+
+* **extra:** change flattenSequentially and pairwise signatures ([71df158](https://github.com/staltz/xstream/commit/71df158))
+* **extra:** move flattenConcurrently from core to extra ([7d0fc01](https://github.com/staltz/xstream/commit/7d0fc01))
+* **imitate:** fix imitate, should not add listener immediately ([a6e39d2](https://github.com/staltz/xstream/commit/a6e39d2)), closes [#5](https://github.com/staltz/xstream/issues/5) [#5](https://github.com/staltz/xstream/issues/5)
+
+
+### BREAKING CHANGES
+
+* extra: Usage of flattenSequentially have changed, from
+compose(flattenSequentially()) to compose(flattenSequentially) and from
+compose(pairwise()) and compose(pairwise).
+* extra: flattenConcurrently must be separately imported as an extra operator and
+used with .compose()
+* imitate: imitate() method on Stream removed. New type introduced: MimicStream,
+which can be created through xs.createMimic(). A MimicStream has the
+method imitate(), which has the same API as before, but imitate does not
+trigger any Stream/Producer to start.
+
+
+
 <a name="2.6.2"></a>
 ## [2.6.2](https://github.com/staltz/xstream/compare/v2.6.1...v2.6.2) (2016-05-25)
 
