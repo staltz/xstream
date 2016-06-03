@@ -30,7 +30,7 @@ describe('flattenSequentially (extra)', () => {
         .compose(flattenSequentially);
       const expected = ['10', '11', '12', '20', '21', '22', '30', '31', '32'];
       const listener = {
-        next: (x: number) => {
+        next: (x: string) => {
           assert.equal(x, expected.shift());
         },
         error: (err: any) => done(err),
@@ -52,7 +52,7 @@ describe('flattenSequentially (extra)', () => {
       //                         -----------30----------31
       const expected = ['10', '11', '20', '21', '30', '31'];
       const listener = {
-        next: (x: number) => {
+        next: (x: string) => {
           assert.equal(x, expected.shift());
         },
         error: (err: any) => done(err),
@@ -76,7 +76,7 @@ describe('flattenSequentially (extra)', () => {
       //                          ------------20-----------21----------22
       const expected = ['00', '01', '02', '10', '11', '12', '20', '21', '22'];
       stream.addListener({
-        next: (x: number) => {
+        next: (x: string) => {
           assert.equal(x, expected.shift());
         },
         error: (err: any) => done(err),
@@ -101,7 +101,7 @@ describe('flattenSequentially (extra)', () => {
 
       const expected = ['00', '01', '02', '10', '11', '12', '20', '21', '22'];
       const listener = {
-        next: (x: number) => {
+        next: (x: string) => {
           assert.equal(x, expected.shift());
         },
         error: (err: any) => done(err),

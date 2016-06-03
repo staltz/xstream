@@ -37,7 +37,7 @@ describe('MimicStream', () => {
   it('should be able to model a circular dependency in the stream graph', (done) => {
     const fakeSecond = xs.createMimic<number>();
     const first = fakeSecond.map(x => x * 10).take(3);
-    const second = first.map(x => x + 1).startWith(1).compose(delay(1));
+    const second = first.map(x => x + 1).startWith(1).compose(delay<number>(1));
     fakeSecond.imitate(second);
     const expected = [1, 11, 111, 1111];
 
