@@ -1046,6 +1046,10 @@ export class Stream<T> implements InternalListener<T> {
     }
   }
 
+  private ctor(): typeof Stream {
+    return this instanceof MemoryStream ? MemoryStream : Stream;
+  }
+
   /**
    * Creates a new Stream given a Producer.
    *
@@ -1295,6 +1299,32 @@ export class Stream<T> implements InternalListener<T> {
       return new Stream<R>(new CombineProducer<R>(project, streams));
     };
 
+  protected _map<U>(project: (t: T) => U): Stream<U> | MemoryStream<U> {
+    const p = this._prod;
+    const ctor = this.ctor();
+    if (p instanceof FilterOperator) {
+      return new ctor<U>(new FilterMapOperator(
+        (<FilterOperator<T>> p).passes,
+        project,
+        (<FilterOperator<T>> p).ins
+      ));
+    }
+    if (p instanceof FilterMapOperator) {
+      return new ctor<U>(new FilterMapOperator(
+        (<FilterMapOperator<T, T>> p).passes,
+        compose2(project, (<FilterMapOperator<T, T>> p).project),
+        (<FilterMapOperator<T, T>> p).ins
+      ));
+    }
+    if (p instanceof MapOperator) {
+      return new ctor<U>(new MapOperator(
+        compose2(project, (<MapOperator<T, T>> p).project),
+        (<MapOperator<T, T>> p).ins
+      ));
+    }
+    return new ctor<U>(new MapOperator(project, this));
+  }
+
   /**
    * Transforms each event from the input Stream through a `project` function,
    * to get a Stream that emits those transformed events.
@@ -1313,28 +1343,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   map<U>(project: (t: T) => U): Stream<U> {
-    const p = this._prod;
-    if (p instanceof FilterOperator) {
-      return new Stream<U>(new FilterMapOperator(
-        (<FilterOperator<T>> p).passes,
-        project,
-        (<FilterOperator<T>> p).ins
-      ));
-    }
-    if (p instanceof FilterMapOperator) {
-      return new Stream<U>(new FilterMapOperator(
-        (<FilterMapOperator<T, T>> p).passes,
-        compose2(project, (<FilterMapOperator<T, T>> p).project),
-        (<FilterMapOperator<T, T>> p).ins
-      ));
-    }
-    if (p instanceof MapOperator) {
-      return new Stream<U>(new MapOperator(
-        compose2(project, (<MapOperator<T, T>> p).project),
-        (<MapOperator<T, T>> p).ins
-      ));
-    }
-    return new Stream<U>(new MapOperator(project, this));
+    return this._map(project);
   }
 
   /**
@@ -1408,7 +1417,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   take(amount: number): Stream<T> {
-    return new Stream<T>(new TakeOperator(amount, this));
+    return new (this.ctor())<T>(new TakeOperator(amount, this));
   }
 
   /**
@@ -1465,8 +1474,8 @@ export class Stream<T> implements InternalListener<T> {
    * @param initial The value or event to prepend.
    * @return {Stream}
    */
-  startWith(initial: T): Stream<T> {
-    return new Stream<T>(new StartWithOperator(this, initial));
+  startWith(initial: T): MemoryStream<T> {
+    return new MemoryStream<T>(new StartWithOperator(this, initial));
   }
 
   /**
@@ -1489,7 +1498,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   endWhen(other: Stream<any>): Stream<T> {
-    return new Stream<T>(new EndWhenOperator(other, this));
+    return new (this.ctor())<T>(new EndWhenOperator(other, this));
   }
 
   /**
@@ -1520,8 +1529,8 @@ export class Stream<T> implements InternalListener<T> {
    * @param seed The initial accumulated value, of type `R`.
    * @return {Stream}
    */
-  fold<R>(accumulate: (acc: R, t: T) => R, seed: R): Stream<R> {
-    return new Stream<R>(new FoldOperator(accumulate, seed, this));
+  fold<R>(accumulate: (acc: R, t: T) => R, seed: R): MemoryStream<R> {
+    return new MemoryStream<R>(new FoldOperator(accumulate, seed, this));
   }
 
   /**
@@ -1548,7 +1557,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   replaceError(replace: (err: any) => Stream<T>): Stream<T> {
-    return new Stream<T>(new ReplaceErrorOperator(replace, this));
+    return new (this.ctor())<T>(new ReplaceErrorOperator(replace, this));
   }
 
   /**
@@ -1700,7 +1709,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   debug(labelOrSpy?: string | ((t: T) => void)): Stream<T> {
-    return new Stream<T>(new DebugOperator(labelOrSpy, this));
+    return new (this.ctor())<T>(new DebugOperator(labelOrSpy, this));
   }
 
   /**
@@ -1770,9 +1779,15 @@ export class MimicStream<T> extends Stream<T> {
    * the current stream, making it re-emit whatever events are emitted by the
    * given `other` stream.
    *
-   * @param {Stream} other The stream to imitate on the current one.
+   * @param {Stream} other The stream to imitate on the current one. Must not be
+   * a MemoryStream.
    */
   imitate(other: Stream<T>): void {
+    if (other instanceof MemoryStream) {
+      throw new Error('A MemoryStream was given to imitate(), but it only ' +
+      'supports a Stream. Read more about this restriction here: ' +
+      'https://github.com/staltz/xstream#faq');
+    }
     this._target = other;
   }
 }
@@ -1798,6 +1813,30 @@ export class MemoryStream<T> extends Stream<T> {
   _x(): void {
     this._has = false;
     super._x();
+  }
+
+  map<U>(project: (t: T) => U): MemoryStream<U> {
+    return <MemoryStream<U>> this._map(project);
+  }
+
+  mapTo<U>(projectedValue: U): MemoryStream<U> {
+    return <MemoryStream<U>> super.mapTo(projectedValue);
+  }
+
+  take(amount: number): MemoryStream<T> {
+    return <MemoryStream<T>> super.take(amount);
+  }
+
+  endWhen(other: Stream<any>): MemoryStream<T> {
+    return <MemoryStream<T>> super.endWhen(other);
+  }
+
+  replaceError(replace: (err: any) => Stream<T>): MemoryStream<T> {
+    return <MemoryStream<T>> super.replaceError(replace);
+  }
+
+  debug(labelOrSpy?: string | ((t: T) => void)): MemoryStream<T> {
+    return <MemoryStream<T>> super.debug(labelOrSpy);
   }
 }
 

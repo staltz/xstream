@@ -1,3 +1,5 @@
+/// <reference path="../../typings/globals/mocha/index.d.ts" />
+/// <reference path="../../typings/globals/node/index.d.ts" />
 import xs from '../../src/index';
 import fromEvent from '../../src/extra/fromEvent';
 import * as assert from 'assert';

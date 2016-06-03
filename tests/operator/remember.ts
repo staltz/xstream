@@ -1,4 +1,6 @@
-import xs from '../../src/index';
+/// <reference path="../../typings/globals/mocha/index.d.ts" />
+/// <reference path="../../typings/globals/node/index.d.ts" />
+import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 function noop() {};
 
@@ -90,5 +92,21 @@ describe('Stream.prototype.remember', () => {
         done();
       },
     });
+  });
+
+  it('should return a MemoryStream if input stream is a Stream', (done) => {
+    const input = xs.of(1, 2, 3);
+    assert.strictEqual(input instanceof Stream, true);
+    const stream: MemoryStream<number> = input.remember();
+    assert.strictEqual(stream instanceof MemoryStream, true);
+    done();
+  })
+
+  it('should return a MemoryStream if input stream is a MemoryStream', (done) => {
+    const input = xs.createWithMemory<number>();
+    assert.strictEqual(input instanceof MemoryStream, true);
+    const stream: MemoryStream<number> = input.remember();
+    assert.strictEqual(stream instanceof MemoryStream, true);
+    done();
   });
 });

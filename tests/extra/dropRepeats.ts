@@ -1,3 +1,5 @@
+/// <reference path="../../typings/globals/mocha/index.d.ts" />
+/// <reference path="../../typings/globals/node/index.d.ts" />
 import xs, {Stream} from '../../src/index';
 import dropRepeats from '../../src/extra/dropRepeats';
 import * as assert from 'assert';

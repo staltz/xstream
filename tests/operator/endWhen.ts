@@ -1,4 +1,6 @@
-import xs from '../../src/index';
+/// <reference path="../../typings/globals/mocha/index.d.ts" />
+/// <reference path="../../typings/globals/node/index.d.ts" />
+import xs, {Stream, MemoryStream} from '../../src/index';
 import delay from '../../src/extra/delay';
 import * as assert from 'assert';
 
@@ -37,5 +39,21 @@ describe('Stream.prototype.endWhen', () => {
         done();
       },
     });
+  });
+
+  it('should return a Stream if input stream is a Stream', (done) => {
+    const input = xs.of<number>(1, 2, 3);
+    assert.strictEqual(input instanceof Stream, true);
+    const stream: Stream<number> = input.endWhen(xs.never());
+    assert.strictEqual(stream instanceof Stream, true);
+    done();
+  });
+
+  it('should return a MemoryStream if input stream is a MemoryStream', (done) => {
+    const input = xs.of<number>(1, 2, 3).remember();
+    assert.strictEqual(input instanceof MemoryStream, true);
+    const stream: MemoryStream<number> = input.endWhen(xs.never());
+    assert.strictEqual(stream instanceof MemoryStream, true);
+    done();
   });
 });

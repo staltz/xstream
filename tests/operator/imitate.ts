@@ -1,4 +1,6 @@
-import xs from '../../src/index';
+/// <reference path="../../typings/globals/mocha/index.d.ts" />
+/// <reference path="../../typings/globals/node/index.d.ts" />
+import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('MimicStream.prototype.imitate', () => {
@@ -37,23 +39,13 @@ describe('MimicStream.prototype.imitate', () => {
     proxyStream.imitate(stream);
   });
 
-//   it('should link the given stream to the mimic stream', (done) => {
-//     const stream = xs.periodic(50).take(3);
-//     const proxyStream = xs.createMimic<number>();
-//     proxyStream.imitate(stream);
-
-//     const expected = [0, 1, 2];
-//     setTimeout(() => {
-//       proxyStream.addListener({
-//         next: (x: number) => {
-//           assert.equal(x, expected.shift());
-//         },
-//         error: (err: any) => done(err),
-//         complete: () => {
-//           assert.equal(expected.length, 0);
-//           done();
-//         },
-//       });
-//     }, 125);
-//   })
+  it('should throw an error when given a MemoryStream', (done) => {
+    const stream = xs.periodic(50).take(3).remember();
+    assert.strictEqual(stream instanceof MemoryStream, true);
+    const proxyStream = xs.createMimic<number>();
+    assert.throws(() => {
+      proxyStream.imitate(stream);
+    });
+    done();
+  });
 });

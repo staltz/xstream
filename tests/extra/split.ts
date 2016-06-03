@@ -1,3 +1,5 @@
+/// <reference path="../../typings/globals/mocha/index.d.ts" />
+/// <reference path="../../typings/globals/node/index.d.ts" />
 import xs, {Stream} from '../../src/index';
 import split from '../../src/extra/split';
 import concat from '../../src/extra/concat';
