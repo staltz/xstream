@@ -1,3 +1,5 @@
+/// <reference path="../../typings/globals/mocha/index.d.ts" />
+/// <reference path="../../typings/globals/node/index.d.ts" />
 import xs from '../../src/index';
 import pairwise from '../../src/extra/pairwise';
 import * as assert from 'assert';

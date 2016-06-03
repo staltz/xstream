@@ -1,4 +1,6 @@
-import xs from '../../src/index';
+/// <reference path="../../typings/globals/mocha/index.d.ts" />
+/// <reference path="../../typings/globals/node/index.d.ts" />
+import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.filter', () => {
@@ -96,6 +98,22 @@ describe('Stream.prototype.filter', () => {
       .mapTo(10);
 
     assert.strictEqual(stream['_prod']['type'], 'filter+mapTo');
+    done();
+  });
+
+  it('should return a Stream if input stream is a Stream', (done) => {
+    const input = xs.of<number>(1, 2, 3);
+    assert.strictEqual(input instanceof Stream, true);
+    const stream: Stream<number> = input.filter(x => x % 2 === 0);
+    assert.strictEqual(stream instanceof Stream, true);
+    done();
+  });
+
+  it('should return a Stream if input stream is a MemoryStream', (done) => {
+    const input = xs.of<number>(1, 2, 3).remember();
+    assert.strictEqual(input instanceof MemoryStream, true);
+    const stream: Stream<number> = input.filter(x => x % 2 === 0);
+    assert.strictEqual(stream instanceof Stream, true);
     done();
   });
 });

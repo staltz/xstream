@@ -1,3 +1,5 @@
+/// <reference path="../typings/globals/mocha/index.d.ts" />
+/// <reference path="../typings/globals/node/index.d.ts" />
 import xs, {Producer, Listener, Stream, MimicStream} from '../src/index';
 import delay from '../src/extra/delay';
 import * as assert from 'assert';

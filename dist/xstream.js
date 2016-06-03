@@ -940,6 +940,9 @@ var Stream = (function () {
             }
         }
     };
+    Stream.prototype.ctor = function () {
+        return this instanceof MemoryStream ? MemoryStream : Stream;
+    };
     
     Stream.create = function (producer) {
         if (producer) {
@@ -1008,19 +1011,23 @@ var Stream = (function () {
         }
         return new Stream(new MergeProducer(streams));
     };
-    
-    Stream.prototype.map = function (project) {
+    Stream.prototype._map = function (project) {
         var p = this._prod;
+        var ctor = this.ctor();
         if (p instanceof FilterOperator) {
-            return new Stream(new FilterMapOperator(p.passes, project, p.ins));
+            return new ctor(new FilterMapOperator(p.passes, project, p.ins));
         }
         if (p instanceof FilterMapOperator) {
-            return new Stream(new FilterMapOperator(p.passes, compose2(project, p.project), p.ins));
+            return new ctor(new FilterMapOperator(p.passes, compose2(project, p.project), p.ins));
         }
         if (p instanceof MapOperator) {
-            return new Stream(new MapOperator(compose2(project, p.project), p.ins));
+            return new ctor(new MapOperator(compose2(project, p.project), p.ins));
         }
-        return new Stream(new MapOperator(project, this));
+        return new ctor(new MapOperator(project, this));
+    };
+    
+    Stream.prototype.map = function (project) {
+        return this._map(project);
     };
     
     Stream.prototype.mapTo = function (projectedValue) {
@@ -1039,7 +1046,7 @@ var Stream = (function () {
     };
     
     Stream.prototype.take = function (amount) {
-        return new Stream(new TakeOperator(amount, this));
+        return new (this.ctor())(new TakeOperator(amount, this));
     };
     
     Stream.prototype.drop = function (amount) {
@@ -1051,19 +1058,19 @@ var Stream = (function () {
     };
     
     Stream.prototype.startWith = function (initial) {
-        return new Stream(new StartWithOperator(this, initial));
+        return new MemoryStream(new StartWithOperator(this, initial));
     };
     
     Stream.prototype.endWhen = function (other) {
-        return new Stream(new EndWhenOperator(other, this));
+        return new (this.ctor())(new EndWhenOperator(other, this));
     };
     
     Stream.prototype.fold = function (accumulate, seed) {
-        return new Stream(new FoldOperator(accumulate, seed, this));
+        return new MemoryStream(new FoldOperator(accumulate, seed, this));
     };
     
     Stream.prototype.replaceError = function (replace) {
-        return new Stream(new ReplaceErrorOperator(replace, this));
+        return new (this.ctor())(new ReplaceErrorOperator(replace, this));
     };
     
     Stream.prototype.flatten = function () {
@@ -1090,7 +1097,7 @@ var Stream = (function () {
     };
     
     Stream.prototype.debug = function (labelOrSpy) {
-        return new Stream(new DebugOperator(labelOrSpy, this));
+        return new (this.ctor())(new DebugOperator(labelOrSpy, this));
     };
     
     Stream.prototype.shamefullySendNext = function (value) {
@@ -1134,6 +1141,9 @@ var MimicStream = (function (_super) {
     };
     
     MimicStream.prototype.imitate = function (other) {
+        if (other instanceof MemoryStream) {
+            throw new Error('bad');
+        }
         this._target = other;
     };
     return MimicStream;
@@ -1159,6 +1169,24 @@ var MemoryStream = (function (_super) {
     MemoryStream.prototype._x = function () {
         this._has = false;
         _super.prototype._x.call(this);
+    };
+    MemoryStream.prototype.map = function (project) {
+        return this._map(project);
+    };
+    MemoryStream.prototype.mapTo = function (projectedValue) {
+        return _super.prototype.mapTo.call(this, projectedValue);
+    };
+    MemoryStream.prototype.take = function (amount) {
+        return _super.prototype.take.call(this, amount);
+    };
+    MemoryStream.prototype.endWhen = function (other) {
+        return _super.prototype.endWhen.call(this, other);
+    };
+    MemoryStream.prototype.replaceError = function (replace) {
+        return _super.prototype.replaceError.call(this, replace);
+    };
+    MemoryStream.prototype.debug = function (labelOrSpy) {
+        return _super.prototype.debug.call(this, labelOrSpy);
     };
     return MemoryStream;
 }(Stream));

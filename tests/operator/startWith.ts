@@ -1,4 +1,6 @@
-import xs from '../../src/index';
+/// <reference path="../../typings/globals/mocha/index.d.ts" />
+/// <reference path="../../typings/globals/node/index.d.ts" />
+import xs, {MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.startWith', () => {
@@ -12,5 +14,11 @@ describe('Stream.prototype.startWith', () => {
       error: done,
       complete: done
     });
+  });
+  
+  it('should return a MemoryStream', (done) => {
+    const stream = xs.of(100).startWith(1);
+    assert.strictEqual(stream instanceof MemoryStream, true);
+    done();
   });
 });

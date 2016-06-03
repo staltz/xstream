@@ -4,6 +4,12 @@ The operators and factories listed above are the core functions. `xstream` has p
 
 # FAQ
 
+**Q: Why does `imitate()` support a Stream but not a MemoryStream?**
+
+A: MemoryStreams are meant for representing "values over time" (your age), while Streams represent simply events (your birthdays). MemoryStreams are usually initialized with a value, and `imitate()` is meant for creating circular dependencies of streams. If we would attempt to imitate a MemoryStream in a circular dependency, we would either get a race condition (where the symptom would be "nothing happens") or an infinite cyclic emission of values.
+
+If you find yourself wanting to use `imitate()` with a MemoryStream, you should rework your code around `imitate()` to use a Stream instead. Look for the stream in the circular dependency that represents an event stream, and that would be a candidate for creating a MimicStream which then imitates the real event stream.
+
 **Q: What's the difference between xstream and RxJS?**
 
 A: Read this [blog post](http://staltz.com/why-we-built-xstream.html) on the topic.

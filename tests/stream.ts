@@ -1,3 +1,5 @@
+/// <reference path="../typings/globals/mocha/index.d.ts" />
+/// <reference path="../typings/globals/node/index.d.ts" />
 import xs, {Producer, Listener, Stream} from '../src/index';
 import * as assert from 'assert';
 

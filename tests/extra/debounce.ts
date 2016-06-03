@@ -1,3 +1,5 @@
+/// <reference path="../../typings/globals/mocha/index.d.ts" />
+/// <reference path="../../typings/globals/node/index.d.ts" />
 import xs, {Listener, Producer} from '../../src/index';
 import debounce from '../../src/extra/debounce';
 import * as assert from 'assert';

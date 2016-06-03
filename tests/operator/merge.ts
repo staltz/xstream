@@ -1,4 +1,6 @@
-import xs from '../../src/index';
+/// <reference path="../../typings/globals/mocha/index.d.ts" />
+/// <reference path="../../typings/globals/node/index.d.ts" />
+import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.merge', () => {
@@ -33,5 +35,21 @@ describe('Stream.prototype.merge', () => {
         done();
       },
     });
+  });
+
+  it('should return a Stream when merging a MemoryStream with a Stream', (done) => {
+    const input1 = xs.periodic(50).take(4).remember();
+    const input2 = xs.periodic(80).take(3);
+    const stream: Stream<number> = input1.merge(input2);
+    assert.strictEqual(stream instanceof Stream, true);
+    done();
+  });
+
+  it('should return a Stream when merging a MemoryStream with a MemoryStream', (done) => {
+    const input1 = xs.periodic(50).take(4).remember();
+    const input2 = xs.periodic(80).take(3).remember();
+    const stream: Stream<number> = input1.merge(input2);
+    assert.strictEqual(stream instanceof Stream, true);
+    done();
   });
 });
