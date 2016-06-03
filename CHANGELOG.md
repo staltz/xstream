@@ -1,3 +1,13 @@
+<a name="4.0.1"></a>
+## [4.0.1](https://github.com/staltz/xstream/compare/v4.0.0...v4.0.1) (2016-06-03)
+
+
+### Bug Fixes
+
+* **compose:** improve compose type signature ([38b1064](https://github.com/staltz/xstream/commit/38b1064))
+
+
+
 <a name="4.0.0"></a>
 # [4.0.0](https://github.com/staltz/xstream/compare/v3.0.0...v4.0.0) (2016-06-03)
 
