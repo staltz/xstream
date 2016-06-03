@@ -1,3 +1,33 @@
+<a name="4.0.0"></a>
+# [4.0.0](https://github.com/staltz/xstream/compare/v3.0.0...v4.0.0) (2016-06-03)
+
+
+### Bug Fixes
+
+* **core:** remove instance combine() and merge() ([00fc72c](https://github.com/staltz/xstream/commit/00fc72c))
+
+### Features
+
+* **core:** improve signature of operators regarding types (#43) ([116e9f2](https://github.com/staltz/xstream/commit/116e9f2))
+
+
+### BREAKING CHANGES
+
+* core: Instance operators stream.combine() and stream.merge() removed. Use
+xs.combine() and xs.merge() instead.
+* core: debug() now returns a MemoryStream if the input was also a MemoryStream.
+endWhen() now returns a MemoryStream if the input was also a MemoryStream.
+fold() now returns always a MemoryStream, not Stream.
+imitate() only works on conventional Stream, will throw error on
+MemoryStream.
+map() now returns a MemoryStream if the input was also a MemoryStream.
+mapTo() now returns a MemoryStream if the input was also a MemoryStream.
+replaceError() now returns a MemoryStream if the input was also a MemoryStream.
+startWith() now returns always a MemoryStream, not Stream.
+take() now returns a MemoryStream if the input was also a MemoryStream.
+
+
+
 <a name="3.0.0"></a>
 # [3.0.0](https://github.com/staltz/xstream/compare/v2.6.2...v3.0.0) (2016-06-02)
 

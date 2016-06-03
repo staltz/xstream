@@ -612,7 +612,8 @@ Marble diagram:
 ### <a id="startWith"></a> `startWith(initial)`
 
 Prepends the given `initial` value to the sequence of events emitted by the
-input stream.
+input stream. The returned stream is a MemoryStream, which means it is
+already `remember()`'d.
 
 Marble diagram:
 
@@ -626,7 +627,7 @@ Marble diagram:
 
 - `initial` The value or event to prepend.
 
-#### Returns:  Stream 
+#### Returns:  MemoryStream 
 
 - - -
 
@@ -660,7 +661,8 @@ Marble diagram:
 
 Combines events from the past throughout
 the entire execution of the input stream, allowing you to accumulate them
-together. It's essentially like `Array.prototype.reduce`.
+together. It's essentially like `Array.prototype.reduce`. The returned
+stream is a MemoryStream, which means it is already `remember()`'d.
 
 The output stream starts by emitting the `seed` which you give as argument.
 Then, when an event happens on the input stream, it is combined with that
@@ -683,7 +685,7 @@ Marble diagram:
 input stream and produces the new accumulated value.
 - `seed` The initial accumulated value, of type `R`.
 
-#### Returns:  Stream 
+#### Returns:  MemoryStream 
 
 - - -
 
@@ -892,6 +894,36 @@ And can be interpreted/read as "when a `B` event happens, remember it and map it
 **License:** MIT
 
 # CHANGELOG
+<a name="4.0.0"></a>
+# [4.0.0](https://github.com/staltz/xstream/compare/v3.0.0...v4.0.0) (2016-06-03)
+
+
+### Bug Fixes
+
+* **core:** remove instance combine() and merge() ([00fc72c](https://github.com/staltz/xstream/commit/00fc72c))
+
+### Features
+
+* **core:** improve signature of operators regarding types (#43) ([116e9f2](https://github.com/staltz/xstream/commit/116e9f2))
+
+
+### BREAKING CHANGES
+
+* core: Instance operators stream.combine() and stream.merge() removed. Use
+xs.combine() and xs.merge() instead.
+* core: debug() now returns a MemoryStream if the input was also a MemoryStream.
+endWhen() now returns a MemoryStream if the input was also a MemoryStream.
+fold() now returns always a MemoryStream, not Stream.
+imitate() only works on conventional Stream, will throw error on
+MemoryStream.
+map() now returns a MemoryStream if the input was also a MemoryStream.
+mapTo() now returns a MemoryStream if the input was also a MemoryStream.
+replaceError() now returns a MemoryStream if the input was also a MemoryStream.
+startWith() now returns always a MemoryStream, not Stream.
+take() now returns a MemoryStream if the input was also a MemoryStream.
+
+
+
 <a name="3.0.0"></a>
 # [3.0.0](https://github.com/staltz/xstream/compare/v2.6.2...v3.0.0) (2016-06-02)
 
