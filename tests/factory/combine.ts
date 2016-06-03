@@ -32,7 +32,7 @@ describe('xs.combine', () => {
       stop: () => {}
     });
 
-    const combined = xs.combine(
+    const combined: Stream<string> = xs.combine(
       (a, b) => a.slice(2) + b.slice(2),
       stream1, stream2
     );
@@ -145,5 +145,21 @@ describe('xs.combine', () => {
         done();
       },
     });
+  });
+
+  it('should return a Stream when combining a MemoryStream with a Stream', (done) => {
+    const input1 = xs.periodic(50).take(4).remember();
+    const input2 = xs.periodic(80).take(3);
+    const stream: Stream<number> = xs.combine((x, y) => x + y, input1, input2);
+    assert.strictEqual(stream instanceof Stream, true);
+    done();
+  });
+
+  it('should return a Stream when combining a MemoryStream with a MemoryStream', (done) => {
+    const input1 = xs.periodic(50).take(4).remember();
+    const input2 = xs.periodic(80).take(3).remember();
+    const stream: Stream<number> = xs.combine((x, y) => x + y, input1, input2);
+    assert.strictEqual(stream instanceof Stream, true);
+    done();
   });
 });

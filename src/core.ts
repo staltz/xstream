@@ -121,28 +121,6 @@ export interface CombineFactorySignature {
   <R>(project: (...args: Array<any>) => R, ...streams: Array<Stream<any>>): Stream<R>;
 }
 
-export interface CombineInstanceSignature<T> {
-  <T2, R>(
-    project: (t1: T, t2: T2) => R,
-    stream2: Stream<T2>): Stream<R>;
-  <T2, T3, R>(
-    project: (t1: T, t2: T2, t3: T3) => R,
-    stream2: Stream<T2>,
-    stream3: Stream<T3>): Stream<R>;
-  <T2, T3, T4, R>(
-    project: (t1: T, t2: T2, t3: T3, t4: T4) => R,
-    stream2: Stream<T2>,
-    stream3: Stream<T3>,
-    stream4: Stream<T4>): Stream<R>;
-  <T2, T3, T4, T5, R>(
-    project: (t1: T, t2: T2, t3: T3, t4: T4, t5: T5) => R,
-    stream2: Stream<T2>,
-    stream3: Stream<T3>,
-    stream4: Stream<T4>,
-    stream5: Stream<T5>): Stream<R>;
-  <R>(project: (...args: Array<any>) => R, ...streams: Array<Stream<any>>): Stream<R>;
-}
-
 export class CombineListener<T> implements InternalListener<T> {
   constructor(private i: number,
               private p: CombineProducer<T>) {
@@ -1593,65 +1571,6 @@ export class Stream<T> implements InternalListener<T> {
         new FlattenOperator(<Stream<Stream<R>>> <any> this)
     );
   }
-
-  /**
-   * Blends two streams together, emitting events from both.
-   *
-   * *merge* takes an `other` stream and returns an output stream that imitates
-   * both the input stream and the `other` stream.
-   *
-   * Marble diagram:
-   *
-   * ```text
-   * --1----2-----3--------4---
-   * ----a-----b----c---d------
-   *            merge
-   * --1-a--2--b--3-c---d--4---
-   * ```
-   *
-   * @param {Stream} other Another stream to merge together with the input
-   * stream.
-   * @return {Stream}
-   */
-  merge(other: Stream<T>): Stream<T> {
-    return Stream.merge(this, other);
-  }
-
-  /**
-   * Combines multiple streams with the input stream to return a stream whose
-   * events are calculated from the latest events of each of its input streams.
-   *
-   * *combine* remembers the most recent event from each of the input streams.
-   * When any of the input streams emits an event, that event together with all
-   * the other saved events are combined in the `project` function which should
-   * return a value. That value will be emitted on the output stream. It's
-   * essentially a way of mixing the events from multiple streams according to a
-   * formula.
-   *
-   * Marble diagram:
-   *
-   * ```text
-   * --1----2-----3--------4---
-   * ----a-----b-----c--d------
-   *   combine((x,y) => x+y)
-   * ----1a-2a-2b-3b-3c-3d-4d--
-   * ```
-   *
-   * @param {Function} project A function of type `(x: T1, y: T2) => R` or
-   * similar that takes the most recent events `x` and `y` from the input
-   * streams and returns a value. The output stream will emit that value. The
-   * number of arguments for this function should match the number of input
-   * streams.
-   * @param {Stream} other Another stream to combine together with the input
-   * stream. There may be more of these arguments.
-   * @return {Stream}
-   */
-  combine: CombineInstanceSignature<T> =
-    function combine<R>(project: CombineProjectFunction,
-                        ...streams: Array<Stream<any>>): Stream<R> {
-      streams.unshift(this);
-      return Stream.combine(project, ...streams);
-    };
 
   /**
    * Passes the input stream to a custom operator, to produce an output stream.

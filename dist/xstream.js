@@ -845,15 +845,6 @@ exports.TakeOperator = TakeOperator;
 var Stream = (function () {
     function Stream(producer) {
         this._stopID = empty;
-        
-        this.combine = function combine(project) {
-            var streams = [];
-            for (var _i = 1; _i < arguments.length; _i++) {
-                streams[_i - 1] = arguments[_i];
-            }
-            streams.unshift(this);
-            return Stream.combine.apply(Stream, [project].concat(streams));
-        };
         this._prod = producer;
         this._ils = [];
     }
@@ -1080,10 +1071,6 @@ var Stream = (function () {
             new FlattenOperator(this));
     };
     
-    Stream.prototype.merge = function (other) {
-        return Stream.merge(this, other);
-    };
-    
     Stream.prototype.compose = function (operator) {
         return operator(this);
     };
@@ -1142,7 +1129,9 @@ var MimicStream = (function (_super) {
     
     MimicStream.prototype.imitate = function (other) {
         if (other instanceof MemoryStream) {
-            throw new Error('bad');
+            throw new Error('A MemoryStream was given to imitate(), but it only ' +
+                'supports a Stream. Read more about this restriction here: ' +
+                'https://github.com/staltz/xstream#faq');
         }
         this._target = other;
     };

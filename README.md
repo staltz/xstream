@@ -82,7 +82,6 @@ var xs = require('xstream').default
 
 ## Methods and Operators
 
-- [`combine`](#combine)
 - [`addListener`](#addListener)
 - [`removeListener`](#removeListener)
 - [`map`](#map)
@@ -96,7 +95,6 @@ var xs = require('xstream').default
 - [`fold`](#fold)
 - [`replaceError`](#replaceError)
 - [`flatten`](#flatten)
-- [`merge`](#merge)
 - [`compose`](#compose)
 - [`remember`](#remember)
 - [`debug`](#debug)
@@ -463,39 +461,6 @@ streams.
 
 Methods are functions attached to a Stream instance, like `stream.addListener()`. Operators are also methods, but return a new Stream, leaving the existing Stream unmodified, except for the fact that it has a child Stream attached as Listener.
 
-### <a id="combine"></a> `combine(project, other)`
-
-Combines multiple streams with the input stream to return a stream whose
-events are calculated from the latest events of each of its input streams.
-
-*combine* remembers the most recent event from each of the input streams.
-When any of the input streams emits an event, that event together with all
-the other saved events are combined in the `project` function which should
-return a value. That value will be emitted on the output stream. It's
-essentially a way of mixing the events from multiple streams according to a
-formula.
-
-Marble diagram:
-
-```text
---1----2-----3--------4---
-----a-----b-----c--d------
-  combine((x,y) => x+y)
-----1a-2a-2b-3b-3c-3d-4d--
-```
-
-#### Arguments:
-
-- `project: Function` A function of type `(x: T1, y: T2) => R` or similar that takes the most recent events `x` and `y` from the input
-streams and returns a value. The output stream will emit that value. The
-number of arguments for this function should match the number of input
-streams.
-- `other: Stream` Another stream to combine together with the input stream. There may be more of these arguments.
-
-#### Returns:  Stream 
-
-- - -
-
 ### <a id="addListener"></a> `addListener(listener)`
 
 Adds a Listener to the Stream.
@@ -778,30 +743,6 @@ Marble diagram:
 
 - - -
 
-### <a id="merge"></a> `merge(other)`
-
-Blends two streams together, emitting events from both.
-
-*merge* takes an `other` stream and returns an output stream that imitates
-both the input stream and the `other` stream.
-
-Marble diagram:
-
-```text
---1----2-----3--------4---
-----a-----b----c---d------
-           merge
---1-a--2--b--3-c---d--4---
-```
-
-#### Arguments:
-
-- `other: Stream` Another stream to merge together with the input stream.
-
-#### Returns:  Stream 
-
-- - -
-
 ### <a id="compose"></a> `compose(operator)`
 
 Passes the input stream to a custom operator, to produce an output stream.
@@ -909,7 +850,7 @@ given `other` stream.
 
 #### Arguments:
 
-- `other: Stream` The stream to imitate on the current one.
+- `other: Stream` The stream to imitate on the current one. Must not be a MemoryStream.
 
 - - -
 
@@ -918,6 +859,12 @@ given `other` stream.
 The operators and factories listed above are the core functions. `xstream` has plenty of extra operators, [documented here](./EXTRA_DOCS.md).
 
 # FAQ
+
+**Q: Why does `imitate()` support a Stream but not a MemoryStream?**
+
+A: MemoryStreams are meant for representing "values over time" (your age), while Streams represent simply events (your birthdays). MemoryStreams are usually initialized with a value, and `imitate()` is meant for creating circular dependencies of streams. If we would attempt to imitate a MemoryStream in a circular dependency, we would either get a race condition (where the symptom would be "nothing happens") or an infinite cyclic emission of values.
+
+If you find yourself wanting to use `imitate()` with a MemoryStream, you should rework your code around `imitate()` to use a Stream instead. Look for the stream in the circular dependency that represents an event stream, and that would be a candidate for creating a MimicStream which then imitates the real event stream.
 
 **Q: What's the difference between xstream and RxJS?**
 
