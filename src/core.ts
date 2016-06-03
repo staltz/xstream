@@ -1439,7 +1439,8 @@ export class Stream<T> implements InternalListener<T> {
 
   /**
    * Prepends the given `initial` value to the sequence of events emitted by the
-   * input stream.
+   * input stream. The returned stream is a MemoryStream, which means it is 
+   * already `remember()`'d.
    *
    * Marble diagram:
    *
@@ -1450,7 +1451,7 @@ export class Stream<T> implements InternalListener<T> {
    * ```
    *
    * @param initial The value or event to prepend.
-   * @return {Stream}
+   * @return {MemoryStream}
    */
   startWith(initial: T): MemoryStream<T> {
     return new MemoryStream<T>(new StartWithOperator(this, initial));
@@ -1484,7 +1485,8 @@ export class Stream<T> implements InternalListener<T> {
    *
    * Combines events from the past throughout
    * the entire execution of the input stream, allowing you to accumulate them
-   * together. It's essentially like `Array.prototype.reduce`.
+   * together. It's essentially like `Array.prototype.reduce`. The returned 
+   * stream is a MemoryStream, which means it is already `remember()`'d.
    *
    * The output stream starts by emitting the `seed` which you give as argument.
    * Then, when an event happens on the input stream, it is combined with that
@@ -1505,7 +1507,7 @@ export class Stream<T> implements InternalListener<T> {
    * takes the previous accumulated value `acc` and the incoming event from the
    * input stream and produces the new accumulated value.
    * @param seed The initial accumulated value, of type `R`.
-   * @return {Stream}
+   * @return {MemoryStream}
    */
   fold<R>(accumulate: (acc: R, t: T) => R, seed: R): MemoryStream<R> {
     return new MemoryStream<R>(new FoldOperator(accumulate, seed, this));
