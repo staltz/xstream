@@ -885,6 +885,16 @@ And can be interpreted/read as "when a `B` event happens, remember it and map it
 **License:** MIT
 
 # CHANGELOG
+<a name="4.0.3"></a>
+## [4.0.3](https://github.com/staltz/xstream/compare/v4.0.2...v4.0.3) (2016-06-08)
+
+
+### Bug Fixes
+
+* **remember:** fix remember() on producer-less streams ([cbe806d](https://github.com/staltz/xstream/commit/cbe806d))
+
+
+
 <a name="4.0.2"></a>
 ## [4.0.2](https://github.com/staltz/xstream/compare/v4.0.1...v4.0.2) (2016-06-08)
 
