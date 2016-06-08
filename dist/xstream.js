@@ -1078,8 +1078,16 @@ var Stream = (function () {
     Stream.prototype.remember = function () {
         var _this = this;
         return new MemoryStream({
-            _start: function (il) { _this._prod._start(il); },
-            _stop: function () { _this._prod._stop(); },
+            _start: function (il) {
+                var p = _this._prod;
+                if (p)
+                    p._start(il);
+            },
+            _stop: function () {
+                var p = _this._prod;
+                if (p)
+                    p._stop();
+            },
         });
     };
     
