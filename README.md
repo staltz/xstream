@@ -894,6 +894,16 @@ And can be interpreted/read as "when a `B` event happens, remember it and map it
 **License:** MIT
 
 # CHANGELOG
+<a name="4.0.2"></a>
+## [4.0.2](https://github.com/staltz/xstream/compare/v4.0.1...v4.0.2) (2016-06-08)
+
+
+### Bug Fixes
+
+* **Stream:** fix small issue with private Stream members ([61b5c12](https://github.com/staltz/xstream/commit/61b5c12))
+
+
+
 <a name="4.0.1"></a>
 ## [4.0.1](https://github.com/staltz/xstream/compare/v4.0.0...v4.0.1) (2016-06-03)
 
