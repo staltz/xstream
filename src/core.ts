@@ -1598,8 +1598,14 @@ export class Stream<T> implements InternalListener<T> {
    */
   remember(): MemoryStream<T> {
     return new MemoryStream<T>({
-      _start: (il: InternalListener<T>) => { this._prod._start(il); },
-      _stop: () => { this._prod._stop(); },
+      _start: (il: InternalListener<T>) => {
+        const p = this._prod;
+        if (p) p._start(il);
+      },
+      _stop: () => {
+        const p = this._prod;
+        if (p) p._stop();
+      },
     });
   }
 
