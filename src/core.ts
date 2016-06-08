@@ -928,9 +928,9 @@ export class TakeOperator<T> implements Operator<T, T> {
 }
 
 export class Stream<T> implements InternalListener<T> {
-  private _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
-  private _stopID: any = empty;
-  private _prod: InternalProducer<T>;
+  protected _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
+  protected _stopID: any = empty;
+  protected _prod: InternalProducer<T>;
 
   constructor(producer?: InternalProducer<T>) {
     this._prod = producer;
@@ -1439,7 +1439,7 @@ export class Stream<T> implements InternalListener<T> {
 
   /**
    * Prepends the given `initial` value to the sequence of events emitted by the
-   * input stream. The returned stream is a MemoryStream, which means it is 
+   * input stream. The returned stream is a MemoryStream, which means it is
    * already `remember()`'d.
    *
    * Marble diagram:
@@ -1485,7 +1485,7 @@ export class Stream<T> implements InternalListener<T> {
    *
    * Combines events from the past throughout
    * the entire execution of the input stream, allowing you to accumulate them
-   * together. It's essentially like `Array.prototype.reduce`. The returned 
+   * together. It's essentially like `Array.prototype.reduce`. The returned
    * stream is a MemoryStream, which means it is already `remember()`'d.
    *
    * The output stream starts by emitting the `seed` which you give as argument.
