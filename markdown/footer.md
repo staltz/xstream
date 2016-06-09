@@ -31,8 +31,16 @@ And can be interpreted/read as "when a `B` event happens, remember it and map it
 
 -----
 
-**Acknowledgements:** *xstream* is built by [staltz](https://github.com/staltz) and [TylorS](https://github.com/tylors).
+# Misc.
 
-**License:** MIT
+## Acknowledgements
 
-# CHANGELOG
+*xstream* is built by [staltz](https://github.com/staltz) and [TylorS](https://github.com/tylors).
+
+## CHANGELOG
+
+Read the [CHANGELOG](https://github.com/staltz/xstream/blob/master/CHANGELOG.md) for release notes of all versions of *xstream*.
+
+##License
+
+[MIT](https://github.com/staltz/xstream/blob/master/LICENSE)

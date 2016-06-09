@@ -15,7 +15,7 @@
     "doctest": "markdown-doctest",
     "precompile": "typings install",
     "compile": "tsc",
-    "page-content": "npm run compile && rm -rf .ignore/ && mkdirp .ignore/ && npm run changelog && node tools/make-toc.js && node tools/make-factories.js && node tools/make-methods.js && cat markdown/header.md markdown/generated-toc.md markdown/overview.md markdown/generated-factories.md markdown/generated-methods.md markdown/footer.md CHANGELOG.md > .ignore/content.md",
+    "page-content": "npm run compile && rm -rf .ignore/ && mkdirp .ignore/ && npm run changelog && node tools/make-toc.js && node tools/make-factories.js && node tools/make-methods.js && cat markdown/header.md markdown/generated-toc.md markdown/overview.md markdown/generated-factories.md markdown/generated-methods.md markdown/footer.md > .ignore/content.md",
     "extra-docs": "node tools/make-extras.js && cp markdown/generated-extras.md EXTRA_DOCS.md",
     "readme": "npm run page-content && cat markdown/readme-title.md .ignore/content.md > README.md",
     "postreadme": "npm run extra-docs",
