@@ -31,11 +31,13 @@ class FakeEventTarget {
 
 module.exports = {
   require: {
-    xstream: xstream,
-    'xstream/extra/fromEvent': require('./extra/fromEvent').default,
-    'xstream/extra/delay': require('./extra/delay').default,
-    'xstream/extra/concat': require('./extra/concat').default,
-    'xstream/extra/fromDiagram': require('./extra/fromDiagram').default,
+    xstream: xstream
+  },
+
+  regexRequire: {
+    'xstream/extra/(.*)': function (_, extra) {
+      return require('./extra/' + extra).default;
+    }
   },
 
   globals: {
