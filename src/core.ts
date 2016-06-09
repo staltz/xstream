@@ -1219,7 +1219,7 @@ export class Stream<T> implements InternalListener<T> {
    * concurrently.
    *
    * *merge* takes multiple streams as arguments, and creates a stream that
-   * imitates each of the argument streams, in parallel.
+   * behaves like each of the argument streams, in parallel.
    *
    * Marble diagram:
    *
@@ -1461,8 +1461,8 @@ export class Stream<T> implements InternalListener<T> {
    * Uses another stream to determine when to complete the current stream.
    *
    * When the given `other` stream emits an event or completes, the output
-   * stream will complete. Before that happens, the output stream will imitate
-   * whatever happens on the input stream.
+   * stream will complete. Before that happens, the output stream will behaves
+   * like the input stream.
    *
    * Marble diagram:
    *
@@ -1518,9 +1518,9 @@ export class Stream<T> implements InternalListener<T> {
    *
    * When (and if) an error happens on the input stream, instead of forwarding
    * that error to the output stream, *replaceError* will call the `replace`
-   * function which returns the stream that the output stream will imitate. And,
-   * in case that new stream also emits an error, `replace` will be called again
-   * to get another stream to start imitating.
+   * function which returns the stream that the output stream will replicate.
+   * And, in case that new stream also emits an error, `replace` will be called
+   * again to get another stream to start replicating.
    *
    * Marble diagram:
    *
@@ -1532,8 +1532,8 @@ export class Stream<T> implements InternalListener<T> {
    *
    * @param {Function} replace A function of type `(err) => Stream` that takes
    * the error that occurred on the input stream or on the previous replacement
-   * stream and returns a new stream. The output stream will imitate the stream
-   * that this function returns.
+   * stream and returns a new stream. The output stream will behave like the
+   * stream that this function returns.
    * @return {Stream}
    */
   replaceError(replace: (err: any) => Stream<T>): Stream<T> {
@@ -1590,9 +1590,9 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   /**
-   * Returns an output stream that imitates the input stream, but also remembers
-   * the most recent event that happens on the input stream, so that a newly
-   * added listener will immediately receive that memorised event.
+   * Returns an output stream that behaves like the input stream, but also
+   * remembers the most recent event that happens on the input stream, so that a
+   * newly added listener will immediately receive that memorised event.
    *
    * @return {MemoryStream}
    */
@@ -1610,8 +1610,8 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   /**
-   * Returns an output stream that identically imitates the input stream, but
-   * also runs a `spy` function fo each event, to help you debug your app.
+   * Returns an output stream that identically behaves like the input stream,
+   * but also runs a `spy` function fo each event, to help you debug your app.
    *
    * *debug* takes a `spy` function as argument, and runs that for each event
    * happening on the input stream. If you don't provide the `spy` argument,
@@ -1699,12 +1699,69 @@ export class MimicStream<T> extends Stream<T> {
 
   /**
    * This method exists only on a MimicStream, which is created through
-   * `xs.createMimic()`. `imitate` changes this current MimicStream to imitate
-   * the `other` given stream.
+   * `xs.createMimic()`. *imitate* changes this current MimicStream to behave
+   * like the `other` given stream.
+   *
+   * The `imitate` method and the `MimicStream` type exist to allow one thing:
+   * **circular dependency of streams**. For instance, let's imagine that for
+   * some reason you need to create a circular dependency where stream `first$`
+   * depends on stream `second$` which in turn depends on `first$`:
+   *
+   * <!-- skip-example -->
+   * ```js
+   * import delay from 'xstream/extra/delay'
+   *
+   * var first$ = second$.map(x => x * 10).take(3);
+   * var second$ = first$.map(x => x + 1).startWith(1).compose(delay(100));
+   * ```
+   *
+   * However, that is invalid JavaScript, because `second$` is undefined
+   * on the first line. This is how a MimicStream and imitate can help solve it:
+   *
+   * ```js
+   * import delay from 'xstream/extra/delay'
+   *
+   * var secondMimic$ = xs.createMimic();
+   * var first$ = secondMimic$.map(x => x * 10).take(3);
+   * var second$ = first$.map(x => x + 1).startWith(1).compose(delay(100));
+   * secondMimic$.imitate(second$);
+   * ```
+   *
+   * We create `secondMimic$` before the others, so it can be used in the
+   * declaration of `first$`. Then, after both `first$` and `second$` are
+   * defined, we hook `secondMimic$` with `second$` with `imitate()` to tell
+   * that they are "the same". `imitate` will not trigger the start of any
+   * stream, it simply forwards listeners of `secondMimic$` to `second$`.
+   *
+   * The following is an example where `imitate()` is important in Cycle.js
+   * applications. A parent component contains some child components. A child
+   * has an action stream which is given to the parent to define its state:
+   *
+   * <!-- skip-example -->
+   * ```js
+   * const childActionMimic$ = xs.createMimic();
+   * const parent = Parent({...sources, childAction$: childActionMimic$});
+   * const childAction$ = parent.state$.map(s => s.child.action$).flatten();
+   * childActionMimic$.imitate(childAction$);
+   * ```
    *
    * The *imitate* method returns nothing. Instead, it changes the behavior of
    * the current stream, making it re-emit whatever events are emitted by the
    * given `other` stream.
+   *
+   * Note, though, that **`imitate()` does not support MemoryStreams**. If we
+   * would attempt to imitate a MemoryStream in a circular dependency, we would
+   * either get a race condition (where the symptom would be "nothing happens")
+   * or an infinite cyclic emission of values. It's useful to think about
+   * MemoryStreams as cells in a spreadsheet. It doesn't make any sense to
+   * define a spreadsheet cell `A1` with a formula that depends on `B1` and
+   * cell `B1` defined with a formula that depends on `A1`.
+   *
+   * If you find yourself wanting to use `imitate()` with a
+   * MemoryStream, you should rework your code around `imitate()` to use a
+   * Stream instead. Look for the stream in the circular dependency that
+   * represents an event stream, and that would be a candidate for creating a
+   * MimicStream which then imitates the real event stream.
    *
    * @param {Stream} other The stream to imitate on the current one. Must not be
    * a MemoryStream.
