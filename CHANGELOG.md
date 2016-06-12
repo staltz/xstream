@@ -1,3 +1,36 @@
+<a name="5.0.2"></a>
+## [5.0.2](https://github.com/staltz/xstream/compare/v4.0.4...v5.0.2) (2016-06-12)
+
+
+### Bug Fixes
+
+* **imitate:** fix cyclic execution leak, and refactor ([8a432b6](https://github.com/staltz/xstream/commit/8a432b6)), closes [#51](https://github.com/staltz/xstream/issues/51) [#49](https://github.com/staltz/xstream/issues/49)
+* **take:** remove redundant stop() call ([625fb3e](https://github.com/staltz/xstream/commit/625fb3e))
+
+
+### Features
+
+* **combine:** change API for combine() operator ([a2aa0a6](https://github.com/staltz/xstream/commit/a2aa0a6))
+* **imitate:** move imitate() from MimicStream to Stream ([ad63372](https://github.com/staltz/xstream/commit/ad63372))
+
+
+### BREAKING CHANGES
+
+* combine: combine() now takes only streams as argument, no more project function. combine() will return an
+stream that emits arrays of the collected values from each input stream. To transform that array,
+you should now use map() operator after combine(), to take the array of collected values and return
+a combination value. See tests for examples.
+* imitate: MimicStream and xs.createMimic() were removed entirely. The imitate() method now exists on every
+Stream instance. To use the proxy stream technique, use xs.create() to create the proxy, then call
+proxy.imitate(other).
+
+
+
+<a name="4.0.4"></a>
+## [4.0.4](https://github.com/staltz/xstream/compare/v4.0.3...v4.0.4) (2016-06-09)
+
+
+
 <a name="4.0.3"></a>
 ## [4.0.3](https://github.com/staltz/xstream/compare/v4.0.2...v4.0.3) (2016-06-08)
 
@@ -36,9 +69,10 @@
 
 * **core:** remove instance combine() and merge() ([00fc72c](https://github.com/staltz/xstream/commit/00fc72c))
 
+
 ### Features
 
-* **core:** improve signature of operators regarding types (#43) ([116e9f2](https://github.com/staltz/xstream/commit/116e9f2))
+* **core:** improve signature of operators regarding types ([#43](https://github.com/staltz/xstream/issues/43)) ([116e9f2](https://github.com/staltz/xstream/commit/116e9f2))
 
 
 ### BREAKING CHANGES
@@ -131,6 +165,7 @@ trigger any Stream/Producer to start.
 
 * **extra:** add safety check against nulls for next() etc ([cf82a8b](https://github.com/staltz/xstream/commit/cf82a8b))
 
+
 ### Performance Improvements
 
 * **debounce:** improve debounce speed/rate ([8bf7903](https://github.com/staltz/xstream/commit/8bf7903))
@@ -166,6 +201,7 @@ trigger any Stream/Producer to start.
 
 * **flatten:** add ins field as metadata to flatten ([cbc1f8b](https://github.com/staltz/xstream/commit/cbc1f8b))
 
+
 ### Features
 
 * **extra:** implement new extra operator: dropUntil ([e06d502](https://github.com/staltz/xstream/commit/e06d502))
@@ -180,6 +216,7 @@ trigger any Stream/Producer to start.
 ### Bug Fixes
 
 * **combine:** fix combine() to export its Producer class ([700a129](https://github.com/staltz/xstream/commit/700a129))
+
 
 ### Features
 
@@ -214,6 +251,7 @@ trigger any Stream/Producer to start.
 ### Bug Fixes
 
 * **combine:** guard CombineListener against invalid out stream ([74c6061](https://github.com/staltz/xstream/commit/74c6061))
+
 
 ### Performance Improvements
 
@@ -260,6 +298,7 @@ trigger any Stream/Producer to start.
 * **flatten:** fix TypeScript output type ([26f2241](https://github.com/staltz/xstream/commit/26f2241)), closes [#4](https://github.com/staltz/xstream/issues/4)
 * **flattenConcurrently:** fix TypeScript output type ([b5445a5](https://github.com/staltz/xstream/commit/b5445a5)), closes [#4](https://github.com/staltz/xstream/issues/4)
 
+
 ### Features
 
 * **create:** Throw an error if for incomplete producer ([39c7c80](https://github.com/staltz/xstream/commit/39c7c80))
@@ -273,6 +312,7 @@ trigger any Stream/Producer to start.
 ### Bug Fixes
 
 * **filter:** fix filter fusion logic. ([8c417f9](https://github.com/staltz/xstream/commit/8c417f9))
+
 
 ### Performance Improvements
 
@@ -328,6 +368,7 @@ xstream/lib/extra/the-operator-you-want
 * **typings:** fix usage of ambient es6-promise ([6b4ae8e](https://github.com/staltz/xstream/commit/6b4ae8e))
 * **typings:** make es6-promise an ambient dep, and bump ([49edd74](https://github.com/staltz/xstream/commit/49edd74))
 
+
 ### Features
 
 * **extra:** implement new flattenSequentially() extra operator ([4a6e63e](https://github.com/staltz/xstream/commit/4a6e63e))
@@ -358,6 +399,7 @@ xstream/lib/extra/the-operator-you-want
 * **Stream:** stop the producer syncly after the Stream errors ([6c803ac](https://github.com/staltz/xstream/commit/6c803ac))
 * **Stream:** use underscore for pseudo-private fields in Stream ([95f2ebb](https://github.com/staltz/xstream/commit/95f2ebb))
 * **take:** fix take() operator, and also combine and merge ([c5fdfc0](https://github.com/staltz/xstream/commit/c5fdfc0))
+
 
 ### Features
 
@@ -410,6 +452,7 @@ xstream/lib/extra/the-operator-you-want
 * **takeUntil:** implement and test takeUntil() ([304bed1](https://github.com/staltz/xstream/commit/304bed1))
 * **throw:** implement new static factory throw() ([76879a5](https://github.com/staltz/xstream/commit/76879a5))
 
+
 ### Performance Improvements
 
 * **core:** have FilterMapOperator extend MapOperator ([e0c153a](https://github.com/staltz/xstream/commit/e0c153a))
@@ -430,6 +473,7 @@ xstream/lib/extra/the-operator-you-want
 * **Stream:** squeeze kB size in map and filter fusion ([23ac9d0](https://github.com/staltz/xstream/commit/23ac9d0))
 * **Stream:** tiny saving of lookups and source code size ([6527129](https://github.com/staltz/xstream/commit/6527129))
 * **take:** improve take() perf by using Proxy Observer class ([6eae1a9](https://github.com/staltz/xstream/commit/6eae1a9))
+
 
 ### Reverts
 

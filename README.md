@@ -412,35 +412,30 @@ Marble diagram:
 
 - - -
 
-### <a id="combine"></a> `combine(project, stream1, stream2)`
+### <a id="combine"></a> `combine(stream1, stream2)`
 
-Combines multiple streams together to return a stream whose events are
-calculated from the latest events of each of the input streams.
+Combines multiple input streams together to return a stream whose events
+are arrays that collect the latest events from each input stream.
 
-*combine* remembers the most recent event from each of the input streams.
-When any of the input streams emits an event, that event together with all
-the other saved events are combined in the `project` function which should
-return a value. That value will be emitted on the output stream. It's
-essentially a way of mixing the events from multiple streams according to a
-formula.
+*combine* internally remembers the most recent event from each of the input
+streams. When any of the input streams emits an event, that event together
+with all the other saved events are combined into an array. That array will
+be emitted on the output stream. It's essentially a way of joining together
+the events from multiple streams.
 
 Marble diagram:
 
 ```text
 --1----2-----3--------4---
 ----a-----b-----c--d------
-  combine((x,y) => x+y)
+         combine
 ----1a-2a-2b-3b-3c-3d-4d--
 ```
 
 #### Arguments:
 
-- `project: Function` A function of type `(x: T1, y: T2) => R` or similar that takes the most recent events `x` and `y` from the input
-streams and returns a value. The output stream will emit that value. The
-number of arguments for this function should match the number of input
-streams.
 - `stream1: Stream` A stream to combine together with other streams.
-- `stream2: Stream` A stream to combine together with other streams. Two or more streams may be given as arguments.
+- `stream2: Stream` A stream to combine together with other streams. Multiple streams, not just two, may be given as arguments.
 
 #### Returns:  Stream 
 

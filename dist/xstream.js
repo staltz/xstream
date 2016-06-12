@@ -31,17 +31,6 @@ function internalizeProducer(producer) {
         };
     producer._stop = producer.stop;
 }
-function invoke(f, args) {
-    switch (args.length) {
-        case 0: return f();
-        case 1: return f(args[0]);
-        case 2: return f(args[0], args[1]);
-        case 3: return f(args[0], args[1], args[2]);
-        case 4: return f(args[0], args[1], args[2], args[3]);
-        case 5: return f(args[0], args[1], args[2], args[3], args[4]);
-        default: return f.apply(void 0, args);
-    }
-}
 function compose2(f1, f2) {
     return function composedFn(arg) {
         return f1(f2(arg));
@@ -52,139 +41,6 @@ function and(f1, f2) {
         return f1(t) && f2(t);
     };
 }
-var CombineListener = (function () {
-    function CombineListener(i, p) {
-        this.i = i;
-        this.p = p;
-        p.ils.push(this);
-    }
-    CombineListener.prototype._n = function (t) {
-        var p = this.p, out = p.out;
-        if (!out)
-            return;
-        if (p.up(t, this.i)) {
-            try {
-                out._n(invoke(p.project, p.vals));
-            }
-            catch (e) {
-                out._e(e);
-            }
-        }
-    };
-    CombineListener.prototype._e = function (err) {
-        var out = this.p.out;
-        if (!out)
-            return;
-        out._e(err);
-    };
-    CombineListener.prototype._c = function () {
-        var p = this.p;
-        if (!p.out)
-            return;
-        if (--p.ac === 0) {
-            p.out._c();
-        }
-    };
-    return CombineListener;
-}());
-exports.CombineListener = CombineListener;
-var CombineProducer = (function () {
-    function CombineProducer(project, streams) {
-        this.project = project;
-        this.streams = streams;
-        this.type = 'combine';
-        this.out = exports.emptyListener;
-        this.ils = [];
-        var n = this.ac = this.left = streams.length;
-        var vals = this.vals = new Array(n);
-        for (var i = 0; i < n; i++) {
-            vals[i] = empty;
-        }
-    }
-    CombineProducer.prototype.up = function (t, i) {
-        var v = this.vals[i];
-        var left = !this.left ? 0 : v === empty ? --this.left : this.left;
-        this.vals[i] = t;
-        return left === 0;
-    };
-    CombineProducer.prototype._start = function (out) {
-        this.out = out;
-        var s = this.streams;
-        var n = s.length;
-        if (n === 0)
-            this.zero(out);
-        else {
-            for (var i = 0; i < n; i++) {
-                s[i]._add(new CombineListener(i, this));
-            }
-        }
-    };
-    CombineProducer.prototype._stop = function () {
-        var s = this.streams;
-        var n = this.ac = this.left = s.length;
-        var vals = this.vals = new Array(n);
-        for (var i = 0; i < n; i++) {
-            s[i]._remove(this.ils[i]);
-            vals[i] = empty;
-        }
-        this.out = null;
-        this.ils = [];
-    };
-    CombineProducer.prototype.zero = function (out) {
-        try {
-            out._n(this.project());
-            out._c();
-        }
-        catch (e) {
-            out._e(e);
-        }
-    };
-    return CombineProducer;
-}());
-exports.CombineProducer = CombineProducer;
-var FromArrayProducer = (function () {
-    function FromArrayProducer(a) {
-        this.a = a;
-        this.type = 'fromArray';
-    }
-    FromArrayProducer.prototype._start = function (out) {
-        var a = this.a;
-        for (var i = 0, l = a.length; i < l; i++) {
-            out._n(a[i]);
-        }
-        out._c();
-    };
-    FromArrayProducer.prototype._stop = function () {
-    };
-    return FromArrayProducer;
-}());
-exports.FromArrayProducer = FromArrayProducer;
-var FromPromiseProducer = (function () {
-    function FromPromiseProducer(p) {
-        this.p = p;
-        this.type = 'fromPromise';
-        this.on = false;
-    }
-    FromPromiseProducer.prototype._start = function (out) {
-        var prod = this;
-        this.on = true;
-        this.p.then(function (v) {
-            if (prod.on) {
-                out._n(v);
-                out._c();
-            }
-        }, function (e) {
-            out._e(e);
-        }).then(null, function (err) {
-            setTimeout(function () { throw err; });
-        });
-    };
-    FromPromiseProducer.prototype._stop = function () {
-        this.on = false;
-    };
-    return FromPromiseProducer;
-}());
-exports.FromPromiseProducer = FromPromiseProducer;
 var MergeProducer = (function () {
     function MergeProducer(streams) {
         this.streams = streams;
@@ -232,6 +88,126 @@ var MergeProducer = (function () {
     return MergeProducer;
 }());
 exports.MergeProducer = MergeProducer;
+var CombineListener = (function () {
+    function CombineListener(i, p) {
+        this.i = i;
+        this.p = p;
+        p.ils.push(this);
+    }
+    CombineListener.prototype._n = function (t) {
+        var p = this.p, out = p.out;
+        if (!out)
+            return;
+        if (p.up(t, this.i)) {
+            out._n(p.vals);
+        }
+    };
+    CombineListener.prototype._e = function (err) {
+        var out = this.p.out;
+        if (!out)
+            return;
+        out._e(err);
+    };
+    CombineListener.prototype._c = function () {
+        var p = this.p;
+        if (!p.out)
+            return;
+        if (--p.ac === 0) {
+            p.out._c();
+        }
+    };
+    return CombineListener;
+}());
+exports.CombineListener = CombineListener;
+var CombineProducer = (function () {
+    function CombineProducer(streams) {
+        this.streams = streams;
+        this.type = 'combine';
+        this.out = exports.emptyListener;
+        this.ils = [];
+        var n = this.ac = this.left = streams.length;
+        var vals = this.vals = new Array(n);
+        for (var i = 0; i < n; i++) {
+            vals[i] = empty;
+        }
+    }
+    CombineProducer.prototype.up = function (t, i) {
+        var v = this.vals[i];
+        var left = !this.left ? 0 : v === empty ? --this.left : this.left;
+        this.vals[i] = t;
+        return left === 0;
+    };
+    CombineProducer.prototype._start = function (out) {
+        this.out = out;
+        var s = this.streams;
+        var n = s.length;
+        if (n === 0) {
+            out._n(this.vals);
+            out._c();
+        }
+        else {
+            for (var i = 0; i < n; i++) {
+                s[i]._add(new CombineListener(i, this));
+            }
+        }
+    };
+    CombineProducer.prototype._stop = function () {
+        var s = this.streams;
+        var n = this.ac = this.left = s.length;
+        var vals = this.vals = new Array(n);
+        for (var i = 0; i < n; i++) {
+            s[i]._remove(this.ils[i]);
+            vals[i] = empty;
+        }
+        this.out = null;
+        this.ils = [];
+    };
+    return CombineProducer;
+}());
+exports.CombineProducer = CombineProducer;
+var FromArrayProducer = (function () {
+    function FromArrayProducer(a) {
+        this.a = a;
+        this.type = 'fromArray';
+    }
+    FromArrayProducer.prototype._start = function (out) {
+        var a = this.a;
+        for (var i = 0, l = a.length; i < l; i++) {
+            out._n(a[i]);
+        }
+        out._c();
+    };
+    FromArrayProducer.prototype._stop = function () {
+    };
+    return FromArrayProducer;
+}());
+exports.FromArrayProducer = FromArrayProducer;
+var FromPromiseProducer = (function () {
+    function FromPromiseProducer(p) {
+        this.p = p;
+        this.type = 'fromPromise';
+        this.on = false;
+    }
+    FromPromiseProducer.prototype._start = function (out) {
+        var prod = this;
+        this.on = true;
+        this.p.then(function (v) {
+            if (prod.on) {
+                out._n(v);
+                out._c();
+            }
+        }, function (e) {
+            out._e(e);
+        }).then(null, function (err) {
+            setTimeout(function () { throw err; });
+        });
+    };
+    FromPromiseProducer.prototype._stop = function () {
+        this.on = false;
+    };
+    return FromPromiseProducer;
+}());
+exports.FromPromiseProducer = FromPromiseProducer;
 var PeriodicProducer = (function () {
     function PeriodicProducer(period) {
         this.period = period;
@@ -824,7 +800,6 @@ var TakeOperator = (function () {
         else {
             u._n(t);
             u._c();
-            this._stop();
         }
     };
     TakeOperator.prototype._e = function (err) {
@@ -847,6 +822,7 @@ var Stream = (function () {
         this._stopID = empty;
         this._prod = producer;
         this._ils = [];
+        this._hil = null;
     }
     Stream.prototype._n = function (t) {
         var a = this._ils;
@@ -858,6 +834,9 @@ var Stream = (function () {
             for (var i = 0; i < L; i++)
                 b[i]._n(t);
         }
+        var h = this._hil;
+        if (h)
+            h._n(t);
     };
     Stream.prototype._e = function (err) {
         var a = this._ils;
@@ -869,6 +848,9 @@ var Stream = (function () {
             for (var i = 0; i < L; i++)
                 b[i]._e(err);
         }
+        var h = this._hil;
+        if (h)
+            h._e(err);
         this._x();
     };
     Stream.prototype._c = function () {
@@ -881,6 +863,9 @@ var Stream = (function () {
             for (var i = 0; i < L; i++)
                 b[i]._c();
         }
+        var h = this._hil;
+        if (h)
+            h._c();
         this._x();
     };
     Stream.prototype._x = function () {
@@ -931,6 +916,9 @@ var Stream = (function () {
             }
         }
     };
+    Stream.prototype._setHIL = function (il) {
+        this._hil = il;
+    };
     Stream.prototype.ctor = function () {
         return this instanceof MemoryStream ? MemoryStream : Stream;
     };
@@ -951,10 +939,6 @@ var Stream = (function () {
             internalizeProducer(producer); 
         }
         return new MemoryStream(producer);
-    };
-    
-    Stream.createMimic = function () {
-        return new MimicStream();
     };
     
     Stream.never = function () {
@@ -1095,6 +1079,15 @@ var Stream = (function () {
         return new (this.ctor())(new DebugOperator(labelOrSpy, this));
     };
     
+    Stream.prototype.imitate = function (other) {
+        if (other instanceof MemoryStream) {
+            throw new Error('A MemoryStream was given to imitate(), but it only ' +
+                'supports a Stream. Read more about this restriction here: ' +
+                'https://github.com/staltz/xstream#faq');
+        }
+        other._setHIL(this);
+    };
+    
     Stream.prototype.shamefullySendNext = function (value) {
         this._n(value);
     };
@@ -1107,45 +1100,16 @@ var Stream = (function () {
         this._c();
     };
     
-    Stream.combine = function combine(project) {
+    Stream.combine = function combine() {
         var streams = [];
-        for (var _i = 1; _i < arguments.length; _i++) {
-            streams[_i - 1] = arguments[_i];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            streams[_i - 0] = arguments[_i];
         }
-        return new Stream(new CombineProducer(project, streams));
+        return new Stream(new CombineProducer(streams));
     };
     return Stream;
 }());
 exports.Stream = Stream;
-var MimicStream = (function (_super) {
-    __extends(MimicStream, _super);
-    function MimicStream() {
-        _super.call(this);
-    }
-    MimicStream.prototype._add = function (il) {
-        var t = this._target;
-        if (!t)
-            return;
-        t._add(il);
-    };
-    MimicStream.prototype._remove = function (il) {
-        var t = this._target;
-        if (!t)
-            return;
-        t._remove(il);
-    };
-    
-    MimicStream.prototype.imitate = function (other) {
-        if (other instanceof MemoryStream) {
-            throw new Error('A MemoryStream was given to imitate(), but it only ' +
-                'supports a Stream. Read more about this restriction here: ' +
-                'https://github.com/staltz/xstream#faq');
-        }
-        this._target = other;
-    };
-    return MimicStream;
-}(Stream));
-exports.MimicStream = MimicStream;
 var MemoryStream = (function (_super) {
     __extends(MemoryStream, _super);
     function MemoryStream(producer) {
@@ -1196,7 +1160,6 @@ exports.default = Stream;
 var core_1 = require('./core');
 exports.Stream = core_1.Stream;
 exports.MemoryStream = core_1.MemoryStream;
-exports.MimicStream = core_1.MimicStream;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = core_1.Stream;
 
