@@ -41,6 +41,6 @@ And can be interpreted/read as "when a `B` event happens, remember it and map it
 
 Read the [CHANGELOG](https://github.com/staltz/xstream/blob/master/CHANGELOG.md) for release notes of all versions of *xstream*.
 
-##License
+## License
 
 [MIT](https://github.com/staltz/xstream/blob/master/LICENSE)
