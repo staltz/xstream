@@ -910,7 +910,6 @@ export class TakeOperator<T> implements Operator<T, T> {
     } else {
       u._n(t);
       u._c();
-      this._stop();
     }
   }
 
