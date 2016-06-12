@@ -3,12 +3,15 @@ _site
 .jekyll-metadata
 .ignore/
 .idea/
+.DS_Store
 Gemfile.lock
 lib/
 markdown/
 node_modules/
 typings/
 extra/
+src/
+tests/
 core.d.ts
 core.js
 core.js.map
