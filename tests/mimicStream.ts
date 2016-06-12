@@ -12,7 +12,7 @@ describe('MimicStream', () => {
     assert.equal(typeof stream.filter, 'function')
     done();
   });
-  
+
   it('should imitate the given stream and send events to dependent streams', (done) => {
     const stream = xs.periodic(50).take(3);
     const proxyStream = xs.createMimic<number>();
@@ -33,7 +33,7 @@ describe('MimicStream', () => {
       });
     }, 125);
   });
-  
+
   it('should be able to model a circular dependency in the stream graph', (done) => {
     const fakeSecond = xs.createMimic<number>();
     const first = fakeSecond.map(x => x * 10).take(3);
@@ -95,5 +95,33 @@ describe('MimicStream', () => {
       assert.equal(completed2, true);
       done();
     }, 400);
-  })
+  });
+
+  it('should not create leaked cyclic executions', (done) => {
+    const expectedMimic = [2, 4, 8, 16];
+    const expectedResult = [2, 4, 8, 16];
+
+    const proxy$ = xs.createMimic<number>();
+    const source$ = proxy$.startWith(1).map(x => x * 2)
+      .debug(x => {
+        assert.equal(expectedMimic.length > 0, true);
+        assert.equal(x, expectedMimic.shift());
+      });
+    const result$ = source$.compose(delay(100)).compose(s => <Stream<number>> s);
+    proxy$.imitate(result$)
+
+    result$.take(4).addListener({
+      next: (x: number) => {
+        assert.equal(x, expectedResult.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.equal(expectedMimic.length, 0);
+        assert.equal(expectedResult.length, 0);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      },
+    });
+  });
 });
