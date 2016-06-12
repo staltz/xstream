@@ -70,6 +70,24 @@ describe('xs.combine', () => {
     });
   });
 
+  it('should just wrap the value if combining one stream', (done) => {
+    const source = xs.periodic(100).take(3);
+    const stream = xs.combine(source);
+    let expected = [[0], [1], [2]];
+
+    stream.addListener({
+      next: (x) => {
+        const e = expected.shift();
+        assert.equal(x[0], e[0]);
+      },
+      error: done,
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      },
+    });
+  });
+
   it('should not break future listeners when CombineProducer tears down', (done) => {
     //     --0--1-2--|  innerA
     //     ---0---1--|  innerB
