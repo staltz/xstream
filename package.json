@@ -51,7 +51,6 @@
     "conventional-changelog-cli": "^1.1.1",
     "cz-conventional-changelog": "^1.1.5",
     "es6-promise": "^3.1.2",
-    "ghooks": "^1.0.3",
     "markdown-doctest": "^0.7.0",
     "markdox": "^0.1.10",
     "mkdirp": "^0.5.1",
@@ -70,9 +69,6 @@
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
-    },
-    "ghooks": {
-      "commit-msg": "node ./node_modules/validate-commit-msg/index.js"
     }
   }
 }
