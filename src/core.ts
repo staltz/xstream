@@ -928,12 +928,14 @@ export class TakeOperator<T> implements Operator<T, T> {
 
 export class Stream<T> implements InternalListener<T> {
   protected _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
+  protected _hil: InternalListener<T>; // 'hil' = Hidden Internal Listener
   protected _stopID: any = empty;
   protected _prod: InternalProducer<T>;
 
   constructor(producer?: InternalProducer<T>) {
     this._prod = producer;
     this._ils = [];
+    this._hil = null;
   }
 
   _n(t: T): void {
@@ -943,6 +945,8 @@ export class Stream<T> implements InternalListener<T> {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._n(t);
     }
+    const h = this._hil;
+    if (h) h._n(t);
   }
 
   _e(err: any): void {
@@ -952,6 +956,8 @@ export class Stream<T> implements InternalListener<T> {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._e(err);
     }
+    const h = this._hil;
+    if (h) h._e(err);
     this._x();
   }
 
@@ -962,6 +968,8 @@ export class Stream<T> implements InternalListener<T> {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._c();
     }
+    const h = this._hil;
+    if (h) h._c();
     this._x();
   }
 
@@ -1021,6 +1029,10 @@ export class Stream<T> implements InternalListener<T> {
         this._stopID = setTimeout(() => p._stop());
       }
     }
+  }
+
+  _setHIL(il: InternalListener<T>): void {
+    this._hil = il;
   }
 
   private ctor(): typeof Stream {
@@ -1679,21 +1691,8 @@ export class Stream<T> implements InternalListener<T> {
 }
 
 export class MimicStream<T> extends Stream<T> {
-  private _target: Stream<T>;
   constructor() {
     super();
-  }
-
-  _add(il: InternalListener<T>): void {
-    const t = this._target;
-    if (!t) return;
-    t._add(il);
-  }
-
-  _remove(il: InternalListener<T>): void {
-    const t = this._target;
-    if (!t) return;
-    t._remove(il);
   }
 
   /**
@@ -1730,7 +1729,7 @@ export class MimicStream<T> extends Stream<T> {
    * declaration of `first$`. Then, after both `first$` and `second$` are
    * defined, we hook `secondMimic$` with `second$` with `imitate()` to tell
    * that they are "the same". `imitate` will not trigger the start of any
-   * stream, it simply forwards listeners of `secondMimic$` to `second$`.
+   * stream, it just binds `secondMimic$` and `second$` together.
    *
    * The following is an example where `imitate()` is important in Cycle.js
    * applications. A parent component contains some child components. A child
@@ -1771,7 +1770,7 @@ export class MimicStream<T> extends Stream<T> {
       'supports a Stream. Read more about this restriction here: ' +
       'https://github.com/staltz/xstream#faq');
     }
-    this._target = other;
+    other._setHIL(this);
   }
 }
 
