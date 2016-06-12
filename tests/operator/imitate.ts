@@ -1,20 +1,12 @@
-/// <reference path="../typings/globals/mocha/index.d.ts" />
-/// <reference path="../typings/globals/node/index.d.ts" />
-import xs, {Producer, Listener, Stream, MemoryStream, MimicStream} from '../src/index';
-import delay from '../src/extra/delay';
+/// <reference path="../../typings/globals/mocha/index.d.ts" />
+/// <reference path="../../typings/globals/node/index.d.ts" />
+import xs, {Producer, Listener, Stream, MemoryStream} from '../../src/index';
+import delay from '../../src/extra/delay';
 import * as assert from 'assert';
 
-describe('MimicStream', () => {
-  it('should be creatable with xs.createMimic()', (done) => {
-    const stream: MimicStream<number> = xs.createMimic<number>();
-    assert.equal(typeof stream.map, 'function');
-    assert.equal(typeof stream.take, 'function');
-    assert.equal(typeof stream.filter, 'function')
-    done();
-  });
-
+describe('Stream.prototype.imitate', () => {
   it('should be able to model a circular dependency in the stream graph', (done) => {
-    const fakeSecond = xs.createMimic<number>();
+    const fakeSecond = xs.create<number>();
     const first = fakeSecond.map(x => x * 10).take(3);
     const second = first.map(x => x + 1).startWith(1).compose(delay<number>(1));
     fakeSecond.imitate(second);
@@ -33,7 +25,7 @@ describe('MimicStream', () => {
   });
 
   it('should broadcast the source stream to multiple listeners', (done) => {
-    const fakeSecond = xs.createMimic<number>();
+    const fakeSecond = xs.create<number>();
     const first = fakeSecond.map(x => x * 10).take(3);
     const second = first.map(x => x + 1).startWith(1).compose(delay<number>(100));
     fakeSecond.imitate(second);
@@ -80,16 +72,16 @@ describe('MimicStream', () => {
   });
 
   it('should not cause leaked cyclic executions', (done) => {
-    const expectedMimic = [2, 4, 8, 16, 32 /* inertia due to stopping on next tick */];
+    const expectedProxy = [2, 4, 8, 16, 32 /* inertia due to stopping on next tick */];
     const expectedResult = [2, 4, 8, 16];
 
-    const proxy$ = xs.createMimic<number>();
+    const proxy$ = xs.create<number>();
     const source$ = proxy$.startWith(1).map(x => x * 2)
       .debug(x => {
         try {
-          assert.equal(expectedMimic.length > 0, true,
+          assert.equal(expectedProxy.length > 0, true,
             'should be expecting the next value ' + x);
-          assert.equal(x, expectedMimic.shift());
+          assert.equal(x, expectedProxy.shift());
         } catch (err) {
           done(err);
         }
@@ -103,7 +95,7 @@ describe('MimicStream', () => {
       },
       error: (err: any) => done(err),
       complete: () => {
-        assert.equal(expectedMimic.length, 1); // still waiting for 32
+        assert.equal(expectedProxy.length, 1); // still waiting for 32
         assert.equal(expectedResult.length, 0);
         setTimeout(() => {
           done();
@@ -112,30 +104,28 @@ describe('MimicStream', () => {
     });
   });
 
-  describe('imitate', () => {
-    it('should not by itself start the target stream execution', (done) => {
-      let nextDelivered = false;
-      const stream = xs.periodic(50).take(3).debug(() => {
-        nextDelivered = true;
-      });
-      const proxyStream = xs.createMimic<number>();
+  it('should not by itself start the target stream execution', (done) => {
+    let nextDelivered = false;
+    const stream = xs.periodic(50).take(3).debug(() => {
+      nextDelivered = true;
+    });
+    const proxyStream = xs.create<number>();
 
-      setTimeout(() => {
-        assert.equal(nextDelivered, false);
-        done();
-      }, 125);
+    setTimeout(() => {
+      assert.equal(nextDelivered, false);
+      done();
+    }, 125);
 
+    proxyStream.imitate(stream);
+  });
+
+  it('should throw an error when given a MemoryStream', (done) => {
+    const stream = xs.periodic(50).take(3).remember();
+    assert.strictEqual(stream instanceof MemoryStream, true);
+    const proxyStream = xs.create<number>();
+    assert.throws(() => {
       proxyStream.imitate(stream);
     });
-
-    it('should throw an error when given a MemoryStream', (done) => {
-      const stream = xs.periodic(50).take(3).remember();
-      assert.strictEqual(stream instanceof MemoryStream, true);
-      const proxyStream = xs.createMimic<number>();
-      assert.throws(() => {
-        proxyStream.imitate(stream);
-      });
-      done();
-    });
+    done();
   });
 });

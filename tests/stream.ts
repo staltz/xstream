@@ -7,7 +7,6 @@ describe('Stream', () => {
   it('should have all the core static operators', () => {
     assert.equal(typeof xs.create, 'function');
     assert.equal(typeof xs.createWithMemory, 'function');
-    assert.equal(typeof xs.createMimic, 'function');
     assert.equal(typeof xs.never, 'function');
     assert.equal(typeof xs.empty, 'function');
     assert.equal(typeof xs.throw, 'function');
@@ -36,6 +35,7 @@ describe('Stream', () => {
     assert.equal(typeof stream.compose, 'function');
     assert.equal(typeof stream.remember, 'function');
     assert.equal(typeof stream.debug, 'function');
+    assert.equal(typeof stream.imitate, 'function');
   });
 
   it('should be createable giving a custom producer object', (done) => {
@@ -349,7 +349,7 @@ describe('Stream', () => {
       try {
         stream.addListener(listener);
       } catch (e) {
-        assert.equal(e.message, 'stream.addListener() requires all three ' + 
+        assert.equal(e.message, 'stream.addListener() requires all three ' +
         'next, error, and complete functions.');
         done();
       }
