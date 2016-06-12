@@ -30,6 +30,9 @@ var options = {
 function add3(a, b, c) {
   return a + b + c;
 }
+function add3Arr(arr) {
+  return arr[0] + arr[1] + arr[2];
+}
 
 var xs1 = xs.fromArray(a);
 var xs2 = xs.fromArray(a);
@@ -46,7 +49,7 @@ var rx3 = rxjs.Observable.from(a);
 suite
   .add('xstream', function(deferred) {
     runners.runXStream(deferred,
-      xs.combine(add3, xs1, xs2, xs3).filter(even));
+      xs.combine(xs1, xs2, xs3).map(add3Arr).filter(even));
   }, options)
   .add('most', function(deferred) {
     runners.runMost(deferred,

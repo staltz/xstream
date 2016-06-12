@@ -7,11 +7,13 @@ describe('xs.combine', () => {
   it('should combine AND-style two streams together', (done) => {
     const stream1 = xs.periodic(100).take(2);
     const stream2 = xs.periodic(120).take(2);
-    const stream = xs.combine((x, y) => `${x}${y}`, stream1, stream2);
-    let expected = ['00', '10', '11'];
+    const stream = xs.combine(stream1, stream2);
+    let expected = [[0,0], [1,0], [1,1]];
     stream.addListener({
       next: (x) => {
-        assert.equal(x, expected.shift());
+        const e = expected.shift();
+        assert.equal(x[0], e[0]);
+        assert.equal(x[1], e[1]);
       },
       error: done,
       complete: () => {
@@ -32,17 +34,14 @@ describe('xs.combine', () => {
       stop: () => {}
     });
 
-    const combined: Stream<string> = xs.combine(
-      (a, b) => a.slice(2) + b.slice(2),
-      stream1, stream2
-    );
+    const combined: Stream<[string, string]> = xs.combine(stream1, stream2);
     done();
   });
 
   it('should complete only when all member streams have completed', (done) => {
     const stream1 = xs.periodic(30).take(1);
     const stream2 = xs.periodic(50).take(4);
-    const stream = xs.combine((x, y) => `${x}${y}`, stream1, stream2);
+    const stream = xs.combine(stream1, stream2).map(arr => arr.join(''))
     let expected = ['00', '01', '02', '03'];
     stream.addListener({
       next: (x) => {
@@ -56,36 +55,16 @@ describe('xs.combine', () => {
     });
   });
 
-  it('should propagate user mistakes in project as errors', (done) => {
-    const stream1 = xs.periodic(30).take(1);
-    const stream2 = xs.periodic(50).take(4);
-    const stream = xs.combine(
-      (x, y) => <number> <any> (<string> <any> x).toLowerCase(),
-      stream1, stream2
-    );
-    stream.addListener({
-      next: () => done('next should not be called'),
-      error: (err) => {
-        assert.notStrictEqual(err.message.match(/is not a function$/), null);
-        done();
-      },
-      complete: () => {
-        done('complete should not be called');
-      },
-    });
-  });
-
-  it('should handle a group of zero streams', (done) => {
-    const stream = xs.combine<string>(() => 'hi');
-    let expected = ['hi'];
+  it('should emit an empty array if combining zero streams', (done) => {
+    const stream = xs.combine();
 
     stream.addListener({
-      next: (x) => {
-        assert.equal(x, expected.shift());
+      next: (a) => {
+        assert.equal(Array.isArray(a), true);
+        assert.equal(a.length, 0);
       },
       error: done,
       complete: () => {
-        assert.equal(expected.length, 0);
         done();
       },
     });
@@ -101,10 +80,8 @@ describe('xs.combine', () => {
     const arrayInners: Array<Stream<number>> = [];
     const stream = outer
       .map(x => {
-        return xs.combine(
-          (...args: Array<number>) => '' + x + args.join(''),
-          ...arrayInners
-        );
+        return xs.combine(...arrayInners)
+          .map(combination => `${x}${combination.join('')}`);
       })
       .flatten();
     const expected = ['00'];
@@ -150,7 +127,7 @@ describe('xs.combine', () => {
   it('should return a Stream when combining a MemoryStream with a Stream', (done) => {
     const input1 = xs.periodic(50).take(4).remember();
     const input2 = xs.periodic(80).take(3);
-    const stream: Stream<number> = xs.combine((x, y) => x + y, input1, input2);
+    const stream: Stream<[number, number]> = xs.combine(input1, input2);
     assert.strictEqual(stream instanceof Stream, true);
     done();
   });
@@ -158,7 +135,7 @@ describe('xs.combine', () => {
   it('should return a Stream when combining a MemoryStream with a MemoryStream', (done) => {
     const input1 = xs.periodic(50).take(4).remember();
     const input2 = xs.periodic(80).take(3).remember();
-    const stream: Stream<number> = xs.combine((x, y) => x + y, input1, input2);
+    const stream: Stream<[number, number]> = xs.combine(input1, input2);
     assert.strictEqual(stream instanceof Stream, true);
     done();
   });

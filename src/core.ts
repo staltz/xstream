@@ -62,18 +62,6 @@ function internalizeProducer<T>(producer: Producer<T>) {
   (<InternalProducer<T>> (<any> producer))._stop = producer.stop;
 }
 
-function invoke(f: Function, args: Array<any>) {
-  switch (args.length) {
-  case 0: return f();
-  case 1: return f(args[0]);
-  case 2: return f(args[0], args[1]);
-  case 3: return f(args[0], args[1], args[2]);
-  case 4: return f(args[0], args[1], args[2], args[3]);
-  case 5: return f(args[0], args[1], args[2], args[3], args[4]);
-  default: return f.apply(void 0, args);
-  }
-}
-
 function compose2<T, U>(f1: (t: T) => any, f2: (t: T) => any): (t: T) => any {
   return function composedFn(arg: T): any {
     return f1(f2(arg));
@@ -84,178 +72,6 @@ function and<T>(f1: (t: T) => boolean, f2: (t: T) => boolean): (t: T) => boolean
   return function andFn(t: T): boolean {
     return f1(t) && f2(t);
   };
-}
-
-export interface CombineProjectFunction {
-  <T1, T2, R>(v1: T1, v2: T2): R;
-  <T1, T2, T3, R>(v1: T1, v2: T2, v3: T3): R;
-  <T1, T2, T3, T4, R>(v1: T1, v2: T2, v3: T3, v4: T4): R;
-  <T1, T2, T3, T4, T5, R>(v1: T1, v2: T2, v3: T3, v4: T4, v5: T5): R;
-  <T1, T2, T3, T4, T5, T6, R>(v1: T1, v2: T2, v3: T3, v4: T4, v5: T5, v6: T6): R;
-  <R>(...values: Array<any>): R;
-}
-
-export interface CombineFactorySignature {
-  <T1, T2, R>(
-    project: (t1: T1, t2: T2) => R,
-    stream1: Stream<T1>,
-    stream2: Stream<T2>): Stream<R>;
-  <T1, T2, T3, R>(
-    project: (t1: T1, t2: T2, t3: T3) => R,
-    stream1: Stream<T1>,
-    stream2: Stream<T2>,
-    stream3: Stream<T3>): Stream<R>;
-  <T1, T2, T3, T4, R>(
-    project: (t1: T1, t2: T2, t3: T3, t4: T4) => R,
-    stream1: Stream<T1>,
-    stream2: Stream<T2>,
-    stream3: Stream<T3>,
-    stream4: Stream<T4>): Stream<R>;
-  <T1, T2, T3, T4, T5, R>(
-    project: (t1: T1, t2: T2, t3: T3, t4: T4, t5: T5) => R,
-    stream1: Stream<T1>,
-    stream2: Stream<T2>,
-    stream3: Stream<T3>,
-    stream4: Stream<T4>,
-    stream5: Stream<T5>): Stream<R>;
-  <R>(project: (...args: Array<any>) => R, ...streams: Array<Stream<any>>): Stream<R>;
-}
-
-export class CombineListener<T> implements InternalListener<T> {
-  constructor(private i: number,
-              private p: CombineProducer<T>) {
-    p.ils.push(this);
-  }
-
-  _n(t: T): void {
-    const p = this.p, out = p.out;
-    if (!out) return;
-    if (p.up(t, this.i)) {
-      try {
-        out._n(invoke(p.project, p.vals));
-      } catch (e) {
-        out._e(e);
-      }
-    }
-  }
-
-  _e(err: any): void {
-    const out = this.p.out;
-    if (!out) return;
-    out._e(err);
-  }
-
-  _c(): void {
-    const p = this.p;
-    if (!p.out) return;
-    if (--p.ac === 0) {
-      p.out._c();
-    }
-  }
-}
-
-export class CombineProducer<R> implements InternalProducer<R> {
-  public type = 'combine';
-  public out: InternalListener<R> = emptyListener;
-  public ils: Array<CombineListener<any>> = [];
-  public ac: number; // ac is "active count", num of streams still not completed
-  public left: number; // number of streams that still need to emit a value
-  public vals: Array<any>;
-
-  constructor(public project: CombineProjectFunction,
-              public streams: Array<Stream<any>>) {
-    const n = this.ac = this.left = streams.length;
-    const vals = this.vals = new Array(n);
-    for (let i = 0; i < n; i++) {
-      vals[i] = empty;
-    }
-  }
-
-  up(t: any, i: number): boolean {
-    const v = this.vals[i];
-    const left = !this.left ? 0 : v === empty ? --this.left : this.left;
-    this.vals[i] = t;
-    return left === 0;
-  }
-
-  _start(out: InternalListener<R>): void {
-    this.out = out;
-    const s = this.streams;
-    const n = s.length;
-    if (n === 0) this.zero(out); else {
-      for (let i = 0; i < n; i++) {
-        s[i]._add(new CombineListener(i, this));
-      }
-    }
-  }
-
-  _stop(): void {
-    const s = this.streams;
-    const n = this.ac = this.left = s.length;
-    const vals = this.vals = new Array(n);
-    for (let i = 0; i < n; i++) {
-      s[i]._remove(this.ils[i]);
-      vals[i] = empty;
-    }
-    this.out = null;
-    this.ils = [];
-  }
-
-  zero(out: InternalListener<R>): void {
-    try {
-      out._n(this.project<R>());
-      out._c();
-    } catch (e) {
-      out._e(e);
-    }
-  }
-}
-
-export class FromArrayProducer<T> implements InternalProducer<T> {
-  public type = 'fromArray';
-  constructor(public a: Array<T>) {
-  }
-
-  _start(out: InternalListener<T>): void {
-    const a = this.a;
-    for (let i = 0, l = a.length; i < l; i++) {
-      out._n(a[i]);
-    }
-    out._c();
-  }
-
-  _stop(): void {
-  }
-}
-
-export class FromPromiseProducer<T> implements InternalProducer<T> {
-  public type = 'fromPromise';
-  public on: boolean = false;
-
-  constructor(public p: Promise<T>) {
-  }
-
-  _start(out: InternalListener<T>): void {
-    const prod = this;
-    this.on = true;
-    this.p.then(
-      (v: T) => {
-        if (prod.on) {
-          out._n(v);
-          out._c();
-        }
-      },
-      (e: any) => {
-        out._e(e);
-      }
-    ).then(null, (err: any) => {
-      setTimeout(() => { throw err; });
-    });
-  }
-
-  _stop(): void {
-    this.on = false;
-  }
 }
 
 export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T> {
@@ -304,6 +120,163 @@ export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T
       if (!u) return;
       u._c();
     }
+  }
+}
+
+export interface CombineSignature {
+  (): Stream<Array<any>>;
+  <T1>(s1: Stream<T1>): Stream<[T1]>;
+  <T1, T2>(
+    s1: Stream<T1>,
+    s2: Stream<T2>): Stream<[T1, T2]>;
+  <T1, T2, T3>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>): Stream<[T1, T2, T3]>;
+  <T1, T2, T3, T4>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>,
+    s4: Stream<T4>): Stream<[T1, T2, T3, T4]>;
+  <T1, T2, T3, T4, T5>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>,
+    s4: Stream<T4>,
+    s5: Stream<T5>): Stream<[T1, T2, T3, T4, T5]>;
+  <T1, T2, T3, T4, T5, T6>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>,
+    s4: Stream<T4>,
+    s5: Stream<T5>,
+    s6: Stream<T6>): Stream<[T1, T2, T3, T4, T5, T6]>;
+  (...stream: Array<Stream<any>>): Stream<Array<any>>;
+}
+
+export class CombineListener<T> implements InternalListener<T> {
+  constructor(private i: number,
+              private p: CombineProducer<T>) {
+    p.ils.push(this);
+  }
+
+  _n(t: T): void {
+    const p = this.p, out = p.out;
+    if (!out) return;
+    if (p.up(t, this.i)) {
+      out._n(p.vals);
+    }
+  }
+
+  _e(err: any): void {
+    const out = this.p.out;
+    if (!out) return;
+    out._e(err);
+  }
+
+  _c(): void {
+    const p = this.p;
+    if (!p.out) return;
+    if (--p.ac === 0) {
+      p.out._c();
+    }
+  }
+}
+
+export class CombineProducer<R> implements InternalProducer<Array<R>> {
+  public type = 'combine';
+  public out: InternalListener<Array<R>> = emptyListener;
+  public ils: Array<CombineListener<any>> = [];
+  public ac: number; // ac is "active count", num of streams still not completed
+  public left: number; // number of streams that still need to emit a value
+  public vals: Array<R>;
+
+  constructor(public streams: Array<Stream<any>>) {
+    const n = this.ac = this.left = streams.length;
+    const vals = this.vals = new Array(n);
+    for (let i = 0; i < n; i++) {
+      vals[i] = empty;
+    }
+  }
+
+  up(t: any, i: number): boolean {
+    const v = this.vals[i];
+    const left = !this.left ? 0 : v === empty ? --this.left : this.left;
+    this.vals[i] = t;
+    return left === 0;
+  }
+
+  _start(out: InternalListener<Array<R>>): void {
+    this.out = out;
+    const s = this.streams;
+    const n = s.length;
+    if (n === 0) {
+      out._n(this.vals);
+      out._c();
+    } else {
+      for (let i = 0; i < n; i++) {
+        s[i]._add(new CombineListener(i, this));
+      }
+    }
+  }
+
+  _stop(): void {
+    const s = this.streams;
+    const n = this.ac = this.left = s.length;
+    const vals = this.vals = new Array(n);
+    for (let i = 0; i < n; i++) {
+      s[i]._remove(this.ils[i]);
+      vals[i] = empty;
+    }
+    this.out = null;
+    this.ils = [];
+  }
+}
+
+export class FromArrayProducer<T> implements InternalProducer<T> {
+  public type = 'fromArray';
+  constructor(public a: Array<T>) {
+  }
+
+  _start(out: InternalListener<T>): void {
+    const a = this.a;
+    for (let i = 0, l = a.length; i < l; i++) {
+      out._n(a[i]);
+    }
+    out._c();
+  }
+
+  _stop(): void {
+  }
+}
+
+export class FromPromiseProducer<T> implements InternalProducer<T> {
+  public type = 'fromPromise';
+  public on: boolean = false;
+
+  constructor(public p: Promise<T>) {
+  }
+
+  _start(out: InternalListener<T>): void {
+    const prod = this;
+    this.on = true;
+    this.p.then(
+      (v: T) => {
+        if (prod.on) {
+          out._n(v);
+          out._c();
+        }
+      },
+      (e: any) => {
+        out._e(e);
+      }
+    ).then(null, (err: any) => {
+      setTimeout(() => { throw err; });
+    });
+  }
+
+  _stop(): void {
+    this.on = false;
   }
 }
 
@@ -1241,40 +1214,33 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   /**
-   * Combines multiple streams together to return a stream whose events are
-   * calculated from the latest events of each of the input streams.
+   * Combines multiple input streams together to return a stream whose events
+   * are arrays that collect the latest events from each input stream.
    *
-   * *combine* remembers the most recent event from each of the input streams.
-   * When any of the input streams emits an event, that event together with all
-   * the other saved events are combined in the `project` function which should
-   * return a value. That value will be emitted on the output stream. It's
-   * essentially a way of mixing the events from multiple streams according to a
-   * formula.
+   * *combine* internally remembers the most recent event from each of the input
+   * streams. When any of the input streams emits an event, that event together
+   * with all the other saved events are combined into an array. That array will
+   * be emitted on the output stream. It's essentially a way of joining together
+   * the events from multiple streams.
    *
    * Marble diagram:
    *
    * ```text
    * --1----2-----3--------4---
    * ----a-----b-----c--d------
-   *   combine((x,y) => x+y)
+   *          combine
    * ----1a-2a-2b-3b-3c-3d-4d--
    * ```
    *
    * @factory true
-   * @param {Function} project A function of type `(x: T1, y: T2) => R` or
-   * similar that takes the most recent events `x` and `y` from the input
-   * streams and returns a value. The output stream will emit that value. The
-   * number of arguments for this function should match the number of input
-   * streams.
    * @param {Stream} stream1 A stream to combine together with other streams.
    * @param {Stream} stream2 A stream to combine together with other streams.
-   * Two or more streams may be given as arguments.
+   * Multiple streams, not just two, may be given as arguments.
    * @return {Stream}
    */
-  static combine: CombineFactorySignature =
-    function combine<R>(project: CombineProjectFunction,
-                        ...streams: Array<Stream<any>>): Stream<R> {
-      return new Stream<R>(new CombineProducer<R>(project, streams));
+  static combine: CombineSignature = <CombineSignature>
+    function combine(...streams: Array<Stream<any>>): Stream<Array<any>> {
+      return new Stream<Array<any>>(new CombineProducer<any>(streams));
     };
 
   protected _map<U>(project: (t: T) => U): Stream<U> | MemoryStream<U> {
