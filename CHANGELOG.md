@@ -1,3 +1,18 @@
+<a name="5.0.3"></a>
+## [5.0.3](https://github.com/staltz/xstream/compare/v5.0.2...v5.0.3) (2016-06-13)
+
+
+### Bug Fixes
+
+* **imitate:** fix imitate() isomorphism ([d9970cc](https://github.com/staltz/xstream/commit/d9970cc))
+
+
+### Performance Improvements
+
+* **dataflow:** add dataflow perf benchmark ([9b8730a](https://github.com/staltz/xstream/commit/9b8730a))
+
+
+
 <a name="5.0.2"></a>
 ## [5.0.2](https://github.com/staltz/xstream/compare/v4.0.4...v5.0.2) (2016-06-12)
 

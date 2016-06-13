@@ -112,7 +112,7 @@ var CombineListener = (function () {
         var p = this.p;
         if (!p.out)
             return;
-        if (--p.ac === 0) {
+        if (--p.Nc === 0) {
             p.out._c();
         }
     };
@@ -120,12 +120,12 @@ var CombineListener = (function () {
 }());
 exports.CombineListener = CombineListener;
 var CombineProducer = (function () {
-    function CombineProducer(streams) {
-        this.streams = streams;
+    function CombineProducer(s) {
+        this.s = s;
         this.type = 'combine';
-        this.out = exports.emptyListener;
+        this.out = null;
         this.ils = [];
-        var n = this.ac = this.left = streams.length;
+        var n = this.Nc = this.Nn = s.length;
         var vals = this.vals = new Array(n);
         for (var i = 0; i < n; i++) {
             vals[i] = empty;
@@ -133,16 +133,16 @@ var CombineProducer = (function () {
     }
     CombineProducer.prototype.up = function (t, i) {
         var v = this.vals[i];
-        var left = !this.left ? 0 : v === empty ? --this.left : this.left;
+        var Nn = !this.Nn ? 0 : v === empty ? --this.Nn : this.Nn;
         this.vals[i] = t;
-        return left === 0;
+        return Nn === 0;
     };
     CombineProducer.prototype._start = function (out) {
         this.out = out;
-        var s = this.streams;
+        var s = this.s;
         var n = s.length;
         if (n === 0) {
-            out._n(this.vals);
+            out._n([]);
             out._c();
         }
         else {
@@ -152,8 +152,8 @@ var CombineProducer = (function () {
         }
     };
     CombineProducer.prototype._stop = function () {
-        var s = this.streams;
-        var n = this.ac = this.left = s.length;
+        var s = this.s;
+        var n = this.Nc = this.Nn = s.length;
         var vals = this.vals = new Array(n);
         for (var i = 0; i < n; i++) {
             s[i]._remove(this.ils[i]);
@@ -823,6 +823,7 @@ var Stream = (function () {
         this._prod = producer;
         this._ils = [];
         this._hil = null;
+        this._target = null;
     }
     Stream.prototype._n = function (t) {
         var a = this._ils;
@@ -893,6 +894,10 @@ var Stream = (function () {
         this._remove(listener);
     };
     Stream.prototype._add = function (il) {
+        var ta = this._target;
+        if (ta && ta._ils.length === 0) {
+            return ta._add(il);
+        }
         var a = this._ils;
         a.push(il);
         if (a.length === 1) {
@@ -914,6 +919,9 @@ var Stream = (function () {
             if (p_1 && a.length <= 0) {
                 this._stopID = setTimeout(function () { return p_1._stop(); });
             }
+        }
+        else if (this._target) {
+            this._target._remove(il);
         }
     };
     Stream.prototype._setHIL = function (il) {
@@ -1079,13 +1087,14 @@ var Stream = (function () {
         return new (this.ctor())(new DebugOperator(labelOrSpy, this));
     };
     
-    Stream.prototype.imitate = function (other) {
-        if (other instanceof MemoryStream) {
+    Stream.prototype.imitate = function (target) {
+        if (target instanceof MemoryStream) {
             throw new Error('A MemoryStream was given to imitate(), but it only ' +
                 'supports a Stream. Read more about this restriction here: ' +
                 'https://github.com/staltz/xstream#faq');
         }
-        other._setHIL(this);
+        this._target = target;
+        target._setHIL(this);
     };
     
     Stream.prototype.shamefullySendNext = function (value) {
