@@ -177,7 +177,7 @@ export class CombineListener<T> implements InternalListener<T> {
   _c(): void {
     const p = this.p;
     if (!p.out) return;
-    if (--p.ac === 0) {
+    if (--p.Nc === 0) {
       p.out._c();
     }
   }
@@ -185,14 +185,14 @@ export class CombineListener<T> implements InternalListener<T> {
 
 export class CombineProducer<R> implements InternalProducer<Array<R>> {
   public type = 'combine';
-  public out: InternalListener<Array<R>> = emptyListener;
+  public out: InternalListener<Array<R>> = null;
   public ils: Array<CombineListener<any>> = [];
-  public ac: number; // ac is "active count", num of streams still not completed
-  public left: number; // number of streams that still need to emit a value
+  public Nc: number; // *N*umber of streams still to send *c*omplete
+  public Nn: number; // *N*umber of streams still to send *n*ext
   public vals: Array<R>;
 
-  constructor(public streams: Array<Stream<any>>) {
-    const n = this.ac = this.left = streams.length;
+  constructor(public s: Array<Stream<any>>) {
+    const n = this.Nc = this.Nn = s.length;
     const vals = this.vals = new Array(n);
     for (let i = 0; i < n; i++) {
       vals[i] = empty;
@@ -201,17 +201,17 @@ export class CombineProducer<R> implements InternalProducer<Array<R>> {
 
   up(t: any, i: number): boolean {
     const v = this.vals[i];
-    const left = !this.left ? 0 : v === empty ? --this.left : this.left;
+    const Nn = !this.Nn ? 0 : v === empty ? --this.Nn : this.Nn;
     this.vals[i] = t;
-    return left === 0;
+    return Nn === 0;
   }
 
   _start(out: InternalListener<Array<R>>): void {
     this.out = out;
-    const s = this.streams;
+    const s = this.s;
     const n = s.length;
     if (n === 0) {
-      out._n(this.vals);
+      out._n([]);
       out._c();
     } else {
       for (let i = 0; i < n; i++) {
@@ -221,8 +221,8 @@ export class CombineProducer<R> implements InternalProducer<Array<R>> {
   }
 
   _stop(): void {
-    const s = this.streams;
-    const n = this.ac = this.left = s.length;
+    const s = this.s;
+    const n = this.Nc = this.Nn = s.length;
     const vals = this.vals = new Array(n);
     for (let i = 0; i < n; i++) {
       s[i]._remove(this.ils[i]);
