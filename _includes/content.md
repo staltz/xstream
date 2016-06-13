@@ -778,7 +778,7 @@ as argument, and does not need to return anything.
 
 - - -
 
-### <a id="imitate"></a> `imitate(other)`
+### <a id="imitate"></a> `imitate(target)`
 
 *imitate* changes this current Stream to emit the same events that the
 `other` given Stream does. This method returns nothing.
@@ -842,7 +842,7 @@ proxy Stream which then imitates the target Stream.
 
 #### Arguments:
 
-- `other: Stream` The stream to imitate on the current one. Must not be a MemoryStream.
+- `target: Stream` The other stream to imitate on the current one. Must not be a MemoryStream.
 
 - - -
 
