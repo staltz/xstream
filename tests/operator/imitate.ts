@@ -6,13 +6,32 @@ import * as assert from 'assert';
 
 describe('Stream.prototype.imitate', () => {
   it('should be able to model a circular dependency in the stream graph', (done) => {
-    const fakeSecond = xs.create<number>();
-    const first = fakeSecond.map(x => x * 10).take(3);
+    const secondMimic = xs.create<number>();
+    const first = secondMimic.map(x => x * 10).take(3);
     const second = first.map(x => x + 1).startWith(1).compose(delay<number>(1));
-    fakeSecond.imitate(second);
+    secondMimic.imitate(second);
     const expected = [1, 11, 111, 1111];
 
     second.addListener({
+      next: (x: number) => {
+        assert.equal(x, expected.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      },
+    });
+  });
+
+  it('should be able to model a circular dependency, mimic subscribed', (done) => {
+    const secondMimic = xs.create<number>();
+    const first = secondMimic.map(x => x * 10).take(3);
+    const second = first.map(x => x + 1).startWith(1).compose(delay<number>(1));
+    secondMimic.imitate(second);
+    const expected = [1, 11, 111, 1111];
+
+    secondMimic.addListener({
       next: (x: number) => {
         assert.equal(x, expected.shift());
       },

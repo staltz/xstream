@@ -904,11 +904,13 @@ export class Stream<T> implements InternalListener<T> {
   protected _hil: InternalListener<T>; // 'hil' = Hidden Internal Listener
   protected _stopID: any = empty;
   protected _prod: InternalProducer<T>;
+  protected _target: Stream<T>; // imitation target if this Stream will imitate
 
   constructor(producer?: InternalProducer<T>) {
     this._prod = producer;
     this._ils = [];
     this._hil = null;
+    this._target = null;
   }
 
   _n(t: T): void {
@@ -980,6 +982,10 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _add(il: InternalListener<T>): void {
+    const ta = this._target;
+    if (ta && ta._ils.length === 0) {
+      return ta._add(il);
+    }
     const a = this._ils;
     a.push(il);
     if (a.length === 1) {
@@ -1001,6 +1007,8 @@ export class Stream<T> implements InternalListener<T> {
       if (p && a.length <= 0) {
         this._stopID = setTimeout(() => p._stop());
       }
+    } else if (this._target) {
+      this._target._remove(il);
     }
   }
 
@@ -1666,16 +1674,17 @@ export class Stream<T> implements InternalListener<T> {
    * represents an event stream, and that would be a candidate for creating a
    * proxy Stream which then imitates the target Stream.
    *
-   * @param {Stream} other The stream to imitate on the current one. Must not be
-   * a MemoryStream.
+   * @param {Stream} target The other stream to imitate on the current one. Must
+   * not be a MemoryStream.
    */
-  imitate(other: Stream<T>): void {
-    if (other instanceof MemoryStream) {
+  imitate(target: Stream<T>): void {
+    if (target instanceof MemoryStream) {
       throw new Error('A MemoryStream was given to imitate(), but it only ' +
       'supports a Stream. Read more about this restriction here: ' +
       'https://github.com/staltz/xstream#faq');
     }
-    other._setHIL(this);
+    this._target = target;
+    target._setHIL(this);
   }
 
   /**
