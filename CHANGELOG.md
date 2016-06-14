@@ -1,3 +1,13 @@
+<a name="5.0.5"></a>
+## [5.0.5](https://github.com/staltz/xstream/compare/v5.0.4...v5.0.5) (2016-06-14)
+
+
+### Bug Fixes
+
+* **imitate:** fix against cyclic propagation of errors ([1aa0549](https://github.com/staltz/xstream/commit/1aa0549))
+
+
+
 <a name="5.0.4"></a>
 ## [5.0.4](https://github.com/staltz/xstream/compare/v5.0.3...v5.0.4) (2016-06-14)
 

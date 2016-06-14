@@ -824,6 +824,7 @@ var Stream = (function () {
         this._prod = producer;
         this._ils = [];
         this._target = null;
+        this._err = null;
     }
     Stream.prototype._n = function (t) {
         var a = this._ils;
@@ -837,6 +838,9 @@ var Stream = (function () {
         }
     };
     Stream.prototype._e = function (err) {
+        if (this._err)
+            return;
+        this._err = err;
         var a = this._ils;
         var L = a.length;
         if (L == 1)
@@ -865,6 +869,7 @@ var Stream = (function () {
             return;
         if (this._prod)
             this._prod._stop();
+        this._err = null;
         this._ils = [];
     };
     
@@ -910,6 +915,7 @@ var Stream = (function () {
             a.splice(i, 1);
             var p_1 = this._prod;
             if (p_1 && a.length <= 0) {
+                this._err = null;
                 this._stopID = setTimeout(function () { return p_1._stop(); });
             }
             else if (a.length === 1) {
