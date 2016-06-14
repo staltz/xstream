@@ -1,3 +1,13 @@
+<a name="5.0.4"></a>
+## [5.0.4](https://github.com/staltz/xstream/compare/v5.0.3...v5.0.4) (2016-06-14)
+
+
+### Bug Fixes
+
+* **imitate:** fix cyclic execution leaks ([8658aa0](https://github.com/staltz/xstream/commit/8658aa0)), closes [#51](https://github.com/staltz/xstream/issues/51)
+
+
+
 <a name="5.0.3"></a>
 ## [5.0.3](https://github.com/staltz/xstream/compare/v5.0.2...v5.0.3) (2016-06-13)
 

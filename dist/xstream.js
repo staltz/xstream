@@ -15,7 +15,7 @@ function copy(a) {
     }
     return b;
 }
-exports.emptyListener = {
+exports.emptyIL = {
     _n: noop,
     _e: noop,
     _c: noop,
@@ -42,22 +42,22 @@ function and(f1, f2) {
     };
 }
 var MergeProducer = (function () {
-    function MergeProducer(streams) {
-        this.streams = streams;
+    function MergeProducer(insArr) {
+        this.insArr = insArr;
         this.type = 'merge';
-        this.out = exports.emptyListener;
-        this.ac = streams.length;
+        this.out = null;
+        this.ac = insArr.length;
     }
     MergeProducer.prototype._start = function (out) {
         this.out = out;
-        var s = this.streams;
+        var s = this.insArr;
         var L = s.length;
         for (var i = 0; i < L; i++) {
             s[i]._add(this);
         }
     };
     MergeProducer.prototype._stop = function () {
-        var s = this.streams;
+        var s = this.insArr;
         var L = s.length;
         for (var i = 0; i < L; i++) {
             s[i]._remove(this);
@@ -89,13 +89,14 @@ var MergeProducer = (function () {
 }());
 exports.MergeProducer = MergeProducer;
 var CombineListener = (function () {
-    function CombineListener(i, p) {
+    function CombineListener(i, out, p) {
         this.i = i;
+        this.out = out;
         this.p = p;
         p.ils.push(this);
     }
     CombineListener.prototype._n = function (t) {
-        var p = this.p, out = p.out;
+        var p = this.p, out = this.out;
         if (!out)
             return;
         if (p.up(t, this.i)) {
@@ -103,7 +104,7 @@ var CombineListener = (function () {
         }
     };
     CombineListener.prototype._e = function (err) {
-        var out = this.p.out;
+        var out = this.out;
         if (!out)
             return;
         out._e(err);
@@ -120,12 +121,12 @@ var CombineListener = (function () {
 }());
 exports.CombineListener = CombineListener;
 var CombineProducer = (function () {
-    function CombineProducer(s) {
-        this.s = s;
+    function CombineProducer(insArr) {
+        this.insArr = insArr;
         this.type = 'combine';
         this.out = null;
         this.ils = [];
-        var n = this.Nc = this.Nn = s.length;
+        var n = this.Nc = this.Nn = insArr.length;
         var vals = this.vals = new Array(n);
         for (var i = 0; i < n; i++) {
             vals[i] = empty;
@@ -139,7 +140,7 @@ var CombineProducer = (function () {
     };
     CombineProducer.prototype._start = function (out) {
         this.out = out;
-        var s = this.s;
+        var s = this.insArr;
         var n = s.length;
         if (n === 0) {
             out._n([]);
@@ -147,12 +148,12 @@ var CombineProducer = (function () {
         }
         else {
             for (var i = 0; i < n; i++) {
-                s[i]._add(new CombineListener(i, this));
+                s[i]._add(new CombineListener(i, out, this));
             }
         }
     };
     CombineProducer.prototype._stop = function () {
-        var s = this.s;
+        var s = this.insArr;
         var n = this.Nc = this.Nn = s.length;
         var vals = this.vals = new Array(n);
         for (var i = 0; i < n; i++) {
@@ -349,7 +350,7 @@ var EndWhenOperator = (function () {
         this.ins = ins;
         this.type = 'endWhen';
         this.out = null;
-        this.oil = exports.emptyListener; 
+        this.oil = exports.emptyIL; 
     }
     EndWhenOperator.prototype._start = function (out) {
         this.out = out;
@@ -759,7 +760,7 @@ var StartWithOperator = (function () {
         this.ins = ins;
         this.value = value;
         this.type = 'startWith';
-        this.out = exports.emptyListener;
+        this.out = exports.emptyIL;
     }
     StartWithOperator.prototype._start = function (out) {
         this.out = out;
@@ -822,7 +823,6 @@ var Stream = (function () {
         this._stopID = empty;
         this._prod = producer;
         this._ils = [];
-        this._hil = null;
         this._target = null;
     }
     Stream.prototype._n = function (t) {
@@ -835,9 +835,6 @@ var Stream = (function () {
             for (var i = 0; i < L; i++)
                 b[i]._n(t);
         }
-        var h = this._hil;
-        if (h)
-            h._n(t);
     };
     Stream.prototype._e = function (err) {
         var a = this._ils;
@@ -849,9 +846,6 @@ var Stream = (function () {
             for (var i = 0; i < L; i++)
                 b[i]._e(err);
         }
-        var h = this._hil;
-        if (h)
-            h._e(err);
         this._x();
     };
     Stream.prototype._c = function () {
@@ -864,9 +858,6 @@ var Stream = (function () {
             for (var i = 0; i < L; i++)
                 b[i]._c();
         }
-        var h = this._hil;
-        if (h)
-            h._c();
         this._x();
     };
     Stream.prototype._x = function () {
@@ -895,9 +886,8 @@ var Stream = (function () {
     };
     Stream.prototype._add = function (il) {
         var ta = this._target;
-        if (ta && ta._ils.length === 0) {
+        if (ta)
             return ta._add(il);
-        }
         var a = this._ils;
         a.push(il);
         if (a.length === 1) {
@@ -911,6 +901,9 @@ var Stream = (function () {
         }
     };
     Stream.prototype._remove = function (il) {
+        var ta = this._target;
+        if (ta)
+            return ta._remove(il);
         var a = this._ils;
         var i = a.indexOf(il);
         if (i > -1) {
@@ -919,13 +912,40 @@ var Stream = (function () {
             if (p_1 && a.length <= 0) {
                 this._stopID = setTimeout(function () { return p_1._stop(); });
             }
-        }
-        else if (this._target) {
-            this._target._remove(il);
+            else if (a.length === 1) {
+                this._pruneCycles();
+            }
         }
     };
-    Stream.prototype._setHIL = function (il) {
-        this._hil = il;
+    
+    
+    
+    
+    Stream.prototype._pruneCycles = function () {
+        if (this._onlyReachesThis(this)) {
+            this._remove(this._ils[0]);
+        }
+    };
+    
+    
+    
+    Stream.prototype._onlyReachesThis = function (x) {
+        if (x.out === this) {
+            return true;
+        }
+        else if (x.out) {
+            return this._onlyReachesThis(x.out);
+        }
+        else if (x._ils) {
+            for (var i = 0, N = x._ils.length; i < N; i++) {
+                if (!this._onlyReachesThis(x._ils[i]))
+                    return false;
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
     };
     Stream.prototype.ctor = function () {
         return this instanceof MemoryStream ? MemoryStream : Stream;
@@ -1094,7 +1114,6 @@ var Stream = (function () {
                 'https://github.com/staltz/xstream#faq');
         }
         this._target = target;
-        target._setHIL(this);
     };
     
     Stream.prototype.shamefullySendNext = function (value) {
