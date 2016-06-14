@@ -1,14 +1,14 @@
-import {Stream, InternalProducer, InternalListener} from '../core';
+import {Stream, InternalProducer, InternalListener, OutSender} from '../core';
 
-class ConcatProducer<T> implements InternalProducer<T>, InternalListener<T> {
+class ConcatProducer<T> implements InternalProducer<T>, InternalListener<T>, OutSender<T> {
   public type = 'concat';
-  private out: InternalListener<T> = null;
+  public out: Stream<T> = null;
   private i: number = 0;
 
   constructor(public streams: Array<Stream<T>>) {
   }
 
-  _start(out: InternalListener<T>): void {
+  _start(out: Stream<T>): void {
     this.out = out;
     this.streams[this.i]._add(this);
   }

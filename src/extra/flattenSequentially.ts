@@ -23,7 +23,7 @@ export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
   private open: boolean = true;
   private active: boolean = false;
   private seq: Array<Stream<T>> = [];
-  private out: Stream<T> = null;
+  public out: Stream<T> = null;
 
   constructor(public ins: Stream<Stream<T>>) {
   }
@@ -90,7 +90,7 @@ export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
  * imitating that nested one. When the next nested stream is emitted on the
  * input stream, *flattenSequentially* will keep that in a buffer, and only
  * start imitating it once the previous nested stream completes.
- * 
+ *
  * In essence, `flattenSequentially` concatenates all nested streams.
  *
  * Marble diagram:

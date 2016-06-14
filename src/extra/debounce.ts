@@ -2,7 +2,7 @@ import {Operator, Stream} from '../core';
 
 class DebounceOperator<T> implements Operator<T, T> {
   public type = 'debounce';
-  private out: Stream<T> = null;
+  public out: Stream<T> = null;
   private value: T = null;
   private id: any = null;
 

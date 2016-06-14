@@ -1,7 +1,7 @@
-import {Operator, Stream, InternalListener} from '../core';
+import {Operator, Stream, OutSender, InternalListener} from '../core';
 
-class FCIL<T> implements InternalListener<T> {
-  constructor(private out: Stream<T>,
+class FCIL<T> implements InternalListener<T>, OutSender<T> {
+  constructor(public out: Stream<T>,
               private op: FlattenConcOperator<T>) {
   }
 
@@ -21,7 +21,7 @@ class FCIL<T> implements InternalListener<T> {
 export class FlattenConcOperator<T> implements Operator<Stream<T>, T> {
   public type = 'flattenConcurrently';
   private active: number = 1; // number of outers and inners that have not yet ended
-  private out: Stream<T> = null;
+  public out: Stream<T> = null;
 
   constructor(public ins: Stream<Stream<T>>) {
   }

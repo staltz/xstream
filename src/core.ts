@@ -18,7 +18,7 @@ export interface InternalListener<T> {
   _c: () => void;
 }
 
-export const emptyListener: InternalListener<any> = {
+export const emptyIL: InternalListener<any> = {
   _n: noop,
   _e: noop,
   _c: noop,
@@ -29,14 +29,20 @@ export interface InternalProducer<T> {
   _stop: () => void;
 }
 
-export interface Operator<T, R> extends InternalProducer<R>, InternalListener<T> {
+export interface OutSender<T> {
+  out: Stream<T>;
+}
+
+export interface Operator<T, R> extends InternalProducer<R>, InternalListener<T>, OutSender<R> {
   type: string;
   ins: Stream<T>;
   _start: (out: Stream<R>) => void;
-  _stop: () => void;
-  _n: (v: T) => void;
-  _e: (err: any) => void;
-  _c: () => void;
+}
+
+export interface Aggregator<T, U> extends InternalProducer<U>, OutSender<U> {
+  type: string;
+  insArr: Array<Stream<T>>;
+  _start: (out: Stream<U>) => void;
 }
 
 export interface Producer<T> {
@@ -74,18 +80,18 @@ function and<T>(f1: (t: T) => boolean, f2: (t: T) => boolean): (t: T) => boolean
   };
 }
 
-export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T> {
+export class MergeProducer<T> implements Aggregator<T, T>, InternalListener<T> {
   public type = 'merge';
-  private out: InternalListener<T> = emptyListener;
+  public out: Stream<T> = null;
   private ac: number; // ac is activeCount, starts initialized
 
-  constructor(public streams: Array<Stream<T>>) {
-    this.ac = streams.length;
+  constructor(public insArr: Array<Stream<T>>) {
+    this.ac = insArr.length;
   }
 
-  _start(out: InternalListener<T>): void {
+  _start(out: Stream<T>): void {
     this.out = out;
-    const s = this.streams;
+    const s = this.insArr;
     const L = s.length;
     for (let i = 0; i < L; i++) {
       s[i]._add(this);
@@ -93,7 +99,7 @@ export class MergeProducer<T> implements InternalProducer<T>, InternalListener<T
   }
 
   _stop(): void {
-    const s = this.streams;
+    const s = this.insArr;
     const L = s.length;
     for (let i = 0; i < L; i++) {
       s[i]._remove(this);
@@ -154,14 +160,15 @@ export interface CombineSignature {
   (...stream: Array<Stream<any>>): Stream<Array<any>>;
 }
 
-export class CombineListener<T> implements InternalListener<T> {
+export class CombineListener<T> implements InternalListener<T>, OutSender<Array<T>> {
   constructor(private i: number,
+              public out: Stream<Array<T>>,
               private p: CombineProducer<T>) {
     p.ils.push(this);
   }
 
   _n(t: T): void {
-    const p = this.p, out = p.out;
+    const p = this.p, out = this.out;
     if (!out) return;
     if (p.up(t, this.i)) {
       out._n(p.vals);
@@ -169,7 +176,7 @@ export class CombineListener<T> implements InternalListener<T> {
   }
 
   _e(err: any): void {
-    const out = this.p.out;
+    const out = this.out;
     if (!out) return;
     out._e(err);
   }
@@ -183,16 +190,16 @@ export class CombineListener<T> implements InternalListener<T> {
   }
 }
 
-export class CombineProducer<R> implements InternalProducer<Array<R>> {
+export class CombineProducer<R> implements Aggregator<any, Array<R>> {
   public type = 'combine';
-  public out: InternalListener<Array<R>> = null;
+  public out: Stream<Array<R>> = null;
   public ils: Array<CombineListener<any>> = [];
   public Nc: number; // *N*umber of streams still to send *c*omplete
   public Nn: number; // *N*umber of streams still to send *n*ext
   public vals: Array<R>;
 
-  constructor(public s: Array<Stream<any>>) {
-    const n = this.Nc = this.Nn = s.length;
+  constructor(public insArr: Array<Stream<any>>) {
+    const n = this.Nc = this.Nn = insArr.length;
     const vals = this.vals = new Array(n);
     for (let i = 0; i < n; i++) {
       vals[i] = empty;
@@ -206,22 +213,22 @@ export class CombineProducer<R> implements InternalProducer<Array<R>> {
     return Nn === 0;
   }
 
-  _start(out: InternalListener<Array<R>>): void {
+  _start(out: Stream<Array<R>>): void {
     this.out = out;
-    const s = this.s;
+    const s = this.insArr;
     const n = s.length;
     if (n === 0) {
       out._n([]);
       out._c();
     } else {
       for (let i = 0; i < n; i++) {
-        s[i]._add(new CombineListener(i, this));
+        s[i]._add(new CombineListener(i, out, this));
       }
     }
   }
 
   _stop(): void {
-    const s = this.s;
+    const s = this.insArr;
     const n = this.Nc = this.Nn = s.length;
     const vals = this.vals = new Array(n);
     for (let i = 0; i < n; i++) {
@@ -303,7 +310,7 @@ export class PeriodicProducer implements InternalProducer<number> {
 
 export class DebugOperator<T> implements Operator<T, T> {
   public type = 'debug';
-  private out: Stream<T> = null;
+  public out: Stream<T> = null;
   private s: (t: T) => any = null; // spy
   private l: string = null; // label
 
@@ -359,7 +366,7 @@ export class DebugOperator<T> implements Operator<T, T> {
 
 export class DropOperator<T> implements Operator<T, T> {
   public type = 'drop';
-  private out: Stream<T> = null;
+  public out: Stream<T> = null;
   private dropped: number = 0;
 
   constructor(public max: number,
@@ -416,8 +423,8 @@ class OtherIL<T> implements InternalListener<any> {
 
 export class EndWhenOperator<T> implements Operator<T, T> {
   public type = 'endWhen';
-  private out: Stream<T> = null;
-  private oil: InternalListener<any> = emptyListener; // oil = other InternalListener
+  public out: Stream<T> = null;
+  private oil: InternalListener<any> = emptyIL; // oil = other InternalListener
 
   constructor(public o: Stream<any>, // o = other
               public ins: Stream<T>) {
@@ -461,7 +468,7 @@ export class EndWhenOperator<T> implements Operator<T, T> {
 
 export class FilterOperator<T> implements Operator<T, T> {
   public type = 'filter';
-  private out: Stream<T> = null;
+  public out: Stream<T> = null;
 
   constructor(public passes: (t: T) => boolean,
               public ins: Stream<T>) {
@@ -524,7 +531,7 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
   public inner: Stream<T> = null; // Current inner Stream
   private il: InternalListener<T> = null; // Current inner InternalListener
   private open: boolean = true;
-  private out: Stream<T> = null;
+  public out: Stream<T> = null;
 
   constructor(public ins: Stream<Stream<T>>) {
   }
@@ -570,7 +577,7 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
 
 export class FoldOperator<T, R> implements Operator<T, R> {
   public type = 'fold';
-  private out: Stream<R> = null;
+  public out: Stream<R> = null;
   private acc: R; // initialized as seed
 
   constructor(public f: (acc: R, t: T) => R,
@@ -616,7 +623,7 @@ export class FoldOperator<T, R> implements Operator<T, R> {
 
 export class LastOperator<T> implements Operator<T, T> {
   public type = 'last';
-  private out: Stream<T> = null;
+  public out: Stream<T> = null;
   private has: boolean = false;
   private val: T = <T> empty;
 
@@ -683,7 +690,7 @@ export class MapFlattenOperator<T, R> implements Operator<T, R> {
   public inner: Stream<R> = null; // Current inner Stream
   private il: InternalListener<R> = null; // Current inner InternalListener
   private open: boolean = true;
-  private out: Stream<R> = null;
+  public out: Stream<R> = null;
 
   constructor(public mapOp: MapOperator<T, Stream<R>>) {
     this.type = `${mapOp.type}+flatten`;
@@ -739,7 +746,7 @@ export class MapFlattenOperator<T, R> implements Operator<T, R> {
 
 export class MapOperator<T, R> implements Operator<T, R> {
   public type = 'map';
-  protected out: Stream<R> = null;
+  public out: Stream<R> = null;
 
   constructor(public project: (t: T) => R,
               public ins: Stream<T>) {
@@ -795,7 +802,7 @@ export class FilterMapOperator<T, R> extends MapOperator<T, R> {
 
 export class ReplaceErrorOperator<T> implements Operator<T, T> {
   public type = 'replaceError';
-  private out: Stream<T> = <Stream<T>> empty;
+  public out: Stream<T> = <Stream<T>> empty;
 
   constructor(public fn: (err: any) => Stream<T>,
               public ins: Stream<T>) {
@@ -837,7 +844,7 @@ export class ReplaceErrorOperator<T> implements Operator<T, T> {
 
 export class StartWithOperator<T> implements InternalProducer<T> {
   public type = 'startWith';
-  private out: InternalListener<T> = emptyListener;
+  private out: InternalListener<T> = emptyIL;
 
   constructor(public ins: Stream<T>,
               public value: T) {
@@ -857,7 +864,7 @@ export class StartWithOperator<T> implements InternalProducer<T> {
 
 export class TakeOperator<T> implements Operator<T, T> {
   public type = 'take';
-  private out: Stream<T> = null;
+  public out: Stream<T> = null;
   private taken: number = 0;
 
   constructor(public max: number,
@@ -901,7 +908,6 @@ export class TakeOperator<T> implements Operator<T, T> {
 
 export class Stream<T> implements InternalListener<T> {
   protected _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
-  protected _hil: InternalListener<T>; // 'hil' = Hidden Internal Listener
   protected _stopID: any = empty;
   protected _prod: InternalProducer<T>;
   protected _target: Stream<T>; // imitation target if this Stream will imitate
@@ -909,7 +915,6 @@ export class Stream<T> implements InternalListener<T> {
   constructor(producer?: InternalProducer<T>) {
     this._prod = producer;
     this._ils = [];
-    this._hil = null;
     this._target = null;
   }
 
@@ -920,8 +925,6 @@ export class Stream<T> implements InternalListener<T> {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._n(t);
     }
-    const h = this._hil;
-    if (h) h._n(t);
   }
 
   _e(err: any): void {
@@ -931,8 +934,6 @@ export class Stream<T> implements InternalListener<T> {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._e(err);
     }
-    const h = this._hil;
-    if (h) h._e(err);
     this._x();
   }
 
@@ -943,8 +944,6 @@ export class Stream<T> implements InternalListener<T> {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._c();
     }
-    const h = this._hil;
-    if (h) h._c();
     this._x();
   }
 
@@ -983,9 +982,7 @@ export class Stream<T> implements InternalListener<T> {
 
   _add(il: InternalListener<T>): void {
     const ta = this._target;
-    if (ta && ta._ils.length === 0) {
-      return ta._add(il);
-    }
+    if (ta) return ta._add(il);
     const a = this._ils;
     a.push(il);
     if (a.length === 1) {
@@ -999,6 +996,8 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _remove(il: InternalListener<T>): void {
+    const ta = this._target;
+    if (ta) return ta._remove(il);
     const a = this._ils;
     const i = a.indexOf(il);
     if (i > -1) {
@@ -1006,14 +1005,38 @@ export class Stream<T> implements InternalListener<T> {
       const p = this._prod;
       if (p && a.length <= 0) {
         this._stopID = setTimeout(() => p._stop());
+      } else if (a.length === 1) {
+        this._pruneCycles();
       }
-    } else if (this._target) {
-      this._target._remove(il);
     }
   }
 
-  _setHIL(il: InternalListener<T>): void {
-    this._hil = il;
+  // If all paths stemming from `this` stream eventually end at `this`
+  // stream, then we remove the single listener of `this` stream, to
+  // force it to end its execution and dispose resources. This method
+  // assumes as a precondition that this._ils has just one listener.
+  _pruneCycles() {
+    if (this._onlyReachesThis(this)) {
+      this._remove(this._ils[0]);
+    }
+  }
+
+  // Checks whether *all* paths starting from `x` will eventually end at
+  // `this` stream, on the stream graph, following edges A->B where B is
+  // a listener of A.
+  _onlyReachesThis(x: InternalListener<any>): boolean {
+    if ((<OutSender<any>><any>x).out === this) {
+      return true;
+    } else if ((<OutSender<any>><any>x).out) {
+      return this._onlyReachesThis((<OutSender<any>><any>x).out);
+    } else if ((<Stream<any>>x)._ils) {
+      for (let i = 0; i < (<Stream<any>>x)._ils.length; i++) {
+        if (!this._onlyReachesThis((<Stream<any>>x)._ils[i])) return false;
+      }
+      return true;
+    } else {
+      return false;
+    }
   }
 
   private ctor(): typeof Stream {
@@ -1684,7 +1707,6 @@ export class Stream<T> implements InternalListener<T> {
       'https://github.com/staltz/xstream#faq');
     }
     this._target = target;
-    target._setHIL(this);
   }
 
   /**

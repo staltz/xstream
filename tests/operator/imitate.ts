@@ -90,7 +90,40 @@ describe('Stream.prototype.imitate', () => {
     }, 600);
   });
 
-  it('should not cause leaked cyclic executions', (done) => {
+  it('should not cause leaked cyclic executions (1)', (done) => {
+    const expectedProxy = [2, 4, 8, 16, 32 /* inertia due to stopping on next tick */];
+    const expectedResult = [2, 4, 8, 16];
+
+    const proxy$ = xs.create<number>();
+    const source$ = proxy$.startWith(1).map(x => x * 2)
+      .debug(x => {
+        try {
+          assert.equal(expectedProxy.length > 0, true,
+            'should be expecting the next value ' + x);
+          assert.equal(x, expectedProxy.shift());
+        } catch (err) {
+          done(err);
+        }
+      });
+    const result$ = source$.compose(delay(100)).compose(s => <Stream<number>> s);
+    proxy$.imitate(result$);
+
+    result$.take(4).addListener({
+      next: (x: number) => {
+        assert.equal(x, expectedResult.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.equal(expectedProxy.length, 1); // still waiting for 32
+        assert.equal(expectedResult.length, 0);
+        setTimeout(() => {
+          done();
+        }, 1000);
+      },
+    });
+  });
+
+  it('should not cause leaked cyclic executions (2)', (done) => {
     const expectedProxy = [2, 4, 8, 16, 32 /* inertia due to stopping on next tick */];
     const expectedResult = [2, 4, 8, 16];
 
@@ -108,7 +141,7 @@ describe('Stream.prototype.imitate', () => {
     const result$ = source$.compose(delay(100)).compose(s => <Stream<number>> s);
     proxy$.imitate(result$)
 
-    result$.take(4).addListener({
+    source$.take(4).addListener({
       next: (x: number) => {
         assert.equal(x, expectedResult.shift());
       },

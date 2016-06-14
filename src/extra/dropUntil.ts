@@ -1,7 +1,7 @@
-import {Operator, InternalListener, Stream, emptyListener} from '../core';
+import {Operator, InternalListener, Stream, OutSender, emptyIL} from '../core';
 
-class OtherIL<T> implements InternalListener<any> {
-  constructor(private out: Stream<T>,
+class OtherIL<T> implements InternalListener<any>, OutSender<T> {
+  constructor(public out: Stream<T>,
               private op: DropUntilOperator<T>) {
   }
 
@@ -20,8 +20,8 @@ class OtherIL<T> implements InternalListener<any> {
 
 export class DropUntilOperator<T> implements Operator<T, T> {
   public type = 'dropUntil';
-  private out: Stream<T> = null;
-  private oil: InternalListener<any> = emptyListener; // oil = other InternalListener
+  public out: Stream<T> = null;
+  private oil: InternalListener<any> = emptyIL; // oil = other InternalListener
   private on: boolean = false;
 
   constructor(public o: Stream<any>, // o = other

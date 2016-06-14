@@ -4,7 +4,7 @@ class PairwiseOperator<T> implements Operator<T, [T, T]> {
   public type = 'pairwise';
   private val: T = null;
   private has: boolean = false;
-  private out: Stream<[T, T]> = null;
+  public out: Stream<[T, T]> = null;
 
   constructor(public ins: Stream<T>) {
   }

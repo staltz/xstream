@@ -3,7 +3,7 @@ const empty = {};
 
 export class DropRepeatsOperator<T> implements Operator<T, T> {
   public type = 'dropRepeats';
-  private out: Stream<T> = null;
+  public out: Stream<T> = null;
   private v: T = <any> empty;
 
   constructor(public fn: (x: T, y: T) => boolean,
