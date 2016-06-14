@@ -1030,7 +1030,7 @@ export class Stream<T> implements InternalListener<T> {
     } else if ((<OutSender<any>><any>x).out) {
       return this._onlyReachesThis((<OutSender<any>><any>x).out);
     } else if ((<Stream<any>>x)._ils) {
-      for (let i = 0; i < (<Stream<any>>x)._ils.length; i++) {
+      for (let i = 0, N = (<Stream<any>>x)._ils.length; i < N; i++) {
         if (!this._onlyReachesThis((<Stream<any>>x)._ils[i])) return false;
       }
       return true;
