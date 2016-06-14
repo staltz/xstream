@@ -911,11 +911,13 @@ export class Stream<T> implements InternalListener<T> {
   protected _stopID: any = empty;
   protected _prod: InternalProducer<T>;
   protected _target: Stream<T>; // imitation target if this Stream will imitate
+  protected _err: any;
 
   constructor(producer?: InternalProducer<T>) {
     this._prod = producer;
     this._ils = [];
     this._target = null;
+    this._err = null;
   }
 
   _n(t: T): void {
@@ -928,6 +930,8 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _e(err: any): void {
+    if (this._err) return;
+    this._err = err;
     const a = this._ils;
     const L = a.length;
     if (L == 1) a[0]._e(err); else {
@@ -950,6 +954,7 @@ export class Stream<T> implements InternalListener<T> {
   _x(): void { // tear down logic, after error or complete
     if (this._ils.length === 0) return;
     if (this._prod) this._prod._stop();
+    this._err = null;
     this._ils = [];
   }
 
@@ -1004,6 +1009,7 @@ export class Stream<T> implements InternalListener<T> {
       a.splice(i, 1);
       const p = this._prod;
       if (p && a.length <= 0) {
+        this._err = null;
         this._stopID = setTimeout(() => p._stop());
       } else if (a.length === 1) {
         this._pruneCycles();

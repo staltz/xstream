@@ -156,6 +156,38 @@ describe('Stream.prototype.imitate', () => {
     });
   });
 
+  it('should not propagate errors in a cycle', (done) => {
+    const proxyAction$ = xs.create<number>();
+    const state$ = proxyAction$.fold((state, action) => state + action, 0);
+    const action$ = state$.map(state => {
+      if (state === 3) {
+        throw new Error(':(');
+      }
+      return xs.of(1).compose(delay<number>(20));
+    }).flatten();
+    proxyAction$.imitate(action$);
+    const expected = [0, 1, 2];
+
+    let errors: Array<any> = [];
+    state$.addListener({
+      next: (x: number) => {
+        assert.equal(x, expected.shift());
+      },
+      error: (err: any) => {
+        errors.push(err);
+      },
+      complete: () => {
+        done('complete should not be called');
+      },
+    });
+
+    setTimeout(() => {
+      assert.equal(errors.length, 1);
+      assert.equal(expected.length, 0);
+      done();
+    }, 150);
+  });
+
   it('should not by itself start the target stream execution', (done) => {
     let nextDelivered = false;
     const stream = xs.periodic(50).take(3).debug(() => {
