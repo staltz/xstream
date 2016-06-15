@@ -156,6 +156,60 @@ describe('Stream.prototype.imitate', () => {
     });
   });
 
+  it('should not cause stack overflow while detecting cycles', (done) => {
+    const outside = xs.periodic(150);
+    const secondMimic = xs.create<number>();
+    const first = xs.merge(outside, secondMimic.map(x => x * 10));
+    const second = first.map(x => x + 1).compose(delay<number>(100));
+    secondMimic.imitate(second);
+    const expectedSecond1 = [1];
+    const expectedSecond4 = [1, 11, 2, 111];
+    const expectedOutside = [0, 1];
+    let completedSecond1 = false;
+    let completedSecond4 = false;
+    let completedOutside = false;
+
+    second.take(1).addListener({
+      next: (x: number) => {
+        assert.equal(x, expectedSecond1.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        completedSecond1 = true;
+      },
+    });
+
+    second.take(4).addListener({
+      next: (x: number) => {
+        assert.equal(x, expectedSecond4.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        completedSecond4 = true;
+      },
+    });
+
+    outside.take(2).addListener({
+      next: (x: number) => {
+        assert.equal(x, expectedOutside.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        completedOutside = true;
+      },
+    });
+
+    setTimeout(() => {
+      assert.equal(expectedSecond1.length, 0);
+      assert.equal(expectedSecond4.length, 0);
+      assert.equal(expectedOutside.length, 0);
+      assert.equal(completedSecond1, true);
+      assert.equal(completedSecond4, true);
+      assert.equal(completedOutside, true);
+      done();
+    }, 1000);
+  });
+
   it('should not propagate errors in a cycle', (done) => {
     const proxyAction$ = xs.create<number>();
     const state$ = proxyAction$.fold((state, action) => state + action, 0);
