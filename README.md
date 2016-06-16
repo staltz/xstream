@@ -10,8 +10,9 @@ __  _____| |_ _ __ ___  __ _ _ __ ___
 <h2 class="site-subtitle">An extremely intuitive, small, and fast<br />functional reactive stream library for JavaScript</h2>
 
 - Only 26 core operators and factories
+- Only ["hot"](https://medium.com/@benlesh/hot-vs-cold-observables-f8094ed53339#.mvzg5e7lf) streams
 - Written in TypeScript
-- Approximately 30 kB in size, without minification or gzip
+- Approximately 30 kB in size, when minified
 - On average, faster than RxJS 4, Kefir, Bacon.js, as fast as RxJS 5, and slower than most.js
 - Tailored for [Cycle.js](http://cycle.js.org), or applications with limited use of `subscribe`
 
