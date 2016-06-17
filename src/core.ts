@@ -1,4 +1,5 @@
 import {Promise} from 'es6-promise';
+import $$observable from 'symbol-observable';
 
 const empty = {};
 function noop() {}
@@ -985,6 +986,20 @@ export class Stream<T> implements InternalListener<T> {
     this._remove(<InternalListener<T>> (<any> listener));
   }
 
+  /**
+   * Adds a Listener to the Stream
+   * 
+   * @param {Listener<T>} listener
+   * @returns {Subscription}
+   */
+  subscribe(listener: Listener<T>): Subscription<T> {
+    return new Subscription(this, listener);
+  }
+
+  [$$observable](): Observable<T> {
+    return Observable.fromStream(this);
+  }
+
   _add(il: InternalListener<T>): void {
     const ta = this._target;
     if (ta) return ta._add(il);
@@ -1168,6 +1183,16 @@ export class Stream<T> implements InternalListener<T> {
    */
   static of<T>(...items: Array<T>): Stream<T> {
     return Stream.fromArray(items);
+  }
+
+  static from<T>(item: Observable<T> | Array<T> | Promise<T>): Stream<T> {
+    if (typeof item[$$observable] === 'function') {
+      return new Stream<T>(new FromObservableProducer(<Observable<T>> item));
+    } else if (typeof (<Promise<T>> item).then === 'function') {
+      return Stream.fromPromise<T>(<Promise<T>>item);
+    } else {
+      return Stream.fromArray<T>(<Array<T>> item);
+    }
   }
 
   /**
@@ -1805,6 +1830,81 @@ export class MemoryStream<T> extends Stream<T> {
 
   debug(labelOrSpy?: string | ((t: T) => void)): MemoryStream<T> {
     return <MemoryStream<T>> super.debug(labelOrSpy);
+  }
+}
+
+class FromObservableProducer<T> implements InternalProducer<T> {
+  private subscription: Subscription<T> = void 0;
+  constructor (private observable: Observable<T>) {
+  }
+
+  _start (out: InternalListener<T>) {
+    this.subscription = this.observable.subscribe({
+      next: x => out._n(x),
+      error: e => out._e(e),
+      complete: () => out._c()
+    });
+  }
+
+  _stop () {
+    if (this.subscription !== void 0) {
+      this.subscription.unsubscribe();
+    }
+  }
+}
+
+export class Subscription<T> {
+  private _isUnsubscribed: boolean = false;
+  constructor (private _stream: Stream<T>, private _listener: Listener<T>) {
+    _stream.addListener(_listener);
+  }
+
+  unsubscribe() {
+    this._isUnsubscribed = true;
+    this._stream.removeListener(this._listener);
+  }
+
+  get closed () {
+    return this._isUnsubscribed;
+  }
+}
+
+export type DisposeFn = () => void;
+export type Subscriber<T> = (listener: Listener<T>) => void | DisposeFn;
+
+export class Observable<T> extends Stream<T> {
+  constructor(private subscriber: Subscriber<T>) {
+    super(new ObservableProducer<T>(subscriber));
+  }
+
+  static fromStream<T>(stream: Stream<T>): Observable<T> {
+    return new Observable<T>((listener: Listener<T>) => {
+      stream.addListener(listener);
+
+      return () => stream.removeListener(listener);
+    });
+  }
+}
+
+class ObservableProducer<T> implements InternalProducer<T> {
+  private unsubscribe: void | DisposeFn;
+  constructor (private subscriber: Subscriber<T>) {
+    this.unsubscribe = void 0;
+  }
+
+  _start (out: InternalListener<T>) {
+    this.unsubscribe = this.subscriber({
+      next: x => out._n(x),
+      error: e => out._e(e),
+      complete: () => out._c()
+    });
+  }
+
+  _stop() {
+    if (typeof this.unsubscribe !== void 0) {
+      const unsubscribe: DisposeFn = <DisposeFn> this.unsubscribe;
+      unsubscribe();
+    }
   }
 }
 
