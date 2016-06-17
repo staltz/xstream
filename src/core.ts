@@ -1022,24 +1022,25 @@ export class Stream<T> implements InternalListener<T> {
   // force it to end its execution and dispose resources. This method
   // assumes as a precondition that this._ils has just one listener.
   _pruneCycles() {
-    if (this._hasCycle(this, [])) {
+    if (this._hasNoSinks(this, [])) {
       this._remove(this._ils[0]);
     }
   }
 
-  // Checks whether any path starting from `x` contains a cycle in the stream
-  // graph, following edges A->B where B is a listener of A. Is given a trace
-  // of all visited nodes so far.
-  _hasCycle(x: InternalListener<any>, trace: Array<any>): boolean {
+  // Checks whether *there is no* path starting from `x` that leads to an end
+  // listener (sink) in the stream graph, following edges A->B where B is a
+  // listener of A. This means these paths constitute a cycle somehow. Is given
+  // a trace of all visited nodes so far.
+  _hasNoSinks(x: InternalListener<any>, trace: Array<any>): boolean {
     if (trace.indexOf(x) !== -1) {
       return true;
     } else if ((<OutSender<any>><any>x).out === this) {
       return true;
     } else if ((<OutSender<any>><any>x).out) {
-      return this._hasCycle((<OutSender<any>><any>x).out, trace.concat(x));
+      return this._hasNoSinks((<OutSender<any>><any>x).out, trace.concat(x));
     } else if ((<Stream<any>>x)._ils) {
       for (let i = 0, N = (<Stream<any>>x)._ils.length; i < N; i++) {
-        if (!this._hasCycle((<Stream<any>>x)._ils[i], trace.concat(x))) {
+        if (!this._hasNoSinks((<Stream<any>>x)._ils[i], trace.concat(x))) {
           return false;
         }
       }
