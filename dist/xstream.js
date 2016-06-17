@@ -928,24 +928,29 @@ var Stream = (function () {
     
     
     Stream.prototype._pruneCycles = function () {
-        if (this._onlyReachesThis(this)) {
+        if (this._hasNoSinks(this, [])) {
             this._remove(this._ils[0]);
         }
     };
     
     
     
-    Stream.prototype._onlyReachesThis = function (x) {
-        if (x.out === this) {
+    
+    Stream.prototype._hasNoSinks = function (x, trace) {
+        if (trace.indexOf(x) !== -1) {
+            return true;
+        }
+        else if (x.out === this) {
             return true;
         }
         else if (x.out) {
-            return this._onlyReachesThis(x.out);
+            return this._hasNoSinks(x.out, trace.concat(x));
         }
         else if (x._ils) {
             for (var i = 0, N = x._ils.length; i < N; i++) {
-                if (!this._onlyReachesThis(x._ils[i]))
+                if (!this._hasNoSinks(x._ils[i], trace.concat(x))) {
                     return false;
+                }
             }
             return true;
         }

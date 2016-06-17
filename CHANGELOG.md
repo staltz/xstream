@@ -1,3 +1,13 @@
+<a name="5.0.6"></a>
+## [5.0.6](https://github.com/staltz/xstream/compare/v5.0.5...v5.0.6) (2016-06-17)
+
+
+### Bug Fixes
+
+* **imitate:** fix stack overflow when pruning cycles ([02b0327](https://github.com/staltz/xstream/commit/02b0327))
+
+
+
 <a name="5.0.5"></a>
 ## [5.0.5](https://github.com/staltz/xstream/compare/v5.0.4...v5.0.5) (2016-06-14)
 
