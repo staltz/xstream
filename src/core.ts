@@ -1022,26 +1022,26 @@ export class Stream<T> implements InternalListener<T> {
   // force it to end its execution and dispose resources. This method
   // assumes as a precondition that this._ils has just one listener.
   _pruneCycles() {
-    if (this._onlyReachesThis(this, [])) {
+    if (this._hasCycle(this, [])) {
       this._remove(this._ils[0]);
     }
   }
 
-  // Checks whether *all* paths starting from `x` will eventually end at
-  // `this` stream, on the stream graph, following edges A->B where B is
-  // a listener of A.
-  _onlyReachesThis(x: InternalListener<any>, trace : Array<InternalListener<any>>): boolean {
+  // Checks whether any path starting from `x` contains a cycle in the stream
+  // graph, following edges A->B where B is a listener of A. Is given a trace
+  // of all visited nodes so far.
+  _hasCycle(x: InternalListener<any>, trace: Array<any>): boolean {
     if (trace.indexOf(x) !== -1) {
-      // Cycle detected. Even if it doesn't contain `this`, we should
-      // still check other paths
       return true;
     } else if ((<OutSender<any>><any>x).out === this) {
       return true;
     } else if ((<OutSender<any>><any>x).out) {
-      return this._onlyReachesThis((<OutSender<any>><any>x).out, trace.concat(x));
+      return this._hasCycle((<OutSender<any>><any>x).out, trace.concat(x));
     } else if ((<Stream<any>>x)._ils) {
       for (let i = 0, N = (<Stream<any>>x)._ils.length; i < N; i++) {
-        if (!this._onlyReachesThis((<Stream<any>>x)._ils[i], trace.concat(x))) return false;
+        if (!this._hasCycle((<Stream<any>>x)._ils[i], trace.concat(x))) {
+          return false;
+        }
       }
       return true;
     } else {
