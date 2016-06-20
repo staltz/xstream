@@ -4,7 +4,7 @@ import xs from '../../src/index';
 import cold from '../../src/extra/cold';
 import * as assert from 'assert';
 
-describe.only('cold (extra)', () => {
+describe('cold (extra)', () => {
   it('should push values to a listener', (done) => {
     const stream = xs.periodic(100).take(3).compose(cold);
 
