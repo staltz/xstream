@@ -909,7 +909,7 @@ export class TakeOperator<T> implements Operator<T, T> {
 export class Stream<T> implements InternalListener<T> {
   protected _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
   protected _stopID: any = empty;
-  protected _prod: InternalProducer<T>;
+  public _prod: InternalProducer<T>;
   protected _target: Stream<T>; // imitation target if this Stream will imitate
   protected _err: any;
 
