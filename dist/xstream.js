@@ -42,28 +42,31 @@ function and(f1, f2) {
     };
 }
 var MergeProducer = (function () {
-    function MergeProducer(insArr) {
-        this.insArr = insArr;
-        this.type = 'merge';
-        this.out = null;
-        this.ac = insArr.length;
+    function MergeProducer(s) {
+        var q = this;
+        q.type = 'merge';
+        q.out = null;
+        q.insArr = s;
+        q.ac = s.length;
     }
     MergeProducer.prototype._start = function (out) {
-        this.out = out;
-        var s = this.insArr;
+        var q = this;
+        q.out = out;
+        var s = q.insArr;
         var L = s.length;
         for (var i = 0; i < L; i++) {
-            s[i]._add(this);
+            s[i]._add(q);
         }
     };
     MergeProducer.prototype._stop = function () {
-        var s = this.insArr;
+        var q = this;
+        var s = q.insArr;
         var L = s.length;
         for (var i = 0; i < L; i++) {
-            s[i]._remove(this);
+            s[i]._remove(q);
         }
-        this.out = null;
-        this.ac = L;
+        q.out = null;
+        q.ac = L;
     };
     MergeProducer.prototype._n = function (t) {
         var u = this.out;
@@ -89,17 +92,19 @@ var MergeProducer = (function () {
 }());
 exports.MergeProducer = MergeProducer;
 var CombineListener = (function () {
-    function CombineListener(i, out, p) {
-        this.i = i;
-        this.out = out;
-        this.p = p;
-        p.ils.push(this);
+    function CombineListener(i, u, p) {
+        var q = this;
+        q.i = i;
+        q.out = u;
+        q.p = p;
+        p.ils.push(q);
     }
     CombineListener.prototype._n = function (t) {
-        var p = this.p, out = this.out;
+        var q = this;
+        var p = q.p, out = q.out;
         if (!out)
             return;
-        if (p.up(t, this.i)) {
+        if (p.up(t, q.i)) {
             out._n(p.vals);
         }
     };
@@ -121,26 +126,29 @@ var CombineListener = (function () {
 }());
 exports.CombineListener = CombineListener;
 var CombineProducer = (function () {
-    function CombineProducer(insArr) {
-        this.insArr = insArr;
-        this.type = 'combine';
-        this.out = null;
-        this.ils = [];
-        var n = this.Nc = this.Nn = insArr.length;
-        var vals = this.vals = new Array(n);
+    function CombineProducer(s) {
+        var q = this;
+        q.type = 'combine';
+        q.out = null;
+        q.ils = [];
+        q.insArr = s;
+        var n = q.Nc = q.Nn = s.length;
+        var vals = q.vals = new Array(n);
         for (var i = 0; i < n; i++) {
             vals[i] = empty;
         }
     }
     CombineProducer.prototype.up = function (t, i) {
-        var v = this.vals[i];
-        var Nn = !this.Nn ? 0 : v === empty ? --this.Nn : this.Nn;
-        this.vals[i] = t;
+        var q = this;
+        var v = q.vals[i];
+        var Nn = !q.Nn ? 0 : v === empty ? --q.Nn : q.Nn;
+        q.vals[i] = t;
         return Nn === 0;
     };
     CombineProducer.prototype._start = function (out) {
-        this.out = out;
-        var s = this.insArr;
+        var q = this;
+        q.out = out;
+        var s = q.insArr;
         var n = s.length;
         if (n === 0) {
             out._n([]);
@@ -148,28 +156,29 @@ var CombineProducer = (function () {
         }
         else {
             for (var i = 0; i < n; i++) {
-                s[i]._add(new CombineListener(i, out, this));
+                s[i]._add(new CombineListener(i, out, q));
             }
         }
     };
     CombineProducer.prototype._stop = function () {
-        var s = this.insArr;
-        var n = this.Nc = this.Nn = s.length;
-        var vals = this.vals = new Array(n);
+        var q = this;
+        var s = q.insArr;
+        var n = q.Nc = q.Nn = s.length;
+        var vals = q.vals = new Array(n);
         for (var i = 0; i < n; i++) {
-            s[i]._remove(this.ils[i]);
+            s[i]._remove(q.ils[i]);
             vals[i] = empty;
         }
-        this.out = null;
-        this.ils = [];
+        q.out = null;
+        q.ils = [];
     };
     return CombineProducer;
 }());
 exports.CombineProducer = CombineProducer;
 var FromArrayProducer = (function () {
     function FromArrayProducer(a) {
-        this.a = a;
         this.type = 'fromArray';
+        this.a = a;
     }
     FromArrayProducer.prototype._start = function (out) {
         var a = this.a;
@@ -185,15 +194,16 @@ var FromArrayProducer = (function () {
 exports.FromArrayProducer = FromArrayProducer;
 var FromPromiseProducer = (function () {
     function FromPromiseProducer(p) {
-        this.p = p;
-        this.type = 'fromPromise';
-        this.on = false;
+        var q = this;
+        q.type = 'fromPromise';
+        q.on = false;
+        q.p = p;
     }
     FromPromiseProducer.prototype._start = function (out) {
-        var prod = this;
-        this.on = true;
-        this.p.then(function (v) {
-            if (prod.on) {
+        var q = this;
+        q.on = true;
+        q.p.then(function (v) {
+            if (q.on) {
                 out._n(v);
                 out._c();
             }
@@ -210,53 +220,59 @@ var FromPromiseProducer = (function () {
 }());
 exports.FromPromiseProducer = FromPromiseProducer;
 var PeriodicProducer = (function () {
-    function PeriodicProducer(period) {
-        this.period = period;
-        this.type = 'periodic';
-        this.intervalID = -1;
-        this.i = 0;
+    function PeriodicProducer(p) {
+        var q = this;
+        q.type = 'periodic';
+        q.id = -1;
+        q.i = 0;
+        q.period = p;
     }
     PeriodicProducer.prototype._start = function (stream) {
-        var self = this;
-        function intervalHandler() { stream._n(self.i++); }
-        this.intervalID = setInterval(intervalHandler, this.period);
+        var q = this;
+        function f() { stream._n(q.i++); }
+        q.id = setInterval(f, q.period);
     };
     PeriodicProducer.prototype._stop = function () {
-        if (this.intervalID !== -1)
-            clearInterval(this.intervalID);
-        this.intervalID = -1;
-        this.i = 0;
+        var q = this;
+        if (q.id !== -1)
+            clearInterval(q.id);
+        q.id = -1;
+        q.i = 0;
     };
     return PeriodicProducer;
 }());
 exports.PeriodicProducer = PeriodicProducer;
 var DebugOperator = (function () {
-    function DebugOperator(arg, ins) {
-        this.ins = ins;
-        this.type = 'debug';
-        this.out = null;
-        this.s = null; 
-        this.l = null; 
+    function DebugOperator(arg, s) {
+        var q = this;
+        q.type = 'debug';
+        q.out = null;
+        q.s = null;
+        q.l = null;
+        q.ins = s;
         if (typeof arg === 'string') {
-            this.l = arg;
+            q.l = arg;
         }
         else {
-            this.s = arg;
+            q.s = arg;
         }
     }
     DebugOperator.prototype._start = function (out) {
-        this.out = out;
-        this.ins._add(this);
+        var q = this;
+        q.out = out;
+        q.ins._add(q);
     };
     DebugOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.out = null;
+        var q = this;
+        q.ins._remove(q);
+        q.out = null;
     };
     DebugOperator.prototype._n = function (t) {
-        var u = this.out;
+        var q = this;
+        var u = q.out;
         if (!u)
             return;
-        var s = this.s, l = this.l;
+        var s = q.s, l = q.l;
         if (s) {
             try {
                 s(t);
@@ -289,27 +305,31 @@ var DebugOperator = (function () {
 }());
 exports.DebugOperator = DebugOperator;
 var DropOperator = (function () {
-    function DropOperator(max, ins) {
-        this.max = max;
-        this.ins = ins;
-        this.type = 'drop';
-        this.out = null;
-        this.dropped = 0;
+    function DropOperator(m, s) {
+        var q = this;
+        q.type = 'drop';
+        q.out = null;
+        q.dropped = 0;
+        q.max = m;
+        q.ins = s;
     }
     DropOperator.prototype._start = function (out) {
-        this.out = out;
-        this.ins._add(this);
+        var q = this;
+        q.out = out;
+        q.ins._add(q);
     };
     DropOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.out = null;
-        this.dropped = 0;
+        var q = this;
+        q.ins._remove(q);
+        q.out = null;
+        q.dropped = 0;
     };
     DropOperator.prototype._n = function (t) {
-        var u = this.out;
+        var q = this;
+        var u = q.out;
         if (!u)
             return;
-        if (this.dropped++ >= this.max)
+        if (q.dropped++ >= q.max)
             u._n(t);
     };
     DropOperator.prototype._e = function (err) {
@@ -328,9 +348,9 @@ var DropOperator = (function () {
 }());
 exports.DropOperator = DropOperator;
 var OtherIL = (function () {
-    function OtherIL(out, op) {
-        this.out = out;
-        this.op = op;
+    function OtherIL(u, o) {
+        this.out = u;
+        this.op = o;
     }
     OtherIL.prototype._n = function (t) {
         this.op.end();
@@ -344,24 +364,26 @@ var OtherIL = (function () {
     return OtherIL;
 }());
 var EndWhenOperator = (function () {
-    function EndWhenOperator(o, 
-        ins) {
-        this.o = o;
-        this.ins = ins;
-        this.type = 'endWhen';
-        this.out = null;
-        this.oil = exports.emptyIL; 
+    function EndWhenOperator(o, s) {
+        var q = this;
+        q.type = 'endWhen';
+        q.out = null;
+        q.o = o;
+        q.ins = s;
+        q.oil = exports.emptyIL;
     }
     EndWhenOperator.prototype._start = function (out) {
-        this.out = out;
-        this.o._add(this.oil = new OtherIL(out, this));
-        this.ins._add(this);
+        var q = this;
+        q.out = out;
+        q.o._add(q.oil = new OtherIL(out, q));
+        q.ins._add(q);
     };
     EndWhenOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.o._remove(this.oil);
-        this.out = null;
-        this.oil = null;
+        var q = this;
+        q.ins._remove(q);
+        q.o._remove(q.oil);
+        q.out = null;
+        q.oil = null;
     };
     EndWhenOperator.prototype.end = function () {
         var u = this.out;
@@ -388,19 +410,22 @@ var EndWhenOperator = (function () {
 }());
 exports.EndWhenOperator = EndWhenOperator;
 var FilterOperator = (function () {
-    function FilterOperator(passes, ins) {
-        this.passes = passes;
-        this.ins = ins;
-        this.type = 'filter';
-        this.out = null;
+    function FilterOperator(p, s) {
+        var q = this;
+        q.type = 'filter';
+        q.out = null;
+        q.passes = p;
+        q.ins = s;
     }
     FilterOperator.prototype._start = function (out) {
-        this.out = out;
-        this.ins._add(this);
+        var q = this;
+        q.out = out;
+        q.ins._add(q);
     };
     FilterOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.out = null;
+        var q = this;
+        q.ins._remove(q);
+        q.out = null;
     };
     FilterOperator.prototype._n = function (t) {
         var u = this.out;
@@ -430,9 +455,9 @@ var FilterOperator = (function () {
 }());
 exports.FilterOperator = FilterOperator;
 var FlattenListener = (function () {
-    function FlattenListener(out, op) {
-        this.out = out;
-        this.op = op;
+    function FlattenListener(u, o) {
+        this.out = u;
+        this.op = o;
     }
     FlattenListener.prototype._n = function (t) {
         this.out._n(t);
@@ -447,40 +472,45 @@ var FlattenListener = (function () {
     return FlattenListener;
 }());
 var FlattenOperator = (function () {
-    function FlattenOperator(ins) {
-        this.ins = ins;
-        this.type = 'flatten';
-        this.inner = null; 
-        this.il = null; 
-        this.open = true;
-        this.out = null;
+    function FlattenOperator(s) {
+        var q = this;
+        q.type = 'flatten';
+        q.inner = null;
+        q.il = null;
+        q.open = true;
+        q.out = null;
+        q.ins = s;
     }
     FlattenOperator.prototype._start = function (out) {
-        this.out = out;
-        this.ins._add(this);
+        var q = this;
+        q.out = out;
+        q.ins._add(q);
     };
     FlattenOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.inner = null;
-        this.il = null;
-        this.open = true;
-        this.out = null;
+        var q = this;
+        q.ins._remove(q);
+        q.inner = null;
+        q.il = null;
+        q.open = true;
+        q.out = null;
     };
     FlattenOperator.prototype.less = function () {
-        var u = this.out;
+        var q = this;
+        var u = q.out;
         if (!u)
             return;
-        if (!this.open && !this.inner)
+        if (!q.open && !q.inner)
             u._c();
     };
     FlattenOperator.prototype._n = function (s) {
-        var u = this.out;
+        var q = this;
+        var u = q.out;
         if (!u)
             return;
-        var _a = this, inner = _a.inner, il = _a.il;
+        var inner = q.inner, il = q.il;
         if (inner && il)
             inner._remove(il);
-        (this.inner = s)._add(this.il = new FlattenListener(u, this));
+        (q.inner = s)._add(q.il = new FlattenListener(u, q));
     };
     FlattenOperator.prototype._e = function (err) {
         var u = this.out;
@@ -496,30 +526,34 @@ var FlattenOperator = (function () {
 }());
 exports.FlattenOperator = FlattenOperator;
 var FoldOperator = (function () {
-    function FoldOperator(f, seed, ins) {
-        this.f = f;
-        this.seed = seed;
-        this.ins = ins;
-        this.type = 'fold';
-        this.out = null;
-        this.acc = seed;
+    function FoldOperator(f, e, s) {
+        var q = this;
+        q.type = 'fold';
+        q.out = null;
+        q.f = f;
+        q.seed = e;
+        q.acc = e;
+        q.ins = s;
     }
     FoldOperator.prototype._start = function (out) {
-        this.out = out;
-        out._n(this.acc);
-        this.ins._add(this);
+        var q = this;
+        q.out = out;
+        out._n(q.acc);
+        q.ins._add(q);
     };
     FoldOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.out = null;
-        this.acc = this.seed;
+        var q = this;
+        q.ins._remove(q);
+        q.out = null;
+        q.acc = q.seed;
     };
     FoldOperator.prototype._n = function (t) {
-        var u = this.out;
+        var q = this;
+        var u = q.out;
         if (!u)
             return;
         try {
-            u._n(this.acc = this.f(this.acc, t));
+            u._n(q.acc = q.f(q.acc, t));
         }
         catch (e) {
             u._e(e);
@@ -541,22 +575,25 @@ var FoldOperator = (function () {
 }());
 exports.FoldOperator = FoldOperator;
 var LastOperator = (function () {
-    function LastOperator(ins) {
-        this.ins = ins;
-        this.type = 'last';
-        this.out = null;
-        this.has = false;
-        this.val = empty;
+    function LastOperator(s) {
+        var q = this;
+        q.type = 'last';
+        q.out = null;
+        q.has = false;
+        q.val = empty;
+        q.ins = s;
     }
     LastOperator.prototype._start = function (out) {
-        this.out = out;
-        this.ins._add(this);
+        var q = this;
+        q.out = out;
+        q.ins._add(q);
     };
     LastOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.out = null;
-        this.has = false;
-        this.val = empty;
+        var q = this;
+        q.ins._remove(q);
+        q.out = null;
+        q.has = false;
+        q.val = empty;
     };
     LastOperator.prototype._n = function (t) {
         this.has = true;
@@ -569,11 +606,12 @@ var LastOperator = (function () {
         u._e(err);
     };
     LastOperator.prototype._c = function () {
-        var u = this.out;
+        var q = this;
+        var u = q.out;
         if (!u)
             return;
-        if (this.has) {
-            u._n(this.val);
+        if (q.has) {
+            u._n(q.val);
             u._c();
         }
         else {
@@ -584,9 +622,9 @@ var LastOperator = (function () {
 }());
 exports.LastOperator = LastOperator;
 var MapFlattenInner = (function () {
-    function MapFlattenInner(out, op) {
-        this.out = out;
-        this.op = op;
+    function MapFlattenInner(u, o) {
+        this.out = u;
+        this.op = o;
     }
     MapFlattenInner.prototype._n = function (r) {
         this.out._n(r);
@@ -601,43 +639,48 @@ var MapFlattenInner = (function () {
     return MapFlattenInner;
 }());
 var MapFlattenOperator = (function () {
-    function MapFlattenOperator(mapOp) {
-        this.mapOp = mapOp;
-        this.inner = null; 
-        this.il = null; 
-        this.open = true;
-        this.out = null;
-        this.type = mapOp.type + "+flatten";
-        this.ins = mapOp.ins;
+    function MapFlattenOperator(m) {
+        var q = this;
+        q.type = m.type + "+flatten";
+        q.ins = m.ins;
+        q.inner = null;
+        q.il = null;
+        q.open = true;
+        q.out = null;
+        q.mapOp = m;
     }
     MapFlattenOperator.prototype._start = function (out) {
-        this.out = out;
-        this.mapOp.ins._add(this);
+        var q = this;
+        q.out = out;
+        q.mapOp.ins._add(q);
     };
     MapFlattenOperator.prototype._stop = function () {
-        this.mapOp.ins._remove(this);
-        this.inner = null;
-        this.il = null;
-        this.open = true;
-        this.out = null;
+        var q = this;
+        q.mapOp.ins._remove(q);
+        q.inner = null;
+        q.il = null;
+        q.open = true;
+        q.out = null;
     };
     MapFlattenOperator.prototype.less = function () {
-        if (!this.open && !this.inner) {
-            var u = this.out;
+        var q = this;
+        if (!q.open && !q.inner) {
+            var u = q.out;
             if (!u)
                 return;
             u._c();
         }
     };
     MapFlattenOperator.prototype._n = function (v) {
-        var u = this.out;
+        var q = this;
+        var u = q.out;
         if (!u)
             return;
-        var _a = this, inner = _a.inner, il = _a.il;
+        var inner = q.inner, il = q.il;
         if (inner && il)
             inner._remove(il);
         try {
-            (this.inner = this.mapOp.project(v))._add(this.il = new MapFlattenInner(u, this));
+            (q.inner = q.mapOp.project(v))._add(q.il = new MapFlattenInner(u, q));
         }
         catch (e) {
             u._e(e);
@@ -657,19 +700,22 @@ var MapFlattenOperator = (function () {
 }());
 exports.MapFlattenOperator = MapFlattenOperator;
 var MapOperator = (function () {
-    function MapOperator(project, ins) {
-        this.project = project;
-        this.ins = ins;
-        this.type = 'map';
-        this.out = null;
+    function MapOperator(p, s) {
+        var q = this;
+        q.type = 'map';
+        q.out = null;
+        q.project = p;
+        q.ins = s;
     }
     MapOperator.prototype._start = function (out) {
-        this.out = out;
-        this.ins._add(this);
+        var q = this;
+        q.out = out;
+        q.ins._add(q);
     };
     MapOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.out = null;
+        var q = this;
+        q.ins._remove(q);
+        q.out = null;
     };
     MapOperator.prototype._n = function (t) {
         var u = this.out;
@@ -699,10 +745,10 @@ var MapOperator = (function () {
 exports.MapOperator = MapOperator;
 var FilterMapOperator = (function (_super) {
     __extends(FilterMapOperator, _super);
-    function FilterMapOperator(passes, project, ins) {
+    function FilterMapOperator(p, project, ins) {
         _super.call(this, project, ins);
-        this.passes = passes;
         this.type = 'filter+map';
+        this.passes = p;
     }
     FilterMapOperator.prototype._n = function (v) {
         if (this.passes(v)) {
@@ -714,19 +760,22 @@ var FilterMapOperator = (function (_super) {
 }(MapOperator));
 exports.FilterMapOperator = FilterMapOperator;
 var ReplaceErrorOperator = (function () {
-    function ReplaceErrorOperator(fn, ins) {
-        this.fn = fn;
-        this.ins = ins;
-        this.type = 'replaceError';
-        this.out = empty;
+    function ReplaceErrorOperator(f, s) {
+        var q = this;
+        q.type = 'replaceError';
+        q.out = empty;
+        q.fn = f;
+        q.ins = s;
     }
     ReplaceErrorOperator.prototype._start = function (out) {
-        this.out = out;
-        this.ins._add(this);
+        var q = this;
+        q.out = out;
+        q.ins._add(q);
     };
     ReplaceErrorOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.out = null;
+        var q = this;
+        q.ins._remove(q);
+        q.out = null;
     };
     ReplaceErrorOperator.prototype._n = function (t) {
         var u = this.out;
@@ -735,12 +784,13 @@ var ReplaceErrorOperator = (function () {
         u._n(t);
     };
     ReplaceErrorOperator.prototype._e = function (err) {
-        var u = this.out;
+        var q = this;
+        var u = q.out;
         if (!u)
             return;
         try {
-            this.ins._remove(this);
-            (this.ins = this.fn(err))._add(this);
+            q.ins._remove(q);
+            (q.ins = q.fn(err))._add(q);
         }
         catch (e) {
             u._e(e);
@@ -756,46 +806,53 @@ var ReplaceErrorOperator = (function () {
 }());
 exports.ReplaceErrorOperator = ReplaceErrorOperator;
 var StartWithOperator = (function () {
-    function StartWithOperator(ins, value) {
-        this.ins = ins;
-        this.value = value;
-        this.type = 'startWith';
-        this.out = exports.emptyIL;
+    function StartWithOperator(s, v) {
+        var q = this;
+        q.type = 'startWith';
+        q.out = exports.emptyIL;
+        q.ins = s;
+        q.value = v;
     }
     StartWithOperator.prototype._start = function (out) {
-        this.out = out;
-        this.out._n(this.value);
-        this.ins._add(out);
+        var q = this;
+        q.out = out;
+        q.out._n(q.value);
+        q.ins._add(out);
     };
     StartWithOperator.prototype._stop = function () {
-        this.ins._remove(this.out);
-        this.out = null;
+        var q = this;
+        q.ins._remove(q.out);
+        q.out = null;
     };
     return StartWithOperator;
 }());
 exports.StartWithOperator = StartWithOperator;
 var TakeOperator = (function () {
-    function TakeOperator(max, ins) {
-        this.max = max;
-        this.ins = ins;
-        this.type = 'take';
-        this.out = null;
-        this.taken = 0;
+    function TakeOperator(m, s) {
+        var q = this;
+        q.type = 'take';
+        q.out = null;
+        q.taken = 0;
+        q.max = m;
+        q.ins = s;
     }
     TakeOperator.prototype._start = function (out) {
-        this.out = out;
-        this.ins._add(this);
+        var q = this;
+        q.out = out;
+        q.ins._add(q);
     };
     TakeOperator.prototype._stop = function () {
-        this.ins._remove(this);
-        this.out = null;
-        this.taken = 0;
+        var q = this;
+        q.ins._remove(q);
+        q.out = null;
+        q.taken = 0;
     };
     TakeOperator.prototype._n = function (t) {
-        var u = this.out;
+        var q = this;
+        var u = q.out;
         if (!u)
             return;
-        if (this.taken++ < this.max - 1) {
+        if (q.taken++ < q.max - 1) {
             u._n(t);
         }
         else {
@@ -820,11 +877,12 @@ var TakeOperator = (function () {
 exports.TakeOperator = TakeOperator;
 var Stream = (function () {
     function Stream(producer) {
-        this._stopID = empty;
-        this._prod = producer;
-        this._ils = [];
-        this._target = null;
-        this._err = null;
+        var q = this;
+        q._prod = producer;
+        q._ils = [];
+        q._stopID = empty;
+        q._target = null;
+        q._err = null;
     }
     Stream.prototype._n = function (t) {
         var a = this._ils;
@@ -838,10 +896,11 @@ var Stream = (function () {
         }
     };
     Stream.prototype._e = function (err) {
-        if (this._err)
+        var q = this;
+        if (q._err)
             return;
-        this._err = err;
-        var a = this._ils;
+        q._err = err;
+        var a = q._ils;
         var L = a.length;
         if (L == 1)
             a[0]._e(err);
@@ -850,7 +909,7 @@ var Stream = (function () {
             for (var i = 0; i < L; i++)
                 b[i]._e(err);
         }
-        this._x();
+        q._x();
     };
     Stream.prototype._c = function () {
         var a = this._ils;
@@ -865,12 +924,13 @@ var Stream = (function () {
         this._x();
     };
     Stream.prototype._x = function () {
-        if (this._ils.length === 0)
+        var q = this;
+        if (q._ils.length === 0)
             return;
-        if (this._prod)
-            this._prod._stop();
-        this._err = null;
-        this._ils = [];
+        if (q._prod)
+            q._prod._stop();
+        q._err = null;
+        q._ils = [];
     };
     
     Stream.prototype.addListener = function (listener) {
@@ -890,36 +950,38 @@ var Stream = (function () {
         this._remove(listener);
     };
     Stream.prototype._add = function (il) {
-        var ta = this._target;
+        var q = this;
+        var ta = q._target;
         if (ta)
             return ta._add(il);
-        var a = this._ils;
+        var a = q._ils;
         a.push(il);
         if (a.length === 1) {
-            if (this._stopID !== empty) {
-                clearTimeout(this._stopID);
-                this._stopID = empty;
+            if (q._stopID !== empty) {
+                clearTimeout(q._stopID);
+                q._stopID = empty;
             }
-            var p = this._prod;
+            var p = q._prod;
             if (p)
-                p._start(this);
+                p._start(q);
         }
     };
     Stream.prototype._remove = function (il) {
-        var ta = this._target;
+        var q = this;
+        var ta = q._target;
         if (ta)
             return ta._remove(il);
-        var a = this._ils;
+        var a = q._ils;
         var i = a.indexOf(il);
         if (i > -1) {
             a.splice(i, 1);
-            var p_1 = this._prod;
+            var p_1 = q._prod;
             if (p_1 && a.length <= 0) {
-                this._err = null;
-                this._stopID = setTimeout(function () { return p_1._stop(); });
+                q._err = null;
+                q._stopID = setTimeout(function () { return p_1._stop(); });
             }
             else if (a.length === 1) {
-                this._pruneCycles();
+                q._pruneCycles();
             }
         }
     };
@@ -928,8 +990,9 @@ var Stream = (function () {
     
     
     Stream.prototype._pruneCycles = function () {
-        if (this._hasNoSinks(this, [])) {
-            this._remove(this._ils[0]);
+        var q = this;
+        if (q._hasNoSinks(q, [])) {
+            q._remove(q._ils[0]);
         }
     };
     
@@ -937,18 +1000,19 @@ var Stream = (function () {
     
     
     Stream.prototype._hasNoSinks = function (x, trace) {
+        var q = this;
         if (trace.indexOf(x) !== -1) {
             return true;
         }
-        else if (x.out === this) {
+        else if (x.out === q) {
             return true;
         }
         else if (x.out) {
-            return this._hasNoSinks(x.out, trace.concat(x));
+            return q._hasNoSinks(x.out, trace.concat(x));
         }
         else if (x._ils) {
             for (var i = 0, N = x._ils.length; i < N; i++) {
-                if (!this._hasNoSinks(x._ils[i], trace.concat(x))) {
+                if (!q._hasNoSinks(x._ils[i], trace.concat(x))) {
                     return false;
                 }
             }
@@ -1026,8 +1090,9 @@ var Stream = (function () {
         return new Stream(new MergeProducer(streams));
     };
     Stream.prototype._map = function (project) {
-        var p = this._prod;
-        var ctor = this.ctor();
+        var q = this;
+        var p = q._prod;
+        var ctor = q.ctor();
         if (p instanceof FilterOperator) {
             return new ctor(new FilterMapOperator(p.passes, project, p.ins));
         }
@@ -1037,7 +1102,7 @@ var Stream = (function () {
         if (p instanceof MapOperator) {
             return new ctor(new MapOperator(compose2(project, p.project), p.ins));
         }
-        return new ctor(new MapOperator(project, this));
+        return new ctor(new MapOperator(project, q));
     };
     
     Stream.prototype.map = function (project) {
@@ -1153,6 +1218,7 @@ var MemoryStream = (function (_super) {
     __extends(MemoryStream, _super);
     function MemoryStream(producer) {
         _super.call(this, producer);
+        this._v = empty;
         this._has = false;
     }
     MemoryStream.prototype._n = function (x) {
