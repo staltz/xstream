@@ -22,6 +22,45 @@ export class DOMEventProducer implements InternalProducer<Event> {
   }
 }
 
+/**
+ * Creates a stream based on DOM events of type `eventType` from the target
+ * node.
+ *
+ * Marble diagram:
+ *
+ * ```text
+ *   fromEvent(node, eventType)
+ * ---ev--ev----ev---------------
+ * ```
+ *
+ * Example:
+ *
+ * ```js
+ * import fromEvent from 'xstream/extra/fromEvent'
+ *
+ * const stream = fromEvent(document.querySelector('.button'), 'click')
+ *   .mapTo('Button clicked!')
+ *
+ * stream.addListener({
+ *   next: i => console.log(i),
+ *   error: err => console.error(err),
+ *   complete: () => console.log('completed')
+ * })
+ * ```
+ *
+ * ```text
+ * > 'Button clicked!'
+ * > 'Button clicked!'
+ * > 'Button clicked!'
+ * ```
+ *
+ * @param {EventTarget} node The element we want to listen to.
+ * @param {string} eventType The type of events we want to listen to.
+ * @param {boolean} useCapture An optional boolean that indicates that events of
+ * this type will be dispatched to the registered listener before being
+ * dispatched to any EventTarget beneath it in the DOM tree. Defaults to false.
+ * @return {Stream}
+ */
 export default function fromEvent(node: EventTarget,
                                   eventType: string,
                                   useCapture: boolean = false): Stream<Event> {

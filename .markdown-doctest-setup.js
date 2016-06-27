@@ -27,6 +27,10 @@ class FakeEventTarget {
   dispatchEvent(event) {
     return true;
   }
+
+  querySelector() {
+    return this;
+  }
 }
 
 module.exports = {

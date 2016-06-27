@@ -68,6 +68,48 @@ export class DropUntilOperator<T> implements Operator<T, T> {
   }
 }
 
+/**
+ * Starts emitting the input stream when another stream emits a next event. The
+ * output stream will complete if/when the other stream completes.
+ *
+ * Marble diagram:
+ *
+ * ```text
+ * ---1---2-----3--4----5----6---
+ *   dropUntil( --------a--b--| )
+ * ---------------------5----6|
+ * ```
+ *
+ * Example:
+ *
+ * ```js
+ * import dropUntil from 'xstream/extra/dropUntil'
+ *
+ * const other = xs.periodic(220).take(1)
+ *
+ * const stream = xs.periodic(50)
+ *   .take(6)
+ *   .compose(dropUntil(other))
+ *
+ * stream.addListener({
+ *   next: i => console.log(i),
+ *   error: err => console.error(err),
+ *   complete: () => console.log('completed')
+ * })
+ * ```
+ *
+ * ```text
+ * > 4
+ * > 5
+ * > completed
+ * ```
+ *
+ * #### Arguments:
+ *
+ * @param {Stream} other Some other stream that is used to know when should the
+ * output stream of this operator start emitting.
+ * @return {Stream}
+ */
 export default function dropUntil<T>(other: Stream<any>): (ins: Stream<T>) => Stream<T> {
   return function dropUntilOperator(ins: Stream<T>): Stream<T> {
     return new Stream<T>(new DropUntilOperator(other, ins));
