@@ -1,6 +1,21 @@
 <!-- This EXTRA_DOCS.md file is automatically generated from source code and files in the /markdown directory. Please DO NOT send pull requests to directly modify this file. Instead, edit the JSDoc comments in source code or the md files in /markdown or the md.ejs files in /tools. -->
 
-# Extra operators and factories
+## Extras
+
+- [`concat`](#concat) (factory)
+- [`debounce`](#debounce) (operator)
+- [`delay`](#delay) (operator)
+- [`dropRepeats`](#dropRepeats) (operator)
+- [`dropUntil`](#dropUntil) (operator)
+- [`flattenConcurrently`](#flattenConcurrently) (operator)
+- [`flattenSequentially`](#flattenSequentially) (operator)
+- [`fromDiagram`](#fromDiagram) (factory)
+- [`fromEvent`](#fromEvent) (operator)
+- [`pairwise`](#pairwise) (operator)
+- [`split`](#split) (operator)
+- [`tween`](#tween) (factory)
+
+# How to use extras
 
 The following are standalone stream operators and stream factories that may be separately imported and utilized in your project.
 To use an extra operator (e.g. `delay`), import it as such:
