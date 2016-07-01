@@ -1,3 +1,13 @@
+<a name="5.1.0"></a>
+# [5.1.0](https://github.com/staltz/xstream/compare/v5.0.6...v5.1.0) (2016-07-01)
+
+
+### Features
+
+* **extra:** add new extra factory tween() ([9ee12a7](https://github.com/staltz/xstream/commit/9ee12a7))
+
+
+
 <a name="5.0.6"></a>
 ## [5.0.6](https://github.com/staltz/xstream/compare/v5.0.5...v5.0.6) (2016-06-17)
 
