@@ -1,3 +1,15 @@
+<a name="5.1.1"></a>
+## [5.1.1](https://github.com/staltz/xstream/compare/v5.1.0...v5.1.1) (2016-07-05)
+
+
+### Bug Fixes
+
+* **flatten:** fix automatic removal of inner listeners ([1c6ed5c](https://github.com/staltz/xstream/commit/1c6ed5c)), closes [#68](https://github.com/staltz/xstream/issues/68)
+* **fromDiagram:** fix support for falsey values ([85c9ca7](https://github.com/staltz/xstream/commit/85c9ca7))
+* **imitate:** fix issue [#66](https://github.com/staltz/xstream/issues/66) with imitate() ([7aa3a04](https://github.com/staltz/xstream/commit/7aa3a04)), closes [#66](https://github.com/staltz/xstream/issues/66) [#66](https://github.com/staltz/xstream/issues/66)
+
+
+
 <a name="5.1.0"></a>
 # [5.1.0](https://github.com/staltz/xstream/compare/v5.0.6...v5.1.0) (2016-07-01)
 

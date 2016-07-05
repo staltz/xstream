@@ -461,6 +461,7 @@ var FlattenOperator = (function () {
     };
     FlattenOperator.prototype._stop = function () {
         this.ins._remove(this);
+        this.inner._remove(this.il);
         this.inner = null;
         this.il = null;
         this.open = true;
@@ -616,6 +617,7 @@ var MapFlattenOperator = (function () {
     };
     MapFlattenOperator.prototype._stop = function () {
         this.mapOp.ins._remove(this);
+        this.inner._remove(this.il);
         this.inner = null;
         this.il = null;
         this.open = true;
@@ -1125,6 +1127,10 @@ var Stream = (function () {
                 'https://github.com/staltz/xstream#faq');
         }
         this._target = target;
+        for (var ils = this._ils, N = ils.length, i = 0; i < N; i++) {
+            target._add(ils[i]);
+        }
+        this._ils = [];
     };
     
     Stream.prototype.shamefullySendNext = function (value) {
