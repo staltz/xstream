@@ -266,4 +266,22 @@ describe('Stream.prototype.imitate', () => {
     });
     done();
   });
+
+  it('should transfer existing listeners to imitation target', (done) => {
+    const mimic = xs.create<number>();
+    const expected = [0, 1, 2];
+
+    mimic.addListener({
+      next: (x: number) => {
+        assert.equal(x, expected.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      },
+    });
+
+    mimic.imitate(xs.periodic(50).take(3));
+  });
 });

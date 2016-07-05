@@ -1718,6 +1718,10 @@ export class Stream<T> implements InternalListener<T> {
       'https://github.com/staltz/xstream#faq');
     }
     this._target = target;
+    for (let ils = this._ils, N = ils.length, i = 0; i < N; i++) {
+      target._add(ils[i]);
+    }
+    this._ils = [];
   }
 
   /**
