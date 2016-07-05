@@ -308,6 +308,24 @@ export class PeriodicProducer implements InternalProducer<number> {
   }
 }
 
+export class RememberOperator<T> implements InternalProducer<T> {
+  public type = 'remember';
+  public out: InternalListener<T> = emptyIL;
+
+  constructor(public ins: Stream<T>) {
+  }
+
+  _start(out: Stream<T>): void {
+    this.out = out;
+    this.ins._add(out);
+  }
+
+  _stop(): void {
+    this.ins._remove(this.out);
+    this.out = null;
+  }
+}
+
 export class DebugOperator<T> implements Operator<T, T> {
   public type = 'debug';
   public out: Stream<T> = null;
@@ -1607,16 +1625,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {MemoryStream}
    */
   remember(): MemoryStream<T> {
-    return new MemoryStream<T>({
-      _start: (il: InternalListener<T>) => {
-        const p = this._prod;
-        if (p) p._start(il);
-      },
-      _stop: () => {
-        const p = this._prod;
-        if (p) p._stop();
-      },
-    });
+    return new MemoryStream<T>(new RememberOperator(this));
   }
 
   /**
