@@ -55,6 +55,42 @@ describe('fromDiagram (extra)', () => {
     });
   });
 
+  it('should support 0 as a value behind a key in the values object', (done) => {
+    const stream = fromDiagram('--a--b----c--|', {
+      values: {a: 0, b: 1, c: 2}
+    });
+    const expected = [0, 1, 2];
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.equal(x, expected.shift());
+      },
+      error: (err) => done(err),
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      },
+    });
+  });
+
+  it('should support null as a value behind a key in the values object', (done) => {
+    const stream = fromDiagram('--a--b----c--|', {
+      values: {a: null, b: 1, c: 2}
+    });
+    const expected = [null, 1, 2];
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.equal(x, expected.shift());
+      },
+      error: (err) => done(err),
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      },
+    });
+  });
+
   it('should create a stream with some sense of order', (done) => {
     const stream1 = fromDiagram('-a---c--|');
     const stream2 = fromDiagram('---b---d|');

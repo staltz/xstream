@@ -43,7 +43,7 @@ export class DiagramProducer implements InternalProducer<any> {
           this.schedule({type: 'complete', time: time}, out);
           break;
         default:
-          const val = this.values[c] ? this.values[c] : c;
+          const val = this.values.hasOwnProperty(c) ? this.values[c] : c;
           this.schedule({type: 'next', value: val, time: time}, out);
           break;
       }
@@ -75,8 +75,8 @@ export class DiagramProducer implements InternalProducer<any> {
 /**
  * Creates a real stream out of an ASCII drawing of a stream. Each string
  * character represents an amount of time passed (by default, 20 milliseconds).
- * `-` characters represent nothing special, `|` is a symbol to mark the 
- * completion of the stream, `#` is an error on the stream, and any other 
+ * `-` characters represent nothing special, `|` is a symbol to mark the
+ * completion of the stream, `#` is an error on the stream, and any other
  * character is a "next" event.
  *
  * Example:
@@ -93,7 +93,7 @@ export class DiagramProducer implements InternalProducer<any> {
  * })
  * ```
  *
- * The character `a` represent emission of the event `'a'`, a string. If you 
+ * The character `a` represent emission of the event `'a'`, a string. If you
  * want to emit something else than a string, you need to provide those values
  * in the options argument.
  *
@@ -114,7 +114,7 @@ export class DiagramProducer implements InternalProducer<any> {
  * ```
  *
  * That way, the stream will emit the numbers 10, 20, 30, 40. The `options`
- * argument may also take `timeUnit`, a number to configure how many 
+ * argument may also take `timeUnit`, a number to configure how many
  * milliseconds does each represents, and `errorValue`, a value to send out as
  * the error which `#` represents.
  *
