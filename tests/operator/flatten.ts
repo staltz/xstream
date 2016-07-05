@@ -140,6 +140,35 @@ describe('Stream.prototype.flatten', () => {
         },
       });
     });
+
+    it('should not leak when used in a withLatestFrom-like case', (done) => {
+      const a$ = xs.periodic(100);
+      const b$ = xs.periodic(220);
+
+      let innerAEmissions = 0;
+
+      // a$.withLatestFrom(b$, (a, b) => a + b)
+      const c$ = b$.map(b =>
+        a$.map(a => a + b).debug(a => { innerAEmissions += 1; })
+      ).flatten().take(1);
+
+      let cEmissions = 0;
+      c$.addListener({
+        next: (c) => {
+          assert.strictEqual(cEmissions, 0);
+          assert.strictEqual(c, 0);
+          cEmissions += 1;
+        },
+        error: (err: any) => done(err),
+        complete: () => { },
+      });
+
+      setTimeout(() => {
+        assert.strictEqual(innerAEmissions, 1);
+        assert.strictEqual(cEmissions, 1);
+        done();
+      }, 800);
+    });
   });
 
   describe('with filter+map fusion', () => {

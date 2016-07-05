@@ -543,6 +543,7 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
 
   _stop(): void {
     this.ins._remove(this);
+    this.inner._remove(this.il);
     this.inner = null;
     this.il = null;
     this.open = true;
@@ -704,6 +705,7 @@ export class MapFlattenOperator<T, R> implements Operator<T, R> {
 
   _stop(): void {
     this.mapOp.ins._remove(this);
+    this.inner._remove(this.il);
     this.inner = null;
     this.il = null;
     this.open = true;
