@@ -169,6 +169,23 @@ describe('Stream.prototype.flatten', () => {
         done();
       }, 800);
     });
+
+    it('should not error when stopping, and outer stream was empty', (done) => {
+      const outer = xs.never();
+      const stream = outer.map(x => xs.of(1, 2, 3)).flatten();
+      const listener = {
+        next: () => {},
+        error: () => {},
+        complete: () => {},
+      };
+
+      assert.doesNotThrow(() => {
+        stream.addListener(listener);
+        stream.removeListener(listener);
+      });
+
+      setTimeout(() => done(), 500);
+    });
   });
 
   describe('with filter+map fusion', () => {
