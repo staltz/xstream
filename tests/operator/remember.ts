@@ -132,7 +132,7 @@ describe('Stream.prototype.remember', () => {
     done();
   });
 
-  it ('should pass last value to second listener, even if it\'s "shameful"', (done) => {
+  it('should pass last value to second listener, even if it\'s "shameful"', (done) => {
     const subject = xs.create();
     const remembered = subject.remember();
 
@@ -154,7 +154,7 @@ describe('Stream.prototype.remember', () => {
     subject.shamefullySendComplete();
   });
 
-  it ('should work properly with "shameful" values after subscription', (done) => {
+  it('should work properly with "shameful" values after subscription', (done) => {
     const subject = xs.create();
     const remembered = subject.remember();
 

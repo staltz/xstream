@@ -308,24 +308,6 @@ export class PeriodicProducer implements InternalProducer<number> {
   }
 }
 
-export class RememberOperator<T> implements InternalProducer<T> {
-  public type = 'remember';
-  public out: InternalListener<T> = emptyIL;
-
-  constructor(public ins: Stream<T>) {
-  }
-
-  _start(out: Stream<T>): void {
-    this.out = out;
-    this.ins._add(out);
-  }
-
-  _stop(): void {
-    this.ins._remove(this.out);
-    this.out = null;
-  }
-}
-
 export class DebugOperator<T> implements Operator<T, T> {
   public type = 'debug';
   public out: Stream<T> = null;
@@ -817,6 +799,24 @@ export class FilterMapOperator<T, R> extends MapOperator<T, R> {
     if (this.passes(v)) {
       super._n(v);
     };
+  }
+}
+
+export class RememberOperator<T> implements InternalProducer<T> {
+  public type = 'remember';
+  public out: InternalListener<T> = emptyIL;
+
+  constructor(public ins: Stream<T>) {
+  }
+
+  _start(out: Stream<T>): void {
+    this.out = out;
+    this.ins._add(out);
+  }
+
+  _stop(): void {
+    this.ins._remove(this.out);
+    this.out = null;
   }
 }
 
