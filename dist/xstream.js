@@ -717,6 +717,23 @@ var FilterMapOperator = (function (_super) {
     return FilterMapOperator;
 }(MapOperator));
 exports.FilterMapOperator = FilterMapOperator;
+var RememberOperator = (function () {
+    function RememberOperator(ins) {
+        this.ins = ins;
+        this.type = 'remember';
+        this.out = exports.emptyIL;
+    }
+    RememberOperator.prototype._start = function (out) {
+        this.out = out;
+        this.ins._add(out);
+    };
+    RememberOperator.prototype._stop = function () {
+        this.ins._remove(this.out);
+        this.out = null;
+    };
+    return RememberOperator;
+}());
+exports.RememberOperator = RememberOperator;
 var ReplaceErrorOperator = (function () {
     function ReplaceErrorOperator(fn, ins) {
         this.fn = fn;
@@ -1103,19 +1120,7 @@ var Stream = (function () {
     };
     
     Stream.prototype.remember = function () {
-        var _this = this;
-        return new MemoryStream({
-            _start: function (il) {
-                var p = _this._prod;
-                if (p)
-                    p._start(il);
-            },
-            _stop: function () {
-                var p = _this._prod;
-                if (p)
-                    p._stop();
-            },
-        });
+        return new MemoryStream(new RememberOperator(this));
     };
     
     Stream.prototype.debug = function (labelOrSpy) {

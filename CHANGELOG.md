@@ -1,3 +1,13 @@
+<a name="5.1.3"></a>
+## [5.1.3](https://github.com/staltz/xstream/compare/v5.1.2...v5.1.3) (2016-07-06)
+
+
+### Bug Fixes
+
+* **remember:** remembers also explicitly sent events ([1cdef65](https://github.com/staltz/xstream/commit/1cdef65)), closes [#69](https://github.com/staltz/xstream/issues/69)
+
+
+
 <a name="5.1.2"></a>
 ## [5.1.2](https://github.com/staltz/xstream/compare/v5.1.1...v5.1.2) (2016-07-06)
 
