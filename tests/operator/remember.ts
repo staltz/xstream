@@ -131,4 +131,24 @@ describe('Stream.prototype.remember', () => {
     });
     done();
   });
+
+  it ('should work properly with `xs.create()`', (done) => {
+    const stream = xs.create().remember();
+    stream.shamefullySendNext('foo');
+
+    let expected = ['foo', 'bar'];
+    stream.addListener({
+      next(x) {
+        assert.strictEqual(x, expected.shift());
+      },
+      error: done,
+      complete: () => {
+        assert.strictEqual(expected.length, 0);
+        done();
+      }
+    });
+
+    stream.shamefullySendNext('bar');
+    stream.shamefullySendComplete();
+  });
 });
