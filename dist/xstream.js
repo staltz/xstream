@@ -461,7 +461,8 @@ var FlattenOperator = (function () {
     };
     FlattenOperator.prototype._stop = function () {
         this.ins._remove(this);
-        this.inner._remove(this.il);
+        if (this.inner)
+            this.inner._remove(this.il);
         this.inner = null;
         this.il = null;
         this.open = true;
@@ -617,7 +618,8 @@ var MapFlattenOperator = (function () {
     };
     MapFlattenOperator.prototype._stop = function () {
         this.mapOp.ins._remove(this);
-        this.inner._remove(this.il);
+        if (this.inner)
+            this.inner._remove(this.il);
         this.inner = null;
         this.il = null;
         this.open = true;

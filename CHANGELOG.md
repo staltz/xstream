@@ -1,3 +1,13 @@
+<a name="5.1.2"></a>
+## [5.1.2](https://github.com/staltz/xstream/compare/v5.1.1...v5.1.2) (2016-07-06)
+
+
+### Bug Fixes
+
+* **flatten:** fix broken flatten on empty outer ([8172ffe](https://github.com/staltz/xstream/commit/8172ffe))
+
+
+
 <a name="5.1.1"></a>
 ## [5.1.1](https://github.com/staltz/xstream/compare/v5.1.0...v5.1.1) (2016-07-05)
 
