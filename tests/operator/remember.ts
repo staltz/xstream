@@ -131,4 +131,46 @@ describe('Stream.prototype.remember', () => {
     });
     done();
   });
+
+  it ('should pass last value to second listener, even if it\'s "shameful"', (done) => {
+    const subject = xs.create();
+    const remembered = subject.remember();
+
+    remembered.addListener({next: noop, error: noop, complete: noop});
+    subject.shamefullySendNext('foo');
+
+    let expected = ['foo'];
+    remembered.addListener({
+      next(x) {
+        assert.strictEqual(x, expected.shift());
+      },
+      error: done,
+      complete: () => {
+        assert.strictEqual(expected.length, 0);
+        done();
+      }
+    });
+
+    subject.shamefullySendComplete();
+  });
+
+  it ('should work properly with "shameful" values after subscription', (done) => {
+    const subject = xs.create();
+    const remembered = subject.remember();
+
+    let expected = ['foo'];
+    remembered.addListener({
+      next(x) {
+        assert.strictEqual(x, expected.shift());
+      },
+      error: done,
+      complete: () => {
+        assert.strictEqual(expected.length, 0);
+        done();
+      }
+    });
+
+    subject.shamefullySendNext('foo');
+    subject.shamefullySendComplete();
+  });
 });
