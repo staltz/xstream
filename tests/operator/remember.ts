@@ -133,11 +133,14 @@ describe('Stream.prototype.remember', () => {
   });
 
   it ('should work properly with `xs.create()`', (done) => {
-    const stream = xs.create().remember();
-    stream.shamefullySendNext('foo');
+    const subject = xs.create();
+    const remembered = subject.remember();
+
+    remembered.addListener({next: noop, error: noop, complete: noop});
+    subject.shamefullySendNext('foo');
 
     let expected = ['foo', 'bar'];
-    stream.addListener({
+    remembered.addListener({
       next(x) {
         assert.strictEqual(x, expected.shift());
       },
@@ -148,7 +151,7 @@ describe('Stream.prototype.remember', () => {
       }
     });
 
-    stream.shamefullySendNext('bar');
-    stream.shamefullySendComplete();
+    subject.shamefullySendNext('bar');
+    subject.shamefullySendComplete();
   });
 });
