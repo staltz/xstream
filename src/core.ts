@@ -985,33 +985,6 @@ export class Stream<T> implements InternalListener<T> {
     this._err = null;
   }
 
-  /**
-   * Adds a Listener to the Stream.
-   *
-   * @param {Listener<T>} listener
-   */
-  addListener(listener: Listener<T>): void {
-    if (typeof listener.next !== 'function'
-    || typeof listener.error !== 'function'
-    || typeof listener.complete !== 'function') {
-      throw new Error('stream.addListener() requires all three next, error, ' +
-      'and complete functions.');
-    }
-    (<InternalListener<T>> (<any> listener))._n = listener.next;
-    (<InternalListener<T>> (<any> listener))._e = listener.error;
-    (<InternalListener<T>> (<any> listener))._c = listener.complete;
-    this._add(<InternalListener<T>> (<any> listener));
-  }
-
-  /**
-   * Removes a Listener from the Stream, assuming the Listener was added to it.
-   *
-   * @param {Listener<T>} listener
-   */
-  removeListener(listener: Listener<T>): void {
-    this._remove(<InternalListener<T>> (<any> listener));
-  }
-
   _add(il: InternalListener<T>): void {
     const ta = this._target;
     if (ta) return ta._add(il);
@@ -1078,6 +1051,33 @@ export class Stream<T> implements InternalListener<T> {
 
   private ctor(): typeof Stream {
     return this instanceof MemoryStream ? MemoryStream : Stream;
+  }
+
+  /**
+   * Adds a Listener to the Stream.
+   *
+   * @param {Listener<T>} listener
+   */
+  addListener(listener: Listener<T>): void {
+    if (typeof listener.next !== 'function'
+    || typeof listener.error !== 'function'
+    || typeof listener.complete !== 'function') {
+      throw new Error('stream.addListener() requires all three next, error, ' +
+      'and complete functions.');
+    }
+    (<InternalListener<T>> (<any> listener))._n = listener.next;
+    (<InternalListener<T>> (<any> listener))._e = listener.error;
+    (<InternalListener<T>> (<any> listener))._c = listener.complete;
+    this._add(<InternalListener<T>> (<any> listener));
+  }
+
+  /**
+   * Removes a Listener from the Stream, assuming the Listener was added to it.
+   *
+   * @param {Listener<T>} listener
+   */
+  removeListener(listener: Listener<T>): void {
+    this._remove(<InternalListener<T>> (<any> listener));
   }
 
   /**
