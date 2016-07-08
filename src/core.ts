@@ -978,6 +978,13 @@ export class Stream<T> implements InternalListener<T> {
     this._ils = [];
   }
 
+  _lateStop() {
+    // this._prod is not null, because this _lateStop is called from _remove
+    // where we already checked that this._prod is truthy
+    this._prod._stop();
+    this._err = null;
+  }
+
   /**
    * Adds a Listener to the Stream.
    *
@@ -1027,10 +1034,9 @@ export class Stream<T> implements InternalListener<T> {
     const i = a.indexOf(il);
     if (i > -1) {
       a.splice(i, 1);
-      const p = this._prod;
-      if (p && a.length <= 0) {
+      if (this._prod && a.length <= 0) {
         this._err = null;
-        this._stopID = setTimeout(() => p._stop());
+        this._stopID = setTimeout(() => this._lateStop());
       } else if (a.length === 1) {
         this._pruneCycles();
       }
@@ -1791,6 +1797,11 @@ export class MemoryStream<T> extends Stream<T> {
   _add(il: InternalListener<T>): void {
     if (this._has) { il._n(this._v); }
     super._add(il);
+  }
+
+  _lateStop() {
+    this._has = false;
+    super._lateStop();
   }
 
   _x(): void {

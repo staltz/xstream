@@ -133,4 +133,31 @@ describe('MemoryStream', () => {
       },
     });
   });
+
+  it('should teardown upstream MemoryStream memory on late async stop', (done) => {
+    const stream = xs.periodic(500).mapTo('world').startWith('hello').take(2);
+    const expected1 = ['hello', 'world'];
+
+    function addSecondListener() {
+      const expected2 = ['hello', 'world'];
+      stream.addListener({
+        next: (x: string) => {
+          assert.strictEqual(x, expected2.shift());
+        },
+        error: (err: any) => done(err),
+        complete: () => done(),
+      });
+    }
+
+    stream.addListener({
+      next: (x: string) => {
+        assert.equal(x, expected1.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.strictEqual(expected1.length, 0);
+        setTimeout(addSecondListener, 200);
+      },
+    });
+  });
 });
