@@ -1,6 +1,6 @@
 {
   "name": "xstream",
-  "version": "5.1.3",
+  "version": "5.1.4",
   "description": "An extremely intuitive, small, and fast functional reactive stream library for JavaScript",
   "main": "index.js",
   "typings": "index.d.ts",

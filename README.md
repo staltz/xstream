@@ -112,7 +112,7 @@ XStream has four fundamental types: Stream, Listener, Producer, and MemoryStream
 A Stream is an **event emitter** with multiple Listeners. When an event happens on the
 Stream, it is broadcast to all its Listeners at the same time.
 
-Streams have methods attached to them called *operators*, such as `map`, `filter`, `fold`, `take`, etc. When called, an operator creates and returns another Stream. The returned Stream is actually a Listener of the source Stream (I forgot to tell you that Streams may be Listeners, too). So once the source Stream broadcasts an event, the event will pass through the operator logic and the returned Stream may perhaps broadcast its own event based on the source one.
+Streams have methods attached to them called *operators*, such as `map`, `filter`, `fold`, `take`, etc. When called, an operator creates and returns another Stream. Once the first Stream broadcasts an event, the event will pass through the operator logic and the output Stream may perhaps broadcast its own event based on the source one.
 
 You can also trigger an event to happen on a Stream with the `shamefullySend*` methods. But you don't want to do that. Really, avoid doing that because it's not the reactive way and you'll be missing the point of this library. Ok?
 

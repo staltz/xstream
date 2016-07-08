@@ -1,3 +1,13 @@
+<a name="5.1.4"></a>
+## [5.1.4](https://github.com/staltz/xstream/compare/v5.1.3...v5.1.4) (2016-07-08)
+
+
+### Bug Fixes
+
+* **MemoryStream:** fix teardown of MemoryStream to forget past executions ([6bdf596](https://github.com/staltz/xstream/commit/6bdf596)), closes [#71](https://github.com/staltz/xstream/issues/71)
+
+
+
 <a name="5.1.3"></a>
 ## [5.1.3](https://github.com/staltz/xstream/compare/v5.1.2...v5.1.3) (2016-07-06)
 

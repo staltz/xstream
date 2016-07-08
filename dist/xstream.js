@@ -893,22 +893,11 @@ var Stream = (function () {
         this._err = null;
         this._ils = [];
     };
-    
-    Stream.prototype.addListener = function (listener) {
-        if (typeof listener.next !== 'function'
-            || typeof listener.error !== 'function'
-            || typeof listener.complete !== 'function') {
-            throw new Error('stream.addListener() requires all three next, error, ' +
-                'and complete functions.');
-        }
-        listener._n = listener.next;
-        listener._e = listener.error;
-        listener._c = listener.complete;
-        this._add(listener);
-    };
-    
-    Stream.prototype.removeListener = function (listener) {
-        this._remove(listener);
+    Stream.prototype._lateStop = function () {
+        
+        
+        this._prod._stop();
+        this._err = null;
     };
     Stream.prototype._add = function (il) {
         var ta = this._target;
@@ -927,6 +916,7 @@ var Stream = (function () {
         }
     };
     Stream.prototype._remove = function (il) {
+        var _this = this;
         var ta = this._target;
         if (ta)
             return ta._remove(il);
@@ -934,10 +924,9 @@ var Stream = (function () {
         var i = a.indexOf(il);
         if (i > -1) {
             a.splice(i, 1);
-            var p_1 = this._prod;
-            if (p_1 && a.length <= 0) {
+            if (this._prod && a.length <= 0) {
                 this._err = null;
-                this._stopID = setTimeout(function () { return p_1._stop(); });
+                this._stopID = setTimeout(function () { return _this._lateStop(); });
             }
             else if (a.length === 1) {
                 this._pruneCycles();
@@ -981,6 +970,23 @@ var Stream = (function () {
     };
     Stream.prototype.ctor = function () {
         return this instanceof MemoryStream ? MemoryStream : Stream;
+    };
+    
+    Stream.prototype.addListener = function (listener) {
+        if (typeof listener.next !== 'function'
+            || typeof listener.error !== 'function'
+            || typeof listener.complete !== 'function') {
+            throw new Error('stream.addListener() requires all three next, error, ' +
+                'and complete functions.');
+        }
+        listener._n = listener.next;
+        listener._e = listener.error;
+        listener._c = listener.complete;
+        this._add(listener);
+    };
+    
+    Stream.prototype.removeListener = function (listener) {
+        this._remove(listener);
     };
     
     Stream.create = function (producer) {
@@ -1178,6 +1184,10 @@ var MemoryStream = (function (_super) {
             il._n(this._v);
         }
         _super.prototype._add.call(this, il);
+    };
+    MemoryStream.prototype._lateStop = function () {
+        this._has = false;
+        _super.prototype._lateStop.call(this);
     };
     MemoryStream.prototype._x = function () {
         this._has = false;
