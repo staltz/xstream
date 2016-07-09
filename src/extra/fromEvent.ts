@@ -102,7 +102,9 @@ export class NodeEventProducer implements InternalProducer<any> {
  * dispatched to any EventTarget beneath it in the DOM tree. Defaults to false.
  * @return {Stream}
  */
-export default function fromEvent( element: EventTarget | EventEmitter, eventName: string, useCapture: boolean = false): Stream<Event|any> {
+export default function fromEvent( element: EventTarget | EventEmitter,
+                                   eventName: string,
+                                   useCapture: boolean = false): Stream<Event|any> {
   if ( element instanceof EventEmitter ) {
     return new Stream<any>(new NodeEventProducer( element, eventName ));
   } else {
