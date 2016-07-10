@@ -2,6 +2,7 @@
 /// <reference path="../../typings/globals/node/index.d.ts" />
 import xs, {Stream} from '../../src/index';
 import * as assert from 'assert';
+function noop() {};
 
 describe('xs.merge', () => {
   it('should merge OR-style two streams together', (done) => {
@@ -38,6 +39,28 @@ describe('xs.merge', () => {
       },
     });
   });
+
+  it('should complete properly when stopped asynchronously and restarted synchronously', (done) => {
+    const initial = xs.of('foo');
+    // debug here needed to stop MergeProducer asynchronously via _remove
+    const stream = xs.merge(initial).debug();
+
+    stream.addListener({next: noop, error: noop, complete: noop});
+
+    let expected = ['foo'];
+    stream.addListener({
+      next: (x) => {
+        assert.equal(x, expected.shift());
+      },
+      error: done,
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      }
+    });
+  });
+
+
 
   it('should return a Stream when merging a MemoryStream with a Stream', (done) => {
     const input1 = xs.periodic(50).take(4).remember();
