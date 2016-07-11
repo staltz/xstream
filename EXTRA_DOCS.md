@@ -399,19 +399,20 @@ the error which `#` represents.
 
 - - -
 
-### <a id="fromEvent"></a> `fromEvent(node, eventType, useCapture)`
+### <a id="fromEvent"></a> `fromEvent(element, eventName, useCapture)`
 
-Creates a stream based on DOM events of type `eventType` from the target
-node.
+Creates a stream based on either:
+- DOM events with the name `eventName` from a provided target node
+- Events with the name `eventName` from a provided NodeJS EventEmitter
 
 Marble diagram:
 
 ```text
-  fromEvent(node, eventType)
+  fromEvent(element, eventName)
 ---ev--ev----ev---------------
 ```
 
-Example:
+Examples:
 
 ```js
 import fromEvent from 'xstream/extra/fromEvent'
@@ -432,10 +433,30 @@ stream.addListener({
 > 'Button clicked!'
 ```
 
+```js
+import fromEvent from 'xstream/extra/fromEvent'
+import {EventEmitter} from 'events'
+
+const MyEmitter = new EventEmitter()
+const stream = fromEvent(MyEmitter, 'foo')
+
+stream.addListener({
+  next: i => console.log(i),
+  error: err => console.error(err),
+  complete: () => console.log('completed')
+})
+
+MyEmitter.emit('foo', 'bar')
+```
+
+```text
+> 'bar'
+```
+
 #### Arguments:
 
-- `node: EventTarget` The element we want to listen to.
-- `eventType: string` The type of events we want to listen to.
+- `element: EventTarget|EventEmitter` The element upon which to listen.
+- `eventName: string` The name of the event for which to listen.
 - `useCapture: boolean` An optional boolean that indicates that events of this type will be dispatched to the registered listener before being
 dispatched to any EventTarget beneath it in the DOM tree. Defaults to false.
 

@@ -1,3 +1,13 @@
+<a name="5.2.0"></a>
+# [5.2.0](https://github.com/staltz/xstream/compare/v5.1.4...v5.2.0) (2016-07-11)
+
+
+### Features
+
+* **fromEvent:** support NodeJS Event Emitters ([c203801](https://github.com/staltz/xstream/commit/c203801))
+
+
+
 <a name="5.1.4"></a>
 ## [5.1.4](https://github.com/staltz/xstream/compare/v5.1.3...v5.1.4) (2016-07-08)
 
