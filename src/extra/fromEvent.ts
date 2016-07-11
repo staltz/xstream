@@ -40,7 +40,7 @@ export class NodeEventProducer implements InternalProducer<any> {
 }
 
 function isEmitter(element: any): boolean {
-    return element.addListener;
+    return element.emit && element.addListener;
 }
 
 /**
