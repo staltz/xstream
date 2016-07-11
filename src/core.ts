@@ -882,7 +882,7 @@ export class FilterMapOperator<T, R> extends MapOperator<T, R> {
 export class RememberOperator<T> implements InternalProducer<T> {
   public type = 'remember';
   public ins: Stream<T>;
-  public out: InternalListener<T>;
+  public out: Stream<T>;
 
   constructor(ins: Stream<T>) {
     this.ins = ins;
@@ -949,16 +949,16 @@ export class ReplaceErrorOperator<T> implements Operator<T, T> {
 export class StartWithOperator<T> implements InternalProducer<T> {
   public type = 'startWith';
   public ins: Stream<T>;
-  private out: InternalListener<T>;
+  public out: Stream<T>;
   public val: T;
 
   constructor(ins: Stream<T>, val: T) {
     this.ins = ins;
-    this.out = emptyIL;
+    this.out = null;
     this.val = val;
   }
 
-  _start(out: InternalListener<T>): void {
+  _start(out: Stream<T>): void {
     this.out = out;
     this.out._n(this.val);
     this.ins._add(out);
