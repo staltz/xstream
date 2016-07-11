@@ -1,7 +1,6 @@
 /// <reference path="../../typings/globals/mocha/index.d.ts" />
 /// <reference path="../../typings/globals/node/index.d.ts" />
 import {EventEmitter} from 'events';
-import xs from '../../src/index';
 import fromEvent from '../../src/extra/fromEvent';
 import * as assert from 'assert';
 function noop() {};
@@ -79,8 +78,8 @@ describe('fromEvent (extra) - DOMEvent', () => {
 
     stream.addListener({next: noop, error: noop, complete: noop});
 
-    assert.strictEqual('test', target.event);
-    assert.strictEqual(true, target.capture);
+    assert.strictEqual(target.event, 'test');
+    assert.strictEqual(target.capture, true);
   });
 
   it('should call addEventListener with expected parameters', () => {
@@ -89,8 +88,8 @@ describe('fromEvent (extra) - DOMEvent', () => {
 
     stream.addListener({next: noop, error: noop, complete: noop});
 
-    assert.strictEqual('test', target.event);
-    assert.strictEqual(false, target.capture);
+    assert.strictEqual(target.event, 'test');
+    assert.strictEqual(target.capture, false);
   });
 
   it('should propagate events', (done) => {
@@ -125,8 +124,8 @@ describe('fromEvent (extra) - DOMEvent', () => {
       error: (err: any) => done(err),
       complete() {
         setTimeout(() => {
-          assert.strictEqual('test', target.removedEvent);
-          assert.strictEqual(true, target.removedCapture);
+          assert.strictEqual(target.removedEvent, 'test');
+          assert.strictEqual(target.removedCapture, true);
           done();
         }, 5);
       }
@@ -144,7 +143,7 @@ describe('fromEvent (extra) - EventEmitter', () => {
 
     stream.addListener({next: noop, error: noop, complete: noop});
 
-    assert.strictEqual('test', target.event);
+    assert.strictEqual(target.event, 'test');
   });
 
   it('should propagate events', (done) => {
@@ -179,7 +178,7 @@ describe('fromEvent (extra) - EventEmitter', () => {
       error: (err: any) => done(err),
       complete() {
         setTimeout(() => {
-          assert.strictEqual('test', target.removedEvent);
+          assert.strictEqual(target.removedEvent, 'test');
           done();
         }, 5);
       }

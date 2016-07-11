@@ -1,6 +1,6 @@
 /// <reference path="../../typings/globals/node/index.d.ts" />
-import { EventEmitter } from 'events';
-import { Stream, InternalProducer, InternalListener } from '../core';
+import {EventEmitter} from 'events';
+import {Stream, InternalProducer, InternalListener} from '../core';
 
 export class DOMEventProducer implements InternalProducer<Event> {
   public type = 'fromEvent';
@@ -13,13 +13,11 @@ export class DOMEventProducer implements InternalProducer<Event> {
 
   _start(out: InternalListener<Event>) {
     this.listener = (e) => out._n(e);
-    const {node, eventType, useCapture} = this;
-    node.addEventListener(eventType, this.listener, useCapture);
+    this.node.addEventListener(this.eventType, this.listener, this.useCapture);
   }
 
   _stop() {
-    const {node, eventType, listener, useCapture} = this;
-    node.removeEventListener(eventType, listener, useCapture);
+    this.node.removeEventListener(this.eventType, this.listener, this.useCapture);
     this.listener = null;
   }
 }
@@ -32,25 +30,28 @@ export class NodeEventProducer implements InternalProducer<any> {
 
   _start(out: InternalListener<any>) {
     this.listener = (e: any) => out._n(e);
-    const {node, eventName} = this;
-    node.addListener(eventName, this.listener);
+    this.node.addListener(this.eventName, this.listener);
   }
 
   _stop() {
-    const {node, eventName, listener} = this;
-    node.removeListener(eventName, listener);
+    this.node.removeListener(this.eventName, this.listener);
     this.listener = null;
   }
 }
 
+function isEmitter(element: any): boolean {
+    return element.addListener;
+}
+
 /**
- * Creates a stream based on DOM events of type `eventType` from the target
- * node.
+ * Creates a stream based on either:
+ * - DOM events with the name `eventName` from a provided target node
+ * - Events with the name `eventName` from a provided NodeJS EventEmitter
  *
  * Marble diagram:
  *
  * ```text
- *   fromEvent( element, eventType )
+ *   fromEvent(element, eventName)
  * ---ev--ev----ev---------------
  * ```
  *
@@ -66,7 +67,7 @@ export class NodeEventProducer implements InternalProducer<any> {
  *   next: i => console.log(i),
  *   error: err => console.error(err),
  *   complete: () => console.log('completed')
- * });
+ * })
  * ```
  *
  * ```text
@@ -77,18 +78,18 @@ export class NodeEventProducer implements InternalProducer<any> {
  *
  * ```js
  * import fromEvent from 'xstream/extra/fromEvent'
- * import {EventEmitter} from 'events';
+ * import {EventEmitter} from 'events'
  *
- * const MyEmitter = new EventEmitter();
- * const stream = fromEvent( MyEmitter, 'foo' );
+ * const MyEmitter = new EventEmitter()
+ * const stream = fromEvent(MyEmitter, 'foo')
  *
  * stream.addListener({
  *   next: i => console.log(i),
  *   error: err => console.error(err),
  *   complete: () => console.log('completed')
- * });
+ * })
  *
- * MyEmitter.emit( 'foo', 'bar' );
+ * MyEmitter.emit('foo', 'bar')
  * ```
  *
  * ```text
@@ -102,12 +103,12 @@ export class NodeEventProducer implements InternalProducer<any> {
  * dispatched to any EventTarget beneath it in the DOM tree. Defaults to false.
  * @return {Stream}
  */
-export default function fromEvent( element: EventTarget | EventEmitter,
-                                   eventName: string,
-                                   useCapture: boolean = false): Stream<Event|any> {
-  if ( element instanceof EventEmitter ) {
-    return new Stream<any>(new NodeEventProducer( element, eventName ));
+export default function fromEvent(element: EventTarget | EventEmitter,
+                                  eventName: string,
+                                  useCapture: boolean = false): Stream<Event|any> {
+  if (isEmitter(element)) {
+    return new Stream<any>(new NodeEventProducer(<EventEmitter> element, eventName));
   } else {
-    return new Stream<Event>(new DOMEventProducer( element, eventName, useCapture ));
+    return new Stream<Event>(new DOMEventProducer(<EventTarget> element, eventName, useCapture));
   }
 }
