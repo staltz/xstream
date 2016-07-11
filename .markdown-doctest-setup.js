@@ -1,4 +1,5 @@
 var xstream = require('./index').default;
+var eventsModule = require('events');
 
 function noop () {}
 
@@ -35,7 +36,8 @@ class FakeEventTarget {
 
 module.exports = {
   require: {
-    xstream: xstream
+    xstream: xstream,
+    events: eventsModule,
   },
 
   regexRequire: {
