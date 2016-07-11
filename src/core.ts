@@ -83,16 +83,16 @@ function and<T>(f1: (t: T) => boolean, f2: (t: T) => boolean): (t: T) => boolean
 export class MergeProducer<T> implements Aggregator<T, T>, InternalListener<T> {
   public type = 'merge';
   public out: Stream<T> = null;
-  private ac: number; // ac is activeCount, starts initialized
+  private ac: number; // ac is activeCount
 
   constructor(public insArr: Array<Stream<T>>) {
-    this.ac = insArr.length;
   }
 
   _start(out: Stream<T>): void {
     this.out = out;
     const s = this.insArr;
     const L = s.length;
+    this.ac = L;
     for (let i = 0; i < L; i++) {
       s[i]._add(this);
     }
@@ -105,7 +105,6 @@ export class MergeProducer<T> implements Aggregator<T, T>, InternalListener<T> {
       s[i]._remove(this);
     }
     this.out = null;
-    this.ac = L;
   }
 
   _n(t: T) {
@@ -121,7 +120,7 @@ export class MergeProducer<T> implements Aggregator<T, T>, InternalListener<T> {
   }
 
   _c() {
-    if (--this.ac === 0) {
+    if (--this.ac <= 0) {
       const u = this.out;
       if (!u) return;
       u._c();
