@@ -1,4 +1,4 @@
-import {Operator, InternalListener, Stream, OutSender, emptyIL} from '../core';
+import {Operator, InternalListener, Stream, OutSender, NO_IL} from '../core';
 
 class SeparatorIL<T> implements InternalListener<any>, OutSender<Stream<T>> {
   constructor(public out: Stream<Stream<T>>,
@@ -23,7 +23,7 @@ export class SplitOperator<T> implements Operator<T, Stream<T>> {
   public type = 'split';
   public curr: Stream<T> = new Stream<T>();
   public out: Stream<Stream<T>> = null;
-  private sil: InternalListener<any> = emptyIL; // sil = separator InternalListener
+  private sil: InternalListener<any> = NO_IL; // sil = separator InternalListener
 
   constructor(public s: Stream<any>, // s = separator
               public ins: Stream<T>) {
@@ -41,7 +41,7 @@ export class SplitOperator<T> implements Operator<T, Stream<T>> {
     this.s._remove(this.sil);
     this.curr = new Stream<T>();
     this.out = null;
-    this.sil = emptyIL;
+    this.sil = NO_IL;
   }
 
   up(): void {

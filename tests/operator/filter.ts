@@ -55,7 +55,7 @@ describe('Stream.prototype.filter', () => {
     });
 
     assert.strictEqual(completeCalled, true);
-    assert.strictEqual(stream['_prod']['out'], null);
+    assert.strictEqual(JSON.stringify(stream['_prod']['out']), '{}');
     done();
   });
 

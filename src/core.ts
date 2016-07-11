@@ -1,6 +1,6 @@
 import {Promise} from 'es6-promise';
 
-const empty = {};
+const NO = {};
 function noop() {}
 
 function copy<T>(a: Array<T>): Array<T> {
@@ -18,7 +18,7 @@ export interface InternalListener<T> {
   _c: () => void;
 }
 
-export const emptyIL: InternalListener<any> = {
+export const NO_IL: InternalListener<any> = {
   _n: noop,
   _e: noop,
   _c: noop,
@@ -88,7 +88,8 @@ export class MergeProducer<T> implements Aggregator<T, T>, InternalListener<T> {
 
   constructor(insArr: Array<Stream<T>>) {
     this.insArr = insArr;
-    this.out = null;
+    this.out = <Stream<T>> NO;
+    this.ac = 0;
   }
 
   _start(out: Stream<T>): void {
@@ -107,25 +108,25 @@ export class MergeProducer<T> implements Aggregator<T, T>, InternalListener<T> {
     for (let i = 0; i < L; i++) {
       s[i]._remove(this);
     }
-    this.out = null;
+    this.out = <Stream<T>> NO;
   }
 
   _n(t: T) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._n(t);
   }
 
   _e(err: any) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._e(err);
   }
 
   _c() {
     if (--this.ac <= 0) {
       const u = this.out;
-      if (!u) return;
+      if (u === NO) return;
       u._c();
     }
   }
@@ -208,18 +209,15 @@ export class CombineProducer<R> implements Aggregator<any, Array<R>> {
 
   constructor(insArr: Array<Stream<any>>) {
     this.insArr = insArr;
-    this.out = null;
+    this.out = <Stream<Array<R>>> NO;
     this.ils = [];
-    const n = this.Nc = this.Nn = insArr.length;
-    const vals = this.vals = new Array(n);
-    for (let i = 0; i < n; i++) {
-      vals[i] = empty;
-    }
+    this.Nc = this.Nn = 0;
+    this.vals = [];
   }
 
   up(t: any, i: number): boolean {
     const v = this.vals[i];
-    const Nn = !this.Nn ? 0 : v === empty ? --this.Nn : this.Nn;
+    const Nn = !this.Nn ? 0 : v === NO ? --this.Nn : this.Nn;
     this.vals[i] = t;
     return Nn === 0;
   }
@@ -227,12 +225,14 @@ export class CombineProducer<R> implements Aggregator<any, Array<R>> {
   _start(out: Stream<Array<R>>): void {
     this.out = out;
     const s = this.insArr;
-    const n = s.length;
+    const n = this.Nc = this.Nn = s.length;
+    const vals = this.vals = new Array(n);
     if (n === 0) {
       out._n([]);
       out._c();
     } else {
       for (let i = 0; i < n; i++) {
+        vals[i] = NO;
         s[i]._add(new CombineListener(i, out, this));
       }
     }
@@ -240,14 +240,13 @@ export class CombineProducer<R> implements Aggregator<any, Array<R>> {
 
   _stop(): void {
     const s = this.insArr;
-    const n = this.Nc = this.Nn = s.length;
-    const vals = this.vals = new Array(n);
+    const n = s.length;
     for (let i = 0; i < n; i++) {
       s[i]._remove(this.ils[i]);
-      vals[i] = empty;
     }
-    this.out = null;
+    this.out = <Stream<Array<R>>> NO;
     this.ils = [];
+    this.vals = [];
   }
 }
 
@@ -338,9 +337,9 @@ export class DebugOperator<T> implements Operator<T, T> {
 
   constructor(arg: string | ((t: T) => any), ins: Stream<T>) {
     this.ins = ins;
-    this.out = null;
-    this.s = null;
-    this.l = null;
+    this.out = <Stream<T>> NO;
+    this.s = noop;
+    this.l = '';
     if (typeof arg === 'string') {
       this.l = arg;
     } else {
@@ -355,14 +354,14 @@ export class DebugOperator<T> implements Operator<T, T> {
 
   _stop(): void {
     this.ins._remove(this);
-    this.out = null;
+    this.out = <Stream<T>> NO;
   }
 
   _n(t: T) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     const s = this.s, l = this.l;
-    if (s) {
+    if (s !== noop) {
       try {
         s(t);
       } catch (e) {
@@ -378,13 +377,13 @@ export class DebugOperator<T> implements Operator<T, T> {
 
   _e(err: any) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._e(err);
   }
 
   _c() {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._c();
   }
 }
@@ -398,37 +397,37 @@ export class DropOperator<T> implements Operator<T, T> {
 
   constructor(max: number, ins: Stream<T>) {
     this.ins = ins;
-    this.out = null;
+    this.out = <Stream<T>> NO;
     this.max = max;
     this.dropped = 0;
   }
 
   _start(out: Stream<T>): void {
     this.out = out;
+    this.dropped = 0;
     this.ins._add(this);
   }
 
   _stop(): void {
     this.ins._remove(this);
-    this.out = null;
-    this.dropped = 0;
+    this.out = <Stream<T>> NO;
   }
 
   _n(t: T) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     if (this.dropped++ >= this.max) u._n(t);
   }
 
   _e(err: any) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._e(err);
   }
 
   _c() {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._c();
   }
 }
@@ -464,9 +463,9 @@ export class EndWhenOperator<T> implements Operator<T, T> {
 
   constructor(o: Stream<any>, ins: Stream<T>) {
     this.ins = ins;
-    this.out = null;
+    this.out = <Stream<T>> NO;
     this.o = o;
-    this.oil = emptyIL;
+    this.oil = NO_IL;
   }
 
   _start(out: Stream<T>): void {
@@ -478,25 +477,25 @@ export class EndWhenOperator<T> implements Operator<T, T> {
   _stop(): void {
     this.ins._remove(this);
     this.o._remove(this.oil);
-    this.out = null;
-    this.oil = null;
+    this.out = <Stream<T>> NO;
+    this.oil = NO_IL;
   }
 
   end(): void {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._c();
   }
 
   _n(t: T) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._n(t);
   }
 
   _e(err: any) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._e(err);
   }
 
@@ -513,7 +512,7 @@ export class FilterOperator<T> implements Operator<T, T> {
 
   constructor(passes: (t: T) => boolean, ins: Stream<T>) {
     this.ins = ins;
-    this.out = null;
+    this.out = <Stream<T>> NO;
     this.passes = passes;
   }
 
@@ -524,12 +523,12 @@ export class FilterOperator<T> implements Operator<T, T> {
 
   _stop(): void {
     this.ins._remove(this);
-    this.out = null;
+    this.out = <Stream<T>> NO;
   }
 
   _n(t: T) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     try {
       if (this.passes(t)) u._n(t);
     } catch (e) {
@@ -539,13 +538,13 @@ export class FilterOperator<T> implements Operator<T, T> {
 
   _e(err: any) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._e(err);
   }
 
   _c() {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._c();
   }
 }
@@ -568,7 +567,7 @@ class FlattenListener<T> implements InternalListener<T> {
   }
 
   _c() {
-    this.op.inner = null;
+    this.op.inner = <Stream<T>> NO;
     this.op.less();
   }
 }
@@ -583,43 +582,46 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
 
   constructor(ins: Stream<Stream<T>>) {
     this.ins = ins;
-    this.out = null;
+    this.out = <Stream<T>> NO;
     this.open = true;
-    this.inner = null;
-    this.il = null;
+    this.inner = <Stream<T>> NO;
+    this.il = NO_IL;
   }
 
   _start(out: Stream<T>): void {
     this.out = out;
+    this.open = true;
+    this.inner = <Stream<T>> NO;
+    this.il = NO_IL;
     this.ins._add(this);
   }
 
   _stop(): void {
     this.ins._remove(this);
-    if (this.inner) this.inner._remove(this.il);
-    this.inner = null;
-    this.il = null;
+    if (this.inner !== NO) this.inner._remove(this.il);
+    this.out = <Stream<T>> NO;
     this.open = true;
-    this.out = null;
+    this.inner = <Stream<T>> NO;
+    this.il = NO_IL;
   }
 
   less(): void {
     const u = this.out;
-    if (!u) return;
-    if (!this.open && !this.inner) u._c();
+    if (u === NO) return;
+    if (!this.open && this.inner === NO) u._c();
   }
 
   _n(s: Stream<T>) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     const {inner, il} = this;
-    if (inner && il) inner._remove(il);
+    if (inner !== NO && il !== NO_IL) inner._remove(il);
     (this.inner = s)._add(this.il = new FlattenListener(u, this));
   }
 
   _e(err: any) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._e(err);
   }
 
@@ -639,26 +641,27 @@ export class FoldOperator<T, R> implements Operator<T, R> {
 
   constructor(f: (acc: R, t: T) => R, seed: R, ins: Stream<T>) {
     this.ins = ins;
-    this.out = null;
+    this.out = <Stream<R>> NO;
     this.f = f;
     this.acc = this.seed = seed;
   }
 
   _start(out: Stream<R>): void {
     this.out = out;
+    this.acc = this.seed;
     out._n(this.acc);
     this.ins._add(this);
   }
 
   _stop(): void {
     this.ins._remove(this);
-    this.out = null;
+    this.out = <Stream<R>> NO;
     this.acc = this.seed;
   }
 
   _n(t: T) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     try {
       u._n(this.acc = this.f(this.acc, t));
     } catch (e) {
@@ -668,13 +671,13 @@ export class FoldOperator<T, R> implements Operator<T, R> {
 
   _e(err: any) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._e(err);
   }
 
   _c() {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._c();
   }
 }
@@ -688,21 +691,21 @@ export class LastOperator<T> implements Operator<T, T> {
 
   constructor(ins: Stream<T>) {
     this.ins = ins;
-    this.out = null;
+    this.out = <Stream<T>> NO;
     this.has = false;
-    this.val = <T> empty;
+    this.val = <T> NO;
   }
 
   _start(out: Stream<T>): void {
     this.out = out;
+    this.has = false;
     this.ins._add(this);
   }
 
   _stop(): void {
     this.ins._remove(this);
-    this.out = null;
-    this.has = false;
-    this.val = <T> empty;
+    this.out = <Stream<T>> NO;
+    this.val = <T> NO;
   }
 
   _n(t: T) {
@@ -712,13 +715,13 @@ export class LastOperator<T> implements Operator<T, T> {
 
   _e(err: any) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._e(err);
   }
 
   _c() {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     if (this.has) {
       u._n(this.val);
       u._c();
@@ -746,7 +749,7 @@ class MapFlattenInner<R> implements InternalListener<R> {
   }
 
   _c() {
-    this.op.inner = null;
+    this.op.inner = <Stream<R>> NO;
     this.op.less();
   }
 }
@@ -763,40 +766,42 @@ export class MapFlattenOperator<T, R> implements Operator<T, R> {
   constructor(mapOp: MapOperator<T, Stream<R>>) {
     this.type = `${mapOp.type}+flatten`;
     this.ins = mapOp.ins;
-    this.out = null;
+    this.out = <Stream<R>> NO;
     this.mapOp = mapOp;
-    this.inner = null;
-    this.il = null;
+    this.inner = <Stream<R>> NO;
+    this.il = NO_IL;
     this.open = true;
   }
 
   _start(out: Stream<R>): void {
     this.out = out;
+    this.inner = <Stream<R>> NO;
+    this.il = NO_IL;
+    this.open = true;
     this.mapOp.ins._add(this);
   }
 
   _stop(): void {
     this.mapOp.ins._remove(this);
-    if (this.inner) this.inner._remove(this.il);
-    this.inner = null;
-    this.il = null;
-    this.open = true;
-    this.out = null;
+    if (this.inner !== NO) this.inner._remove(this.il);
+    this.out = <Stream<R>> NO;
+    this.inner = <Stream<R>> NO;
+    this.il = NO_IL;
   }
 
   less(): void {
-    if (!this.open && !this.inner) {
+    if (!this.open && this.inner === NO) {
       const u = this.out;
-      if (!u) return;
+      if (u === NO) return;
       u._c();
     }
   }
 
   _n(v: T) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     const {inner, il} = this;
-    if (inner && il) inner._remove(il);
+    if (inner !== NO && il !== NO_IL) inner._remove(il);
     try {
       (this.inner = this.mapOp.project(v))._add(
         this.il = new MapFlattenInner(u, this)
@@ -808,7 +813,7 @@ export class MapFlattenOperator<T, R> implements Operator<T, R> {
 
   _e(err: any) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._e(err);
   }
 
@@ -826,7 +831,7 @@ export class MapOperator<T, R> implements Operator<T, R> {
 
   constructor(project: (t: T) => R, ins: Stream<T>) {
     this.ins = ins;
-    this.out = null;
+    this.out = <Stream<R>> NO;
     this.project = project;
   }
 
@@ -837,12 +842,12 @@ export class MapOperator<T, R> implements Operator<T, R> {
 
   _stop(): void {
     this.ins._remove(this);
-    this.out = null;
+    this.out = <Stream<R>> NO;
   }
 
   _n(t: T) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     try {
       u._n(this.project(t));
     } catch (e) {
@@ -852,13 +857,13 @@ export class MapOperator<T, R> implements Operator<T, R> {
 
   _e(err: any) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._e(err);
   }
 
   _c() {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._c();
   }
 }
@@ -886,7 +891,7 @@ export class RememberOperator<T> implements InternalProducer<T> {
 
   constructor(ins: Stream<T>) {
     this.ins = ins;
-    this.out = null;
+    this.out = <Stream<T>> NO;
   }
 
   _start(out: Stream<T>): void {
@@ -896,7 +901,7 @@ export class RememberOperator<T> implements InternalProducer<T> {
 
   _stop(): void {
     this.ins._remove(this.out);
-    this.out = null;
+    this.out = <Stream<T>> NO;
   }
 }
 
@@ -908,7 +913,7 @@ export class ReplaceErrorOperator<T> implements Operator<T, T> {
 
   constructor(fn: (err: any) => Stream<T>, ins: Stream<T>) {
     this.ins = ins;
-    this.out = null;
+    this.out = <Stream<T>> NO;
     this.fn = fn;
   }
 
@@ -919,18 +924,18 @@ export class ReplaceErrorOperator<T> implements Operator<T, T> {
 
   _stop(): void {
     this.ins._remove(this);
-    this.out = null;
+    this.out = <Stream<T>> NO;
   }
 
   _n(t: T) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._n(t);
   }
 
   _e(err: any) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     try {
       this.ins._remove(this);
       (this.ins = this.fn(err))._add(this);
@@ -941,7 +946,7 @@ export class ReplaceErrorOperator<T> implements Operator<T, T> {
 
   _c() {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._c();
   }
 }
@@ -954,7 +959,7 @@ export class StartWithOperator<T> implements InternalProducer<T> {
 
   constructor(ins: Stream<T>, val: T) {
     this.ins = ins;
-    this.out = null;
+    this.out = <Stream<T>> NO;
     this.val = val;
   }
 
@@ -966,7 +971,7 @@ export class StartWithOperator<T> implements InternalProducer<T> {
 
   _stop(): void {
     this.ins._remove(this.out);
-    this.out = null;
+    this.out = <Stream<T>> NO;
   }
 }
 
@@ -979,25 +984,25 @@ export class TakeOperator<T> implements Operator<T, T> {
 
   constructor(max: number, ins: Stream<T>) {
     this.ins = ins;
-    this.out = null;
+    this.out = <Stream<T>> NO;
     this.max = max;
     this.taken = 0;
   }
 
   _start(out: Stream<T>): void {
     this.out = out;
+    this.taken = 0;
     this.ins._add(this);
   }
 
   _stop(): void {
     this.ins._remove(this);
-    this.out = null;
-    this.taken = 0;
+    this.out = <Stream<T>> NO;
   }
 
   _n(t: T) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     if (this.taken++ < this.max - 1) {
       u._n(t);
     } else {
@@ -1008,13 +1013,13 @@ export class TakeOperator<T> implements Operator<T, T> {
 
   _e(err: any) {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._e(err);
   }
 
   _c() {
     const u = this.out;
-    if (!u) return;
+    if (u === NO) return;
     u._c();
   }
 }
@@ -1027,11 +1032,11 @@ export class Stream<T> implements InternalListener<T> {
   protected _err: any;
 
   constructor(producer?: InternalProducer<T>) {
-    this._prod = producer;
+    this._prod = producer || <InternalProducer<T>> NO;
     this._ils = [];
-    this._stopID = empty;
-    this._target = null;
-    this._err = null;
+    this._stopID = NO;
+    this._target = <Stream<T>> NO;
+    this._err = NO;
   }
 
   _n(t: T): void {
@@ -1044,7 +1049,7 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   _e(err: any): void {
-    if (this._err) return;
+    if (this._err !== NO) return;
     this._err = err;
     const a = this._ils;
     const L = a.length;
@@ -1067,8 +1072,8 @@ export class Stream<T> implements InternalListener<T> {
 
   _x(): void { // tear down logic, after error or complete
     if (this._ils.length === 0) return;
-    if (this._prod) this._prod._stop();
-    this._err = null;
+    if (this._prod !== NO) this._prod._stop();
+    this._err = NO;
     this._ils = [];
   }
 
@@ -1076,33 +1081,33 @@ export class Stream<T> implements InternalListener<T> {
     // this._prod is not null, because this _lateStop is called from _remove
     // where we already checked that this._prod is truthy
     this._prod._stop();
-    this._err = null;
+    this._err = NO;
   }
 
   _add(il: InternalListener<T>): void {
     const ta = this._target;
-    if (ta) return ta._add(il);
+    if (ta !== NO) return ta._add(il);
     const a = this._ils;
     a.push(il);
     if (a.length === 1) {
-      if (this._stopID !== empty) {
+      if (this._stopID !== NO) {
         clearTimeout(this._stopID);
-        this._stopID = empty;
+        this._stopID = NO;
       }
       const p = this._prod;
-      if (p) p._start(this);
+      if (p !== NO) p._start(this);
     }
   }
 
   _remove(il: InternalListener<T>): void {
     const ta = this._target;
-    if (ta) return ta._remove(il);
+    if (ta !== NO) return ta._remove(il);
     const a = this._ils;
     const i = a.indexOf(il);
     if (i > -1) {
       a.splice(i, 1);
-      if (this._prod && a.length <= 0) {
-        this._err = null;
+      if (this._prod !== NO && a.length <= 0) {
+        this._err = NO;
         this._stopID = setTimeout(() => this._lateStop());
       } else if (a.length === 1) {
         this._pruneCycles();
@@ -1129,7 +1134,7 @@ export class Stream<T> implements InternalListener<T> {
       return true;
     } else if ((<OutSender<any>><any>x).out === this) {
       return true;
-    } else if ((<OutSender<any>><any>x).out) {
+    } else if ((<OutSender<any>><any>x).out && (<OutSender<any>><any>x).out !== NO) {
       return this._hasNoSinks((<OutSender<any>><any>x).out, trace.concat(x));
     } else if ((<Stream<any>>x)._ils) {
       for (let i = 0, N = (<Stream<any>>x)._ils.length; i < N; i++) {

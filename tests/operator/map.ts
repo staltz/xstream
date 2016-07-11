@@ -55,7 +55,7 @@ describe('Stream.prototype.map', () => {
     });
 
     assert.strictEqual(completeCalled, true);
-    assert.strictEqual(stream['_prod']['out'], null);
+    assert.strictEqual(JSON.stringify(stream['_prod']['out']), '{}');
     done();
   });
 
@@ -95,7 +95,7 @@ describe('Stream.prototype.map', () => {
 
     assert.strictEqual(errorCalled, true);
     assert.strictEqual(expected.length, 0);
-    assert.strictEqual(stream['_prod']['out'], null);
+    assert.strictEqual(JSON.stringify(stream['_prod']['out']), '{}');
     done();
   });
 });

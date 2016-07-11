@@ -15,7 +15,7 @@ describe('Stream.prototype.startWith', () => {
       complete: done
     });
   });
-  
+
   it('should return a MemoryStream', (done) => {
     const stream = xs.of(100).startWith(1);
     assert.strictEqual(stream instanceof MemoryStream, true);
