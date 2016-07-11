@@ -1,3 +1,5 @@
+/// <reference path="../../typings/globals/node/index.d.ts" />
+import {EventEmitter} from 'events';
 import {Stream, InternalProducer, InternalListener} from '../core';
 
 export class DOMEventProducer implements InternalProducer<Event> {
@@ -11,29 +13,49 @@ export class DOMEventProducer implements InternalProducer<Event> {
 
   _start(out: InternalListener<Event>) {
     this.listener = (e) => out._n(e);
-    const {node, eventType, useCapture} = this;
-    node.addEventListener(eventType, this.listener, useCapture);
+    this.node.addEventListener(this.eventType, this.listener, this.useCapture);
   }
 
   _stop() {
-    const {node, eventType, listener, useCapture} = this;
-    node.removeEventListener(eventType, listener, useCapture);
+    this.node.removeEventListener(this.eventType, this.listener, this.useCapture);
     this.listener = null;
   }
 }
 
+export class NodeEventProducer implements InternalProducer<any> {
+  public type = 'fromEvent';
+  private listener: Function;
+
+  constructor(private node: EventEmitter, private eventName: string) { }
+
+  _start(out: InternalListener<any>) {
+    this.listener = (e: any) => out._n(e);
+    this.node.addListener(this.eventName, this.listener);
+  }
+
+  _stop() {
+    this.node.removeListener(this.eventName, this.listener);
+    this.listener = null;
+  }
+}
+
+function isEmitter(element: any): boolean {
+    return element.emit && element.addListener;
+}
+
 /**
- * Creates a stream based on DOM events of type `eventType` from the target
- * node.
+ * Creates a stream based on either:
+ * - DOM events with the name `eventName` from a provided target node
+ * - Events with the name `eventName` from a provided NodeJS EventEmitter
  *
  * Marble diagram:
  *
  * ```text
- *   fromEvent(node, eventType)
+ *   fromEvent(element, eventName)
  * ---ev--ev----ev---------------
  * ```
  *
- * Example:
+ * Examples:
  *
  * ```js
  * import fromEvent from 'xstream/extra/fromEvent'
@@ -54,15 +76,39 @@ export class DOMEventProducer implements InternalProducer<Event> {
  * > 'Button clicked!'
  * ```
  *
- * @param {EventTarget} node The element we want to listen to.
- * @param {string} eventType The type of events we want to listen to.
- * @param {boolean} useCapture An optional boolean that indicates that events of
+ * ```js
+ * import fromEvent from 'xstream/extra/fromEvent'
+ * import {EventEmitter} from 'events'
+ *
+ * const MyEmitter = new EventEmitter()
+ * const stream = fromEvent(MyEmitter, 'foo')
+ *
+ * stream.addListener({
+ *   next: i => console.log(i),
+ *   error: err => console.error(err),
+ *   complete: () => console.log('completed')
+ * })
+ *
+ * MyEmitter.emit('foo', 'bar')
+ * ```
+ *
+ * ```text
+ * > 'bar'
+ * ```
+ *
+ * @param {EventTarget|EventEmitter} element The element upon which to listen.
+ * @param {string} eventName The name of the event for which to listen.
+ * @param {boolean?} useCapture An optional boolean that indicates that events of
  * this type will be dispatched to the registered listener before being
  * dispatched to any EventTarget beneath it in the DOM tree. Defaults to false.
  * @return {Stream}
  */
-export default function fromEvent(node: EventTarget,
-                                  eventType: string,
-                                  useCapture: boolean = false): Stream<Event> {
-  return new Stream<Event>(new DOMEventProducer(node, eventType, useCapture));
+export default function fromEvent(element: EventTarget | EventEmitter,
+                                  eventName: string,
+                                  useCapture: boolean = false): Stream<Event|any> {
+  if (isEmitter(element)) {
+    return new Stream<any>(new NodeEventProducer(<EventEmitter> element, eventName));
+  } else {
+    return new Stream<Event>(new DOMEventProducer(<EventTarget> element, eventName, useCapture));
+  }
 }
