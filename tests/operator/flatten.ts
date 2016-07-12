@@ -1,6 +1,7 @@
 /// <reference path="../../typings/globals/mocha/index.d.ts" />
 /// <reference path="../../typings/globals/node/index.d.ts" />
 import xs, {Stream, Listener} from '../../src/index';
+import fromDiagram from '../../src/extra/fromDiagram';
 import * as assert from 'assert';
 
 describe('Stream.prototype.flatten', () => {
@@ -24,7 +25,7 @@ describe('Stream.prototype.flatten', () => {
     });
 
     it('should have an ins field as metadata', (done) => {
-      const source: Stream<number> = xs.periodic(100).take(3)
+      const source: Stream<number> = xs.periodic(100).take(3);
       const stream: Stream<number> = source
         .map((i: number) => xs.of(1 + i, 2 + i, 3 + i))
         .flatten();
@@ -185,6 +186,34 @@ describe('Stream.prototype.flatten', () => {
       });
 
       setTimeout(() => done(), 500);
+    });
+
+    it('should allow switching inners asynchronously without restarting source', (done) => {
+      const outer = fromDiagram(   '-A---------B----------C------|');
+      const periodic = fromDiagram('---a-b--c----d--e--f----g--h-|', {
+        values: { a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8 }
+      });
+      const stream = outer.map(x => {
+        if (x === 'A') {
+          return periodic.map(i => i * 10);
+        } else if (x === 'B') {
+          return periodic.map(i => i * 100);
+        } else if (x === 'C') {
+          return periodic.map(i => i * 1000);
+        }
+      }).flatten();
+      const expected = [10, 20, 30, 400, 500, 600, 7000, 8000];
+
+      stream.addListener({
+        next: (x: number) => {
+          assert.equal(x, expected.shift());
+        },
+        error: (err: any) => done(err),
+        complete: () => {
+          assert.equal(expected.length, 0);
+          done();
+        }
+      });
     });
   });
 
