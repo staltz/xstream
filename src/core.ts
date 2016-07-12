@@ -1082,6 +1082,7 @@ export class Stream<T> implements InternalListener<T> {
     // where we already checked that this._prod is truthy
     this._prod._stop();
     this._err = NO;
+    this._stopID = NO;
   }
 
   _add(il: InternalListener<T>): void {
