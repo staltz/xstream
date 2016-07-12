@@ -1,3 +1,14 @@
+<a name="5.2.1"></a>
+## [5.2.1](https://github.com/staltz/xstream/compare/v5.2.0...v5.2.1) (2016-07-12)
+
+
+### Bug Fixes
+
+* **merge:** fix completion and disposal ([5bbcade](https://github.com/staltz/xstream/commit/5bbcade))
+* **operators:** improve resistence against disposal bugs ([ff36fbd](https://github.com/staltz/xstream/commit/ff36fbd))
+
+
+
 <a name="5.2.0"></a>
 # [5.2.0](https://github.com/staltz/xstream/compare/v5.1.4...v5.2.0) (2016-07-11)
 
