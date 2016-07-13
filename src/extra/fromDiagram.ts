@@ -1,4 +1,5 @@
-import {Stream, InternalProducer, InternalListener} from '../core';
+import { Subscribable, Subscription, Listener } from '../interfaces'
+import { Stream } from '../core'
 
 export interface FromDiagramOptions {
   values?: Object;
@@ -10,66 +11,6 @@ interface Notification {
   type: 'next' | 'error' | 'complete';
   value?: any;
   time: number;
-}
-
-export class DiagramProducer implements InternalProducer<any> {
-  private diagram: string;
-  private values: Object;
-  private errorVal: any;
-  private timeUnit: number;
-  private tasks: Array<any>;
-
-  constructor(diagram: string,
-              opt?: FromDiagramOptions) {
-    this.diagram = diagram.trim();
-    this.errorVal = (opt && opt.errorValue) ? opt.errorValue : '#';
-    this.timeUnit = (opt && opt.timeUnit) ? opt.timeUnit : 20;
-    this.values = (opt && opt.values) ? opt.values : {};
-    this.tasks = [];
-  }
-
-  _start(out: InternalListener<any>) {
-    const L = this.diagram.length;
-    for (let i = 0; i < L; i++) {
-      const c = this.diagram[i];
-      const time = this.timeUnit * i;
-      switch (c) {
-        case '-':
-          break;
-        case '#':
-          this.schedule({type: 'error', value: this.errorVal, time: time}, out);
-          break;
-        case '|':
-          this.schedule({type: 'complete', time: time}, out);
-          break;
-        default:
-          const val = this.values.hasOwnProperty(c) ? this.values[c] : c;
-          this.schedule({type: 'next', value: val, time: time}, out);
-          break;
-      }
-    }
-  }
-
-  private schedule(notification: Notification, out: InternalListener<any>) {
-    const id = setInterval(() => {
-      switch (notification.type) {
-        case 'next':
-          out._n(notification.value);
-          break;
-        case 'error':
-          out._e(notification.value);
-          break;
-        case 'complete':
-          out._c();
-          break;
-      }
-      clearInterval(id);
-    }, notification.time);
-  }
-
-  _stop() {
-    this.tasks.forEach(id => clearInterval(id));
-  }
 }
 
 /**
@@ -125,6 +66,66 @@ export class DiagramProducer implements InternalProducer<any> {
  * details of the creation of the stream.
  * @return {Stream}
  */
-export default function fromDiagram(diagram: string, options?: FromDiagramOptions): Stream<any> {
-  return new Stream<any>(new DiagramProducer(diagram, options));
+export default function fromDiagram<T> (diagram: string, options?: FromDiagramOptions): Stream<T> {
+  return new Stream<T>(new DiagramProducer(diagram, options))
+}
+
+class DiagramProducer<T> implements Subscribable<T> {
+  private diagram: string;
+  private values: Object;
+  private errorVal: any;
+  private timeUnit: number;
+  private tasks: Array<any>;
+  constructor (diagram: string, opt?: FromDiagramOptions) {
+    this.diagram = diagram.trim()
+    this.errorVal = (opt && opt.errorValue) ? opt.errorValue : '#'
+    this.timeUnit = (opt && opt.timeUnit) ? opt.timeUnit : 20
+    this.values = (opt && opt.values) ? opt.values : {}
+    this.tasks = []
+  }
+
+  subscribe (listener: Listener<T>): Subscription {
+    const L = this.diagram.length
+    for (let i = 0; i < L; ++i) {
+      const c = this.diagram[i]
+      const time = this.timeUnit * i
+      switch (c) {
+        case '-':
+          break
+        case '#':
+          this.schedule({type: 'error', value: this.errorVal, time}, listener)
+          break
+        case '|':
+          this.schedule({type: 'complete', time}, listener)
+        default:
+          const value = this.values.hasOwnProperty(c) ? this.values[c] : c
+          this.schedule({type: 'next', value, time}, listener)
+          break
+      }
+
+      const self = this
+      return {
+        unsubscribe () {
+          self.tasks.forEach(id => clearInterval(id))
+        }
+      }
+    }
+  }
+
+  private schedule (notification: Notification, listener: Listener<T>) {
+    const id = setInterval(() => {
+      switch (notification.type) {
+        case 'next':
+          listener.next(notification.value)
+          break
+        case 'error':
+          listener.error(notification.value)
+          break
+        case 'complete':
+          listener.complete()
+          break
+      }
+      clearInterval(id)
+    }, notification.time)
+  }
 }

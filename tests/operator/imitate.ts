@@ -1,6 +1,6 @@
 /// <reference path="../../typings/globals/mocha/index.d.ts" />
 /// <reference path="../../typings/globals/node/index.d.ts" />
-import xs, {Producer, Listener, Stream, MemoryStream} from '../../src/index';
+import xs, {Stream, MemoryStream} from '../../src/index';
 import delay from '../../src/extra/delay';
 import * as assert from 'assert';
 
@@ -105,7 +105,7 @@ describe('Stream.prototype.imitate', () => {
           done(err);
         }
       });
-    const result$ = source$.compose(delay(100)).compose(s => <Stream<number>> s);
+    const result$ = source$.compose(delay(100)).compose((s: Stream<number>) => <Stream<number>> s);
     proxy$.imitate(result$);
 
     result$.take(4).addListener({
@@ -138,7 +138,7 @@ describe('Stream.prototype.imitate', () => {
           done(err);
         }
       });
-    const result$ = source$.compose(delay(100)).compose(s => <Stream<number>> s);
+    const result$ = source$.compose(delay(100)).compose((s: Stream<number>) => <Stream<number>> s);
     proxy$.imitate(result$)
 
     source$.take(4).addListener({

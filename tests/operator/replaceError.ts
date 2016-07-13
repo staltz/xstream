@@ -1,6 +1,6 @@
 /// <reference path="../../typings/globals/mocha/index.d.ts" />
 /// <reference path="../../typings/globals/node/index.d.ts" />
-import xs, {Stream, MemoryStream, Producer} from '../../src/index';
+import xs, {Stream, MemoryStream, Listener, Subscribable} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.replaceError', () => {
@@ -36,7 +36,7 @@ describe('Stream.prototype.replaceError', () => {
     ];
 
     const source = xs.create({
-      start: (listener) => {
+      subscribe: (listener: Listener<any>) => {
         while (events.length > 0) {
           const event = events.shift();
           switch (event.type) {
@@ -46,8 +46,8 @@ describe('Stream.prototype.replaceError', () => {
             default: done('not supposed to happen');
           }
         }
-      },
-      stop: () => void 0,
+        return { unsubscribe () {} }
+      }
     });
 
     const stream = source.replaceError(err => source);
@@ -77,9 +77,9 @@ describe('Stream.prototype.replaceError', () => {
       {type: 'next', value: 60},
       {type: 'complete'},
     ];
-    const source = xs.create(<Producer<number>> {
+    const source = xs.create(<Subscribable<number>> {
       on: false,
-      start: (listener) => {
+      subscribe: (listener: Listener<number>) => {
         this.on = true;
         for (let i = 0; i < events.length; i++) {
           if (!this.on) return;
@@ -91,10 +91,9 @@ describe('Stream.prototype.replaceError', () => {
             default: done('not supposed to happen');
           }
         }
-      },
-      stop: () => {
-        this.on = false;
-      },
+        const self = this
+        return { unsubscribe () { self.on = false }}
+      }
     });
 
     const stream = source.replaceError(err => source).take(8);

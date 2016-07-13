@@ -18,18 +18,6 @@
   "files": [
     "typings/index.d.ts",
     "src/core.ts",
-    "src/extra/concat.ts",
-    "src/extra/debounce.ts",
-    "src/extra/delay.ts",
-    "src/extra/dropRepeats.ts",
-    "src/extra/dropUntil.ts",
-    "src/extra/flattenSequentially.ts",
-    "src/extra/flattenConcurrently.ts",
-    "src/extra/fromDiagram.ts",
-    "src/extra/fromEvent.ts",
-    "src/extra/pairwise.ts",
-    "src/extra/split.ts",
-    "src/extra/tween.ts",
     "src/index.ts"
   ],
   "filesGlob": [

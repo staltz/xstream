@@ -8,7 +8,7 @@ describe('xs.combine', () => {
     const stream1 = xs.periodic(100).take(2);
     const stream2 = xs.periodic(120).take(2);
     const stream = xs.combine(stream1, stream2);
-    let expected = [[0,0], [1,0], [1,1]];
+    let expected = [[0, 0], [1, 0], [1, 1]];
     stream.addListener({
       next: (x) => {
         const e = expected.shift();
@@ -24,15 +24,9 @@ describe('xs.combine', () => {
   });
 
   it('should have correct TypeScript signature', (done) => {
-    const stream1 = xs.create<string>({
-      start: listener => {},
-      stop: () => {}
-    });
+    const stream1 = xs.create<string>();
 
-    const stream2 = xs.create<string>({
-      start: listener => {},
-      stop: () => {}
-    });
+    const stream2 = xs.create<string>();
 
     const combined: Stream<[string, string]> = xs.combine(stream1, stream2);
     done();
