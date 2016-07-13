@@ -34,14 +34,12 @@ describe('Stream.prototype.flatten', () => {
     });
 
     it('should return a flat stream with correct TypeScript types', (done) => {
-      const streamStrings: Stream<string> = Stream.create({
-        start: (listener: Listener<string>) => {},
-        stop: () => {}
+      const streamStrings: Stream<string> = Stream.create<string>({
+        subscribe: (listener: Listener<string>) => ({unsubscribe () {}}),
       });
 
       const streamBooleans: Stream<boolean> = Stream.create({
-        start: (listener: Listener<boolean>) => {},
-        stop: () => {}
+        subscribe: (listener: Listener<boolean>) => ({unsubscribe () {}}),
       });
 
       // Type checked by the compiler. Without Stream<boolean> it does not compile.
@@ -195,11 +193,11 @@ describe('Stream.prototype.flatten', () => {
       });
       const stream = outer.map(x => {
         if (x === 'A') {
-          return periodic.map(i => i * 10);
+          return periodic.map((i: number) => i * 10);
         } else if (x === 'B') {
-          return periodic.map(i => i * 100);
+          return periodic.map((i: number) => i * 100);
         } else if (x === 'C') {
-          return periodic.map(i => i * 1000);
+          return periodic.map((i: number) => i * 1000);
         }
       }).flatten();
       const expected = [10, 20, 30, 400, 500, 600, 7000, 8000];

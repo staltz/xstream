@@ -114,7 +114,7 @@ describe('Stream.prototype.remember', () => {
   });
 
   it('should return a MemoryStream if input stream is a MemoryStream', (done) => {
-    const input = xs.createWithMemory<number>();
+    const input = xs.create<number>().remember();
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream: MemoryStream<number> = input.remember();
     assert.strictEqual(stream instanceof MemoryStream, true);
@@ -122,7 +122,7 @@ describe('Stream.prototype.remember', () => {
   });
 
   it('should not fail if original memorystream has no producer, and start is called', (done) => {
-    const input = xs.createWithMemory<number>();
+    const input = xs.create<number>().remember();
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream: MemoryStream<number> = input.remember();
     assert.strictEqual(stream instanceof MemoryStream, true);

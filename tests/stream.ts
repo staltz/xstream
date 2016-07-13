@@ -1,12 +1,11 @@
 /// <reference path="../typings/globals/mocha/index.d.ts" />
 /// <reference path="../typings/globals/node/index.d.ts" />
-import xs, {Producer, Listener, Stream} from '../src/index';
+import xs, {Subscribable, Listener, Stream} from '../src/index';
 import * as assert from 'assert';
 
 describe('Stream', () => {
   it('should have all the core static operators', () => {
     assert.equal(typeof xs.create, 'function');
-    assert.equal(typeof xs.createWithMemory, 'function');
     assert.equal(typeof xs.never, 'function');
     assert.equal(typeof xs.empty, 'function');
     assert.equal(typeof xs.throw, 'function');
@@ -42,19 +41,20 @@ describe('Stream', () => {
     const expected = [10, 20, 30];
     let listenerGotEnd: boolean = false;
 
-    const producer: Producer<number> = {
-      start(listener: Listener<number>) {
+    const producer: Subscribable<number> = {
+      subscribe(listener: Listener<number>) {
         listener.next(10);
         listener.next(20);
         listener.next(30);
         listener.complete();
-      },
-
-      stop() {
-        done();
-        assert.equal(expected.length, 0);
-        assert.equal(listenerGotEnd, true);
-      },
+        return {
+          unsubscribe () {
+            done();
+            assert.equal(expected.length, 0);
+            assert.equal(listenerGotEnd, true);
+          }
+        }
+      }
     };
 
     const stream: Stream<number> = xs.create(producer);
@@ -197,16 +197,18 @@ describe('Stream', () => {
   it('should synchronously stop producer when completed', (done) => {
     let on = false;
     const stream = xs.create({
-      start: (listener) => {
+      subscribe: (listener) => {
         on = true;
         listener.next(10);
         listener.next(20);
         listener.next(30);
         listener.complete();
-      },
-      stop: () => {
-        on = false;
-      },
+        return ({
+          unsubscribe () {
+            on = false
+          }
+        })
+      }
     });
     const expected1 = [10, 20, 30];
     const expected2 = [10, 20, 30];
@@ -244,16 +246,18 @@ describe('Stream', () => {
   it('should synchronously stop producer when error thrown', (done) => {
     let on = false;
     const stream = xs.create({
-      start: (listener) => {
+      subscribe: (listener) => {
         on = true;
         listener.next(10);
         listener.next(20);
         listener.next(30);
         listener.error('oops');
-      },
-      stop: () => {
-        on = false;
-      },
+        return {
+          unsubscribe () {
+            on = false
+          }
+        }
+      }
     });
     const expected1 = [10, 20, 30];
     const expected2 = [10, 20, 30];
@@ -297,9 +301,8 @@ describe('Stream', () => {
   describe('create', () => {
     it('throws a helpful error if you pass an incomplete producer', (done) => {
       try {
-        const incompleteProducer = <Producer<any>> <any> {
-          start: () => {},
-          stop: undefined
+        const incompleteProducer = <Subscribable<any>> <any> {
+          subscribe: undefined
         };
 
         xs.create(incompleteProducer);

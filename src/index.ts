@@ -1,3 +1,5 @@
-import {Stream, MemoryStream, Listener, Producer, Operator} from './core';
-export {Stream, MemoryStream, Listener, Producer, Operator};
-export default Stream;
+export * from './interfaces'
+import {Stream, MemoryStream, StreamSubscription, CompositeSubscription} from './core'
+export {Stream, MemoryStream, StreamSubscription, CompositeSubscription}
+
+export default Stream

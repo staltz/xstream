@@ -1,13 +1,11 @@
 /// <reference path="../typings/globals/mocha/index.d.ts" />
 /// <reference path="../typings/globals/node/index.d.ts" />
-import xs, {Producer, Listener, Stream} from '../src/index';
+import xs, {Listener} from '../src/index';
 import * as assert from 'assert';
-
-const noop = () => {};
 
 describe('MemoryStream', () => {
   it('should allow use like a subject, from xs.createWithMemory()', (done) => {
-    const stream = xs.createWithMemory();
+    const stream = xs.create().remember();
 
     stream.shamefullySendNext(1);
 
@@ -26,20 +24,21 @@ describe('MemoryStream', () => {
     const expected = [10, 20, 30];
     let listenerGotEnd: boolean = false;
 
-    const stream = xs.createWithMemory({
-      start(listener: Listener<number>) {
+    const stream = xs.create({
+      subscribe(listener: Listener<number>) {
         listener.next(10);
         listener.next(20);
         listener.next(30);
         listener.complete();
-      },
-
-      stop() {
-        done();
-        assert.equal(expected.length, 0);
-        assert.equal(listenerGotEnd, true);
-      },
-    });
+        return ({
+          unsubscribe () {
+            done();
+            assert.equal(expected.length, 0);
+            assert.equal(listenerGotEnd, true);
+          }
+        })
+      }
+    }).remember();
 
     stream.addListener({
       next: (x: number) => {
@@ -53,15 +52,16 @@ describe('MemoryStream', () => {
   });
 
   it('should broadcast the producer to multiple listeners', (done) => {
-    const stream = xs.createWithMemory({
-      start(listener: Listener<number>) {
+    const stream = xs.create({
+      subscribe(listener: Listener<number>) {
         setTimeout(() => listener.next(0), 100);
         setTimeout(() => listener.next(1), 200);
         setTimeout(() => listener.next(2), 300);
-      },
-
-      stop() {},
-    });
+        return {
+          unsubscribe () {}
+        }
+      }
+    }).remember();
     const expected1 = [0, 1, 2];
     const expected2 = [0, 1, 2];
 
@@ -95,15 +95,17 @@ describe('MemoryStream', () => {
   });
 
   it('should reset completely after it has completed', (done) => {
-    const stream = xs.createWithMemory({
-      start(listener: Listener<number>) {
+    const stream = xs.create({
+      subscribe(listener: Listener<number>) {
         listener.next(1);
         listener.next(2);
         listener.next(3);
         listener.complete();
-      },
-      stop() {},
-    });
+        return {
+          unsubscribe () {}
+        }
+      }
+    }).remember();
 
     const expected1 = [1, 2, 3];
     let completed1 = false;

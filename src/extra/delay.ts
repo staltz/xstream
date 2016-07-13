@@ -1,92 +1,40 @@
-import {Operator, Stream} from '../core';
+import { Subscribable, Subscription, Listener } from '../interfaces'
+import { Stream, MemoryStream } from '../core'
 
-class DelayOperator<T> implements Operator<T, T> {
-  public type = 'delay';
-  public out: Stream<T> = null;
+import ctor from './ctor'
 
-  constructor(public dt: number,
-              public ins: Stream<T>) {
-  }
-
-  _start(out: Stream<T>): void {
-    this.out = out;
-    this.ins._add(this);
-  }
-
-  _stop(): void {
-    this.ins._remove(this);
-    this.out = null;
-  }
-
-  _n(t: T) {
-    const u = this.out;
-    if (!u) return;
-    const id = setInterval(() => {
-      u._n(t);
-      clearInterval(id);
-    }, this.dt);
-  }
-
-  _e(err: any) {
-    const u = this.out;
-    if (!u) return;
-    const id = setInterval(() => {
-      u._e(err);
-      clearInterval(id);
-    }, this.dt);
-  }
-
-  _c() {
-    const u = this.out;
-    if (!u) return;
-    const id = setInterval(() => {
-      u._c();
-      clearInterval(id);
-    }, this.dt);
+export default function delay<T> (delayTime: number): ((stream: Stream<T> | MemoryStream<T>) => Stream<T> | MemoryStream<T>) {
+  return function delayOperator<T> (stream: Stream<T> | MemoryStream<T>): Stream<T> | MemoryStream<T> {
+    const constructor = ctor(stream)
+    return new constructor<T>(new DelayOperator<T>(delayTime, stream))
   }
 }
 
-/**
- * Delays periodic events by a given time period.
- *
- * Marble diagram:
- *
- * ```text
- * 1----2--3--4----5|
- *     delay(60)
- * ---1----2--3--4----5|
- * ```
- *
- * Example:
- *
- * ```js
- * import fromDiagram from 'xstream/extra/fromDiagram'
- * import delay from 'xstream/extra/delay'
- *
- * const stream = fromDiagram('1----2--3--4----5|')
- *  .compose(delay(60))
- *
- * stream.addListener({
- *   next: i => console.log(i),
- *   error: err => console.error(err),
- *   complete: () => console.log('completed')
- * })
- * ```
- *
- * ```text
- * > 1  (after 60 ms)
- * > 2  (after 160 ms)
- * > 3  (after 220 ms)
- * > 4  (after 280 ms)
- * > 5  (after 380 ms)
- * > completed
- * ```
- *
- * @param {number} period The amount of silence required in milliseconds.
- * @return {Stream}
- */
-export default function delay<T>(period: number): (ins: Stream<T>) => Stream<T> {
-  return function delayOperator(ins: Stream<T>): Stream<T> {
-    return new Stream<T>(new DelayOperator(period, ins));
-  };
+class DelayOperator <T> implements Subscribable<T> {
+  constructor (private delayTime: number, public _subscribable: Subscribable<T>) {}
+
+  subscribe (listener: Listener<T>): Subscription {
+    return this._subscribable.subscribe(new DelayListener<T>(this.delayTime, listener))
+  }
+}
+
+class DelayListener<T> implements Listener<T> {
+  private _stopId: any = -1
+  constructor (private delayTime: number, private listener: Listener<T>) {}
+
+  next (x: T) {
+    this._stopId = setTimeout(() => this.listener.next(x), this.delayTime)
+  }
+
+  error(e: any) {
+    if (this._stopId !== -1) clearTimeout(this._stopId)
+    this.listener.error(e)
+    this._stopId = -1
+  }
+
+  complete () {
+    if (this._stopId !== -1) clearTimeout(this._stopId)
+    this.listener.complete()
+    this._stopId = -1
+  }
 }
