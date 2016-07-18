@@ -1929,6 +1929,10 @@ export class MemoryStream<T> extends Stream<T> {
     return <MemoryStream<T>> super.replaceError(replace);
   }
 
+  remember(): MemoryStream<T> {
+    return this;
+  }
+
   debug(labelOrSpy?: string | ((t: T) => void)): MemoryStream<T> {
     return <MemoryStream<T>> super.debug(labelOrSpy);
   }

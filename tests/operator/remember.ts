@@ -121,6 +121,13 @@ describe('Stream.prototype.remember', () => {
     done();
   });
 
+  it('should be a true bypass if input stream is a MemoryStream', (done) => {
+    const input = xs.createWithMemory<number>();
+    const stream: MemoryStream<number> = input.remember();
+    assert.strictEqual(stream, input);
+    done();
+  });
+
   it('should not fail if original memorystream has no producer, and start is called', (done) => {
     const input = xs.createWithMemory<number>();
     assert.strictEqual(input instanceof MemoryStream, true);
