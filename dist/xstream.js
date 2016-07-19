@@ -1211,6 +1211,9 @@ var MemoryStream = (function (_super) {
     MemoryStream.prototype.replaceError = function (replace) {
         return _super.prototype.replaceError.call(this, replace);
     };
+    MemoryStream.prototype.remember = function () {
+        return this;
+    };
     MemoryStream.prototype.debug = function (labelOrSpy) {
         return _super.prototype.debug.call(this, labelOrSpy);
     };

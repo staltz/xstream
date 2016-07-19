@@ -1,3 +1,13 @@
+<a name="5.2.2"></a>
+## [5.2.2](https://github.com/staltz/xstream/compare/v5.2.1...v5.2.2) (2016-07-19)
+
+
+### Bug Fixes
+
+* **remember:** bypass on MemoryStream ([34b8ddc](https://github.com/staltz/xstream/commit/34b8ddc))
+
+
+
 <a name="5.2.1"></a>
 ## [5.2.1](https://github.com/staltz/xstream/compare/v5.2.0...v5.2.1) (2016-07-12)
 
