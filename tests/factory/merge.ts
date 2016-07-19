@@ -75,4 +75,25 @@ describe('xs.merge', () => {
     assert.strictEqual(stream instanceof Stream, true);
     done();
   });
+
+  it('should have a correct TypeScript signature', () => {
+    const bools = xs.create<boolean>({
+      start: listener => {},
+      stop: () => {}
+    });
+
+    const numbers = xs.create<number>({
+      start: listener => {},
+      stop: () => {}
+    });
+
+    const strings = xs.create<string>({
+      start: listener => {},
+      stop: () => {}
+    });
+
+    const emptyIsh: Stream<boolean> = xs.merge<boolean>();
+    const doubled: Stream<boolean | string> = xs.merge(bools, strings);
+    const tripled: Stream<boolean | number | string> = xs.merge(bools, strings, numbers);
+  });
 });
