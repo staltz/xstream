@@ -1076,7 +1076,7 @@ var Stream = (function () {
     Stream.prototype.filter = function (passes) {
         var p = this._prod;
         if (p instanceof FilterOperator) {
-            return new Stream(new FilterOperator(and(passes, p.passes), p.ins));
+            return new Stream(new FilterOperator(and(p.passes, passes), p.ins));
         }
         return new Stream(new FilterOperator(passes, this));
     };

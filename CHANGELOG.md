@@ -1,3 +1,13 @@
+<a name="5.2.4"></a>
+## [5.2.4](https://github.com/staltz/xstream/compare/v5.2.3...v5.2.4) (2016-07-20)
+
+
+### Bug Fixes
+
+* **filter:** consecutive filtering respects original order ([fdbd00a](https://github.com/staltz/xstream/commit/fdbd00a)), closes [#85](https://github.com/staltz/xstream/issues/85)
+
+
+
 <a name="5.2.3"></a>
 ## [5.2.3](https://github.com/staltz/xstream/compare/v5.2.2...v5.2.3) (2016-07-20)
 
