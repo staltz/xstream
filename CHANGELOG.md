@@ -1,3 +1,13 @@
+<a name="5.2.3"></a>
+## [5.2.3](https://github.com/staltz/xstream/compare/v5.2.2...v5.2.3) (2016-07-20)
+
+
+### Bug Fixes
+
+* **merge:** support union types ([5327cb0](https://github.com/staltz/xstream/commit/5327cb0)), closes [staltz/xstream#80](https://github.com/staltz/xstream/issues/80)
+
+
+
 <a name="5.2.2"></a>
 ## [5.2.2](https://github.com/staltz/xstream/compare/v5.2.1...v5.2.2) (2016-07-19)
 

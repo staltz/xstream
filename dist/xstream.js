@@ -1047,14 +1047,6 @@ var Stream = (function () {
     Stream.periodic = function (period) {
         return new Stream(new PeriodicProducer(period));
     };
-    
-    Stream.merge = function () {
-        var streams = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            streams[_i - 0] = arguments[_i];
-        }
-        return new Stream(new MergeProducer(streams));
-    };
     Stream.prototype._map = function (project) {
         var p = this._prod;
         var ctor = this.ctor();
@@ -1159,6 +1151,14 @@ var Stream = (function () {
     
     Stream.prototype.shamefullySendComplete = function () {
         this._c();
+    };
+    
+    Stream.merge = function merge() {
+        var streams = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            streams[_i - 0] = arguments[_i];
+        }
+        return new Stream(new MergeProducer(streams));
     };
     
     Stream.combine = function combine() {
