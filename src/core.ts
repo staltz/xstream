@@ -132,6 +132,37 @@ export class MergeProducer<T> implements Aggregator<T, T>, InternalListener<T> {
   }
 }
 
+export interface MergeSignature {
+  (): Stream<any>;
+  <T1>(s1: Stream<T1>): Stream<T1>;
+  <T1, T2>(
+    s1: Stream<T1>,
+    s2: Stream<T2>): Stream<T1 | T2>;
+  <T1, T2, T3>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>): Stream<T1 | T2 | T3>;
+  <T1, T2, T3, T4>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>,
+    s4: Stream<T4>): Stream<T1 | T2 | T3 | T4>;
+  <T1, T2, T3, T4, T5>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>,
+    s4: Stream<T4>,
+    s5: Stream<T5>): Stream<T1 | T2 | T3 | T4 | T5>;
+  <T1, T2, T3, T4, T5, T6>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>,
+    s4: Stream<T4>,
+    s5: Stream<T5>,
+    s6: Stream<T6>): Stream<T1 | T2 | T3 | T4 | T5 | T6>;
+  <T>(...stream: Array<Stream<T>>): Stream<T>;
+}
+
 export interface CombineSignature {
   (): Stream<Array<any>>;
   <T1>(s1: Stream<T1>): Stream<[T1]>;
@@ -1377,9 +1408,10 @@ export class Stream<T> implements InternalListener<T> {
    * or more streams may be given as arguments.
    * @return {Stream}
    */
-  static merge<T>(...streams: Array<Stream<T>>): Stream<T> {
-    return new Stream<T>(new MergeProducer(streams));
-  }
+  static merge: MergeSignature = <MergeSignature>
+    function merge(...streams: Array<Stream<any>>): Stream<any> {
+      return new Stream<any>(new MergeProducer(streams));
+    };
 
   /**
    * Combines multiple input streams together to return a stream whose events
