@@ -1537,7 +1537,7 @@ export class Stream<T> implements InternalListener<T> {
     const p = this._prod;
     if (p instanceof FilterOperator) {
       return new Stream<T>(new FilterOperator(
-        and(passes, (<FilterOperator<T>> p).passes),
+        and((<FilterOperator<T>> p).passes, passes),
         (<FilterOperator<T>> p).ins
       ));
     }

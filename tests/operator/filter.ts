@@ -101,6 +101,33 @@ describe('Stream.prototype.filter', () => {
     done();
   });
 
+  it('should call functions in correct order for filter+filter fusion', (done) => {
+    const object$ = xs.of<any>(
+      { foo: { a: 10 } },
+      { foo: { bar: { b: 20 } } },
+      { foo: true }
+    );
+
+    const filtered$ = object$
+      .filter(val => val.foo)
+      .filter(val => val.foo.bar)
+      .filter(val => val.foo.bar.b === 20)
+      .map(x => JSON.stringify(x));
+
+    const expected = ['{"foo":{"bar":{"b":20}}}'];
+
+    filtered$.addListener({
+      next(x: string) {
+        assert.strictEqual(x, expected.shift());
+      },
+      error: (err: any) => done(err),
+      complete() {
+        assert.strictEqual(expected.length, 0);
+        done();
+      }
+    });
+  });
+
   it('should return a Stream if input stream is a Stream', (done) => {
     const input = xs.of<number>(1, 2, 3);
     assert.strictEqual(input instanceof Stream, true);
