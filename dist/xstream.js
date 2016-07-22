@@ -238,7 +238,7 @@ var DebugOperator = (function () {
         if (typeof arg === 'string') {
             this.l = arg;
         }
-        else {
+        else if (typeof arg === 'function') {
             this.s = arg;
         }
     }

@@ -1,3 +1,13 @@
+<a name="5.3.1"></a>
+## [5.3.1](https://github.com/staltz/xstream/compare/v5.3.0...v5.3.1) (2016-07-22)
+
+
+### Bug Fixes
+
+* **debug:** support usage with no argument given ([6cefc81](https://github.com/staltz/xstream/commit/6cefc81)), closes [#87](https://github.com/staltz/xstream/issues/87)
+
+
+
 <a name="5.3.0"></a>
 # [5.3.0](https://github.com/staltz/xstream/compare/v5.2.4...v5.3.0) (2016-07-22)
 
