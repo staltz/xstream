@@ -40,16 +40,16 @@ function isCommitBreakingChange(commit) {
 }
 
 function showReportHeaderPositive() {
-  console.log('RELEASES TO DO\n\n' +
-              'We checked all packages and recent commits, and discovered that\n' +
-              'according to semver.org you should release new versions for the\n' +
-              'following packages.\n');
+  console.log(
+    'RELEASES TO DO\n\n' +
+    'We checked all recent commits, and discovered that according\n' +
+    'to semver.org you should release a new version of xstream.');
 }
 
 function showReportHeaderNegative() {
   console.log('Nothing to release.\n\n' +
-              'We checked all packages and recent commits, and discovered that\n' +
-              'you do not need to release any new version, according to semver.org.')
+              'We checked all recent commits, and discovered that you do\n' +
+              'not need to release a new version, according to semver.org.')
 }
 
 function showReport(status) {
