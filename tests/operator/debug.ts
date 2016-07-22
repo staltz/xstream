@@ -2,8 +2,18 @@
 /// <reference path="../../typings/globals/node/index.d.ts" />
 import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 
+var sandbox: sinon.SinonSandbox;
 describe('Stream.prototype.debug', () => {
+  beforeEach(function () {
+    sandbox = sinon.sandbox.create();
+  });
+
+  afterEach(function () {
+    sandbox.restore();
+  });
+
   it('should allow inspecting the operator chain', (done) => {
     const expected = [0, 1, 2];
     const stream = xs.periodic(50).take(3).debug(x => {
@@ -21,6 +31,29 @@ describe('Stream.prototype.debug', () => {
       complete: () => done('complete should not be called'),
     };
     stream.addListener(listener);
+  });
+
+  it('should use console.log if no argument given', (done) => {
+    let stub = sandbox.stub(console, 'log');
+
+    const expected = [0, 1, 2];
+    const stream = xs.periodic(50).take(3).debug();
+
+    assert.doesNotThrow(() => {
+      stream.addListener({
+        next: (x: number) => {
+          assert.equal(x, expected.shift());
+        },
+        error: (err) => done(err),
+        complete: () => {
+          assert.strictEqual(stub.callCount, 3);
+          assert.strictEqual(stub.firstCall.args[0], 0);
+          assert.strictEqual(stub.secondCall.args[0], 1);
+          assert.strictEqual(stub.thirdCall.args[0], 2);
+          done();
+        },
+      });
+    });
   });
 
   it('should return a Stream if input stream is a Stream', (done) => {

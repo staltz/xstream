@@ -373,7 +373,7 @@ export class DebugOperator<T> implements Operator<T, T> {
     this.l = '';
     if (typeof arg === 'string') {
       this.l = arg;
-    } else {
+    } else if (typeof arg === 'function') {
       this.s = arg;
     }
   }
