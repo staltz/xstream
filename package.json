@@ -23,11 +23,13 @@
     "dist": "browserify index.js --standalone xstream | node tools/strip-comments.js > dist/xstream.js",
     "postdist": "uglifyjs dist/xstream.js -o dist/xstream.min.js",
     "start": "npm install && npm prune",
+    "check-release": "node tools/check-release.js",
     "prepublish": "npm run compile",
     "preversion": "npm run readme && npm test",
     "version": "npm run readme && npm run dist && git add -A",
     "postversion": "git push origin master && git push origin --tags && npm publish && npm run update-gh-pages",
     "update-gh-pages": "git checkout gh-pages && rm _includes/content.md && cp .ignore/content.md _includes/ && git commit -a -m \"update site\" && git push origin gh-pages && git checkout master",
+    "release": "./tools/release-if-necessary.sh",
     "release-patch": "npm version patch -m \"chore(package): release new version\"",
     "release-minor": "npm version minor -m \"chore(package): release new version\"",
     "release-major": "npm version major -m \"chore(package): release new version\""
