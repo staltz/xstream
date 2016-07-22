@@ -405,6 +405,10 @@ Creates a stream based on either:
 - DOM events with the name `eventName` from a provided target node
 - Events with the name `eventName` from a provided NodeJS EventEmitter
 
+When creating a stream from EventEmitters, if the source event has more than
+one argument all the arguments will be aggregated into an array in the
+result stream.
+
 Marble diagram:
 
 ```text
@@ -451,6 +455,26 @@ MyEmitter.emit('foo', 'bar')
 
 ```text
 > 'bar'
+```
+
+```js
+import fromEvent from 'xstream/extra/fromEvent'
+import {EventEmitter} from 'events'
+
+const MyEmitter = new EventEmitter()
+const stream = fromEvent(MyEmitter, 'foo')
+
+stream.addListener({
+  next: i => console.log(i),
+  error: err => console.error(err),
+  complete: () => console.log('completed')
+})
+
+MyEmitter.emit('foo', 'bar', 'baz', 'buzz')
+```
+
+```text
+> ['bar', 'baz', 'buzz']
 ```
 
 #### Arguments:

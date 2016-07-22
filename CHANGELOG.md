@@ -1,3 +1,28 @@
+<a name="5.3.0"></a>
+# [5.3.0](https://github.com/staltz/xstream/compare/v5.2.4...v5.3.0) (2016-07-22)
+
+
+### Features
+
+* **fromEvent:** Aggregate multiple arguments ([714dd01](https://github.com/staltz/xstream/commit/714dd01)), closes [staltz/xstream#84](https://github.com/staltz/xstream/issues/84) [#89](https://github.com/staltz/xstream/issues/89)
+
+
+### BREAKING CHANGES
+
+* fromEvent: .
+  2. An expanded function signature would become 'crowded', and one of
+     the architectural goals of xstream is to keep interfaces as small
+     as they need to be to achieve their goals.
+  3. Aggregating emitted events into an array is consistent with the
+     implementation in Most.js, and achieves similar flexibility with Rx
+     when providing a selector function to `.map()` on a result stream.
+
+`fromEvent` will now emit mixed-types. If consumers are not responsible
+for calling `.emit()` on the source emitter, they should implement
+appropriate guards to ensure they are dealing with an intended type.
+
+
+
 <a name="5.2.4"></a>
 ## [5.2.4](https://github.com/staltz/xstream/compare/v5.2.3...v5.2.4) (2016-07-20)
 
