@@ -187,4 +187,25 @@ describe('fromEvent (extra) - EventEmitter', () => {
     target.emit( 'test', 1 );
     target.emit( 'test', 2 );
   });
+
+  it('should aggregate arguments from emitters', (done) => {
+    const target = new FakeEventEmitter();
+    const stream = fromEvent(target, 'test').take(2);
+
+    let expected = [[1, 'foo', true], [2, 'bar', false]];
+
+    stream.addListener({
+      next: (x: any) => {
+        assert.deepEqual(x, expected.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.strictEqual(expected.length, 0);
+        done();
+      }
+    });
+
+    target.emit( 'test', 1, 'foo', true );
+    target.emit( 'test', 2, 'bar', false );
+  });
 });
