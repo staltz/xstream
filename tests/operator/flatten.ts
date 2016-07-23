@@ -5,6 +5,31 @@ import fromDiagram from '../../src/extra/fromDiagram';
 import * as assert from 'assert';
 
 describe('Stream.prototype.flatten', () => {
+  describe('with map+debug to break the fusion', () => {
+    it('should restart inner stream if switching to the same inner stream', (done) => {
+      const outer = fromDiagram('-A---------B----------C--------|');
+      const nums = fromDiagram(  '-a-b-c-----------------------|', {
+        values: {a: 1, b: 2, c: 3}
+      });
+      const inner = nums.fold((acc, x) => acc + x, 0);
+
+      const stream = outer.map(() => inner).debug(() => { }).flatten();
+
+      const expected = [0, 1, 3, 6, 0, 1, 3, 6, 0, 1, 3, 6];
+
+      stream.addListener({
+        next: (x: number) => {
+          assert.equal(x, expected.shift());
+        },
+        error: (err: any) => done(err),
+        complete: () => {
+          assert.equal(expected.length, 0);
+          done();
+        }
+      });
+    });
+  });
+
   describe('with map', () => {
     it('should expand each periodic event with 3 sync events', (done) => {
       const source: Stream<Stream<number>> = xs.periodic(100).take(3)
@@ -215,6 +240,29 @@ describe('Stream.prototype.flatten', () => {
         }
       });
     });
+
+    it('should restart inner stream if switching to the same inner stream', (done) => {
+      const outer = fromDiagram('-A---------B----------C--------|');
+      const nums = fromDiagram(  '-a-b-c-----------------------|', {
+        values: {a: 1, b: 2, c: 3}
+      });
+      const inner = nums.fold((acc, x) => acc + x, 0);
+
+      const stream = outer.map(() => inner).flatten();
+
+      const expected = [0, 1, 3, 6, 0, 1, 3, 6, 0, 1, 3, 6];
+
+      stream.addListener({
+        next: (x: number) => {
+          assert.equal(x, expected.shift());
+        },
+        error: (err: any) => done(err),
+        complete: () => {
+          assert.equal(expected.length, 0);
+          done();
+        }
+      });
+    });
   });
 
   describe('with filter+map fusion', () => {
@@ -259,6 +307,29 @@ describe('Stream.prototype.flatten', () => {
       const stream: Stream<number> = source.flatten();
       assert.strictEqual(stream['_prod']['type'], 'mapTo+flatten');
       done();
+    });
+
+    it('should restart inner stream if switching to the same inner stream', (done) => {
+      const outer = fromDiagram('-A---------B----------C--------|');
+      const nums = fromDiagram(  '-a-b-c-----------------------|', {
+        values: {a: 1, b: 2, c: 3}
+      });
+      const inner = nums.fold((acc, x) => acc + x, 0);
+
+      const stream = outer.mapTo(inner).flatten();
+
+      const expected = [0, 1, 3, 6, 0, 1, 3, 6, 0, 1, 3, 6];
+
+      stream.addListener({
+        next: (x: number) => {
+          assert.equal(x, expected.shift());
+        },
+        error: (err: any) => done(err),
+        complete: () => {
+          assert.equal(expected.length, 0);
+          done();
+        }
+      });
     });
   });
 });

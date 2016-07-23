@@ -646,6 +646,7 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
     const u = this.out;
     if (u === NO) return;
     const {inner, il} = this;
+    if (s === inner && s._prod !== NO) s._stopNow();
     if (inner !== NO && il !== NO_IL) inner._remove(il);
     (this.inner = s)._add(this.il = new FlattenListener(u, this));
   }
@@ -832,14 +833,16 @@ export class MapFlattenOperator<T, R> implements Operator<T, R> {
     const u = this.out;
     if (u === NO) return;
     const {inner, il} = this;
-    if (inner !== NO && il !== NO_IL) inner._remove(il);
+    let s: Stream<R>;
     try {
-      (this.inner = this.mapOp.project(v))._add(
-        this.il = new MapFlattenInner(u, this)
-      );
+      s = this.mapOp.project(v);
     } catch (e) {
       u._e(e);
+      return;
     }
+    if (s === inner && s._prod !== NO) s._stopNow();
+    if (inner !== NO && il !== NO_IL) inner._remove(il);
+    (this.inner = s)._add(this.il = new MapFlattenInner(u, this));
   }
 
   _e(err: any) {
@@ -1056,9 +1059,9 @@ export class TakeOperator<T> implements Operator<T, T> {
 }
 
 export class Stream<T> implements InternalListener<T> {
+  public _prod: InternalProducer<T>;
   protected _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
   protected _stopID: any;
-  protected _prod: InternalProducer<T>;
   protected _target: Stream<T>; // imitation target if this Stream will imitate
   protected _err: any;
 
@@ -1108,9 +1111,9 @@ export class Stream<T> implements InternalListener<T> {
     this._ils = [];
   }
 
-  _lateStop() {
-    // this._prod is not null, because this _lateStop is called from _remove
-    // where we already checked that this._prod is truthy
+  _stopNow() {
+    // WARNING: code that calls this method should
+    // first check if this._prod is valid (not `NO`)
     this._prod._stop();
     this._err = NO;
     this._stopID = NO;
@@ -1140,7 +1143,7 @@ export class Stream<T> implements InternalListener<T> {
       a.splice(i, 1);
       if (this._prod !== NO && a.length <= 0) {
         this._err = NO;
-        this._stopID = setTimeout(() => this._lateStop());
+        this._stopID = setTimeout(() => this._stopNow());
       } else if (a.length === 1) {
         this._pruneCycles();
       }
@@ -1931,9 +1934,9 @@ export class MemoryStream<T> extends Stream<T> {
     super._add(il);
   }
 
-  _lateStop() {
+  _stopNow() {
     this._has = false;
-    super._lateStop();
+    super._stopNow();
   }
 
   _x(): void {
