@@ -480,6 +480,8 @@ var FlattenOperator = (function () {
         if (u === NO)
             return;
         var _a = this, inner = _a.inner, il = _a.il;
+        if (s === inner && s._prod !== NO)
+            s._stopNow();
         if (inner !== NO && il !== exports.NO_IL)
             inner._remove(il);
         (this.inner = s)._add(this.il = new FlattenListener(u, this));
@@ -640,14 +642,19 @@ var MapFlattenOperator = (function () {
         if (u === NO)
             return;
         var _a = this, inner = _a.inner, il = _a.il;
-        if (inner !== NO && il !== exports.NO_IL)
-            inner._remove(il);
+        var s;
         try {
-            (this.inner = this.mapOp.project(v))._add(this.il = new MapFlattenInner(u, this));
+            s = this.mapOp.project(v);
         }
         catch (e) {
             u._e(e);
+            return;
         }
+        if (s === inner && s._prod !== NO)
+            s._stopNow();
+        if (inner !== NO && il !== exports.NO_IL)
+            inner._remove(il);
+        (this.inner = s)._add(this.il = new MapFlattenInner(u, this));
     };
     MapFlattenOperator.prototype._e = function (err) {
         var u = this.out;
@@ -895,7 +902,7 @@ var Stream = (function () {
         this._err = NO;
         this._ils = [];
     };
-    Stream.prototype._lateStop = function () {
+    Stream.prototype._stopNow = function () {
         
         
         this._prod._stop();
@@ -929,7 +936,7 @@ var Stream = (function () {
             a.splice(i, 1);
             if (this._prod !== NO && a.length <= 0) {
                 this._err = NO;
-                this._stopID = setTimeout(function () { return _this._lateStop(); });
+                this._stopID = setTimeout(function () { return _this._stopNow(); });
             }
             else if (a.length === 1) {
                 this._pruneCycles();
@@ -1188,9 +1195,9 @@ var MemoryStream = (function (_super) {
         }
         _super.prototype._add.call(this, il);
     };
-    MemoryStream.prototype._lateStop = function () {
+    MemoryStream.prototype._stopNow = function () {
         this._has = false;
-        _super.prototype._lateStop.call(this);
+        _super.prototype._stopNow.call(this);
     };
     MemoryStream.prototype._x = function () {
         this._has = false;

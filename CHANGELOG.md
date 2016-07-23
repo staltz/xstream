@@ -1,3 +1,13 @@
+<a name="5.3.2"></a>
+## [5.3.2](https://github.com/staltz/xstream/compare/v5.3.1...v5.3.2) (2016-07-23)
+
+
+### Bug Fixes
+
+* **flatten:** when same inner stream, restart ([819bc94](https://github.com/staltz/xstream/commit/819bc94)), closes [#90](https://github.com/staltz/xstream/issues/90)
+
+
+
 <a name="5.3.1"></a>
 ## [5.3.1](https://github.com/staltz/xstream/compare/v5.3.0...v5.3.1) (2016-07-22)
 
