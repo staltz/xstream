@@ -37,4 +37,29 @@ describe('dropRepeats (extra)', () => {
       },
     });
   });
+
+  it('should drop consecutive duplicate numbers, with a circular stream dependency', (done) => {
+    const streamProxy = xs.create();
+    const input = xs.of(0, 0, 1, 1, 1)
+    const stream = xs.merge(streamProxy, input).compose(dropRepeats());
+    streamProxy.imitate(stream);
+    const expected = [0, 1];
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.equal(x, expected.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {},
+    });
+
+    input.addListener({
+      next: (x: number) => {},
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      },
+    });
+  });
 });
