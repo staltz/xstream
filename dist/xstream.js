@@ -480,8 +480,6 @@ var FlattenOperator = (function () {
         if (u === NO)
             return;
         var _a = this, inner = _a.inner, il = _a.il;
-        if (s === inner && s._prod !== NO)
-            s._stopNow();
         if (inner !== NO && il !== exports.NO_IL)
             inner._remove(il);
         (this.inner = s)._add(this.il = new FlattenListener(u, this));
@@ -650,8 +648,6 @@ var MapFlattenOperator = (function () {
             u._e(e);
             return;
         }
-        if (s === inner && s._prod !== NO)
-            s._stopNow();
         if (inner !== NO && il !== exports.NO_IL)
             inner._remove(il);
         (this.inner = s)._add(this.il = new MapFlattenInner(u, this));

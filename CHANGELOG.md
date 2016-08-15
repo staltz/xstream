@@ -1,3 +1,13 @@
+<a name="5.3.4"></a>
+## [5.3.4](https://github.com/staltz/xstream/compare/v5.3.3...v5.3.4) (2016-08-15)
+
+
+### Bug Fixes
+
+* **flatten:** do not restart inner stream if equals the previous inner ([9973eca](https://github.com/staltz/xstream/commit/9973eca)), closes [#103](https://github.com/staltz/xstream/issues/103) [#103](https://github.com/staltz/xstream/issues/103)
+
+
+
 <a name="5.3.3"></a>
 ## [5.3.3](https://github.com/staltz/xstream/compare/v5.3.2...v5.3.3) (2016-08-15)
 
