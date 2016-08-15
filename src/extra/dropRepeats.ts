@@ -29,10 +29,9 @@ export class DropRepeatsOperator<T> implements Operator<T, T> {
     const u = this.out;
     if (!u) return;
     const v = this.v;
-    if (v === empty || !this.isEq(t, v)) {
-      u._n(t);
-    }
+    if (v !== empty && this.isEq(t, v)) return;
     this.v = t;
+    u._n(t);
   }
 
   _e(err: any) {
