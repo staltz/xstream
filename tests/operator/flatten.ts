@@ -6,16 +6,16 @@ import * as assert from 'assert';
 
 describe('Stream.prototype.flatten', () => {
   describe('with map+debug to break the fusion', () => {
-    it('should restart inner stream if switching to the same inner stream', (done) => {
+    it('should not restart inner stream if switching to the same inner stream', (done) => {
       const outer = fromDiagram('-A---------B----------C--------|');
       const nums = fromDiagram(  '-a-b-c-----------------------|', {
         values: {a: 1, b: 2, c: 3}
       });
-      const inner = nums.fold((acc, x) => acc + x, 0);
+      const inner = nums.map(x => 10 * x);
 
       const stream = outer.map(() => inner).debug(() => { }).flatten();
 
-      const expected = [0, 1, 3, 6, 0, 1, 3, 6, 0, 1, 3, 6];
+      const expected = [10, 20, 30];
 
       stream.addListener({
         next: (x: number) => {
@@ -241,16 +241,16 @@ describe('Stream.prototype.flatten', () => {
       });
     });
 
-    it('should restart inner stream if switching to the same inner stream', (done) => {
+    it('should not restart inner stream if switching to the same inner stream', (done) => {
       const outer = fromDiagram('-A---------B----------C--------|');
       const nums = fromDiagram(  '-a-b-c-----------------------|', {
         values: {a: 1, b: 2, c: 3}
       });
-      const inner = nums.fold((acc, x) => acc + x, 0);
+      const inner = nums.map(x => 10 * x);
 
       const stream = outer.map(() => inner).flatten();
 
-      const expected = [0, 1, 3, 6, 0, 1, 3, 6, 0, 1, 3, 6];
+      const expected = [10, 20, 30];
 
       stream.addListener({
         next: (x: number) => {
@@ -309,16 +309,16 @@ describe('Stream.prototype.flatten', () => {
       done();
     });
 
-    it('should restart inner stream if switching to the same inner stream', (done) => {
+    it('should not restart inner stream if switching to the same inner stream', (done) => {
       const outer = fromDiagram('-A---------B----------C--------|');
       const nums = fromDiagram(  '-a-b-c-----------------------|', {
         values: {a: 1, b: 2, c: 3}
       });
-      const inner = nums.fold((acc, x) => acc + x, 0);
+      const inner = nums.map(x => 10 * x);
 
       const stream = outer.mapTo(inner).flatten();
 
-      const expected = [0, 1, 3, 6, 0, 1, 3, 6, 0, 1, 3, 6];
+      const expected = [10, 20, 30];
 
       stream.addListener({
         next: (x: number) => {

@@ -646,7 +646,6 @@ export class FlattenOperator<T> implements Operator<Stream<T>, T> {
     const u = this.out;
     if (u === NO) return;
     const {inner, il} = this;
-    if (s === inner && s._prod !== NO) s._stopNow();
     if (inner !== NO && il !== NO_IL) inner._remove(il);
     (this.inner = s)._add(this.il = new FlattenListener(u, this));
   }
@@ -840,7 +839,6 @@ export class MapFlattenOperator<T, R> implements Operator<T, R> {
       u._e(e);
       return;
     }
-    if (s === inner && s._prod !== NO) s._stopNow();
     if (inner !== NO && il !== NO_IL) inner._remove(il);
     (this.inner = s)._add(this.il = new MapFlattenInner(u, this));
   }
