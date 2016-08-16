@@ -263,6 +263,24 @@ describe('Stream.prototype.flatten', () => {
         }
       });
     });
+
+    it('should not run multiple executions of the inner', (done) => {
+      const inner = xs.periodic(350).take(2).map(i => i * 100);
+      const outer = xs.periodic(200).take(4);
+      const stream = outer.map(() => inner).flatten();
+
+      const expected = [0, 100];
+      stream.addListener({
+        next: (x: number) => {
+          assert.equal(x, expected.shift());
+        },
+        error: (err: any) => done(err),
+        complete: () => {
+          assert.equal(expected.length, 0);
+          done();
+        }
+      });
+    });
   });
 
   describe('with filter+map fusion', () => {

@@ -24,7 +24,7 @@ describe('MemoryStream', () => {
 
   it('should be createable giving a custom producer object', (done) => {
     const expected = [10, 20, 30];
-    let listenerGotEnd: boolean = false;
+    let producerStopped: boolean = false;
 
     const stream = xs.createWithMemory({
       start(listener: Listener<number>) {
@@ -37,7 +37,8 @@ describe('MemoryStream', () => {
       stop() {
         done();
         assert.equal(expected.length, 0);
-        assert.equal(listenerGotEnd, true);
+        assert.equal(producerStopped, false);
+        producerStopped = true;
       },
     });
 
@@ -47,7 +48,7 @@ describe('MemoryStream', () => {
       },
       error: (err: any) => done(err),
       complete: () => {
-        listenerGotEnd = true;
+        assert.equal(producerStopped, true);
       },
     });
   });

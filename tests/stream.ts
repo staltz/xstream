@@ -40,7 +40,7 @@ describe('Stream', () => {
 
   it('should be createable giving a custom producer object', (done) => {
     const expected = [10, 20, 30];
-    let listenerGotEnd: boolean = false;
+    let producerStopped: boolean = false;
 
     const producer: Producer<number> = {
       start(listener: Listener<number>) {
@@ -53,7 +53,8 @@ describe('Stream', () => {
       stop() {
         done();
         assert.equal(expected.length, 0);
-        assert.equal(listenerGotEnd, true);
+        assert.equal(producerStopped, false);
+        producerStopped = true;
       },
     };
 
@@ -64,7 +65,7 @@ describe('Stream', () => {
       },
       error: (err: any) => done(err),
       complete: () => {
-        listenerGotEnd = true;
+        assert.equal(producerStopped, true);
       },
     });
   });
@@ -218,7 +219,7 @@ describe('Stream', () => {
       },
       error: (err: any) => done(err),
       complete: () => {
-        assert.equal(on, true);
+        assert.equal(on, false);
         assert.equal(expected1.length, 0);
       },
     });
@@ -232,7 +233,7 @@ describe('Stream', () => {
       },
       error: (err: any) => done(err),
       complete: () => {
-        assert.equal(on, true);
+        assert.equal(on, false);
         assert.equal(expected2.length, 0);
       },
     });
@@ -265,7 +266,7 @@ describe('Stream', () => {
       },
       error: (err: any) => {
         assert.equal(err, 'oops');
-        assert.equal(on, true);
+        assert.equal(on, false);
         assert.equal(expected1.length, 0);
       },
       complete: () => {
@@ -282,7 +283,7 @@ describe('Stream', () => {
       },
       error: (err: any) => {
         assert.equal(err, 'oops');
-        assert.equal(on, true);
+        assert.equal(on, false);
         assert.equal(expected2.length, 0);
       },
       complete: () => {

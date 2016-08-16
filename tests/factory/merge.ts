@@ -41,8 +41,7 @@ describe('xs.merge', () => {
 
   it('should complete properly when stopped asynchronously and restarted synchronously', (done) => {
     const initial = xs.of('foo');
-    // debug here needed to stop MergeProducer asynchronously via _remove
-    const stream = xs.merge(initial).debug(() => {});
+    const stream = xs.merge(initial);
 
     const noop = () => {};
     stream.addListener({next: noop, error: noop, complete: noop});

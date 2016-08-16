@@ -1089,21 +1089,21 @@ export class Stream<T> implements InternalListener<T> {
     this._err = err;
     const a = this._ils;
     const L = a.length;
+    this._x();
     if (L == 1) a[0]._e(err); else {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._e(err);
     }
-    this._x();
   }
 
   _c(): void {
     const a = this._ils;
     const L = a.length;
+    this._x();
     if (L == 1) a[0]._c(); else {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._c();
     }
-    this._x();
   }
 
   _x(): void { // tear down logic, after error or complete
@@ -1126,11 +1126,11 @@ export class Stream<T> implements InternalListener<T> {
     if (ta !== NO) return ta._add(il);
     const a = this._ils;
     a.push(il);
-    if (a.length === 1) {
-      if (this._stopID !== NO) {
-        clearTimeout(this._stopID);
-        this._stopID = NO;
-      }
+    if (a.length > 1) return;
+    if (this._stopID !== NO) {
+      clearTimeout(this._stopID);
+      this._stopID = NO;
+    } else {
       const p = this._prod;
       if (p !== NO) p._start(this);
     }
