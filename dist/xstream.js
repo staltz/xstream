@@ -811,7 +811,12 @@ var TakeOperator = (function () {
     TakeOperator.prototype._start = function (out) {
         this.out = out;
         this.taken = 0;
-        this.ins._add(this);
+        if (this.max <= 0) {
+            out._c();
+        }
+        else {
+            this.ins._add(this);
+        }
     };
     TakeOperator.prototype._stop = function () {
         this.ins._remove(this);

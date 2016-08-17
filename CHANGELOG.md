@@ -1,3 +1,13 @@
+<a name="5.3.5"></a>
+## [5.3.5](https://github.com/staltz/xstream/compare/v5.3.4...v5.3.5) (2016-08-17)
+
+
+### Bug Fixes
+
+* **take:** fix behavior for take(0) ([d965294](https://github.com/staltz/xstream/commit/d965294)), closes [#107](https://github.com/staltz/xstream/issues/107)
+
+
+
 <a name="5.3.4"></a>
 ## [5.3.4](https://github.com/staltz/xstream/compare/v5.3.3...v5.3.4) (2016-08-15)
 
