@@ -30,7 +30,7 @@ export class DropRepeatsOperator<T> implements Operator<T, T> {
     if (!u) return;
     const v = this.v;
     if (v !== empty && this.isEq(t, v)) return;
-    this.v = t;
+    this.v = Array.isArray(t) ? <T> <any> (<Array<any>> <any> t).slice() : t;
     u._n(t);
   }
 

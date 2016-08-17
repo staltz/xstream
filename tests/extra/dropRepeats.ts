@@ -1,6 +1,7 @@
 /// <reference path="../../typings/globals/mocha/index.d.ts" />
 /// <reference path="../../typings/globals/node/index.d.ts" />
 import xs, {Stream} from '../../src/index';
+import fromDiagram from '../../src/extra/fromDiagram';
 import dropRepeats from '../../src/extra/dropRepeats';
 import * as assert from 'assert';
 
@@ -55,6 +56,28 @@ describe('dropRepeats (extra)', () => {
 
     input.addListener({
       next: (x: number) => {},
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      },
+    });
+  });
+
+  it('should support dropping duplicates of combine arrays', (done) => {
+    const A: Stream<string> = fromDiagram('---a---b------b------|');
+    const B: Stream<string> = fromDiagram('-x---y---y------z--y-|');
+    const stream = xs.combine(A, B).compose(
+      dropRepeats(([i1, i2]: [string, string], [j1, j2]: [string, string]) => {
+        return i1 === j1 && i2 === j2;
+      })
+    ).map(arr => arr.join(''));
+
+    const expected = ['ax', 'ay', 'by', 'bz', 'by'];
+    stream.addListener({
+      next: (x: string) => {
+        assert.equal(x, expected.shift());
+      },
       error: (err: any) => done(err),
       complete: () => {
         assert.equal(expected.length, 0);
