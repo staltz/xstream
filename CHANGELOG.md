@@ -1,3 +1,13 @@
+<a name="5.3.6"></a>
+## [5.3.6](https://github.com/staltz/xstream/compare/v5.3.5...v5.3.6) (2016-08-17)
+
+
+### Bug Fixes
+
+* **dropRepeats:** fix usage with xs.combine ([4b3d65c](https://github.com/staltz/xstream/commit/4b3d65c)), closes [#105](https://github.com/staltz/xstream/issues/105)
+
+
+
 <a name="5.3.5"></a>
 ## [5.3.5](https://github.com/staltz/xstream/compare/v5.3.4...v5.3.5) (2016-08-17)
 
