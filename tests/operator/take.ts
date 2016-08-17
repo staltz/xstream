@@ -65,4 +65,18 @@ describe('Stream.prototype.take', () => {
       },
     });
   });
+
+  it('should just complete if given max=0', (done) => {
+    const stream = xs.periodic(50).take(0);
+
+    stream.addListener({
+      next: (x: number) => {
+        done('next should not be called');
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        done();
+      },
+    });
+  });
 });

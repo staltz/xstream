@@ -1024,7 +1024,11 @@ export class TakeOperator<T> implements Operator<T, T> {
   _start(out: Stream<T>): void {
     this.out = out;
     this.taken = 0;
-    this.ins._add(this);
+    if (this.max <= 0) {
+      out._c();
+    } else {
+      this.ins._add(this);
+    }
   }
 
   _stop(): void {
