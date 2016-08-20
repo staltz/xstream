@@ -1,3 +1,21 @@
+<a name="6.0.0"></a>
+# [6.0.0](https://github.com/staltz/xstream/compare/v5.3.6...v6.0.0) (2016-08-20)
+
+
+### Bug Fixes
+
+* **core:** teardown and stop producer before complete/error ([ec8d6e8](https://github.com/staltz/xstream/commit/ec8d6e8)), closes [#91](https://github.com/staltz/xstream/issues/91)
+
+
+### BREAKING CHANGES
+
+* core: in this version, when a stream completes or errors, its producer has already been
+stopped. In previous versions, the stream first completes, propagates the complete to other
+listeners and operators, and then its producer is stopped. You may barely notice this breaking
+change when updating your code. Most existing code will still work like before.
+
+
+
 <a name="5.3.6"></a>
 ## [5.3.6](https://github.com/staltz/xstream/compare/v5.3.5...v5.3.6) (2016-08-17)
 
@@ -65,21 +83,6 @@
 ### Features
 
 * **fromEvent:** Aggregate multiple arguments ([714dd01](https://github.com/staltz/xstream/commit/714dd01)), closes [staltz/xstream#84](https://github.com/staltz/xstream/issues/84) [#89](https://github.com/staltz/xstream/issues/89)
-
-
-### BREAKING CHANGES
-
-* fromEvent: .
-  2. An expanded function signature would become 'crowded', and one of
-     the architectural goals of xstream is to keep interfaces as small
-     as they need to be to achieve their goals.
-  3. Aggregating emitted events into an array is consistent with the
-     implementation in Most.js, and achieves similar flexibility with Rx
-     when providing a selector function to `.map()` on a result stream.
-
-`fromEvent` will now emit mixed-types. If consumers are not responsible
-for calling `.emit()` on the source emitter, they should implement
-appropriate guards to ensure they are dealing with an intended type.
 
 
 
@@ -172,7 +175,7 @@ appropriate guards to ensure they are dealing with an intended type.
 
 * **flatten:** fix automatic removal of inner listeners ([1c6ed5c](https://github.com/staltz/xstream/commit/1c6ed5c)), closes [#68](https://github.com/staltz/xstream/issues/68)
 * **fromDiagram:** fix support for falsey values ([85c9ca7](https://github.com/staltz/xstream/commit/85c9ca7))
-* **imitate:** fix issue [#66](https://github.com/staltz/xstream/issues/66) with imitate() ([7aa3a04](https://github.com/staltz/xstream/commit/7aa3a04)), closes [#66](https://github.com/staltz/xstream/issues/66) [#66](https://github.com/staltz/xstream/issues/66)
+* **imitate:** fix issue [#66](https://github.com/staltz/xstream/issues/66) with imitate() ([7aa3a04](https://github.com/staltz/xstream/commit/7aa3a04))
 
 
 
