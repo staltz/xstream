@@ -30,7 +30,7 @@ export class NodeEventProducer implements InternalProducer<any> {
 
   _start(out: InternalListener<any>) {
     this.listener = (...args: Array<any>) => {
-        return (args.length > 1) ? out._n(args) : out._n(args[0]);
+      return (args.length > 1) ? out._n(args) : out._n(args[0]);
     };
     this.node.addListener(this.eventName, this.listener);
   }
@@ -42,7 +42,7 @@ export class NodeEventProducer implements InternalProducer<any> {
 }
 
 function isEmitter(element: any): boolean {
-    return element.emit && element.addListener;
+  return element.emit && element.addListener;
 }
 
 /**
@@ -133,8 +133,8 @@ export default function fromEvent(element: EventTarget | EventEmitter,
                                   eventName: string,
                                   useCapture: boolean = false): Stream<Event|any> {
   if (isEmitter(element)) {
-    return new Stream<any>(new NodeEventProducer(<EventEmitter> element, eventName));
+    return new Stream<any>(new NodeEventProducer(element as EventEmitter, eventName));
   } else {
-    return new Stream<Event>(new DOMEventProducer(<EventTarget> element, eventName, useCapture));
+    return new Stream<Event>(new DOMEventProducer(element as EventTarget, eventName, useCapture));
   }
 }
