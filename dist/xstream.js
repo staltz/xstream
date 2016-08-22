@@ -854,12 +854,16 @@ var Stream = (function () {
         this._prod = producer || NO;
         this._ils = [];
         this._stopID = NO;
+        this._dl = NO;
+        this._d = false;
         this._target = NO;
         this._err = NO;
     }
     Stream.prototype._n = function (t) {
         var a = this._ils;
         var L = a.length;
+        if (this._d)
+            this._dl._n(t);
         if (L == 1)
             a[0]._n(t);
         else {
@@ -875,6 +879,8 @@ var Stream = (function () {
         var a = this._ils;
         var L = a.length;
         this._x();
+        if (this._d)
+            this._dl._e(err);
         if (L == 1)
             a[0]._e(err);
         else {
@@ -887,6 +893,8 @@ var Stream = (function () {
         var a = this._ils;
         var L = a.length;
         this._x();
+        if (this._d)
+            this._dl._c();
         if (L == 1)
             a[0]._c();
         else {
@@ -1161,6 +1169,20 @@ var Stream = (function () {
     
     Stream.prototype.shamefullySendComplete = function () {
         this._c();
+    };
+    
+    Stream.prototype.setDebugListener = function (listener) {
+        if (!listener) {
+            this._d = false;
+            this._dl = NO;
+        }
+        else {
+            this._d = true;
+            listener._n = listener.next;
+            listener._e = listener.error;
+            listener._c = listener.complete;
+            this._dl = listener;
+        }
     };
     
     Stream.merge = function merge() {

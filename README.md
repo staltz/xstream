@@ -102,6 +102,7 @@ var xs = require('xstream').default
 - [`shamefullySendNext`](#shamefullySendNext)
 - [`shamefullySendError`](#shamefullySendError)
 - [`shamefullySendComplete`](#shamefullySendComplete)
+- [`setDebugListener`](#setDebugListener)
 
 # Overview
 
@@ -891,6 +892,31 @@ Forces the Stream to emit the "completed" event to its listeners.
 As the name indicates, if you use this, you are most likely doing something
 The Wrong Way. Please try to understand the reactive way before using this
 method. Use it only when you know what you are doing.
+
+- - -
+
+### <a id="setDebugListener"></a> `setDebugListener(listener)`
+
+Adds a "debug" listener to the stream. There can only be one debug
+listener, that's why this is 'setDebugListener'. To remove the debug
+listener, just call setDebugListener(null).
+
+A debug listener is like any other listener. The only difference is that a
+debug listener is "stealthy": its presence/absence does not trigger the
+start/stop of the stream (or the producer inside the stream). This is
+useful so you can inspect what is going on without changing the behavior
+of the program. If you have an idle stream and you add a normal listener to
+it, the stream will start executing. But if you set a debug listener on an
+idle stream, it won't start executing (not until the first normal listener
+is added).
+
+As the name indicates, we don't recommend using this method to build app
+logic. In fact, in most cases the debug operator works just fine. Only use
+this one if you know what you're doing.
+
+#### Arguments:
+
+- `listener: Listener\<T>`
 
 - - -
 
