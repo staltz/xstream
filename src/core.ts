@@ -1064,6 +1064,8 @@ export class Stream<T> implements InternalListener<T> {
   public _prod: InternalProducer<T>;
   protected _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
   protected _stopID: any;
+  protected _dl: InternalListener<T>; // the debug listener
+  protected _d: boolean; // flag indicating the existence of the debug listener
   protected _target: Stream<T>; // imitation target if this Stream will imitate
   protected _err: any;
 
@@ -1071,6 +1073,8 @@ export class Stream<T> implements InternalListener<T> {
     this._prod = producer || <InternalProducer<T>> NO;
     this._ils = [];
     this._stopID = NO;
+    this._dl = NO as InternalListener<T>;
+    this._d = false;
     this._target = <Stream<T>> NO;
     this._err = NO;
   }
@@ -1078,6 +1082,7 @@ export class Stream<T> implements InternalListener<T> {
   _n(t: T): void {
     const a = this._ils;
     const L = a.length;
+    if (this._d) this._dl._n(t);
     if (L == 1) a[0]._n(t); else {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._n(t);
@@ -1090,6 +1095,7 @@ export class Stream<T> implements InternalListener<T> {
     const a = this._ils;
     const L = a.length;
     this._x();
+    if (this._d) this._dl._e(err);
     if (L == 1) a[0]._e(err); else {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._e(err);
@@ -1100,6 +1106,7 @@ export class Stream<T> implements InternalListener<T> {
     const a = this._ils;
     const L = a.length;
     this._x();
+    if (this._d) this._dl._c();
     if (L == 1) a[0]._c(); else {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._c();
@@ -1915,6 +1922,39 @@ export class Stream<T> implements InternalListener<T> {
    */
   shamefullySendComplete() {
     this._c();
+  }
+
+  /**
+   * Adds a "debug" listener to the stream. There can only be one debug
+   * listener, that's why this is 'setDebugListener'. To remove the debug
+   * listener, just call setDebugListener(null).
+   *
+   * A debug listener is like any other listener. The only difference is that a
+   * debug listener is "stealthy": its presence/absence does not trigger the
+   * start/stop of the stream (or the producer inside the stream). This is
+   * useful so you can inspect what is going on without changing the behavior
+   * of the program. If you have an idle stream and you add a normal listener to
+   * it, the stream will start executing. But if you set a debug listener on an
+   * idle stream, it won't start executing (not until the first normal listener
+   * is added).
+   *
+   * As the name indicates, we don't recommend using this method to build app
+   * logic. In fact, in most cases the debug operator works just fine. Only use
+   * this one if you know what you're doing.
+   *
+   * @param {Listener<T>} listener
+   */
+  setDebugListener(listener: Listener<T>) {
+    if (!listener) {
+      this._d = false;
+      this._dl = NO as InternalListener<T>;
+    } else {
+      this._d = true;
+      (listener as any as InternalListener<T>)._n = listener.next;
+      (listener as any as InternalListener<T>)._e = listener.error;
+      (listener as any as InternalListener<T>)._c = listener.complete;
+      this._dl = listener as any as InternalListener<T>;
+    }
   }
 }
 

@@ -311,6 +311,43 @@ describe('Stream', () => {
     });
   });
 
+  describe('setDebugListener', () => {
+    it('should not trigger a stream execution', (done) => {
+      const stream = xs.of(1, 2, 3);
+      const listener: Listener<number> = {
+        next: () => done('should not be called'),
+        error: () => done('should not be called'),
+        complete: () => done('should not be called'),
+      };
+
+      stream.setDebugListener(listener);
+      setTimeout(() => done(), 200);
+    });
+
+    it('should spy an existing stream execution', (done) => {
+      const stream = xs.periodic(200).take(8);
+      const listener = { next: () => { }, error: () => { }, complete: () => { } };
+      const expected = [0, 1, 2];
+
+      const debugListener: Listener<number> = {
+        next: (x: number) => {
+          assert.strictEqual(x, expected.shift());
+        },
+        error: () => done('should not be called'),
+        complete: () => done('should not be called')
+      };
+      stream.setDebugListener(debugListener);
+
+      stream.addListener(listener);
+      setTimeout(() => stream.removeListener(listener), 700);
+
+      setTimeout(() => {
+        assert.strictEqual(expected.length, 0);
+        done();
+      }, 1000);
+    });
+  });
+
   describe('addListener', () => {
     it('throws a helpful error if you forget the next function', (done) => {
       const stream = xs.empty();
