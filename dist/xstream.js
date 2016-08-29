@@ -1090,7 +1090,6 @@ var Stream = (function () {
         op.type = op.type.replace('map', 'mapTo');
         return s;
     };
-    
     Stream.prototype.filter = function (passes) {
         var p = this._prod;
         if (p instanceof FilterOperator) {

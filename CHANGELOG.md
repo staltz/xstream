@@ -1,3 +1,13 @@
+<a name="6.2.0"></a>
+# [6.2.0](https://github.com/staltz/xstream/compare/v6.1.0...v6.2.0) (2016-08-29)
+
+
+### Features
+
+* **filter:** support type guard predicates ([34e529a](https://github.com/staltz/xstream/commit/34e529a))
+
+
+
 <a name="6.1.0"></a>
 # [6.1.0](https://github.com/staltz/xstream/compare/v6.0.0...v6.1.0) (2016-08-22)
 
