@@ -143,4 +143,24 @@ describe('Stream.prototype.filter', () => {
     assert.strictEqual(stream instanceof Stream, true);
     done();
   });
+
+  it('should return stream of constrained type if predicate is type guard', (done) => {
+    class Animal { }
+    class Dog extends Animal {
+      thisIsADog: boolean;
+    }
+    class Cat extends Animal {
+      thisIsACat: boolean;
+    }
+
+    function isDog(a: Animal): a is Dog {
+      return a instanceof Dog;
+    }
+
+    const input: Stream<Animal> = xs.of<Animal>(
+      new Animal(), new Cat(), new Dog(), new Animal()
+    );
+    const output: Stream<Dog> = input.filter(isDog);
+    done();
+  });
 });
