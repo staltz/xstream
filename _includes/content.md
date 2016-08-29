@@ -10,6 +10,7 @@
 ![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.js.svg)
 ![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.min.js.svg?compression=gzip)
 [![Build Status](https://travis-ci.org/staltz/xstream.svg?branch=master)](https://travis-ci.org/staltz/xstream)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg?maxAge=2592000)](https://gitter.im/staltz/xstream)
 
 # Example
 
@@ -77,7 +78,6 @@ var xs = require('xstream').default
 - [`removeListener`](#removeListener)
 - [`map`](#map)
 - [`mapTo`](#mapTo)
-- [`filter`](#filter)
 - [`take`](#take)
 - [`drop`](#drop)
 - [`last`](#last)
@@ -152,7 +152,7 @@ A Producer is like a machine that produces events to be broadcast on a Stream.
 
 Events from a Stream must come from somewhere, right? That's why we need Producers. They are objects with two functions attached: `start(listener)` and `stop()`. Once you call `start` with a `listener`, the Producer will start generating events and it will send those to the listener. When you call `stop()`, the Producer should quit doing its own thing.
 
-Because Streams are Listeners, if you give a Stream as the Listener in `start(stream)`, essentially the Producer is now generating events that will be broadcast on the Stream. Nice, huh? Now a bunch of listeners can be attached to the Stream and they can all get those events originally coming from the Producer. That's why `xs.create(producer)` receives a Producer to be the heart of a new Stream. Check this out:
+Streams are also Listeners (actually they are "InternalListeners", not Listeners, but that's a detail you can ignore), so you can theoretically give a Stream as the listener in `producer.start(streamAsListener)`. Then, essentially the Producer is now generating events that will be broadcast on the Stream. Nice, huh? Now a bunch of listeners can be attached to the Stream and they can all get those events originally coming from the Producer. That's why `xs.create(producer)` receives a Producer to be the heart of a new Stream. Check this out:
 
 ```js
 var producer = {
@@ -497,31 +497,6 @@ Marble diagram:
 #### Arguments:
 
 - `projectedValue` A value to emit on the output Stream whenever the input Stream emits any value.
-
-#### Returns:  Stream 
-
-- - -
-
-### <a id="filter"></a> `filter(passes)`
-
-Only allows events that pass the test given by the `passes` argument.
-
-Each event from the input stream is given to the `passes` function. If the
-function returns `true`, the event is forwarded to the output stream,
-otherwise it is ignored and not forwarded.
-
-Marble diagram:
-
-```text
---1---2--3-----4-----5---6--7-8--
-    filter(i => i % 2 === 0)
-------2--------4---------6----8--
-```
-
-#### Arguments:
-
-- `passes: Function` A function of type `(t: T) +> boolean` that takes an event from the input stream and checks if it passes, by returning a
-boolean.
 
 #### Returns:  Stream 
 
