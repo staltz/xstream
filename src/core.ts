@@ -1523,6 +1523,8 @@ export class Stream<T> implements InternalListener<T> {
     return s;
   }
 
+  filter<S extends T>(passes: (t: T) => t is S): Stream<S>;
+  filter(passes: (t: T) => boolean): Stream<T>;
   /**
    * Only allows events that pass the test given by the `passes` argument.
    *
@@ -1543,8 +1545,6 @@ export class Stream<T> implements InternalListener<T> {
    * boolean.
    * @return {Stream}
    */
-  filter<S extends T>(passes: (t: T) => t is S): Stream<S>;
-  filter(passes: (t: T) => boolean): Stream<T>;
   filter(passes: (t: T) => boolean): Stream<T> {
     const p = this._prod;
     if (p instanceof FilterOperator) {
