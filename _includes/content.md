@@ -914,7 +914,7 @@ this one if you know what you're doing.
 
 # Extra operators and factories
 
-The operators and factories listed above are the core functions. `xstream` has plenty of extra operators, [documented here](./EXTRA_DOCS.md).
+The operators and factories listed above are the core functions. `xstream` has plenty of extra operators, [documented here](https://github.com/staltz/xstream/blob/master/EXTRA_DOCS.md).
 
 # FAQ
 
