@@ -78,6 +78,7 @@ var xs = require('xstream').default
 - [`removeListener`](#removeListener)
 - [`map`](#map)
 - [`mapTo`](#mapTo)
+- [`filter`](#filter)
 - [`take`](#take)
 - [`drop`](#drop)
 - [`last`](#last)
@@ -497,6 +498,31 @@ Marble diagram:
 #### Arguments:
 
 - `projectedValue` A value to emit on the output Stream whenever the input Stream emits any value.
+
+#### Returns:  Stream 
+
+- - -
+
+### <a id="filter"></a> `filter(passes)`
+
+Only allows events that pass the test given by the `passes` argument.
+
+Each event from the input stream is given to the `passes` function. If the
+function returns `true`, the event is forwarded to the output stream,
+otherwise it is ignored and not forwarded.
+
+Marble diagram:
+
+```text
+--1---2--3-----4-----5---6--7-8--
+    filter(i => i % 2 === 0)
+------2--------4---------6----8--
+```
+
+#### Arguments:
+
+- `passes: Function` A function of type `(t: T) +> boolean` that takes an event from the input stream and checks if it passes, by returning a
+boolean.
 
 #### Returns:  Stream 
 
