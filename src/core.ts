@@ -1067,7 +1067,7 @@ class ObservableProducer<T> implements InternalProducer<T> {
   public type = 'fromObservable';
   public ins: any;
   public out: Stream<T>;
-  private _unsusbcribe: () => void;
+  private _subscription: { unsubscribe: () => void; };
 
   constructor (observable: any) {
     this.ins = observable;
@@ -1075,11 +1075,11 @@ class ObservableProducer<T> implements InternalProducer<T> {
 
   _start (out: Stream<T>) {
     this.out = out;
-    this._unsusbcribe = this.ins.subscribe(new ObservableListener(out));
+    this._subscription = this.ins.subscribe(new ObservableListener(out));
   }
 
   _stop () {
-    this._unsusbcribe();
+    this._subscription.unsubscribe();
   }
 }
 
@@ -2111,7 +2111,7 @@ export class MemoryStream<T> extends Stream<T> {
   }
 }
 
-class Subscription<T> {
+export class Subscription<T> {
   constructor (private _stream: Stream<T>, private _listener: Listener<T>) {}
 
   unsubscribe (): void {
