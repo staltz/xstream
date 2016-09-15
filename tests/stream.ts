@@ -11,8 +11,10 @@ describe('Stream', () => {
     assert.equal(typeof xs.empty, 'function');
     assert.equal(typeof xs.throw, 'function');
     assert.equal(typeof xs.of, 'function');
+    assert.equal(typeof xs.from, 'function');
     assert.equal(typeof xs.fromArray, 'function');
     assert.equal(typeof xs.fromPromise, 'function');
+    assert.equal(typeof xs.fromObservable, 'function');
     assert.equal(typeof xs.periodic, 'function');
     assert.equal(typeof xs.merge, 'function');
     assert.equal(typeof xs.combine, 'function');
@@ -22,6 +24,7 @@ describe('Stream', () => {
     const stream = xs.create();
     assert.equal(typeof stream.addListener, 'function');
     assert.equal(typeof stream.removeListener, 'function');
+    assert.equal(typeof stream.subscribe, 'function');
     assert.equal(typeof stream.map, 'function');
     assert.equal(typeof stream.mapTo, 'function');
     assert.equal(typeof stream.filter, 'function');
@@ -406,6 +409,84 @@ describe('Stream', () => {
         'next, error, and complete functions.');
         done();
       }
+    });
+  });
+
+  describe('subscribe', () => {
+     it('throws a helpful error if you forget the next function', (done) => {
+      const stream = xs.empty();
+      const listener = <Listener<Number>> <any> {};
+
+      try {
+        stream.subscribe(listener);
+      } catch (e) {
+        assert.equal(e.message, 'stream.addListener() requires all three ' +
+        'next, error, and complete functions.');
+        done();
+      }
+    });
+
+    it('throws a helpful error if you forget the error function', (done) => {
+      const stream = xs.empty();
+      const listener = <Listener<Number>> <any> {
+        next: (x: any) => {}
+      };
+
+      try {
+        stream.subscribe(listener);
+      } catch (e) {
+        assert.equal(e.message, 'stream.addListener() requires all three ' +
+        'next, error, and complete functions.');
+        done();
+      }
+    });
+
+    it('throws a helpful error if you forget the complete function', (done) => {
+      const stream = xs.empty();
+      const listener = <Listener<Number>> <any> {
+        next: (x: any) => {},
+        error: (err: any) => {}
+      };
+
+      try {
+        stream.subscribe(listener);
+      } catch (e) {
+        assert.equal(e.message, 'stream.addListener() requires all three ' +
+        'next, error, and complete functions.');
+        done();
+      }
+    });
+
+    it('throws a helpful error if you pass a non function value as the next function', (done) => {
+      const stream = xs.empty();
+      const listener = <Listener<Number>> <any> {
+        next: undefined
+      };
+
+      try {
+        stream.subscribe(listener);
+      } catch (e) {
+        assert.equal(e.message, 'stream.addListener() requires all three ' +
+        'next, error, and complete functions.');
+        done();
+      }
+    });
+
+    it('should return a subscription', (done) => {
+      const stream = xs.empty();
+      const noop = (): void => void 0;
+      const listener = {
+        next: noop,
+        error: noop,
+        complete: noop
+      };
+
+      const subscription = stream.subscribe(listener);
+
+      assert.equal(typeof subscription, 'object');
+      assert.equal(typeof subscription.unsubscribe, 'function');
+
+      done();
     });
   });
 });
