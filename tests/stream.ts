@@ -410,4 +410,80 @@ describe('Stream', () => {
       }
     });
   });
+
+  describe('subscribe', () => {
+     it('throws a helpful error if you forget the next function', (done) => {
+      const stream = xs.empty();
+      const listener = <Listener<Number>> <any> {};
+
+      try {
+        stream.subscribe(listener);
+      } catch (e) {
+        assert.equal(e.message, 'stream.addListener() requires all three ' +
+        'next, error, and complete functions.');
+        done();
+      }
+    });
+
+    it('throws a helpful error if you forget the error function', (done) => {
+      const stream = xs.empty();
+      const listener = <Listener<Number>> <any> {
+        next: (x: any) => {}
+      };
+
+      try {
+        stream.subscribe(listener);
+      } catch (e) {
+        assert.equal(e.message, 'stream.addListener() requires all three ' +
+        'next, error, and complete functions.');
+        done();
+      }
+    });
+
+    it('throws a helpful error if you forget the complete function', (done) => {
+      const stream = xs.empty();
+      const listener = <Listener<Number>> <any> {
+        next: (x: any) => {},
+        error: (err: any) => {}
+      };
+
+      try {
+        stream.subscribe(listener);
+      } catch (e) {
+        assert.equal(e.message, 'stream.addListener() requires all three ' +
+        'next, error, and complete functions.');
+        done();
+      }
+    });
+
+    it('throws a helpful error if you pass a non function value as the next function', (done) => {
+      const stream = xs.empty();
+      const listener = <Listener<Number>> <any> {
+        next: undefined
+      };
+
+      try {
+        stream.subscribe(listener);
+      } catch (e) {
+        assert.equal(e.message, 'stream.addListener() requires all three ' +
+        'next, error, and complete functions.');
+        done();
+      }
+    });
+
+    it('should return a subscription', (done) => {
+      const stream = xs.empty();
+      const noop = (): void => void 0;
+      const listener = {
+        next: noop,
+        error: noop,
+        complete: noop
+      };
+
+      const subscription = stream.subscribe(listener);
+
+      assert.equal(typeof subscription, 'object');
+      assert.equal(typeof subscription.unsubscribe, 'function');
+    });
+  });
 });
