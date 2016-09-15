@@ -87,6 +87,50 @@ function and<T>(f1: (t: T) => boolean, f2: (t: T) => boolean): (t: T) => boolean
   };
 }
 
+export class Subscription<T> {
+  constructor(private _stream: Stream<T>, private _listener: Listener<T>) {}
+
+  unsubscribe(): void {
+    this._stream.removeListener(this._listener);
+  }
+}
+
+class ObservableProducer<T> implements InternalProducer<T> {
+  public type = 'fromObservable';
+  public ins: any;
+  public out: Stream<T>;
+  private _subscription: { unsubscribe: () => void; };
+
+  constructor(observable: any) {
+    this.ins = observable;
+  }
+
+  _start(out: Stream<T>) {
+    this.out = out;
+    this._subscription = this.ins.subscribe(new ObservableListener(out));
+  }
+
+  _stop() {
+    this._subscription.unsubscribe();
+  }
+}
+
+class ObservableListener<T> implements Listener<T> {
+  constructor(private _listener: InternalListener<T>) {}
+
+  next(value: T) {
+    this._listener._n(value);
+  }
+
+  error(err: any) {
+    this._listener._e(err);
+  }
+
+  complete() {
+    this._listener._c();
+  }
+}
+
 export class MergeProducer<T> implements Aggregator<T, T>, InternalListener<T> {
   public type = 'merge';
   public insArr: Array<Stream<T>>;
@@ -1067,42 +1111,6 @@ export class TakeOperator<T> implements Operator<T, T> {
   }
 }
 
-class ObservableProducer<T> implements InternalProducer<T> {
-  public type = 'fromObservable';
-  public ins: any;
-  public out: Stream<T>;
-  private _subscription: { unsubscribe: () => void; };
-
-  constructor (observable: any) {
-    this.ins = observable;
-  }
-
-  _start (out: Stream<T>) {
-    this.out = out;
-    this._subscription = this.ins.subscribe(new ObservableListener(out));
-  }
-
-  _stop () {
-    this._subscription.unsubscribe();
-  }
-}
-
-class ObservableListener<T> implements Listener<T> {
-  constructor (private _listener: InternalListener<T>) {}
-
-  next (value: T) {
-    this._listener._n(value);
-  }
-
-  error (err: any) {
-    this._listener._e(err);
-  }
-
-  complete () {
-    this._listener._c();
-  }
-}
-
 export class Stream<T> implements InternalListener<T> {
   public _prod: InternalProducer<T>;
   protected _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
@@ -1269,11 +1277,9 @@ export class Stream<T> implements InternalListener<T> {
   /**
    * Adds a Listener to the Stream returning a Subscription to remove that
    * listener.
-   * 
-   * @param {Listener<T>} listener
-   * @returns {Subscription<T>}
-   * 
-   * @memberOf Stream
+   *
+   * @param {Listener} listener
+   * @returns {Subscription}
    */
   subscribe(listener: Listener<T>): Subscription<T> {
     this.addListener(listener);
@@ -1283,13 +1289,10 @@ export class Stream<T> implements InternalListener<T> {
 
   /**
    * Add interop between most.js and RxJS 5
-   * 
-   * @returns
-   * 
-   * @memberOf Stream
-   * 
+   *
+   * @returns {Stream}
    */
-  [$$observable] (): Stream<T> {
+  [$$observable](): Stream<T> {
     return this;
   }
 
@@ -1389,10 +1392,10 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   /**
-   * Creates a string from an array, promise, or an Observable.
-   * 
+   * Creates a stream from an Array, Promise, or an Observable.
+   *
    * @factory true
-   * @param {Array|Promise|Stream} input The input to make a stream from.
+   * @param {Array|Promise|Observable} input The input to make a stream from.
    * @return {Stream}
    */
   static from<T>(input: FromInput<T>): Stream<T> {
@@ -1469,7 +1472,7 @@ export class Stream<T> implements InternalListener<T> {
 
   /**
    * Converts an Observable into a Stream.
-   * 
+   *
    * @factory true
    * @param {any} observable The observable to be converted as a stream.
    * @return {Stream}
@@ -2112,14 +2115,6 @@ export class MemoryStream<T> extends Stream<T> {
 
   debug(labelOrSpy?: string | ((t: T) => void)): MemoryStream<T> {
     return super.debug(labelOrSpy) as MemoryStream<T>;
-  }
-}
-
-export class Subscription<T> {
-  constructor (private _stream: Stream<T>, private _listener: Listener<T>) {}
-
-  unsubscribe (): void {
-    this._stream.removeListener(this._listener);
   }
 }
 
