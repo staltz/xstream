@@ -57,7 +57,11 @@ export interface Listener<T> {
   complete: () => void;
 }
 
-export type FromInput<T> = Promise<T> | Stream<T> | Array<T>
+export type Observable<T> = {
+  subscribe(listener: Listener<T>): { unsubscribe: () => void; }
+}
+
+export type FromInput<T> = Promise<T> | Stream<T> | Array<T> | Observable<T>;
 
 // mutates the input
 function internalizeProducer<T>(producer: Producer<T>) {
