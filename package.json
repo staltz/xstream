@@ -59,6 +59,7 @@
     "markdox": "^0.1.10",
     "mkdirp": "^0.5.1",
     "mocha": "^2.4.5",
+    "most": "^1.0.3",
     "sinon": "^1.16.0",
     "strip-comments": "^0.4.4",
     "ts-node": "^0.9.0",
