@@ -13,6 +13,7 @@ describe('Stream', () => {
     assert.equal(typeof xs.of, 'function');
     assert.equal(typeof xs.fromArray, 'function');
     assert.equal(typeof xs.fromPromise, 'function');
+    assert.equal(typeof xs.fromObservable, 'function');
     assert.equal(typeof xs.periodic, 'function');
     assert.equal(typeof xs.merge, 'function');
     assert.equal(typeof xs.combine, 'function');
@@ -22,6 +23,7 @@ describe('Stream', () => {
     const stream = xs.create();
     assert.equal(typeof stream.addListener, 'function');
     assert.equal(typeof stream.removeListener, 'function');
+    assert.equal(typeof stream.subscribe, 'function');
     assert.equal(typeof stream.map, 'function');
     assert.equal(typeof stream.mapTo, 'function');
     assert.equal(typeof stream.filter, 'function');
