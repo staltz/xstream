@@ -1,3 +1,19 @@
+<a name="6.3.0"></a>
+# [6.3.0](https://github.com/staltz/xstream/compare/v6.2.0...v6.3.0) (2016-09-15)
+
+
+### Bug Fixes
+
+* **core:** fix observable producer ([0229338](https://github.com/staltz/xstream/commit/0229338))
+* **src:** create Observable type for fromInput; export from index ([42984ac](https://github.com/staltz/xstream/commit/42984ac))
+
+
+### Features
+
+* **core:** implement basic Observable interop. ([8fe7069](https://github.com/staltz/xstream/commit/8fe7069))
+
+
+
 <a name="6.2.0"></a>
 # [6.2.0](https://github.com/staltz/xstream/compare/v6.1.0...v6.2.0) (2016-08-29)
 

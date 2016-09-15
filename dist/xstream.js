@@ -5,6 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var symbol_observable_1 = require('symbol-observable');
 var NO = {};
 function noop() { }
 function copy(a) {
@@ -41,6 +42,46 @@ function and(f1, f2) {
         return f1(t) && f2(t);
     };
 }
+var Subscription = (function () {
+    function Subscription(_stream, _listener) {
+        this._stream = _stream;
+        this._listener = _listener;
+    }
+    Subscription.prototype.unsubscribe = function () {
+        this._stream.removeListener(this._listener);
+    };
+    return Subscription;
+}());
+exports.Subscription = Subscription;
+var ObservableProducer = (function () {
+    function ObservableProducer(observable) {
+        this.type = 'fromObservable';
+        this.ins = observable;
+    }
+    ObservableProducer.prototype._start = function (out) {
+        this.out = out;
+        this._subscription = this.ins.subscribe(new ObservableListener(out));
+    };
+    ObservableProducer.prototype._stop = function () {
+        this._subscription.unsubscribe();
+    };
+    return ObservableProducer;
+}());
+var ObservableListener = (function () {
+    function ObservableListener(_listener) {
+        this._listener = _listener;
+    }
+    ObservableListener.prototype.next = function (value) {
+        this._listener._n(value);
+    };
+    ObservableListener.prototype.error = function (err) {
+        this._listener._e(err);
+    };
+    ObservableListener.prototype.complete = function () {
+        this._listener._c();
+    };
+    return ObservableListener;
+}());
 var MergeProducer = (function () {
     function MergeProducer(insArr) {
         this.type = 'merge';
@@ -1010,6 +1051,15 @@ var Stream = (function () {
         this._remove(listener);
     };
     
+    Stream.prototype.subscribe = function (listener) {
+        this.addListener(listener);
+        return new Subscription(this, listener);
+    };
+    
+    Stream.prototype[symbol_observable_1.default] = function () {
+        return this;
+    };
+    
     Stream.create = function (producer) {
         if (producer) {
             if (typeof producer.start !== 'function'
@@ -1046,6 +1096,19 @@ var Stream = (function () {
         });
     };
     
+    Stream.from = function (input) {
+        if (typeof input[symbol_observable_1.default] === 'function') {
+            return Stream.fromObservable(input);
+        }
+        else if (typeof input.then === 'function') {
+            return Stream.fromPromise(input);
+        }
+        else if (Array.isArray(input)) {
+            return Stream.fromArray(input);
+        }
+        throw new TypeError("Type of input to from() must be an Array, Promise, or Observable");
+    };
+    
     Stream.of = function () {
         var items = [];
         for (var _i = 0; _i < arguments.length; _i++) {
@@ -1060,6 +1123,10 @@ var Stream = (function () {
     
     Stream.fromPromise = function (promise) {
         return new Stream(new FromPromiseProducer(promise));
+    };
+    
+    Stream.fromObservable = function (observable) {
+        return new Stream(new ObservableProducer(observable));
     };
     
     Stream.periodic = function (period) {
@@ -1090,6 +1157,7 @@ var Stream = (function () {
         op.type = op.type.replace('map', 'mapTo');
         return s;
     };
+    
     Stream.prototype.filter = function (passes) {
         var p = this._prod;
         if (p instanceof FilterOperator) {
@@ -1254,7 +1322,7 @@ exports.MemoryStream = MemoryStream;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Stream;
 
-},{}],2:[function(require,module,exports){
+},{"symbol-observable":3}],2:[function(require,module,exports){
 "use strict";
 var core_1 = require('./core');
 exports.Stream = core_1.Stream;
@@ -1262,5 +1330,57 @@ exports.MemoryStream = core_1.MemoryStream;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = core_1.Stream;
 
-},{"./core":1}]},{},[2])(2)
+},{"./core":1}],3:[function(require,module,exports){
+module.exports = require('./lib/index');
+
+},{"./lib/index":4}],4:[function(require,module,exports){
+(function (global){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _ponyfill = require('./ponyfill');
+
+var _ponyfill2 = _interopRequireDefault(_ponyfill);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var root = undefined; 
+
+if (typeof global !== 'undefined') {
+	root = global;
+} else if (typeof window !== 'undefined') {
+	root = window;
+}
+
+var result = (0, _ponyfill2['default'])(root);
+exports['default'] = result;
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./ponyfill":5}],5:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports['default'] = symbolObservablePonyfill;
+function symbolObservablePonyfill(root) {
+	var result;
+	var _Symbol = root.Symbol;
+
+	if (typeof _Symbol === 'function') {
+		if (_Symbol.observable) {
+			result = _Symbol.observable;
+		} else {
+			result = _Symbol('observable');
+			_Symbol.observable = result;
+		}
+	} else {
+		result = '@@observable';
+	}
+
+	return result;
+};
+},{}]},{},[2])(2)
 });

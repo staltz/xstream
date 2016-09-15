@@ -74,9 +74,11 @@ var xs = require('xstream').default
 - [`never`](#never)
 - [`empty`](#empty)
 - [`throw`](#throw)
+- [`from`](#from)
 - [`of`](#of)
 - [`fromArray`](#fromArray)
 - [`fromPromise`](#fromPromise)
+- [`fromObservable`](#fromObservable)
 - [`periodic`](#periodic)
 - [`merge`](#merge)
 - [`combine`](#combine)
@@ -85,6 +87,8 @@ var xs = require('xstream').default
 
 - [`addListener`](#addListener)
 - [`removeListener`](#removeListener)
+- [`subscribe`](#subscribe)
+
 - [`map`](#map)
 - [`mapTo`](#mapTo)
 - [`filter`](#filter)
@@ -307,6 +311,18 @@ throw(X)
 
 - - -
 
+### <a id="from"></a> `from(input)`
+
+Creates a stream from an Array, Promise, or an Observable.
+
+#### Arguments:
+
+- `input: Array|Promise|Observable` The input to make a stream from.
+
+#### Returns:  Stream 
+
+- - -
+
 ### <a id="of"></a> `of(a, b)`
 
 Creates a Stream that immediately emits the arguments that you give to
@@ -364,6 +380,18 @@ fromPromise( ----42 )
 #### Arguments:
 
 - `promise: Promise` The promise to be converted as a stream.
+
+#### Returns:  Stream 
+
+- - -
+
+### <a id="fromObservable"></a> `fromObservable(observable)`
+
+Converts an Observable into a Stream.
+
+#### Arguments:
+
+- `observable: any` The observable to be converted as a stream.
 
 #### Returns:  Stream 
 
@@ -466,6 +494,19 @@ Removes a Listener from the Stream, assuming the Listener was added to it.
 #### Arguments:
 
 - `listener: Listener\<T>`
+
+- - -
+
+### <a id="subscribe"></a> `subscribe(listener)`
+
+Adds a Listener to the Stream returning a Subscription to remove that
+listener.
+
+#### Arguments:
+
+- `listener: Listener`
+
+#### Returns:  Subscription 
 
 - - -
 
