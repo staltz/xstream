@@ -1,4 +1,5 @@
 import {Promise} from 'es6-promise';
+import $$observable from 'symbol-observable';
 
 const NO = {};
 function noop() {}
@@ -55,6 +56,8 @@ export interface Listener<T> {
   error: (err: any) => void;
   complete: () => void;
 }
+
+export type FromInput<T> = Promise<T> | Stream<T> | Array<T>
 
 // mutates the input
 function internalizeProducer<T>(producer: Producer<T>) {
@@ -1060,6 +1063,42 @@ export class TakeOperator<T> implements Operator<T, T> {
   }
 }
 
+class ObservableProducer<T> implements InternalProducer<T> {
+  public type = 'fromObservable';
+  public ins: any;
+  public out: Stream<T>;
+  private _unsusbcribe: () => void;
+
+  constructor (observable: any) {
+    this.ins = observable;
+  }
+
+  _start (out: Stream<T>) {
+    this.out = out;
+    this._unsusbcribe = this.ins.subscribe(new ObservableListener(out));
+  }
+
+  _stop () {
+    this._unsusbcribe();
+  }
+}
+
+class ObservableListener<T> implements Listener<T> {
+  constructor (private _listener: InternalListener<T>) {}
+
+  next (value: T) {
+    this._listener._n(value);
+  }
+
+  error (err: any) {
+    this._listener._e(err);
+  }
+
+  complete () {
+    this._listener._c();
+  }
+}
+
 export class Stream<T> implements InternalListener<T> {
   public _prod: InternalProducer<T>;
   protected _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
@@ -1224,6 +1263,33 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   /**
+   * Adds a Listener to the Stream returning a Subscription to remove that
+   * listener.
+   * 
+   * @param {Listener<T>} listener
+   * @returns {Subscription<T>}
+   * 
+   * @memberOf Stream
+   */
+  subscribe(listener: Listener<T>): Subscription<T> {
+    this.addListener(listener);
+
+    return new Subscription<T>(this, listener);
+  }
+
+  /**
+   * Add interop between most.js and RxJS 5
+   * 
+   * @returns
+   * 
+   * @memberOf Stream
+   * 
+   */
+  [$$observable] (): Stream<T> {
+    return this;
+  }
+
+  /**
    * Creates a new Stream given a Producer.
    *
    * @factory true
@@ -1319,6 +1385,25 @@ export class Stream<T> implements InternalListener<T> {
   }
 
   /**
+   * Creates a string from an array, promise, or an Observable.
+   * 
+   * @factory true
+   * @param {Array|Promise|Stream} input The input to make a stream from.
+   * @return {Stream}
+   */
+  static from<T>(input: FromInput<T>): Stream<T> {
+    if (typeof input[$$observable] === 'function') {
+      return Stream.fromObservable<T>(input);
+    } else if (typeof (input as Promise<T>).then === 'function') {
+      return Stream.fromPromise<T>(input as Promise<T>);
+    } else if (Array.isArray(input)) {
+      return Stream.fromArray<T>(input);
+    }
+
+    throw new TypeError(`Type of input to from() must be an Array, Promise, or Observable`);
+  }
+
+  /**
    * Creates a Stream that immediately emits the arguments that you give to
    * *of*, then completes.
    *
@@ -1376,6 +1461,17 @@ export class Stream<T> implements InternalListener<T> {
    */
   static fromPromise<T>(promise: Promise<T>): Stream<T> {
     return new Stream<T>(new FromPromiseProducer<T>(promise));
+  }
+
+  /**
+   * Converts an Observable into a Stream.
+   * 
+   * @factory true
+   * @param {any} observable The observable to be converted as a stream.
+   * @return {Stream}
+   */
+  static fromObservable<T>(observable: any): Stream<T> {
+    return new Stream<T>(new ObservableProducer(observable));
   }
 
   /**
@@ -2012,6 +2108,14 @@ export class MemoryStream<T> extends Stream<T> {
 
   debug(labelOrSpy?: string | ((t: T) => void)): MemoryStream<T> {
     return super.debug(labelOrSpy) as MemoryStream<T>;
+  }
+}
+
+class Subscription<T> {
+  constructor (private _stream: Stream<T>, private _listener: Listener<T>) {}
+
+  unsubscribe (): void {
+    this._stream.removeListener(this._listener);
   }
 }
 
