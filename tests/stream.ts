@@ -484,6 +484,8 @@ describe('Stream', () => {
 
       assert.equal(typeof subscription, 'object');
       assert.equal(typeof subscription.unsubscribe, 'function');
+
+      done();
     });
   });
 });
