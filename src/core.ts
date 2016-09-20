@@ -1189,6 +1189,7 @@ export class Stream<T> implements InternalListener<T> {
       const b = copy(a);
       for (let i = 0; i < L; i++) b[i]._e(err);
     }
+    if (!this._d && L == 0) throw this._err;
   }
 
   _c(): void {
