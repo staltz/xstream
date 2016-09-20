@@ -1,3 +1,13 @@
+<a name="6.3.1"></a>
+## [6.3.1](https://github.com/staltz/xstream/compare/v6.3.0...v6.3.1) (2016-09-20)
+
+
+### Bug Fixes
+
+* **merge:** increase variadic type count to max 10 ([2909a78](https://github.com/staltz/xstream/commit/2909a78))
+
+
+
 <a name="6.3.0"></a>
 # [6.3.0](https://github.com/staltz/xstream/compare/v6.2.0...v6.3.0) (2016-09-15)
 
