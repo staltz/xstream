@@ -1,3 +1,13 @@
+<a name="6.3.2"></a>
+## [6.3.2](https://github.com/staltz/xstream/compare/v6.3.1...v6.3.2) (2016-09-21)
+
+
+### Bug Fixes
+
+* **pairwise:** support use of pairwise in synchronous recursive situations ([530dc25](https://github.com/staltz/xstream/commit/530dc25))
+
+
+
 <a name="6.3.1"></a>
 ## [6.3.1](https://github.com/staltz/xstream/compare/v6.3.0...v6.3.1) (2016-09-20)
 
