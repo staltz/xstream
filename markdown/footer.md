@@ -16,12 +16,14 @@ A: Read this [blog post](http://staltz.com/why-we-built-xstream.html) on the top
 
 **Q: What is the equivalent of [`withLatestFrom`](http://reactivex.io/rxjs/class/es6/Observable.js~Observable.html#instance-method-withLatestFrom) in xstream?**
 
+`withLatestFrom` is implemented as an extra named [`sampleCombine`](https://github.com/staltz/xstream/blob/master/EXTRA_DOCS.md#sampleCombine). It may also be composed with existing operators:
+
 <!-- skip-example -->
 ```js
 A.withLatestFrom(B, (a, b) => a + b)
 ```
 
-can be achieved in *xstream* with
+can be composed in *xstream* with
 
 ```js
 B.map(b => A.map(a => a + b)).flatten()

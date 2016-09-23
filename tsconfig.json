@@ -28,6 +28,7 @@
     "src/extra/fromDiagram.ts",
     "src/extra/fromEvent.ts",
     "src/extra/pairwise.ts",
+    "src/extra/sampleCombine.ts",
     "src/extra/split.ts",
     "src/extra/tween.ts",
     "src/index.ts"
