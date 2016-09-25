@@ -1,5 +1,14 @@
 <!-- This EXTRA_DOCS.md file is automatically generated from source code and files in the /markdown directory. Please DO NOT send pull requests to directly modify this file. Instead, edit the JSDoc comments in source code or the md files in /markdown or the md.ejs files in /tools. -->
 
+<? docfiles.forEach(function(doc) { ?>
+  <? doc.javadoc.forEach(function(comment) { ?>
+    <? if (comment.raw.code.substr(0,13) === 'sampleCombine') { ?>
+    <?   comment.name = 'sampleCombine'; ?>
+    <?   comment.isFunction = true; ?>
+    <? } ?>
+  <? }) ?>
+<? }) ?>
+
 ## Extras
 <? docfiles.forEach(function(doc) { ?><? doc.javadoc.forEach(function(comment) { ?><? if (!comment.ignore && comment.raw.tags.findIndex(o => o.type === 'factory') >= 0) { ?><? if (comment.name) { ?>
 - [`<?= comment.name ?>`](#<?= comment.name ?>) (factory)<? } ?><? } ?><? if (!comment.ignore && comment.raw.tags.findIndex(o => o.type === 'factory') === -1) { ?><? if (comment.name) { ?>

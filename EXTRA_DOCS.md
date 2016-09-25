@@ -12,6 +12,7 @@
 - [`fromDiagram`](#fromDiagram) (factory)
 - [`fromEvent`](#fromEvent) (operator)
 - [`pairwise`](#pairwise) (operator)
+- [`sampleCombine`](#sampleCombine) (operator)
 - [`split`](#split) (operator)
 - [`tween`](#tween) (factory)
 
@@ -522,6 +523,82 @@ stream.addListener({
 > [5,6]
 > completed
 ```
+
+#### Returns:  Stream 
+
+- - -
+
+### <a id="sampleCombine"></a> `sampleCombine(streams)`
+
+Combines a source stream with multiple other streams. The result stream
+will emit the latest events from all input streams, but only when the
+source stream emits.
+
+If the source, or any input stream, throws an error, the result stream
+will propagate the error. If any input streams end, their final emitted
+value will remain in the array of any subsequent events from the result
+stream.
+
+The result stream will only complete upon completion of the source stream.
+
+Marble diagram:
+
+```text
+--1----2-----3--------4--- (source)
+----a-----b-----c--d------ (other)
+     sampleCombine
+-------2a----3b-------4d--
+```
+
+Examples:
+
+```js
+import sampleCombine from 'xstream/extra/sampleCombine'
+import xs from 'xstream'
+
+const sampler = xs.periodic(1000).take(3)
+const other = xs.periodic(100)
+
+const stream = sampler.compose(sampleCombine(other))
+
+stream.addListener({
+  next: i => console.log(i),
+  error: err => console.error(err),
+  complete: () => console.log('completed')
+})
+```
+
+```text
+> [0, 8]
+> [1, 18]
+> [2, 28]
+```
+
+```js
+import sampleCombine from 'xstream/extra/sampleCombine'
+import xs from 'xstream'
+
+const sampler = xs.periodic(1000).take(3)
+const other = xs.periodic(100).take(2)
+
+const stream = sampler.compose(sampleCombine(other))
+
+stream.addListener({
+  next: i => console.log(i),
+  error: err => console.error(err),
+  complete: () => console.log('completed')
+})
+```
+
+```text
+> [0, 1]
+> [1, 1]
+> [2, 1]
+```
+
+#### Arguments:
+
+- `streams: Stream` One or more streams to combine with the sampler stream.
 
 #### Returns:  Stream 
 

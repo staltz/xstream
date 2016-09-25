@@ -146,13 +146,9 @@ export class SampleCombineOperator<T> implements Operator<T, Array<any>> {
 }
 
 let sampleCombine: SampleCombineSignature;
-sampleCombine = function sampleCombine(...streams: Array<Stream<any>>) {
-  return function sampleCombineOperator(sampler: Stream<any>): Stream<Array<any>> {
-    return new Stream<Array<any>>(new SampleCombineOperator(sampler, streams));
-  };
-} as SampleCombineSignature;
 
 /**
+ *
  * Combines a source stream with multiple other streams. The result stream
  * will emit the latest events from all input streams, but only when the
  * source stream emits.
@@ -223,4 +219,10 @@ sampleCombine = function sampleCombine(...streams: Array<Stream<any>>) {
  * stream.
  * @return {Stream}
  */
+sampleCombine = function sampleCombine(...streams: Array<Stream<any>>) {
+  return function sampleCombineOperator(sampler: Stream<any>): Stream<Array<any>> {
+    return new Stream<Array<any>>(new SampleCombineOperator(sampler, streams));
+  };
+} as SampleCombineSignature;
+
 export default sampleCombine;
