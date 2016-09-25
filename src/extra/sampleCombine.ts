@@ -49,22 +49,22 @@ export interface SampleCombineSignature {
 }
 
 export class SampleCombineListener<T> implements InternalListener<T> {
-    constructor(private i: number, private p: SampleCombineOperator<any>) {
-        p.ils[i] = this;
-    }
+  constructor(private i: number, private p: SampleCombineOperator<any>) {
+    p.ils[i] = this;
+  }
 
-    _n(t: T): void {
-        if (!this.p.out) return;
-        this.p.vals[this.i] = t;
-    }
+  _n(t: T): void {
+    if (!this.p.out) return;
+    this.p.vals[this.i] = t;
+  }
 
-    _e(err: any): void {
-        this.p._e(err);
-    }
+  _e(err: any): void {
+    this.p._e(err);
+  }
 
-    _c(): void {
-        this.p.d(this.i, this);
-    }
+  _c(): void {
+    this.p.d(this.i, this);
+  }
 }
 
 export class SampleCombineOperator<T> implements Operator<T, Array<any>> {
@@ -75,51 +75,51 @@ export class SampleCombineOperator<T> implements Operator<T, Array<any>> {
   public ils: Array<SampleCombineListener<any>> = [];
 
   constructor(public ins: Stream<T>,
-              public streams: Array<Stream<any>>) {}
+              public streams: Array<Stream<any>>) { }
 
   _start(out: Stream<Array<any>>): void {
-      if (!this.ins || !this.streams) {
-          out._n([]);
-          out._c();
-      } else {
-          this.Sc = this.streams.length;
-          this.ins._add(this);
-          this.out = out;
-          if (this.Sc) {
-              for (let i = 0; i < this.Sc; i++) {
-                  this.vals[i] = undefined;
-                  this.streams[i]._add(new SampleCombineListener<any>(i, this));
-              }
-          }
+    if (!this.ins || !this.streams) {
+      out._n([]);
+      out._c();
+    } else {
+      this.Sc = this.streams.length;
+      this.ins._add(this);
+      this.out = out;
+      if (this.Sc) {
+        for (let i = 0; i < this.Sc; i++) {
+          this.vals[i] = undefined;
+          this.streams[i]._add(new SampleCombineListener<any>(i, this));
+        }
       }
+    }
   }
 
   _stop(): void {
-      if (!this.ins || this.Sc) return;
-      this.ins._remove(this);
-      this.out = this.vals = null;
-      for (let i = 0; i < this.Sc; i++) {
-        this.streams[i]._remove(this.ils[i]);
-      }
+    if (!this.ins || this.Sc) return;
+    this.ins._remove(this);
+    this.out = this.vals = null;
+    for (let i = 0; i < this.Sc; i++) {
+      this.streams[i]._remove(this.ils[i]);
+    }
   }
 
   _n(t: T): void {
-      if (!this.out) return;
-      this.out._n([t, ...this.vals]);
+    if (!this.out) return;
+    this.out._n([t, ...this.vals]);
   }
 
   _e(err: any): void {
-      if (!this.out) return;
-      this.out._e(err);
+    if (!this.out) return;
+    this.out._e(err);
   }
 
   _c(): void {
-      if (!this.out) return;
-      this.out._c();
+    if (!this.out) return;
+    this.out._c();
   }
 
   d(i: number, l: SampleCombineListener<any>): void {
-      this.streams[i]._remove(l);
+    this.streams[i]._remove(l);
   }
 }
 
