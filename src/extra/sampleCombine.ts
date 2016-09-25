@@ -48,14 +48,17 @@ export interface SampleCombineSignature {
   (...streams: Array<Stream<any>>): (s: Stream<any>) => Stream<Array<any>>;
 }
 
+const NO = {};
+
 export class SampleCombineListener<T> implements InternalListener<T> {
   constructor(private i: number, private p: SampleCombineOperator<any>) {
     p.ils[i] = this;
   }
 
   _n(t: T): void {
-    if (!this.p.out) return;
-    this.p.vals[this.i] = t;
+    const p = this.p;
+    if (p.out === NO) return;
+    p.up(t, this.i);
   }
 
   _e(err: any): void {
@@ -63,63 +66,82 @@ export class SampleCombineListener<T> implements InternalListener<T> {
   }
 
   _c(): void {
-    this.p.d(this.i, this);
+    this.p.down(this.i, this);
   }
 }
 
 export class SampleCombineOperator<T> implements Operator<T, Array<any>> {
   public type = 'sampleCombine';
+  public ins: Stream<T>;
+  public others: Array<Stream<any>>;
   public out: Stream<Array<any>>;
-  public vals: Array<any> = [];
-  public Sc: number = 0;
-  public ils: Array<SampleCombineListener<any>> = [];
+  public ils: Array<SampleCombineListener<any>>;
+  public Nn: number; // *N*umber of streams still to send *n*ext
+  public vals: Array<any>;
 
-  constructor(public ins: Stream<T>,
-              public streams: Array<Stream<any>>) { }
+  constructor(ins: Stream<T>, streams: Array<Stream<any>>) {
+    this.ins = ins;
+    this.others = streams;
+    this.out = NO as Stream<Array<any>>;
+    this.ils = [];
+    this.Nn = 0;
+    this.vals = [];
+  }
 
   _start(out: Stream<Array<any>>): void {
-    if (!this.ins || !this.streams) {
-      out._n([]);
-      out._c();
-    } else {
-      this.Sc = this.streams.length;
-      this.ins._add(this);
-      this.out = out;
-      if (this.Sc) {
-        for (let i = 0; i < this.Sc; i++) {
-          this.vals[i] = undefined;
-          this.streams[i]._add(new SampleCombineListener<any>(i, this));
-        }
-      }
+    this.out = out;
+    const s = this.others;
+    const n = this.Nn = s.length;
+    const vals = this.vals = new Array(n);
+    for (let i = 0; i < n; i++) {
+      vals[i] = NO;
+      s[i]._add(new SampleCombineListener<any>(i, this));
     }
+    this.ins._add(this);
   }
 
   _stop(): void {
-    if (!this.ins || this.Sc) return;
+    const s = this.others;
+    const n = s.length;
+    const ils = this.ils;
     this.ins._remove(this);
-    this.out = this.vals = null;
-    for (let i = 0; i < this.Sc; i++) {
-      this.streams[i]._remove(this.ils[i]);
+    for (let i = 0; i < n; i++) {
+      s[i]._remove(ils[i]);
     }
+    this.out = NO as Stream<Array<any>>;
+    this.vals = [];
+    this.ils = [];
   }
 
   _n(t: T): void {
-    if (!this.out) return;
-    this.out._n([t, ...this.vals]);
+    const out = this.out;
+    if (out === NO) return;
+    if (this.Nn > 0) return;
+    out._n([t, ...this.vals]);
   }
 
   _e(err: any): void {
-    if (!this.out) return;
-    this.out._e(err);
+    const out = this.out;
+    if (out === NO) return;
+    out._e(err);
   }
 
   _c(): void {
-    if (!this.out) return;
-    this.out._c();
+    const out = this.out;
+    if (out === NO) return;
+    out._c();
   }
 
-  d(i: number, l: SampleCombineListener<any>): void {
-    this.streams[i]._remove(l);
+  up(t: any, i: number): void {
+    const v = this.vals[i];
+    if (this.Nn > 0 && v === NO) {
+      this.Nn--;
+    }
+    this.vals[i] = t;
+  }
+
+  down(i: number, l: SampleCombineListener<any>): void {
+    this.others[i]._remove(l);
   }
 }
 

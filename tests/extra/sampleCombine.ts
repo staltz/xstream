@@ -57,6 +57,23 @@ describe('sampleCombine (extra)', () => {
     });
   });
 
+  it('should not pick values from sampled streams before they have emitted', (done) => {
+    const stream1 = xs.periodic(100).take(4);
+    const stream2 = xs.periodic(150).take(1);
+    const stream = stream1.compose(sampleCombine(stream2)).map(arr => arr.join(''));
+    let expected = ['10', '20', '30'];
+    stream.addListener({
+      next: (x) => {
+        assert.equal(x, expected.shift());
+      },
+      error: done,
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      },
+    });
+  });
+
   it('should just wrap the value if combining one stream', (done) => {
     const source = xs.periodic(100).take(3);
     const stream = source.compose(sampleCombine());
@@ -76,13 +93,13 @@ describe('sampleCombine (extra)', () => {
   });
 
   it('should not break future listeners when SampleCombineProducer tears down', (done) => {
-    //     --0---1--2---|  innerA
-    //     ----0----1---|  innerB
-    // ----0-----1--2---|  outer
-    // ------00--11-12--|  stream
+    //     --0---1----2-|  innerA
+    //     ----0-----1--|  innerB
+    // ----a-----b--c---|  outer
+    // ------a0-----c21-|  stream
     const innerA = xs.create<number>();
     const innerB = xs.create<number>();
-    const outer = xs.create<number>();
+    const outer = xs.create<string>();
     const arrayInners: Array<Stream<number>> = [];
     const stream = outer
       .map(x => {
@@ -92,11 +109,11 @@ describe('sampleCombine (extra)', () => {
           .map(combination => `${x}${combination.join('')}`);
       })
       .flatten();
-    const expected = ['00', '11', '12'];
+    const expected = ['a0', 'c21'];
 
     setTimeout(() => {
       arrayInners.push(innerA);
-      outer.shamefullySendNext(0);
+      outer.shamefullySendNext('a');
     }, 100);
     setTimeout(() => {
       innerA.shamefullySendNext(0);
@@ -106,13 +123,13 @@ describe('sampleCombine (extra)', () => {
     }, 175);
     setTimeout(() => {
       arrayInners.push(innerB);
-      outer.shamefullySendNext(1);
+      outer.shamefullySendNext('b');
       innerA.shamefullySendNext(1);
     }, 200);
     setTimeout(() => {
-      innerA.shamefullySendNext(2);
-      outer.shamefullySendNext(2);
+      outer.shamefullySendNext('c');
       innerB.shamefullySendNext(1);
+      innerA.shamefullySendNext(2);
     }, 250);
     setTimeout(() => {
       innerA.shamefullySendComplete();
