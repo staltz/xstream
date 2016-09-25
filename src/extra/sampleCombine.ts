@@ -1,4 +1,52 @@
-import {CombineSignature, InternalListener, Operator, Stream} from '../core';
+import {InternalListener, Operator, Stream} from '../core';
+
+export interface SampleCombineSignature {
+  (): <T>(s: Stream<T>) => Stream<[T]>;
+  <T1>(s1: Stream<T1>): <T>(s: Stream<T>) => Stream<[T, T1]>;
+  <T1, T2>(
+    s1: Stream<T1>,
+    s2: Stream<T2>): <T>(s: Stream<T>) => Stream<[T, T1, T2]>;
+  <T1, T2, T3>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>): <T>(s: Stream<T>) => Stream<[T, T1, T2, T3]>;
+  <T1, T2, T3, T4>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>,
+    s4: Stream<T4>): <T>(s: Stream<T>) => Stream<[T, T1, T2, T3, T4]>;
+  <T1, T2, T3, T4, T5>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>,
+    s4: Stream<T4>,
+    s5: Stream<T5>): <T>(s: Stream<T>) => Stream<[T, T1, T2, T3, T4, T5]>;
+  <T1, T2, T3, T4, T5, T6>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>,
+    s4: Stream<T4>,
+    s5: Stream<T5>,
+    s6: Stream<T6>): <T>(s: Stream<T>) => Stream<[T, T1, T2, T3, T4, T5, T6]>;
+  <T1, T2, T3, T4, T5, T6, T7>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>,
+    s4: Stream<T4>,
+    s5: Stream<T5>,
+    s6: Stream<T6>,
+    s7: Stream<T7>): <T>(s: Stream<T>) => Stream<[T, T1, T2, T3, T4, T5, T6, T7]>;
+  <T1, T2, T3, T4, T5, T6, T7, T8>(
+    s1: Stream<T1>,
+    s2: Stream<T2>,
+    s3: Stream<T3>,
+    s4: Stream<T4>,
+    s5: Stream<T5>,
+    s6: Stream<T6>,
+    s7: Stream<T7>,
+    s8: Stream<T8>): <T>(s: Stream<T>) => Stream<[T, T1, T2, T3, T4, T5, T6, T7, T8]>;
+  (...streams: Array<Stream<any>>): (s: Stream<any>) => Stream<Array<any>>;
+}
 
 export class SampleCombineListener<T> implements InternalListener<T> {
     constructor(private i: number, private p: SampleCombineOperator<any>) {
@@ -75,6 +123,13 @@ export class SampleCombineOperator<T> implements Operator<T, Array<any>> {
   }
 }
 
+let sampleCombine: SampleCombineSignature;
+sampleCombine = function sampleCombine(...streams: Array<Stream<any>>) {
+  return function sampleCombineOperator(sampler: Stream<any>): Stream<Array<any>> {
+    return new Stream<Array<any>>(new SampleCombineOperator(sampler, streams));
+  };
+} as SampleCombineSignature;
+
 /**
  * Combines a source stream with multiple other streams. The result stream
  * will emit the latest events from all input streams, but only when the
@@ -90,10 +145,10 @@ export class SampleCombineOperator<T> implements Operator<T, Array<any>> {
  * Marble diagram:
  *
  * ```text
- * --1----2-----3--------4---
- * ----a-----b-----c--d------
+ * --1----2-----3--------4--- (source)
+ * ----a-----b-----c--d------ (other)
  *      sampleCombine
- * --1?---2a----3b-------4d--
+ * -------2a----3b-------4d--
  * ```
  *
  * Examples:
@@ -105,7 +160,7 @@ export class SampleCombineOperator<T> implements Operator<T, Array<any>> {
  * const sampler = xs.periodic(1000).take(3)
  * const other = xs.periodic(100)
  *
- * const stream = sampleCombine(sampler, other)
+ * const stream = sampler.compose(sampleCombine(other))
  *
  * stream.addListener({
  *   next: i => console.log(i),
@@ -127,7 +182,7 @@ export class SampleCombineOperator<T> implements Operator<T, Array<any>> {
  * const sampler = xs.periodic(1000).take(3)
  * const other = xs.periodic(100).take(2)
  *
- * const stream = sampleCombine(sampler, other)
+ * const stream = sampler.compose(sampleCombine(other))
  *
  * stream.addListener({
  *   next: i => console.log(i),
@@ -142,14 +197,8 @@ export class SampleCombineOperator<T> implements Operator<T, Array<any>> {
  * > [2, 1]
  * ```
  *
- * @param {Stream} sampler The source stream of which to sample.
- * @param {...Stream} streams One or more streams to combine.
+ * @param {...Stream} streams One or more streams to combine with the sampler
+ * stream.
  * @return {Stream}
  */
-let sampleCombine: CombineSignature;
-sampleCombine = function(sampler: Stream<any>,
-                         ...streams: Array<Stream<any>>): Stream<Array<any>> {
-    return new Stream<Array<any>>(new SampleCombineOperator<any>(sampler, streams));
-} as CombineSignature;
-
 export default sampleCombine;

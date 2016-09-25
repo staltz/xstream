@@ -6,9 +6,9 @@ import * as assert from 'assert';
 
 describe('sampleCombine (extra)', () => {
   it('should combine AND-style two streams together', (done) => {
-    const stream1 = xs.periodic(100).take(3);
+    const stream1 = xs.periodic(100).take(3).startWith(null);
     const stream2 = xs.periodic(99).take(3);
-    const stream = sampleCombine(stream1, stream2);
+    const stream = stream1.compose(sampleCombine(stream2));
     let expected = [[0, 0], [1, 1], [2, 2]];
     stream.addListener({
       next: (x) => {
@@ -35,14 +35,15 @@ describe('sampleCombine (extra)', () => {
       stop: () => {}
     });
 
-    const combined: Stream<[string, string]> = sampleCombine(stream1, stream2);
+    const combined: Stream<[string, string]> = stream1
+      .compose(sampleCombine(stream2));
     done();
   });
 
   it('should complete only when the sample stream has completed', (done) => {
     const stream1 = xs.periodic(100).take(4);
     const stream2 = xs.periodic(99).take(1);
-    const stream = sampleCombine(stream1, stream2).map(arr => arr.join(''));
+    const stream = stream1.compose(sampleCombine(stream2)).map(arr => arr.join(''));
     let expected = ['00', '10', '20', '30'];
     stream.addListener({
       next: (x) => {
@@ -56,24 +57,9 @@ describe('sampleCombine (extra)', () => {
     });
   });
 
-  it('should emit an empty array if combining zero streams', (done) => {
-    const stream = sampleCombine();
-
-    stream.addListener({
-      next: (a) => {
-        assert.equal(Array.isArray(a), true);
-        assert.equal(a.length, 0);
-      },
-      error: done,
-      complete: () => {
-        done();
-      },
-    });
-  });
-
   it('should just wrap the value if combining one stream', (done) => {
     const source = xs.periodic(100).take(3);
-    const stream = sampleCombine(source);
+    const stream = source.compose(sampleCombine());
     let expected = [[0], [1], [2]];
 
     stream.addListener({
@@ -100,7 +86,9 @@ describe('sampleCombine (extra)', () => {
     const arrayInners: Array<Stream<number>> = [];
     const stream = outer
       .map(x => {
-        return sampleCombine(...arrayInners)
+        const sampler = arrayInners[0];
+        const others = arrayInners.slice(1, 1000);
+        return sampler.compose(sampleCombine(...others))
           .map(combination => `${x}${combination.join('')}`);
       })
       .flatten();
@@ -147,7 +135,7 @@ describe('sampleCombine (extra)', () => {
   it('should return a Stream when combining a MemoryStream with a Stream', (done) => {
     const input1 = xs.periodic(80).take(4).remember();
     const input2 = xs.periodic(50).take(3);
-    const stream: Stream<[number, number]> = sampleCombine(input1, input2);
+    const stream: Stream<[number, number]> = input1.compose(sampleCombine(input2));
     assert.strictEqual(stream instanceof Stream, true);
     done();
   });
@@ -155,7 +143,7 @@ describe('sampleCombine (extra)', () => {
   it('should return a Stream when combining a MemoryStream with a MemoryStream', (done) => {
     const input1 = xs.periodic(80).take(4).remember();
     const input2 = xs.periodic(50).take(3).remember();
-    const stream: Stream<[number, number]> = sampleCombine(input1, input2);
+    const stream: Stream<[number, number]> = input1.compose(sampleCombine(input2));
     assert.strictEqual(stream instanceof Stream, true);
     done();
   });
