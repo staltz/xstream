@@ -335,7 +335,7 @@ export class CombineListener<T> implements InternalListener<T>, OutSender<Array<
 
   _n(t: T): void {
     const p = this.p, out = this.out;
-    if (!out) return;
+    if (out === NO) return;
     if (p.up(t, this.i)) {
       out._n(p.vals);
     }
@@ -343,13 +343,13 @@ export class CombineListener<T> implements InternalListener<T>, OutSender<Array<
 
   _e(err: any): void {
     const out = this.out;
-    if (!out) return;
+    if (out === NO) return;
     out._e(err);
   }
 
   _c(): void {
     const p = this.p;
-    if (!p.out) return;
+    if (p.out === NO) return;
     if (--p.Nc === 0) {
       p.out._c();
     }
@@ -399,8 +399,9 @@ export class CombineProducer<R> implements Aggregator<any, Array<R>> {
   _stop(): void {
     const s = this.insArr;
     const n = s.length;
+    const ils = this.ils;
     for (let i = 0; i < n; i++) {
-      s[i]._remove(this.ils[i]);
+      s[i]._remove(ils[i]);
     }
     this.out = NO as Stream<Array<R>>;
     this.ils = [];
