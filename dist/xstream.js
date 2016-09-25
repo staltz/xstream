@@ -138,7 +138,7 @@ var CombineListener = (function () {
     }
     CombineListener.prototype._n = function (t) {
         var p = this.p, out = this.out;
-        if (!out)
+        if (out === NO)
             return;
         if (p.up(t, this.i)) {
             out._n(p.vals);
@@ -146,13 +146,13 @@ var CombineListener = (function () {
     };
     CombineListener.prototype._e = function (err) {
         var out = this.out;
-        if (!out)
+        if (out === NO)
             return;
         out._e(err);
     };
     CombineListener.prototype._c = function () {
         var p = this.p;
-        if (!p.out)
+        if (p.out === NO)
             return;
         if (--p.Nc === 0) {
             p.out._c();
@@ -195,8 +195,9 @@ var CombineProducer = (function () {
     CombineProducer.prototype._stop = function () {
         var s = this.insArr;
         var n = s.length;
+        var ils = this.ils;
         for (var i = 0; i < n; i++) {
-            s[i]._remove(this.ils[i]);
+            s[i]._remove(ils[i]);
         }
         this.out = NO;
         this.ils = [];

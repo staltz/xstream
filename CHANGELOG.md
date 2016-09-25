@@ -1,3 +1,22 @@
+<a name="6.4.0"></a>
+# [6.4.0](https://github.com/staltz/xstream/compare/v6.3.2...v6.4.0) (2016-09-25)
+
+
+### Bug Fixes
+
+* **combine:** increase variadic type count to 10 ([b4fb52d](https://github.com/staltz/xstream/commit/b4fb52d))
+* **combine:** tiny fixes and perf improvements ([9090b59](https://github.com/staltz/xstream/commit/9090b59))
+* **merge:** correct typo in MergeSignature ([7a7cd64](https://github.com/staltz/xstream/commit/7a7cd64))
+* **sampleCombine:** change API to fit compose() usage ([38782d8](https://github.com/staltz/xstream/commit/38782d8))
+* **sampleCombine:** do not sample until all streams have emitted ([9882e89](https://github.com/staltz/xstream/commit/9882e89))
+
+
+### Features
+
+* **sampleCombine:** add sampleCombine extra ([d3aceed](https://github.com/staltz/xstream/commit/d3aceed)), closes [staltz/xstream#102](https://github.com/staltz/xstream/issues/102)
+
+
+
 <a name="6.3.2"></a>
 ## [6.3.2](https://github.com/staltz/xstream/compare/v6.3.1...v6.3.2) (2016-09-21)
 
