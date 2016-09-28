@@ -1,3 +1,13 @@
+<a name="6.4.1"></a>
+## [6.4.1](https://github.com/staltz/xstream/compare/v6.4.0...v6.4.1) (2016-09-28)
+
+
+### Bug Fixes
+
+* **debounce:** improve TypeScript typings with better inference ([7bbba73](https://github.com/staltz/xstream/commit/7bbba73))
+
+
+
 <a name="6.4.0"></a>
 # [6.4.0](https://github.com/staltz/xstream/compare/v6.3.2...v6.4.0) (2016-09-25)
 
