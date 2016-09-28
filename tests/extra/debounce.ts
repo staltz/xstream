@@ -13,7 +13,7 @@ describe('debounce (extra)', () => {
         out.next(5);
       },
       stop() {}
-    }
+    };
     const stream = xs.create(producer).compose(debounce(100));
     const expected = [5];
     let listener = {
