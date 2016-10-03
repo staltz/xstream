@@ -8,7 +8,7 @@ describe('Stream.prototype.imitate', () => {
   it('should be able to model a circular dependency in the stream graph', (done) => {
     const secondMimic = xs.create<number>();
     const first = secondMimic.map(x => x * 10).take(3);
-    const second = first.map(x => x + 1).startWith(1).compose(delay<number>(1));
+    const second = first.map(x => x + 1).startWith(1).compose(delay(1));
     secondMimic.imitate(second);
     const expected = [1, 11, 111, 1111];
 
@@ -27,7 +27,7 @@ describe('Stream.prototype.imitate', () => {
   it('should be able to model a circular dependency, mimic subscribed', (done) => {
     const secondMimic = xs.create<number>();
     const first = secondMimic.map(x => x * 10).take(3);
-    const second = first.map(x => x + 1).startWith(1).compose(delay<number>(1));
+    const second = first.map(x => x + 1).startWith(1).compose(delay(1));
     secondMimic.imitate(second);
     const expected = [1, 11, 111, 1111];
 
@@ -46,7 +46,7 @@ describe('Stream.prototype.imitate', () => {
   it('should broadcast the source stream to multiple listeners', (done) => {
     const fakeSecond = xs.create<number>();
     const first = fakeSecond.map(x => x * 10).take(3);
-    const second = first.map(x => x + 1).startWith(1).compose(delay<number>(100));
+    const second = first.map(x => x + 1).startWith(1).compose(delay(100));
     fakeSecond.imitate(second);
 
     const expected1 = [1, 11, 111, 1111];
@@ -160,7 +160,7 @@ describe('Stream.prototype.imitate', () => {
     const outside = xs.periodic(150);
     const secondMimic = xs.create<number>();
     const first = xs.merge(outside, secondMimic.map(x => x * 10));
-    const second = first.map(x => x + 1).compose(delay<number>(100));
+    const second = first.map(x => x + 1).compose(delay(100));
     secondMimic.imitate(second);
     const expectedSecond1 = [1];
     const expectedSecond4 = [1, 11, 2, 111];
@@ -217,7 +217,7 @@ describe('Stream.prototype.imitate', () => {
       if (state === 3) {
         throw new Error(':(');
       }
-      return xs.of(1).compose(delay<number>(20));
+      return xs.of(1).compose(delay(20));
     }).flatten();
     proxyAction$.imitate(action$);
     const expected = [0, 1, 2];
