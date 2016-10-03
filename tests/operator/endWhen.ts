@@ -25,7 +25,7 @@ describe('Stream.prototype.endWhen', () => {
 
   it('should complete the stream when another stream emits complete', (done) => {
     const source = xs.periodic(50);
-    const other = xs.empty().compose(delay<any>(220));
+    const other = xs.empty().compose(delay(220));
     const stream = source.endWhen(other);
     const expected = [0, 1, 2, 3];
 

@@ -26,7 +26,7 @@ describe('dropUntil (extra)', () => {
 
   it('should complete the stream when another stream emits complete', (done) => {
     const source = xs.periodic(50).take(6);
-    const other = xs.empty().compose(delay<any>(220));
+    const other = xs.empty().compose(delay(220));
     const stream = source.compose(dropUntil(other));
     const expected = [4, 5];
 
