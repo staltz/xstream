@@ -1,3 +1,18 @@
+<a name="6.5.0"></a>
+# [6.5.0](https://github.com/staltz/xstream/compare/v6.4.1...v6.5.0) (2016-10-17)
+
+
+### Bug Fixes
+
+* **delay,dropRepeats,dropUnti,split:** improve TypeScript typings with better inference ([c96ff10](https://github.com/staltz/xstream/commit/c96ff10))
+
+
+### Features
+
+* **throttle:** add throttle extra operator ([8b5c211](https://github.com/staltz/xstream/commit/8b5c211))
+
+
+
 <a name="6.4.1"></a>
 ## [6.4.1](https://github.com/staltz/xstream/compare/v6.4.0...v6.4.1) (2016-09-28)
 
