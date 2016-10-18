@@ -30,6 +30,7 @@
     "src/extra/pairwise.ts",
     "src/extra/sampleCombine.ts",
     "src/extra/split.ts",
+    "src/extra/throttle.ts",
     "src/extra/tween.ts",
     "src/index.ts"
   ],
