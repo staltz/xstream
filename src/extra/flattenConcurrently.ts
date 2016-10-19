@@ -21,7 +21,7 @@ class FCIL<T> implements InternalListener<T>, OutSender<T> {
 export class FlattenConcOperator<T> implements Operator<Stream<T>, T> {
   public type = 'flattenConcurrently';
   private active: number = 1; // number of outers and inners that have not yet ended
-  public out: Stream<T> = null;
+  public out: Stream<T> = null as any;
 
   constructor(public ins: Stream<Stream<T>>) {
   }
@@ -34,7 +34,7 @@ export class FlattenConcOperator<T> implements Operator<Stream<T>, T> {
   _stop(): void {
     this.ins._remove(this);
     this.active = 1;
-    this.out = null;
+    this.out = null as any;
   }
 
   less(): void {

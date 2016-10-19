@@ -458,7 +458,7 @@ export class FromPromiseProducer<T> implements InternalProducer<T> {
       (e: any) => {
         out._e(e);
       }
-    ).then(null, (err: any) => {
+    ).then(noop, (err: any) => {
       setTimeout(() => { throw err; });
     });
   }
@@ -500,7 +500,11 @@ export class DebugOperator<T> implements Operator<T, T> {
   private s: (t: T) => any; // spy
   private l: string; // label
 
-  constructor(arg: string | ((t: T) => any), ins: Stream<T>) {
+  constructor(ins: Stream<T>);
+  constructor(ins: Stream<T>, arg?: string);
+  constructor(ins: Stream<T>, arg?: (t: T) => any);
+  constructor(ins: Stream<T>, arg?: string | ((t: T) => any));
+  constructor(ins: Stream<T>, arg?: string | ((t: T) => any) | undefined) {
     this.ins = ins;
     this.out = NO as Stream<T>;
     this.s = noop;
@@ -1958,6 +1962,9 @@ export class Stream<T> implements InternalListener<T> {
     return new MemoryStream<T>(new RememberOperator<T>(this));
   }
 
+  debug(): Stream<T>;
+  debug(labelOrSpy: string): Stream<T>;
+  debug(labelOrSpy: (t: T) => any): Stream<T>;
   /**
    * Returns an output stream that identically behaves like the input stream,
    * but also runs a `spy` function fo each event, to help you debug your app.
@@ -1984,8 +1991,8 @@ export class Stream<T> implements InternalListener<T> {
    * as argument, and does not need to return anything.
    * @return {Stream}
    */
-  debug(labelOrSpy?: string | ((t: T) => void)): Stream<T> {
-    return new (this.ctor())<T>(new DebugOperator<T>(labelOrSpy, this));
+  debug(labelOrSpy?: string | ((t: T) => any)): Stream<T> {
+    return new (this.ctor())<T>(new DebugOperator<T>(this, labelOrSpy));
   }
 
   /**
@@ -2190,8 +2197,11 @@ export class MemoryStream<T> extends Stream<T> {
     return this;
   }
 
-  debug(labelOrSpy?: string | ((t: T) => void)): MemoryStream<T> {
-    return super.debug(labelOrSpy) as MemoryStream<T>;
+  debug(): MemoryStream<T>;
+  debug(labelOrSpy: string): MemoryStream<T>;
+  debug(labelOrSpy: (t: T) => any): MemoryStream<T>;
+  debug(labelOrSpy?: string | ((t: T) => any) | undefined): MemoryStream<T> {
+    return super.debug(labelOrSpy as any) as MemoryStream<T>;
   }
 }
 

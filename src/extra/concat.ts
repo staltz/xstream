@@ -2,7 +2,7 @@ import {Stream, InternalProducer, InternalListener, OutSender} from '../core';
 
 class ConcatProducer<T> implements InternalProducer<T>, InternalListener<T>, OutSender<T> {
   public type = 'concat';
-  public out: Stream<T> = null;
+  public out: Stream<T> = null as any;
   private i: number = 0;
 
   constructor(public streams: Array<Stream<T>>) {
@@ -19,7 +19,7 @@ class ConcatProducer<T> implements InternalProducer<T>, InternalListener<T>, Out
       streams[this.i]._remove(this);
     }
     this.i = 0;
-    this.out = null;
+    this.out = null as any;
   }
 
   _n(t: T) {

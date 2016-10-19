@@ -2,8 +2,7 @@ import {Operator, Stream} from '../core';
 
 class ThrottleOperator<T> implements Operator<T, T> {
   public type = 'throttle';
-  public out: Stream<T> = null;
-  private value: T = null;
+  public out: Stream<T> = null as any;
   private id: any = null;
 
   constructor(public dt: number,
@@ -17,8 +16,7 @@ class ThrottleOperator<T> implements Operator<T, T> {
 
   _stop(): void {
     this.ins._remove(this);
-    this.out = null;
-    this.value = null;
+    this.out = null as any;
     this.id = null;
   }
 
@@ -33,7 +31,6 @@ class ThrottleOperator<T> implements Operator<T, T> {
   _n(t: T) {
     const u = this.out;
     if (!u) return;
-    this.value = t;
     if (this.id) return;
     u._n(t);
     this.id = setInterval(() => {

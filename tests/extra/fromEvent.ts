@@ -6,7 +6,7 @@ import * as assert from 'assert';
 function noop() {};
 
 class FakeEventTarget implements EventTarget {
-  public handler: EventListener;
+  public handler: EventListener | undefined;
   public event: string;
   public capture: boolean;
   public removedEvent: string;
@@ -21,17 +21,17 @@ class FakeEventTarget implements EventTarget {
     this.handler.call(void 0, x);
   }
 
-  addEventListener(e: string, handler: EventListener, capture: boolean) {
+  addEventListener(e: string, handler: EventListener | undefined, capture: boolean) {
     this.event = e;
     this.handler = handler;
     this.capture = capture;
   }
 
-  removeEventListener(e: string, handler: EventListener, capture: boolean) {
+  removeEventListener(e: string, handler: EventListener | undefined, capture: boolean) {
     this.removedEvent = e;
     this.removedCapture = capture;
 
-    this.handler = this.event = this.capture = void 0;
+    this.handler = void 0;
   }
 
   dispatchEvent(event: Event) {
@@ -40,7 +40,7 @@ class FakeEventTarget implements EventTarget {
 };
 
 class FakeEventEmitter extends EventEmitter {
-  public handler: Function;
+  public handler: Function | undefined;
   public event: string;
   public removedEvent: string;
 
@@ -64,11 +64,9 @@ class FakeEventEmitter extends EventEmitter {
 
   removeListener(e: string, handler: Function): FakeEventEmitter {
     this.removedEvent = e;
-
-    this.handler = this.event = void 0;
+    this.handler = void 0;
     return this;
   }
-
 };
 
 describe('fromEvent (extra) - DOMEvent', () => {

@@ -12,8 +12,12 @@ describe('xs.combine', () => {
     stream.addListener({
       next: (x) => {
         const e = expected.shift();
-        assert.equal(x[0], e[0]);
-        assert.equal(x[1], e[1]);
+        if (e) {
+          assert.equal(x[0], e[0]);
+          assert.equal(x[1], e[1]);
+        } else {
+          assert.fail('e should be defined');
+        }
       },
       error: done,
       complete: () => {
@@ -78,7 +82,11 @@ describe('xs.combine', () => {
     stream.addListener({
       next: (x) => {
         const e = expected.shift();
-        assert.equal(x[0], e[0]);
+        if (e) {
+          assert.equal(x[0], e[0]);
+        } else {
+          assert.fail('e should be defined');
+        }
       },
       error: done,
       complete: () => {

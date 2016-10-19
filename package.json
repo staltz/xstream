@@ -7,7 +7,7 @@
   "scripts": {
     "commit": "git-cz",
     "changelog": "conventional-changelog --infile CHANGELOG.md --same-file --release-count 0 --preset angular",
-    "lint": "tslint -c tslint.json src/**/*.ts",
+    "lint": "tslint -c tslint.json src/**/*.ts src/extra/*.ts",
     "premocha": "npm run compile",
     "mocha": "mocha tests/*.ts tests/**/*.ts --require ts-node/register",
     "postmocha": "rm -rf tests/**/*.js",
@@ -64,8 +64,8 @@
     "strip-comments": "^0.4.4",
     "ts-node": "^0.9.0",
     "tslint": "^3.6.0",
-    "typescript": "^1.8.9",
-    "typings": "^1.0.4",
+    "typescript": "^2.0.3",
+    "typings": "^1.4.0",
     "uglify-js": "^2.6.2",
     "validate-commit-msg": "^2.4.0"
   },

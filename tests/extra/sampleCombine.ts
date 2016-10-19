@@ -6,15 +6,19 @@ import * as assert from 'assert';
 
 describe('sampleCombine (extra)', () => {
   it('should combine AND-style two streams together', (done) => {
-    const stream1 = xs.periodic(100).take(3).startWith(null);
+    const stream1 = xs.periodic(100).take(3).startWith(-1);
     const stream2 = xs.periodic(99).take(3);
     const stream = stream1.compose(sampleCombine(stream2));
     let expected = [[0, 0], [1, 1], [2, 2]];
     stream.addListener({
-      next: (x) => {
+      next: (x: [number, number]) => {
         const e = expected.shift();
-        assert.equal(x[0], e[0]);
-        assert.equal(x[1], e[1]);
+        if (e) {
+          assert.equal(x[0], e[0]);
+          assert.equal(x[1], e[1]);
+        } else {
+          assert.fail('e should be defined');
+        }
       },
       error: done,
       complete: () => {
@@ -82,7 +86,11 @@ describe('sampleCombine (extra)', () => {
     stream.addListener({
       next: (x) => {
         const e = expected.shift();
-        assert.equal(x[0], e[0]);
+        if (e) {
+          assert.equal(x[0], e[0]);
+        } else {
+          assert.fail('e should be defined');
+        }
       },
       error: done,
       complete: () => {

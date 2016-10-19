@@ -200,7 +200,7 @@ function tween({
   duration,
   ease = tweenFactory.linear.ease,
   interval = DEFAULT_INTERVAL
-}): Stream<number> {
+}: TweenConfig): Stream<number> {
   const totalTicks = Math.round(duration / interval);
   return Stream.periodic(interval)
     .take(totalTicks)

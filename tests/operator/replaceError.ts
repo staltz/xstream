@@ -39,11 +39,15 @@ describe('Stream.prototype.replaceError', () => {
       start: (listener) => {
         while (events.length > 0) {
           const event = events.shift();
-          switch (event.type) {
-            case 'next': listener.next(event.value); break;
-            case 'error': listener.error(event.value); return;
-            case 'complete': listener.complete(); return;
-            default: done('not supposed to happen');
+          if (!event) {
+            assert.fail('event should not be undefined');
+          } else {
+            switch (event.type) {
+              case 'next': listener.next(event.value); break;
+              case 'error': listener.error(event.value); return;
+              case 'complete': listener.complete(); return;
+              default: done('not supposed to happen');
+            }
           }
         }
       },

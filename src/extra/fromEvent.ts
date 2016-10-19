@@ -4,7 +4,7 @@ import {Stream, InternalProducer, InternalListener} from '../core';
 
 export class DOMEventProducer implements InternalProducer<Event> {
   public type = 'fromEvent';
-  private listener: EventListener;
+  private listener: EventListener | null;
 
   constructor(private node: EventTarget,
               private eventType: string,
@@ -17,14 +17,14 @@ export class DOMEventProducer implements InternalProducer<Event> {
   }
 
   _stop() {
-    this.node.removeEventListener(this.eventType, this.listener, this.useCapture);
+    this.node.removeEventListener(this.eventType, this.listener as any, this.useCapture);
     this.listener = null;
   }
 }
 
 export class NodeEventProducer implements InternalProducer<any> {
   public type = 'fromEvent';
-  private listener: Function;
+  private listener: Function | null;
 
   constructor(private node: EventEmitter, private eventName: string) { }
 
@@ -36,7 +36,7 @@ export class NodeEventProducer implements InternalProducer<any> {
   }
 
   _stop() {
-    this.node.removeListener(this.eventName, this.listener);
+    this.node.removeListener(this.eventName, this.listener as any);
     this.listener = null;
   }
 }

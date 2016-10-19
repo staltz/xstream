@@ -2,9 +2,9 @@ import {Operator, Stream} from '../core';
 
 class PairwiseOperator<T> implements Operator<T, [T, T]> {
   public type = 'pairwise';
-  private val: T = null;
+  private val: T | null = null;
   private has: boolean = false;
-  public out: Stream<[T, T]> = null;
+  public out: Stream<[T, T]> = null as any;
 
   constructor(public ins: Stream<T>) {
   }
@@ -17,7 +17,7 @@ class PairwiseOperator<T> implements Operator<T, [T, T]> {
   _stop(): void {
     this.ins._remove(this);
     this.has = false;
-    this.out = null;
+    this.out = null as any;
     this.val = null;
   }
 
@@ -27,7 +27,7 @@ class PairwiseOperator<T> implements Operator<T, [T, T]> {
     if (this.has) {
       const prev = this.val;
       this.val = t;
-      u._n([prev, t]);
+      u._n([prev as T, t]);
     } else {
       this.val = t;
       this.has = true;

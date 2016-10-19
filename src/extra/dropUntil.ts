@@ -20,7 +20,7 @@ class OtherIL<T> implements InternalListener<any>, OutSender<T> {
 
 export class DropUntilOperator<T> implements Operator<T, T> {
   public type = 'dropUntil';
-  public out: Stream<T> = null;
+  public out: Stream<T> = null as any;
   private oil: InternalListener<any> = NO_IL; // oil = other InternalListener
   private on: boolean = false;
 
@@ -37,14 +37,14 @@ export class DropUntilOperator<T> implements Operator<T, T> {
   _stop(): void {
     this.ins._remove(this);
     this.o._remove(this.oil);
-    this.out = null;
-    this.oil = null;
+    this.out = null as any;
+    this.oil = NO_IL;
   }
 
   up(): void {
     this.on = true;
     this.o._remove(this.oil);
-    this.oil = null;
+    this.oil = NO_IL;
   }
 
   _n(t: T) {

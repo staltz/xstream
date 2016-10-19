@@ -3,11 +3,11 @@ const empty = {};
 
 export class DropRepeatsOperator<T> implements Operator<T, T> {
   public type = 'dropRepeats';
-  public out: Stream<T> = null;
+  public out: Stream<T> = null as any;
   private v: T = <any> empty;
 
-  constructor(public fn: (x: T, y: T) => boolean,
-              public ins: Stream<T>) {
+  constructor(public ins: Stream<T>,
+              public fn: ((x: T, y: T) => boolean) | undefined) {
   }
 
   _start(out: Stream<T>): void {
@@ -17,7 +17,7 @@ export class DropRepeatsOperator<T> implements Operator<T, T> {
 
   _stop(): void {
     this.ins._remove(this);
-    this.out = null;
+    this.out = null as any;
     this.v = empty as any;
   }
 
@@ -112,8 +112,8 @@ export class DropRepeatsOperator<T> implements Operator<T, T> {
  * checks if it is equal to previous event, by returning a boolean.
  * @return {Stream}
  */
-export default function dropRepeats<T>(isEqual: <T>(x: T, y: T) => boolean = null): <T>(ins: Stream<T>) => Stream<T> {
+export default function dropRepeats<T>(isEqual: (<T>(x: T, y: T) => boolean) | undefined = void 0): <T>(ins: Stream<T>) => Stream<T> {
   return function dropRepeatsOperator<T>(ins: Stream<T>): Stream<T> {
-    return new Stream<T>(new DropRepeatsOperator<T>(isEqual, ins));
+    return new Stream<T>(new DropRepeatsOperator<T>(ins, isEqual));
   };
 }

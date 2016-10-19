@@ -22,7 +22,7 @@ class SeparatorIL<T> implements InternalListener<any>, OutSender<Stream<T>> {
 export class SplitOperator<T> implements Operator<T, Stream<T>> {
   public type = 'split';
   public curr: Stream<T> = new Stream<T>();
-  public out: Stream<Stream<T>> = null;
+  public out: Stream<Stream<T>> = null as any;
   private sil: InternalListener<any> = NO_IL; // sil = separator InternalListener
 
   constructor(public s: Stream<any>, // s = separator
@@ -40,7 +40,7 @@ export class SplitOperator<T> implements Operator<T, Stream<T>> {
     this.ins._remove(this);
     this.s._remove(this.sil);
     this.curr = new Stream<T>();
-    this.out = null;
+    this.out = null as any;
     this.sil = NO_IL;
   }
 

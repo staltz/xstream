@@ -21,11 +21,19 @@ describe('split (extra)', () => {
         const innerExpected = outerExpected.shift();
         inner.addListener({
           next: (x: number) => {
-            assert.equal(x, innerExpected.shift());
+            if (innerExpected) {
+              assert.equal(x, innerExpected.shift());
+            } else {
+              assert.fail('innerExpected should be defined');
+            }
           },
           error: (err: any) => done(err),
           complete: () => {
-            assert.equal(innerExpected.length, 0);
+            if (innerExpected) {
+              assert.equal(innerExpected.length, 0);
+            } else {
+              assert.fail('innerExpected should be defined');
+            }
           }
         });
       },

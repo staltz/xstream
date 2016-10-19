@@ -2,8 +2,7 @@ import {Operator, Stream} from '../core';
 
 class DebounceOperator<T> implements Operator<T, T> {
   public type = 'debounce';
-  public out: Stream<T> = null;
-  private value: T = null;
+  public out: Stream<T> = null as any;
   private id: any = null;
 
   constructor(public dt: number,
@@ -17,8 +16,7 @@ class DebounceOperator<T> implements Operator<T, T> {
 
   _stop(): void {
     this.ins._remove(this);
-    this.out = null;
-    this.value = null;
+    this.out = null as any;
     this.id = null;
   }
 
@@ -33,7 +31,6 @@ class DebounceOperator<T> implements Operator<T, T> {
   _n(t: T) {
     const u = this.out;
     if (!u) return;
-    this.value = t;
     this.clearInterval();
     this.id = setInterval(() => {
       this.clearInterval();

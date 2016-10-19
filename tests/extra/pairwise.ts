@@ -18,9 +18,13 @@ describe('pairwise (extra)', () => {
     stream.addListener({
       next: (x: [number, number]) => {
         const e = expected.shift();
-        assert.equal(x.length, e.length);
-        assert.equal(x[0], e[0]);
-        assert.equal(x[1], e[1]);
+        if (e) {
+          assert.equal(x.length, e.length);
+          assert.equal(x[0], e[0]);
+          assert.equal(x[1], e[1]);
+        } else {
+          assert.fail('e should be defined');
+        }
       },
       error: (err: any) => done(err),
       complete: () => {

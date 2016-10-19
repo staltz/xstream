@@ -225,6 +225,8 @@ describe('Stream.prototype.flatten', () => {
           return periodic.map(i => i * 100);
         } else if (x === 'C') {
           return periodic.map(i => i * 1000);
+        } else {
+          return xs.never();
         }
       }).flatten();
       const expected = [10, 20, 30, 400, 500, 600, 7000, 8000];

@@ -41,7 +41,7 @@ function plot(position$: Stream<number>): Stream<string> {
     .fold((acc, curr) => {
       acc.push(curr);
       return acc;
-    }, [])
+    }, [] as Array<number>)
     .last()
     .map(arr => {
       let coords = arr.map((y, x) => [x, y]);
@@ -54,7 +54,7 @@ function plot(position$: Stream<number>): Stream<string> {
         }
         lines.push(newline);
         return lines;
-      }, []);
+      }, [] as Array<string>);
       return rotate(lines)
         .map(line => '|'.concat(line.replace(/ *$/g, '')).concat('\n'))
         .reduce((lines, line) => lines.concat(line), '')

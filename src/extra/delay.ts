@@ -2,7 +2,7 @@ import {Operator, Stream} from '../core';
 
 class DelayOperator<T> implements Operator<T, T> {
   public type = 'delay';
-  public out: Stream<T> = null;
+  public out: Stream<T> = null as any;
 
   constructor(public dt: number,
               public ins: Stream<T>) {
@@ -15,7 +15,7 @@ class DelayOperator<T> implements Operator<T, T> {
 
   _stop(): void {
     this.ins._remove(this);
-    this.out = null;
+    this.out = null as any;
   }
 
   _n(t: T) {

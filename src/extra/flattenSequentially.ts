@@ -23,7 +23,7 @@ export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
   private open: boolean = true;
   private active: boolean = false;
   private seq: Array<Stream<T>> = [];
-  public out: Stream<T> = null;
+  public out: Stream<T> = null as any;
 
   constructor(public ins: Stream<Stream<T>>) {
   }
@@ -38,14 +38,14 @@ export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
     this.open = true;
     this.active = false;
     this.seq = [];
-    this.out = null;
+    this.out = null as any;
   }
 
   less(): void {
     this.active = false;
     const seq = this.seq;
     if (seq.length > 0) {
-      this._n(seq.shift());
+      this._n(seq.shift() as Stream<T>);
     }
     if (!this.open && !this.active) {
       this.out._c();
