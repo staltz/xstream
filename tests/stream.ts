@@ -1,6 +1,7 @@
 /// <reference path="../typings/globals/mocha/index.d.ts" />
 /// <reference path="../typings/globals/node/index.d.ts" />
 import xs, {Producer, Listener, Stream} from '../src/index';
+import fromDiagram from '../src/extra/fromDiagram';
 import * as assert from 'assert';
 
 describe('Stream', () => {
@@ -352,126 +353,50 @@ describe('Stream', () => {
   });
 
   describe('addListener', () => {
-    it('throws a helpful error if you forget the next function', (done) => {
-      const stream = xs.empty();
-      const listener = <Listener<Number>> <any> {};
+    it('should accept a partial listener with just next', (done) => {
+      const stream = fromDiagram('--a--b----c----d---|');
+      const expected = ['a', 'b', 'c', 'd'];
 
-      try {
-        stream.addListener(listener);
-      } catch (e) {
-        assert.equal(e.message, 'stream.addListener() requires all three ' +
-        'next, error, and complete functions.');
-        done();
-      }
-    });
-
-    it('throws a helpful error if you forget the error function', (done) => {
-      const stream = xs.empty();
-      const listener = <Listener<Number>> <any> {
-        next: (x: any) => {}
+      let listener = {
+        next: (x: number) => {
+          assert.equal(x, expected.shift());
+          if (expected.length === 0) {
+            stream.removeListener(listener as any);
+            done();
+          }
+        },
       };
 
-      try {
-        stream.addListener(listener);
-      } catch (e) {
-        assert.equal(e.message, 'stream.addListener() requires all three ' +
-        'next, error, and complete functions.');
-        done();
-      }
+      stream.addListener(listener as any);
     });
 
-    it('throws a helpful error if you forget the complete function', (done) => {
-      const stream = xs.empty();
-      const listener = <Listener<Number>> <any> {
-        next: (x: any) => {},
-        error: (err: any) => {}
+    it('should accept a partial listener with just error', (done) => {
+      const stream = fromDiagram('--a--b----c----d---#', {errorValue: 'oops'});
+
+      let listener = {
+        error: (err: any) => {
+          assert.equal(err, 'oops');
+          done();
+        },
       };
 
-      try {
-        stream.addListener(listener);
-      } catch (e) {
-        assert.equal(e.message, 'stream.addListener() requires all three ' +
-        'next, error, and complete functions.');
-        done();
-      }
+      stream.addListener(listener as any);
     });
 
-    it('throws a helpful error if you pass a non function value as the next function', (done) => {
-      const stream = xs.empty();
-      const listener = <Listener<Number>> <any> {
-        next: undefined
+    it('should accept a partial listener with just complete', (done) => {
+      const stream = fromDiagram('--a--b----c----d---|');
+
+      let listener = {
+        complete: () => {
+          done();
+        },
       };
 
-      try {
-        stream.addListener(listener);
-      } catch (e) {
-        assert.equal(e.message, 'stream.addListener() requires all three ' +
-        'next, error, and complete functions.');
-        done();
-      }
+      stream.addListener(listener as any);
     });
   });
 
   describe('subscribe', () => {
-     it('throws a helpful error if you forget the next function', (done) => {
-      const stream = xs.empty();
-      const listener = <Listener<Number>> <any> {};
-
-      try {
-        stream.subscribe(listener);
-      } catch (e) {
-        assert.equal(e.message, 'stream.addListener() requires all three ' +
-        'next, error, and complete functions.');
-        done();
-      }
-    });
-
-    it('throws a helpful error if you forget the error function', (done) => {
-      const stream = xs.empty();
-      const listener = <Listener<Number>> <any> {
-        next: (x: any) => {}
-      };
-
-      try {
-        stream.subscribe(listener);
-      } catch (e) {
-        assert.equal(e.message, 'stream.addListener() requires all three ' +
-        'next, error, and complete functions.');
-        done();
-      }
-    });
-
-    it('throws a helpful error if you forget the complete function', (done) => {
-      const stream = xs.empty();
-      const listener = <Listener<Number>> <any> {
-        next: (x: any) => {},
-        error: (err: any) => {}
-      };
-
-      try {
-        stream.subscribe(listener);
-      } catch (e) {
-        assert.equal(e.message, 'stream.addListener() requires all three ' +
-        'next, error, and complete functions.');
-        done();
-      }
-    });
-
-    it('throws a helpful error if you pass a non function value as the next function', (done) => {
-      const stream = xs.empty();
-      const listener = <Listener<Number>> <any> {
-        next: undefined
-      };
-
-      try {
-        stream.subscribe(listener);
-      } catch (e) {
-        assert.equal(e.message, 'stream.addListener() requires all three ' +
-        'next, error, and complete functions.');
-        done();
-      }
-    });
-
     it('should return a subscription', (done) => {
       const stream = xs.empty();
       const noop = (): void => void 0;

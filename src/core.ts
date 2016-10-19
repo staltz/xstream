@@ -57,6 +57,12 @@ export interface Listener<T> {
   complete: () => void;
 }
 
+export interface PartialListener<T> {
+  next?: (x: T) => void;
+  error?: (err: any) => void;
+  complete?: () => void;
+}
+
 export type Observable<T> = {
   subscribe(listener: Listener<T>): { unsubscribe: () => void; }
 }
@@ -1329,16 +1335,10 @@ export class Stream<T> implements InternalListener<T> {
    *
    * @param {Listener<T>} listener
    */
-  addListener(listener: Listener<T>): void {
-    if (typeof listener.next !== 'function'
-    || typeof listener.error !== 'function'
-    || typeof listener.complete !== 'function') {
-      throw new Error('stream.addListener() requires all three next, error, ' +
-      'and complete functions.');
-    }
-    (listener as InternalListener<T> & Listener<T>)._n = listener.next;
-    (listener as InternalListener<T> & Listener<T>)._e = listener.error;
-    (listener as InternalListener<T> & Listener<T>)._c = listener.complete;
+  addListener(listener: PartialListener<T>): void {
+    (listener as InternalListener<T> & Listener<T>)._n = listener.next || noop;
+    (listener as InternalListener<T> & Listener<T>)._e = listener.error || noop;
+    (listener as InternalListener<T> & Listener<T>)._c = listener.complete || noop;
     this._add(listener as InternalListener<T> & Listener<T>);
   }
 
