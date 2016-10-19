@@ -14,6 +14,7 @@
 - [`pairwise`](#pairwise) (operator)
 - [`sampleCombine`](#sampleCombine) (operator)
 - [`split`](#split) (operator)
+- [`throttle`](#throttle) (operator)
 - [`tween`](#tween) (factory)
 
 # How to use extras
@@ -664,6 +665,49 @@ result.addListener({
 #### Arguments:
 
 - `separator: Stream` Some other stream that is used to know when to split the output stream.
+
+#### Returns:  Stream 
+
+- - -
+
+### <a id="throttle"></a> `throttle(period)`
+
+Emits event and drops subsequent events until a certain amount of silence has passed.
+
+Marble diagram:
+
+```text
+--1-2-----3--4----5|
+    throttle(60)
+--1-------3-------5-|
+```
+
+Example:
+
+```js
+import fromDiagram from 'xstream/extra/fromDiagram'
+import throttle from 'xstream/extra/throttle'
+
+const stream = fromDiagram('--1-2-----3--4----5|')
+ .compose(throttle(60))
+
+stream.addListener({
+  next: i => console.log(i),
+  error: err => console.error(err),
+  complete: () => console.log('completed')
+})
+```
+
+```text
+> 1
+> 3
+> 5
+> completed
+```
+
+#### Arguments:
+
+- `period: number` The amount of silence required in milliseconds.
 
 #### Returns:  Stream 
 

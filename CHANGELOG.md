@@ -1,3 +1,13 @@
+<a name="6.6.0"></a>
+# [6.6.0](https://github.com/staltz/xstream/compare/v6.5.0...v6.6.0) (2016-10-19)
+
+
+### Features
+
+* **Stream:** accept partially defined listeners ([e9d005d](https://github.com/staltz/xstream/commit/e9d005d))
+
+
+
 <a name="6.5.0"></a>
 # [6.5.0](https://github.com/staltz/xstream/compare/v6.4.1...v6.5.0) (2016-10-17)
 

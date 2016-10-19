@@ -239,7 +239,7 @@ var FromPromiseProducer = (function () {
             }
         }, function (e) {
             out._e(e);
-        }).then(null, function (err) {
+        }).then(noop, function (err) {
             setTimeout(function () { throw err; });
         });
     };
@@ -271,7 +271,7 @@ var PeriodicProducer = (function () {
 }());
 exports.PeriodicProducer = PeriodicProducer;
 var DebugOperator = (function () {
-    function DebugOperator(arg, ins) {
+    function DebugOperator(ins, arg) {
         this.type = 'debug';
         this.ins = ins;
         this.out = NO;
@@ -1036,15 +1036,9 @@ var Stream = (function () {
     };
     
     Stream.prototype.addListener = function (listener) {
-        if (typeof listener.next !== 'function'
-            || typeof listener.error !== 'function'
-            || typeof listener.complete !== 'function') {
-            throw new Error('stream.addListener() requires all three next, error, ' +
-                'and complete functions.');
-        }
-        listener._n = listener.next;
-        listener._e = listener.error;
-        listener._c = listener.complete;
+        listener._n = listener.next || noop;
+        listener._e = listener.error || noop;
+        listener._c = listener.complete || noop;
         this._add(listener);
     };
     
@@ -1211,7 +1205,7 @@ var Stream = (function () {
     };
     
     Stream.prototype.debug = function (labelOrSpy) {
-        return new (this.ctor())(new DebugOperator(labelOrSpy, this));
+        return new (this.ctor())(new DebugOperator(this, labelOrSpy));
     };
     
     Stream.prototype.imitate = function (target) {
@@ -1339,7 +1333,7 @@ module.exports = require('./lib/index');
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
 });
 
 var _ponyfill = require('./ponyfill');
@@ -1348,12 +1342,19 @@ var _ponyfill2 = _interopRequireDefault(_ponyfill);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var root = undefined; 
+var root; 
 
-if (typeof global !== 'undefined') {
-	root = global;
+
+if (typeof self !== 'undefined') {
+  root = self;
 } else if (typeof window !== 'undefined') {
-	root = window;
+  root = window;
+} else if (typeof global !== 'undefined') {
+  root = global;
+} else if (typeof module !== 'undefined') {
+  root = module;
+} else {
+  root = Function('return this')();
 }
 
 var result = (0, _ponyfill2['default'])(root);
