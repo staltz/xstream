@@ -124,7 +124,7 @@ You can also trigger an event to happen on a Stream with the `shamefullySend*` m
 
 ## Listener
 
-A Listener is an object with three functions attached to it: `next`, `error`, and `complete`. There is one function for each type of event a Stream may emit.
+A Listener is an object with up to three functions attached to it: `next`, `error`, and `complete`. There is usually one function for each type of event a Stream may emit but only `next` is always required.
 
 - `next` events are the typical type, they deliver a value.
 - `error` events abort (stop) the execution of the Stream, and happen when something goes wrong in the Stream (or upstream somewhere in the chain of operators)
