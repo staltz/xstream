@@ -2159,8 +2159,22 @@ export class MemoryStream<T> extends Stream<T> {
   }
 
   _add(il: InternalListener<T>): void {
-    if (this._has) { il._n(this._v); }
-    super._add(il);
+    const ta = this._target;
+    if (ta !== NO) return ta._add(il);
+    const a = this._ils;
+    a.push(il);
+    if (a.length > 1) {
+      if (this._has) il._n(this._v);
+      return;
+    }
+    if (this._stopID !== NO) {
+      if (this._has) il._n(this._v);
+      clearTimeout(this._stopID);
+      this._stopID = NO;
+    } else if (this._has) il._n(this._v); else {
+      const p = this._prod;
+      if (p !== NO) p._start(this);
+    }
   }
 
   _stopNow() {
