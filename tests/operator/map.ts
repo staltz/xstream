@@ -98,4 +98,68 @@ describe('Stream.prototype.map', () => {
     assert.strictEqual(JSON.stringify(stream['_prod']['out']), '{}');
     done();
   });
+
+  it('should not repeat the map project function (e.g. no map+map fusion)', (done) => {
+    const stream = xs.create();
+    let firstMapCalled = 0;
+
+    const source$ = stream.map(x => {
+      firstMapCalled += 1;
+      return {a: 10, b: 20, c: 30};
+    });
+
+    const a$ = source$.map(x => x.a);
+    const b$ = source$.map(x => x.b);
+    const c$ = source$.map(x => x.c);
+
+    const expectedA = [10];
+    const expectedB = [20];
+    const expectedC = [30];
+
+    a$.addListener({next: a => assert.strictEqual(a, expectedA.shift())});
+    b$.addListener({next: b => assert.strictEqual(b, expectedB.shift())});
+    c$.addListener({next: c => assert.strictEqual(c, expectedC.shift())});
+
+    stream.shamefullySendNext(1);
+
+    setTimeout(() => {
+      assert.strictEqual(firstMapCalled, 1);
+      assert.strictEqual(expectedA.length, 0);
+      assert.strictEqual(expectedB.length, 0);
+      assert.strictEqual(expectedC.length, 0);
+      done();
+    });
+  });
+
+  it('should not repeat the map project function (e.g. no filter+map+map fusion)', (done) => {
+    const stream = xs.create();
+    let firstMapCalled = 0;
+
+    const source$ = stream.filter(x => x !== 42).map(x => {
+      firstMapCalled += 1;
+      return {a: 10, b: 20, c: 30};
+    });
+
+    const a$ = source$.map(x => x.a);
+    const b$ = source$.map(x => x.b);
+    const c$ = source$.map(x => x.c);
+
+    const expectedA = [10];
+    const expectedB = [20];
+    const expectedC = [30];
+
+    a$.addListener({next: a => assert.strictEqual(a, expectedA.shift())});
+    b$.addListener({next: b => assert.strictEqual(b, expectedB.shift())});
+    c$.addListener({next: c => assert.strictEqual(c, expectedC.shift())});
+
+    stream.shamefullySendNext(1);
+
+    setTimeout(() => {
+      assert.strictEqual(firstMapCalled, 1);
+      assert.strictEqual(expectedA.length, 0);
+      assert.strictEqual(expectedB.length, 0);
+      assert.strictEqual(expectedC.length, 0);
+      done();
+    });
+  });
 });

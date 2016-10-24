@@ -81,12 +81,6 @@ function internalizeProducer<T>(producer: Producer<T>) {
   (producer as InternalProducer<T> & Producer<T>)._stop = producer.stop;
 }
 
-function compose2<T, U>(f1: (t: T) => any, f2: (t: T) => any): (t: T) => any {
-  return function composedFn(arg: T): any {
-    return f1(f2(arg));
-  };
-}
-
 function and<T>(f1: (t: T) => boolean, f2: (t: T) => boolean): (t: T) => boolean {
   return function andFn(t: T): boolean {
     return f1(t) && f2(t);
@@ -1641,24 +1635,7 @@ export class Stream<T> implements InternalListener<T> {
     const p = this._prod;
     const ctor = this.ctor();
     if (p instanceof FilterOperator) {
-      return new ctor<U>(new FilterMapOperator<T, U>(
-        (p as FilterOperator<T>).passes,
-        project,
-        (p as FilterOperator<T>).ins
-      ));
-    }
-    if (p instanceof FilterMapOperator) {
-      return new ctor<U>(new FilterMapOperator<T, U>(
-        (p as FilterMapOperator<T, U>).passes,
-        compose2(project, (p as FilterMapOperator<T, U>).project),
-        (p as FilterMapOperator<T, U>).ins
-      ));
-    }
-    if (p instanceof MapOperator) {
-      return new ctor<U>(new MapOperator<T, U>(
-        compose2(project, (p as MapOperator<T, U>).project),
-        (p as MapOperator<T, U>).ins
-      ));
+      return new ctor<U>(new FilterMapOperator<T, U>(p.passes, project, p.ins));
     }
     return new ctor<U>(new MapOperator<T, U>(project, this));
   }
