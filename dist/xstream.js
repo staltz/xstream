@@ -32,11 +32,6 @@ function internalizeProducer(producer) {
         };
     producer._stop = producer.stop;
 }
-function compose2(f1, f2) {
-    return function composedFn(arg) {
-        return f1(f2(arg));
-    };
-}
 function and(f1, f2) {
     return function andFn(t) {
         return f1(t) && f2(t);
@@ -755,11 +750,18 @@ var FilterMapOperator = (function (_super) {
         this.type = 'filter+map';
         this.passes = passes;
     }
-    FilterMapOperator.prototype._n = function (v) {
-        if (this.passes(v)) {
-            _super.prototype._n.call(this, v);
+    FilterMapOperator.prototype._n = function (t) {
+        if (!this.passes(t))
+            return;
+        var u = this.out;
+        if (u === NO)
+            return;
+        try {
+            u._n(this.project(t));
         }
-        ;
+        catch (e) {
+            u._e(e);
+        }
     };
     return FilterMapOperator;
 }(MapOperator));
@@ -1133,12 +1135,6 @@ var Stream = (function () {
         if (p instanceof FilterOperator) {
             return new ctor(new FilterMapOperator(p.passes, project, p.ins));
         }
-        if (p instanceof FilterMapOperator) {
-            return new ctor(new FilterMapOperator(p.passes, compose2(project, p.project), p.ins));
-        }
-        if (p instanceof MapOperator) {
-            return new ctor(new MapOperator(compose2(project, p.project), p.ins));
-        }
         return new ctor(new MapOperator(project, this));
     };
     
@@ -1277,10 +1273,29 @@ var MemoryStream = (function (_super) {
         _super.prototype._n.call(this, x);
     };
     MemoryStream.prototype._add = function (il) {
-        if (this._has) {
-            il._n(this._v);
+        var ta = this._target;
+        if (ta !== NO)
+            return ta._add(il);
+        var a = this._ils;
+        a.push(il);
+        if (a.length > 1) {
+            if (this._has)
+                il._n(this._v);
+            return;
         }
-        _super.prototype._add.call(this, il);
+        if (this._stopID !== NO) {
+            if (this._has)
+                il._n(this._v);
+            clearTimeout(this._stopID);
+            this._stopID = NO;
+        }
+        else if (this._has)
+            il._n(this._v);
+        else {
+            var p = this._prod;
+            if (p !== NO)
+                p._start(this);
+        }
     };
     MemoryStream.prototype._stopNow = function () {
         this._has = false;

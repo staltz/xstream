@@ -1,3 +1,27 @@
+<a name="7.0.0"></a>
+# [7.0.0](https://github.com/staltz/xstream/compare/v6.6.0...v7.0.0) (2016-10-24)
+
+
+### Bug Fixes
+
+* **map:** remove map+map fusion optimization ([1ca6a5c](https://github.com/staltz/xstream/commit/1ca6a5c)), closes [#98](https://github.com/staltz/xstream/issues/98) [#108](https://github.com/staltz/xstream/issues/108) [#93](https://github.com/staltz/xstream/issues/93)
+* **MemoryStream:** fix a leaking execution bug ([47e67ff](https://github.com/staltz/xstream/commit/47e67ff)), closes [#53](https://github.com/staltz/xstream/issues/53)
+
+
+### BREAKING CHANGES
+
+* map: This change will remove map+map fusions. Your application code may or
+may not rely on the bugs that map+map fusion caused, so we advise to
+update carefully, testing your application code as you go. Generally
+this is very straightforward and safe to update, as there are no visible
+API changes.
+* MemoryStream: This is generally safe to update, but note that the behavior around
+MemoryStream, startWith, take, imitate etc may have slightly changed, so
+it is recommended to run tests on your application and see if it is
+working, in case your application code was relying on buggy behavior.
+
+
+
 <a name="6.6.0"></a>
 # [6.6.0](https://github.com/staltz/xstream/compare/v6.5.0...v6.6.0) (2016-10-19)
 
