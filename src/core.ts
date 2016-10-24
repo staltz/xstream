@@ -1041,10 +1041,15 @@ export class FilterMapOperator<T, R> extends MapOperator<T, R> {
     this.passes = passes;
   }
 
-  _n(v: T) {
-    if (this.passes(v)) {
-      super._n(v);
-    };
+  _n(t: T) {
+    if (!this.passes(t)) return;
+    const u = this.out;
+    if (u === NO) return;
+    try {
+      u._n(this.project(t));
+    } catch (e) {
+      u._e(e);
+    }
   }
 }
 
