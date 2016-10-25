@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 /** This script checks whether xstream should be released with
- * a new version according to semver. It has two modes: REPORT and ORACLE.
+ * a new version according to ComVer https://github.com/staltz/comver.
+ * It has two modes: REPORT and ORACLE.
  *
  * It runs in REPORT mode if no additional command line argument was given.
  * For instance, `node check-release.js`. It will display a human readable
@@ -12,9 +13,8 @@
  * it will exit with a status code answering whether the
  * package should be released with a new version.
  * 0 means no new release is necessary
- * 1 means it should have a new patch version _._.x release
- * 2 means it should have a new minor version _.x._ release
- * 3 means it should have a new major version x._._ release
+ * 2 means it should have a new minor version _.x release
+ * 3 means it should have a new major version x._ release
  */
 
 var conventionalChangelog = require('conventional-changelog');
@@ -43,13 +43,15 @@ function showReportHeaderPositive() {
   console.log(
     'RELEASES TO DO\n\n' +
     'We checked all recent commits, and discovered that according\n' +
-    'to semver.org you should release a new version of xstream.');
+    'to ComVer (https://github.com/staltz/comver) you should\n' +
+    'release a new version of xstream.\n');
 }
 
 function showReportHeaderNegative() {
-  console.log('Nothing to release.\n\n' +
-              'We checked all recent commits, and discovered that you do\n' +
-              'not need to release a new version, according to semver.org.')
+  console.log(
+    'Nothing to release.\n\n' +
+    'We checked all recent commits, and discovered that you do\n' +
+    'not need to release a new version, according to ComVer.\n')
 }
 
 function showReport(status) {
@@ -76,11 +78,7 @@ conventionalChangelog({
   append: true,
   transform: function (commit, cb) {
     var toPush = null;
-    if (commit.type === 'fix') {
-      status.increment = Math.max(status.increment, 1);
-      toPush = commit;
-    }
-    if (commit.type === 'feat') {
+    if (commit.type === 'fix' || commit.type === 'feat') {
       status.increment = Math.max(status.increment, 2);
       toPush = commit;
     }
