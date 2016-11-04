@@ -30,6 +30,12 @@ const inputStream = xs.of(1, 2, 3, 4)
 const outputStream = inputStream.compose(delay(500))
 ```
 
+In CommonJS:
+
+```js
+var delay = require('xstream/extra/delay').default;
+```
+
 To import and use an extra factory (e.g. `fromEvent`), import it as such:
 
 ```js
