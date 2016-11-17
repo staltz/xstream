@@ -133,5 +133,23 @@ describe('flattenSequentially (extra)', () => {
         },
       });
     });
+
+    it('should emit data from inner streams after synchronous outer completes', (done) => {
+      const outer = xs.of(42);
+      const stream = outer.map(i => xs.periodic(50).take(2).mapTo(i))
+        .compose(flattenSequentially);
+      const expected = [42, 42];
+
+      stream.addListener({
+        next: (x: number) => {
+          assert.strictEqual(x, expected.shift());
+        },
+        error: (err: any) => done(err),
+        complete: () => {
+          assert.strictEqual(expected.length, 0);
+          done();
+        },
+      });
+    });
   });
 });

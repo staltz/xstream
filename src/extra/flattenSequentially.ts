@@ -20,16 +20,25 @@ class FSInner<T> implements InternalListener<T> {
 
 export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
   public type = 'flattenSequentially';
-  private open: boolean = true;
-  private active: boolean = false;
-  private seq: Array<Stream<T>> = [];
-  public out: Stream<T> = null as any;
+  public ins: Stream<Stream<T>>;
+  private open: boolean;
+  private active: boolean;
+  private seq: Array<Stream<T>>;
+  public out: Stream<T>;
 
-  constructor(public ins: Stream<Stream<T>>) {
+  constructor(ins: Stream<Stream<T>>) {
+    this.ins = ins;
+    this.out = null as any;
+    this.open = true;
+    this.active = false;
+    this.seq = [];
   }
 
   _start(out: Stream<T>): void {
     this.out = out;
+    this.open = true;
+    this.active = false;
+    this.seq = [];
     this.ins._add(this);
   }
 
@@ -73,7 +82,7 @@ export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
     const u = this.out;
     if (!u) return;
     this.open = false;
-    if (this.seq.length === 0) {
+    if (!this.active && this.seq.length === 0) {
       u._c();
     }
   }
