@@ -1,3 +1,23 @@
+<a name="8.0.0"></a>
+# [8.0.0](https://github.com/staltz/xstream/compare/v7.0.0...v8.0.0) (2016-11-17)
+
+
+### Bug Fixes
+
+* **flattenSequentially:** fix behaviour of outer stream completion ([fd31d49](https://github.com/staltz/xstream/commit/fd31d49))
+
+
+### BREAKING CHANGES
+
+* flattenSequentially: If your code was relying on buggy behavior, you may need to migrate carefully. Check your usages of
+flattenSequentially and how the outer stream completes.
+![maybe
+won't](https://img.shields.io/badge/will%20it%20affect%20me%3F-maybe%20won't-yellowgreen.svg)
+
+ISSUES CLOSED: #141.
+
+
+
 <a name="7.0.0"></a>
 # [7.0.0](https://github.com/staltz/xstream/compare/v6.6.0...v7.0.0) (2016-10-24)
 
