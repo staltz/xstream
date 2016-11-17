@@ -151,5 +151,36 @@ describe('flattenSequentially (extra)', () => {
         },
       });
     });
+
+    it('should stop inner emissions if result stops', (done) => {
+      const expectedInner = [0, 1];
+
+      const stream = xs.of(1)
+        .map(i =>
+          xs.periodic(150).take(3) // 150ms, 300ms, 450ms, 600ms
+            .debug(x => assert.strictEqual(x, expectedInner.shift()))
+        )
+        .compose(flattenSequentially);
+
+      const expected = [0, 1];
+      const listener = {
+        next: (x: number) => {
+          assert.strictEqual(x, expected.shift());
+        },
+        error: (err: any) => done(err),
+        complete: () => done('should not call complete'),
+      };
+
+      stream.addListener(listener);
+      setTimeout(() => {
+        stream.removeListener(listener);
+      }, 390);
+
+      setTimeout(() => {
+        assert.strictEqual(expectedInner.length, 0);
+        assert.strictEqual(expected.length, 0);
+        done();
+      }, 500);
+    });
   });
 });
