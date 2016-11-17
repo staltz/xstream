@@ -10,6 +10,7 @@
 ![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.js.svg)
 ![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.min.js.svg?compression=gzip)
 [![Build Status](https://travis-ci.org/staltz/xstream.svg?branch=master)](https://travis-ci.org/staltz/xstream)
+[![ComVer](https://img.shields.io/badge/ComVer-compliant-brightgreen.svg)](https://github.com/staltz/comver)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg?maxAge=2592000)](https://gitter.im/staltz/xstream)
 
 # Example
@@ -115,7 +116,7 @@ You can also trigger an event to happen on a Stream with the `shamefullySend*` m
 
 ## Listener
 
-A Listener is an object with three functions attached to it: `next`, `error`, and `complete`. There is one function for each type of event a Stream may emit.
+A Listener is an object with one to three functions attached to it: `next`, `error`, and `complete`. There is usually one function for each type of event a Stream may emit but only `next` is always required.
 
 - `next` events are the typical type, they deliver a value.
 - `error` events abort (stop) the execution of the Stream, and happen when something goes wrong in the Stream (or upstream somewhere in the chain of operators)
