@@ -2,10 +2,21 @@
 # API
 
 ## Factories
-  <? doc.javadoc.forEach(function(comment) { ?><? if (!comment.ignore && comment.raw.tags.findIndex(o => o.type === 'factory') >= 0) { ?>
-      <? if (comment.name) { ?>- [`<?= comment.name ?>`](#<?= comment.name ?>)<? } ?><? } ?><? }) ?>
+  <?
+    doc.javadoc.forEach(comment => {
+      if (!comment.ignore && comment.name && comment.raw.tags.findIndex(o => o.type === 'factory') >= 0) {
+        ?>- [`<?= comment.name ?>`](#<?= comment.name ?>)<?- '\n' ?><?
+      }
+    })
+  ?>
+
 
 ## Methods and Operators
-  <? doc.javadoc.forEach(function(comment) { ?><? if (!comment.ignore && comment.raw.tags.findIndex(o => o.type === 'factory') === -1) { ?>
-      <? if (comment.name) { ?>- [`<?= comment.name ?>`](#<?= comment.name ?>)<? } ?><? } ?><? }) ?>
+  <?
+    doc.javadoc.forEach(comment => {
+      if (!comment.ignore && comment.name && comment.raw.tags.findIndex(o => o.type === 'factory') === -1) {
+        ?>- [`<?= comment.name ?>`](#<?= comment.name ?>)<?- '\n' ?><?
+      }
+    })
+  ?>
 <? }) ?>
