@@ -69,7 +69,6 @@ var xs = require('xstream').default
 # API
 
 ## Factories
-
 - [`create`](#create)
 - [`createWithMemory`](#createWithMemory)
 - [`never`](#never)
@@ -85,11 +84,9 @@ var xs = require('xstream').default
 - [`combine`](#combine)
 
 ## Methods and Operators
-
 - [`addListener`](#addListener)
 - [`removeListener`](#removeListener)
 - [`subscribe`](#subscribe)
-
 - [`map`](#map)
 - [`mapTo`](#mapTo)
 - [`filter`](#filter)
