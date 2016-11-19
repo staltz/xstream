@@ -220,7 +220,7 @@ describe('Stream.prototype.imitate', () => {
       return xs.of(1).compose(delay<number>(20));
     }).flatten();
     proxyAction$.imitate(action$);
-    const expected = [0, 1, 2];
+    const expected = [0, 1, 2, 3];
 
     let errors: Array<any> = [];
     state$.addListener({
