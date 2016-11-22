@@ -148,7 +148,7 @@ describe('Stream', () => {
       assert.equal(expected1.length, 0);
       assert.equal(expected2.length, 0);
       done();
-    }, 400);
+    }, 350);
   });
 
   it('should not stop if listener is synchronously removed and re-added', (done) => {
