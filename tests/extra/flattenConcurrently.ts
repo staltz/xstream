@@ -43,11 +43,11 @@ describe('flattenConcurrently (extra)', () => {
 
     it('should expand 3 sync events as a periodic each', (done) => {
       const stream = xs.of(0, 1, 2)
-        .map(i => xs.periodic(100 * (i + 1)).take(2).map(x => `${i}${x}`))
+        .map(i => xs.periodic(100 * (i + 1) + 10 * i).take(2).map(x => `${i}${x}`))
         .compose(flattenConcurrently);
       // ---x---x---x---x---x---x
       // ---00--01
-      // -------10------11
+      // --------10------11
       // -----------20----------21
       const expected = ['00', '01', '10', '20', '11', '21'];
 
