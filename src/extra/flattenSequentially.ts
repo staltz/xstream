@@ -22,7 +22,8 @@ export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
   public type = 'flattenSequentially';
   public ins: Stream<Stream<T>>;
   private open: boolean;
-  private active: boolean;
+  private active: Stream<T> | null;
+  private activeIL: FSInner<T> | null;
   private seq: Array<Stream<T>>;
   public out: Stream<T>;
 
@@ -30,28 +31,34 @@ export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
     this.ins = ins;
     this.out = null as any;
     this.open = true;
-    this.active = false;
+    this.active = null;
+    this.activeIL = null;
     this.seq = [];
   }
 
   _start(out: Stream<T>): void {
     this.out = out;
     this.open = true;
-    this.active = false;
+    this.active = null;
+    this.activeIL = new FSInner(out, this);
     this.seq = [];
     this.ins._add(this);
   }
 
   _stop(): void {
     this.ins._remove(this);
+    if (this.active && this.activeIL) {
+      this.active._remove(this.activeIL);
+    }
     this.open = true;
-    this.active = false;
+    this.active = null;
+    this.activeIL = null;
     this.seq = [];
     this.out = null as any;
   }
 
   less(): void {
-    this.active = false;
+    this.active = null;
     const seq = this.seq;
     if (seq.length > 0) {
       this._n(seq.shift() as Stream<T>);
@@ -67,8 +74,8 @@ export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
     if (this.active) {
       this.seq.push(s);
     } else {
-      this.active = true;
-      s._add(new FSInner(u, this));
+      this.active = s;
+      s._add(this.activeIL as FSInner<T>);
     }
   }
 
