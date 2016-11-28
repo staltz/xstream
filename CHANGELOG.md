@@ -1,3 +1,29 @@
+<a name="9.0.0"></a>
+# [9.0.0](https://github.com/staltz/xstream/compare/v8.0.0...v9.0.0) (2016-11-28)
+
+
+### Bug Fixes
+
+* **flattenSequentially:** stop execution of interrupted inner streams ([b8d6995](https://github.com/staltz/xstream/commit/b8d6995))
+* **stream:** throw error when there are no error listeners ([e512c3e](https://github.com/staltz/xstream/commit/e512c3e)), closes [#121](https://github.com/staltz/xstream/issues/121)
+
+
+### BREAKING CHANGES
+
+* flattenSequentially: ![maybe won't](https://img.shields.io/badge/will%20it%20affect%20me%3F-maybe%20won't-yellowgreen.svg)
+This is likely a breaking change for people using flattenSequentially,
+specially given that xstream core was fixed so that errors are not swallowed.
+Most flattenSequentially code should still work, but upgrade carefully anyway.
+* stream: ![maybe
+will](https://img.shields.io/badge/will%20it%20affect%20me%3F-maybe%20will-yellow.svg)
+This changes the behavior of most xstream code because errors are no
+longer swallowed. When you update xstream to this version, you may
+experience new errors thrown that you haven't seen before. Upgrade
+carefully, keeping in mind that these thrown errors were always there,
+but only now are surfaced.
+
+
+
 <a name="8.0.0"></a>
 # [8.0.0](https://github.com/staltz/xstream/compare/v7.0.0...v8.0.0) (2016-11-17)
 

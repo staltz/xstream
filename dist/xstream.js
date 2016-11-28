@@ -932,6 +932,8 @@ var Stream = (function () {
             for (var i = 0; i < L; i++)
                 b[i]._e(err);
         }
+        if (!this._d && L == 0)
+            throw this._err;
     };
     Stream.prototype._c = function () {
         var a = this._ils;
