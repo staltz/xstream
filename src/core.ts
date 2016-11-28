@@ -51,6 +51,10 @@ export interface Producer<T> {
   stop: () => void;
 }
 
+export interface ProducerFn<T> {
+  (listener: Listener<T>): () => void;
+}
+
 export interface Listener<T> {
   next: (x: T) => void;
   error: (err: any) => void;
@@ -70,15 +74,32 @@ export type Observable<T> = {
 export type FromInput<T> = Promise<T> | Stream<T> | Array<T> | Observable<T>;
 
 // mutates the input
-function internalizeProducer<T>(producer: Producer<T>) {
+function internalizeProducer<T>(producer: Producer<T> | ProducerFn<T>) {
   (producer as InternalProducer<T> & Producer<T>)._start =
     function _start(il: InternalListener<T>) {
       (il as InternalListener<T> & Listener<T>).next = il._n;
       (il as InternalListener<T> & Listener<T>).error = il._e;
-      (il as InternalListener<T> & Listener<T>).complete = il._c;
-      this.start(il as InternalListener<T> & Listener<T>);
+      if (typeof producer === 'function') {
+        let _stoped = false;
+        (il as InternalListener<T> & Listener<T>).complete = function _stop () {
+          (producer as InternalProducer<T> & ProducerFn<T>)._stop
+            ? (producer as InternalProducer<T> & ProducerFn<T>)._stop()
+            : _stoped = true;
+        };
+        (producer as InternalProducer<T> & ProducerFn<T>)._stop =
+          (producer as ProducerFn<T>)(il as InternalListener<T> & Listener<T>);
+        if (_stoped) {
+          (producer as InternalProducer<T> & ProducerFn<T>)._stop();
+        }
+      } else {
+        (il as InternalListener<T> & Listener<T>).complete = il._c;
+        this.start(il as InternalListener<T> & Listener<T>);
+      }
     };
-  (producer as InternalProducer<T> & Producer<T>)._stop = producer.stop;
+    if (typeof producer !== 'function') {
+      (producer as InternalProducer<T> & Producer<T>)._stop =
+        (producer as Producer<T>).stop;
+    }
 }
 
 function and<T>(f1: (t: T) => boolean, f2: (t: T) => boolean): (t: T) => boolean {
@@ -1385,15 +1406,18 @@ export class Stream<T> implements InternalListener<T> {
    * start, generate events, and stop the Stream.
    * @return {Stream}
    */
-  static create<T>(producer?: Producer<T>): Stream<T> {
+  static create<T>(producer?: Producer<T> | ProducerFn<T>): Stream<T> {
     if (producer) {
-      if (typeof producer.start !== 'function'
-      || typeof producer.stop !== 'function') {
-        throw new Error('producer requires both start and stop functions');
+      if (typeof producer !== 'function' &&
+        (typeof (producer as any).start !== 'function'
+        || typeof (producer as any).stop !== 'function')) {
+        throw new Error('producer should be either a function'
+        + ' or an object with both start and stop functions');
       }
       internalizeProducer(producer); // mutates the input
     }
-    return new Stream(producer as InternalProducer<T> & Producer<T>);
+    //return new Stream(producer as InternalProducer<T> & Producer<T>);
+    return new Stream(producer as InternalProducer<T> & (Producer<T> | ProducerFn<T>));
   }
 
   /**

@@ -74,6 +74,33 @@ describe('Stream', () => {
     });
   });
 
+  it('should be createable giving a custom producer function', (done) => {
+    const expected = [10, 20, 30];
+    let producerStopped: boolean = false;
+
+    const stream: Stream<number> = xs.create<number>((listener) => {
+      listener.next(10);
+      listener.next(20);
+      listener.next(30);
+      listener.complete();
+      return () => {
+        done();
+        assert.equal(expected.length, 0);
+        assert.equal(producerStopped, false);
+        producerStopped = true;
+      }
+    });
+    stream.addListener({
+      next: (x: number) => {
+        assert.equal(x, expected.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.equal(producerStopped, true);
+      },
+    });
+  });
+
   it('should allow using shamefullySend* methods', (done) => {
     const expected = [10, 20, 30];
     let listenerGotEnd: boolean = false;
@@ -309,7 +336,7 @@ describe('Stream', () => {
 
         xs.create(incompleteProducer);
       } catch (e) {
-        assert.equal(e.message, 'producer requires both start and stop functions');
+        assert.equal(e.message, 'producer should be either a function or an object with both start and stop functions');
         done();
       }
     });
