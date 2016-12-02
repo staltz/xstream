@@ -1618,6 +1618,16 @@ export class Stream<T> implements InternalListener<T> {
    * be emitted on the output stream. It's essentially a way of joining together
    * the events from multiple streams.
    *
+   * Note: to minimize garbage collection, *combine* uses the same array
+   * instance for each emission.  If you need to compare emissions over time,
+   * cache the values with `map` first:
+   *
+   * ```js
+   * xs.combine(stream1, stream2).map(
+   *   combinedEmissions => ([ ...combinedEmissions ])
+   * ).compose(pairwise)
+   * ```
+   *
    * Marble diagram:
    *
    * ```text
