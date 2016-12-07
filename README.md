@@ -460,6 +460,21 @@ Marble diagram:
 ----1a-2a-2b-3b-3c-3d-4d--
 ```
 
+Note: to minimize garbage collection, *combine* uses the same array
+instance for each emission.  If you need to compare emissions over time,
+cache the values with `map` first:
+
+```js
+import pairwise from 'xstream/extra/pairwise'
+
+const stream1 = xs.of(1);
+const stream2 = xs.of(2);
+
+xs.combine(stream1, stream2).map(
+  combinedEmissions => ([ ...combinedEmissions ])
+).compose(pairwise)
+```
+
 #### Arguments:
 
 - `stream1: Stream` A stream to combine together with other streams.
