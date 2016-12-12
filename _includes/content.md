@@ -9,7 +9,6 @@
 
 ![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.js.svg)
 ![](https://badge-size.herokuapp.com/staltz/xstream/master/dist/xstream.min.js.svg?compression=gzip)
-[![Build Status](https://travis-ci.org/staltz/xstream.svg?branch=master)](https://travis-ci.org/staltz/xstream)
 [![ComVer](https://img.shields.io/badge/ComVer-compliant-brightgreen.svg)](https://github.com/staltz/comver)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg?maxAge=2592000)](https://gitter.im/staltz/xstream)
 
@@ -450,6 +449,21 @@ Marble diagram:
 ----a-----b-----c--d------
          combine
 ----1a-2a-2b-3b-3c-3d-4d--
+```
+
+Note: to minimize garbage collection, *combine* uses the same array
+instance for each emission.  If you need to compare emissions over time,
+cache the values with `map` first:
+
+```js
+import pairwise from 'xstream/extra/pairwise'
+
+const stream1 = xs.of(1);
+const stream2 = xs.of(2);
+
+xs.combine(stream1, stream2).map(
+  combinedEmissions => ([ ...combinedEmissions ])
+).compose(pairwise)
 ```
 
 #### Arguments:
