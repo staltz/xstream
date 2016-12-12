@@ -1,3 +1,18 @@
+<a name="10.0.0"></a>
+# [10.0.0](https://github.com/staltz/xstream/compare/v9.1.0...v10.0.0) (2016-12-12)
+
+
+### Bug Fixes
+
+* **src:** usage of TypeScript v2.1 is a breaking change ([3e74cb1](https://github.com/staltz/xstream/commit/3e74cb1))
+
+
+### BREAKING CHANGES
+
+* src: This version of xstream can only be used with TypeScript v2.1 or higher.
+
+
+
 <a name="9.1.0"></a>
 # [9.1.0](https://github.com/staltz/xstream/compare/v9.0.0...v9.1.0) (2016-12-12)
 
