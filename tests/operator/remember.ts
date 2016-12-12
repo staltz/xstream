@@ -5,7 +5,7 @@ import * as assert from 'assert';
 function noop() {};
 
 describe('Stream.prototype.remember', () => {
-  it('should replay the second event to a new listener', (done) => {
+  it('should replay the second event to a new listener', (done: any) => {
     const stream = xs.periodic(50).take(4).remember();
 
     stream.addListener({next: noop, error: noop, complete: noop});
@@ -25,7 +25,7 @@ describe('Stream.prototype.remember', () => {
     }, 125);
   });
 
-  it('should not be ruined by map+map fusion optimizations', (done) => {
+  it('should not be ruined by map+map fusion optimizations', (done: any) => {
     let expectedA = [10];
     let expectedB = [10];
 
@@ -62,7 +62,7 @@ describe('Stream.prototype.remember', () => {
     }, 100);
   });
 
-  it('should reset completely after it has completed', (done) => {
+  it('should reset completely after it has completed', (done: any) => {
     const stream = xs.of(1, 2, 3).remember();
 
     const expected1 = [1, 2, 3];
@@ -94,7 +94,7 @@ describe('Stream.prototype.remember', () => {
     });
   });
 
-  it('should return a MemoryStream if input stream is a Stream', (done) => {
+  it('should return a MemoryStream if input stream is a Stream', (done: any) => {
     const input = xs.of(1, 2, 3);
     assert.strictEqual(input instanceof Stream, true);
     const stream: MemoryStream<number> = input.remember();
@@ -102,7 +102,7 @@ describe('Stream.prototype.remember', () => {
     done();
   })
 
-  it('should not fail if original stream has no producer, and start is called', (done) => {
+  it('should not fail if original stream has no producer, and start is called', (done: any) => {
     const input = xs.create<number>();
     assert.strictEqual(input instanceof Stream, true);
     const stream: MemoryStream<number> = input.remember();
@@ -113,7 +113,7 @@ describe('Stream.prototype.remember', () => {
     done();
   });
 
-  it('should return a MemoryStream if input stream is a MemoryStream', (done) => {
+  it('should return a MemoryStream if input stream is a MemoryStream', (done: any) => {
     const input = xs.createWithMemory<number>();
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream: MemoryStream<number> = input.remember();
@@ -121,14 +121,14 @@ describe('Stream.prototype.remember', () => {
     done();
   });
 
-  it('should be a true bypass if input stream is a MemoryStream', (done) => {
+  it('should be a true bypass if input stream is a MemoryStream', (done: any) => {
     const input = xs.createWithMemory<number>();
     const stream: MemoryStream<number> = input.remember();
     assert.strictEqual(stream, input);
     done();
   });
 
-  it('should not fail if original memorystream has no producer, and start is called', (done) => {
+  it('should not fail if original memorystream has no producer, and start is called', (done: any) => {
     const input = xs.createWithMemory<number>();
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream: MemoryStream<number> = input.remember();
@@ -139,7 +139,7 @@ describe('Stream.prototype.remember', () => {
     done();
   });
 
-  it('should pass last value to second listener, even if it\'s "shameful"', (done) => {
+  it('should pass last value to second listener, even if it\'s "shameful"', (done: any) => {
     const subject = xs.create();
     const remembered = subject.remember();
 
@@ -161,7 +161,7 @@ describe('Stream.prototype.remember', () => {
     subject.shamefullySendComplete();
   });
 
-  it('should work properly with "shameful" values after subscription', (done) => {
+  it('should work properly with "shameful" values after subscription', (done: any) => {
     const subject = xs.create();
     const remembered = subject.remember();
 

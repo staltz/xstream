@@ -5,7 +5,7 @@ import delay from '../../src/extra/delay';
 import * as assert from 'assert';
 
 describe('Stream.prototype.endWhen', () => {
-  it('should complete the stream when another stream emits next', (done) => {
+  it('should complete the stream when another stream emits next', (done: any) => {
     const source = xs.periodic(50);
     const other = xs.periodic(220).take(1);
     const stream = source.endWhen(other);
@@ -23,7 +23,7 @@ describe('Stream.prototype.endWhen', () => {
     });
   });
 
-  it('should complete the stream when another stream emits complete', (done) => {
+  it('should complete the stream when another stream emits complete', (done: any) => {
     const source = xs.periodic(50);
     const other = xs.empty().compose(delay(220));
     const stream = source.endWhen(other);
@@ -41,7 +41,7 @@ describe('Stream.prototype.endWhen', () => {
     });
   });
 
-  it('should return a Stream if input stream is a Stream', (done) => {
+  it('should return a Stream if input stream is a Stream', (done: any) => {
     const input = xs.of<number>(1, 2, 3);
     assert.strictEqual(input instanceof Stream, true);
     const stream: Stream<number> = input.endWhen(xs.never());
@@ -49,7 +49,7 @@ describe('Stream.prototype.endWhen', () => {
     done();
   });
 
-  it('should return a MemoryStream if input stream is a MemoryStream', (done) => {
+  it('should return a MemoryStream if input stream is a MemoryStream', (done: any) => {
     const input = xs.of<number>(1, 2, 3).remember();
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream: MemoryStream<number> = input.endWhen(xs.never());

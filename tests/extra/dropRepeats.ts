@@ -6,7 +6,7 @@ import dropRepeats from '../../src/extra/dropRepeats';
 import * as assert from 'assert';
 
 describe('dropRepeats (extra)', () => {
-  it('should drop consecutive duplicate numbers (as events)', (done) => {
+  it('should drop consecutive duplicate numbers (as events)', (done: any) => {
     const stream = xs.of(1, 2, 1, 1, 1, 2, 3, 4, 3, 3).compose(dropRepeats());
     const expected = [1, 2, 1, 2, 3, 4, 3];
 
@@ -22,7 +22,7 @@ describe('dropRepeats (extra)', () => {
     });
   });
 
-  it('should drop consecutive \'duplicate\' strings, with a custom isEqual', (done) => {
+  it('should drop consecutive \'duplicate\' strings, with a custom isEqual', (done: any) => {
     const stream = xs.of('a', 'b', 'a', 'A', 'B', 'b')
       .compose(dropRepeats((x: string, y: string) => x.toLowerCase() === y.toLowerCase()));
     const expected = ['a', 'b', 'a', 'B'];
@@ -39,9 +39,9 @@ describe('dropRepeats (extra)', () => {
     });
   });
 
-  it('should drop consecutive duplicate numbers, with a circular stream dependency', (done) => {
+  it('should drop consecutive duplicate numbers, with a circular stream dependency', (done: any) => {
     const streamProxy = xs.create();
-    const input = xs.of(0, 0, 1, 1, 1)
+    const input = xs.of(0, 0, 1, 1, 1);
     const stream = xs.merge(streamProxy, input).compose(dropRepeats());
     streamProxy.imitate(stream);
     const expected = [0, 1];
@@ -64,7 +64,7 @@ describe('dropRepeats (extra)', () => {
     });
   });
 
-  it('should support dropping duplicates of combine arrays', (done) => {
+  it('should support dropping duplicates of combine arrays', (done: any) => {
     const A: Stream<string> = fromDiagram('---a---b------b------|');
     const B: Stream<string> = fromDiagram('-x---y---y------z--y-|');
     const stream = xs.combine(A, B).compose(

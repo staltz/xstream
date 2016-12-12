@@ -6,7 +6,7 @@ export type Easings = {
   easeIn: Ease;
   easeOut: Ease;
   easeInOut: Ease;
-}
+};
 
 export type NumericFunction = (input: number) => number;
 

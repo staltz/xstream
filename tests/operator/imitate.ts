@@ -5,7 +5,7 @@ import delay from '../../src/extra/delay';
 import * as assert from 'assert';
 
 describe('Stream.prototype.imitate', () => {
-  it('should be able to model a circular dependency in the stream graph', (done) => {
+  it('should be able to model a circular dependency in the stream graph', (done: any) => {
     const secondMimic = xs.create<number>();
     const first = secondMimic.map(x => x * 10).take(3);
     const second = first.map(x => x + 1).startWith(1).compose(delay(1));
@@ -24,7 +24,7 @@ describe('Stream.prototype.imitate', () => {
     });
   });
 
-  it('should be able to model a circular dependency, mimic subscribed', (done) => {
+  it('should be able to model a circular dependency, mimic subscribed', (done: any) => {
     const secondMimic = xs.create<number>();
     const first = secondMimic.map(x => x * 10).take(3);
     const second = first.map(x => x + 1).startWith(1).compose(delay(1));
@@ -43,7 +43,7 @@ describe('Stream.prototype.imitate', () => {
     });
   });
 
-  it('should broadcast the source stream to multiple listeners', (done) => {
+  it('should broadcast the source stream to multiple listeners', (done: any) => {
     const fakeSecond = xs.create<number>();
     const first = fakeSecond.map(x => x * 10).take(3);
     const second = first.map(x => x + 1).startWith(1).compose(delay(100));
@@ -90,7 +90,7 @@ describe('Stream.prototype.imitate', () => {
     }, 600);
   });
 
-  it('should not cause leaked cyclic executions (1)', (done) => {
+  it('should not cause leaked cyclic executions (1)', (done: any) => {
     const expectedProxy = [2, 4, 8, 16, 32 /* inertia due to stopping on next tick */];
     const expectedResult = [2, 4, 8, 16];
 
@@ -123,7 +123,7 @@ describe('Stream.prototype.imitate', () => {
     });
   });
 
-  it('should not cause leaked cyclic executions (2)', (done) => {
+  it('should not cause leaked cyclic executions (2)', (done: any) => {
     const expectedProxy = [2, 4, 8, 16, 32 /* inertia due to stopping on next tick */];
     const expectedResult = [2, 4, 8, 16];
 
@@ -156,7 +156,7 @@ describe('Stream.prototype.imitate', () => {
     });
   });
 
-  it('should not cause stack overflow while detecting cycles', (done) => {
+  it('should not cause stack overflow while detecting cycles', (done: any) => {
     const outside = xs.periodic(150);
     const secondMimic = xs.create<number>();
     const first = xs.merge(outside, secondMimic.map(x => x * 10));
@@ -210,7 +210,7 @@ describe('Stream.prototype.imitate', () => {
     }, 1000);
   });
 
-  it('should not propagate errors in a cycle', (done) => {
+  it('should not propagate errors in a cycle', (done: any) => {
     const proxyAction$ = xs.create<number>();
     const state$ = proxyAction$.fold((state, action) => state + action, 0);
     const action$ = state$.map(state => {
@@ -242,7 +242,7 @@ describe('Stream.prototype.imitate', () => {
     }, 150);
   });
 
-  it('should not by itself start the target stream execution', (done) => {
+  it('should not by itself start the target stream execution', (done: any) => {
     let nextDelivered = false;
     const stream = xs.periodic(50).take(3).debug(() => {
       nextDelivered = true;
@@ -257,7 +257,7 @@ describe('Stream.prototype.imitate', () => {
     proxyStream.imitate(stream);
   });
 
-  it('should throw an error when given a MemoryStream', (done) => {
+  it('should throw an error when given a MemoryStream', (done: any) => {
     const stream = xs.periodic(50).take(3).remember();
     assert.strictEqual(stream instanceof MemoryStream, true);
     const proxyStream = xs.create<number>();
@@ -267,7 +267,7 @@ describe('Stream.prototype.imitate', () => {
     done();
   });
 
-  it('should transfer existing listeners to imitation target', (done) => {
+  it('should transfer existing listeners to imitation target', (done: any) => {
     const mimic = xs.create<number>();
     const expected = [0, 1, 2];
 

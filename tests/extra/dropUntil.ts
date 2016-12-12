@@ -6,7 +6,7 @@ import delay from '../../src/extra/delay';
 import * as assert from 'assert';
 
 describe('dropUntil (extra)', () => {
-  it('should start emitting the stream when another stream emits next', (done) => {
+  it('should start emitting the stream when another stream emits next', (done: any) => {
     const source = xs.periodic(50).take(6);
     const other = xs.periodic(220).take(1);
     const stream = source.compose(dropUntil(other));
@@ -24,7 +24,7 @@ describe('dropUntil (extra)', () => {
     });
   });
 
-  it('should complete the stream when another stream emits complete', (done) => {
+  it('should complete the stream when another stream emits complete', (done: any) => {
     const source = xs.periodic(50).take(6);
     const other = xs.empty().compose(delay(220));
     const stream = source.compose(dropUntil(other));

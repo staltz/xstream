@@ -4,7 +4,7 @@ import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.take', () => {
-  it('should allow specifying max amount to take from input stream', (done) => {
+  it('should allow specifying max amount to take from input stream', (done: any) => {
     const stream = xs.periodic(50).take(4);
     const expected = [0, 1, 2, 3];
     let listener = {
@@ -21,7 +21,7 @@ describe('Stream.prototype.take', () => {
     stream.addListener(listener);
   });
 
-  it('should return a Stream if input stream is a tream', (done) => {
+  it('should return a Stream if input stream is a tream', (done: any) => {
     const input = xs.of(1, 2, 3);
     assert.strictEqual(input instanceof Stream, true);
     const stream: Stream<number> = input.take(2);
@@ -29,7 +29,7 @@ describe('Stream.prototype.take', () => {
     done();
   });
 
-  it('should return a MemoryStream if input stream is a MemoryStream', (done) => {
+  it('should return a MemoryStream if input stream is a MemoryStream', (done: any) => {
     const input = xs.of(1, 2, 3).remember();
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream: MemoryStream<number> = input.take(2);
@@ -37,7 +37,7 @@ describe('Stream.prototype.take', () => {
     done();
   });
 
-  it('should not break sibling listeners when TakeOperator tears down', (done) => {
+  it('should not break sibling listeners when TakeOperator tears down', (done: any) => {
     const source = xs.periodic(50);
     const streamA = source.take(3);
     const streamB = source.take(6);
@@ -66,7 +66,7 @@ describe('Stream.prototype.take', () => {
     });
   });
 
-  it('should just complete if given max=0', (done) => {
+  it('should just complete if given max=0', (done: any) => {
     const stream = xs.periodic(50).take(0);
 
     stream.addListener({

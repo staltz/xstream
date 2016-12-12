@@ -75,7 +75,7 @@ function makeAssertPlot(done: MochaDone, assert: any, expected: string) {
 }
 
 describe('tween (extra)', () => {
-  it('should do linear tweening', (done) => {
+  it('should do linear tweening', (done: any) => {
     let position$ = tween({
       ease: tween.linear.ease,
       from: plotTweenConfigs.from,
@@ -108,7 +108,7 @@ describe('tween (extra)', () => {
 +---------------------`));
   });
 
-  it('should do power of 2 easing (ease in)', (done) => {
+  it('should do power of 2 easing (ease in)', (done: any) => {
     let position$ = tween({
       ease: tween.power2.easeIn,
       from: plotTweenConfigs.from,
@@ -141,7 +141,7 @@ describe('tween (extra)', () => {
 +---------------------`));
   });
 
-  it("should do power of 3 easing (ease in)", function (done) {
+  it("should do power of 3 easing (ease in)", function (done: any) {
     let position$ = tween({
       ease: tween.power3.easeIn,
       from: plotTweenConfigs.from,
@@ -174,7 +174,7 @@ describe('tween (extra)', () => {
 +---------------------`));
   });
 
-  it("should do power of 4 easing (ease in)", function (done) {
+  it("should do power of 4 easing (ease in)", function (done: any) {
     let position$ = tween({
       ease: tween.power4.easeIn,
       from: plotTweenConfigs.from,
@@ -207,7 +207,7 @@ describe('tween (extra)', () => {
 +---------------------`));
   });
 
-  it("should do exponential easing (ease in)", function (done) {
+  it("should do exponential easing (ease in)", function (done: any) {
     let position$ = tween({
       ease: tween.exponential.easeIn,
       from: plotTweenConfigs.from,
@@ -240,7 +240,7 @@ describe('tween (extra)', () => {
 +---------------------`));
   });
 
-  it("should do back easing (ease in)", function (done) {
+  it("should do back easing (ease in)", function (done: any) {
     let position$ = tween({
       ease: tween.back.easeIn,
       from: plotTweenConfigs.from,
@@ -273,7 +273,7 @@ describe('tween (extra)', () => {
 +---------------------`));
   });
 
-  it("should do bounce easing (ease in)", function (done) {
+  it("should do bounce easing (ease in)", function (done: any) {
     let position$ = tween({
       ease: tween.bounce.easeIn,
       from: plotTweenConfigs.from,
@@ -306,7 +306,7 @@ describe('tween (extra)', () => {
 +---------------------`));
   });
 
-  it("should do circular easing (ease in)", function (done) {
+  it("should do circular easing (ease in)", function (done: any) {
     let position$ = tween({
       ease: tween.circular.easeIn,
       from: plotTweenConfigs.from,
@@ -339,7 +339,7 @@ describe('tween (extra)', () => {
 +---------------------`));
   });
 
-  it("should do elastic easing (ease in)", function (done) {
+  it("should do elastic easing (ease in)", function (done: any) {
     let position$ = tween({
       ease: tween.elastic.easeIn,
       from: plotTweenConfigs.from,
@@ -372,7 +372,7 @@ describe('tween (extra)', () => {
 +---------------------`));
   });
 
-  it("should do sine easing (ease in)", function (done) {
+  it("should do sine easing (ease in)", function (done: any) {
     let position$ = tween({
       ease: tween.sine.easeIn,
       from: plotTweenConfigs.from,

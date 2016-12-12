@@ -5,7 +5,7 @@ import throttle from '../../src/extra/throttle';
 import * as assert from 'assert';
 
 describe('throttle (extra)', () => {
-  it('should emit event and drop subsequent events until a period of silence has passed', (done) => {
+  it('should emit event and drop subsequent events until a period of silence has passed', (done: any) => {
     const producer: Producer<number> = {
       start(out: Listener<number>) {
         out.next(1);

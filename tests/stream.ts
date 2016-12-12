@@ -42,7 +42,7 @@ describe('Stream', () => {
     assert.equal(typeof stream.imitate, 'function');
   });
 
-  it('should be createable giving a custom producer object', (done) => {
+  it('should be createable giving a custom producer object', (done: any) => {
     const expected = [10, 20, 30];
     let producerStopped: boolean = false;
 
@@ -74,7 +74,7 @@ describe('Stream', () => {
     });
   });
 
-  it('should allow using shamefullySend* methods', (done) => {
+  it('should allow using shamefullySend* methods', (done: any) => {
     const expected = [10, 20, 30];
     let listenerGotEnd: boolean = false;
 
@@ -100,7 +100,7 @@ describe('Stream', () => {
     done();
   });
 
-  it('should be possible to addListener and removeListener with 1 listener', (done) => {
+  it('should be possible to addListener and removeListener with 1 listener', (done: any) => {
     const stream = xs.periodic(100);
     const expected = [0, 1, 2];
     let listener = {
@@ -117,7 +117,7 @@ describe('Stream', () => {
     stream.addListener(listener);
   });
 
-  it('should broadcast events to two listeners', (done) => {
+  it('should broadcast events to two listeners', (done: any) => {
     const stream = xs.periodic(100);
     const expected1 = [0, 1, 2];
     const expected2 = [1, 2];
@@ -151,7 +151,7 @@ describe('Stream', () => {
     }, 350);
   });
 
-  it('should not stop if listener is synchronously removed and re-added', (done) => {
+  it('should not stop if listener is synchronously removed and re-added', (done: any) => {
     const stream = xs.periodic(100);
     const expected = [0, 1, 2];
     let listener = {
@@ -173,7 +173,7 @@ describe('Stream', () => {
     }, 150);
   });
 
-  it('should restart if listener is asynchronously removed and re-added', (done) => {
+  it('should restart if listener is asynchronously removed and re-added', (done: any) => {
     const stream = xs.periodic(100);
     let expected = [0, 1, 2];
     let listener = {
@@ -199,7 +199,7 @@ describe('Stream', () => {
     }, 180);
   });
 
-  it('should synchronously stop producer when completed', (done) => {
+  it('should synchronously stop producer when completed', (done: any) => {
     let on = false;
     const stream = xs.create({
       start: (listener) => {
@@ -246,7 +246,7 @@ describe('Stream', () => {
     done();
   });
 
-  it('should synchronously stop producer when error thrown', (done) => {
+  it('should synchronously stop producer when error thrown', (done: any) => {
     let on = false;
     const stream = xs.create({
       start: (listener) => {
@@ -300,7 +300,7 @@ describe('Stream', () => {
   });
 
   describe('create', () => {
-    it('throws a helpful error if you pass an incomplete producer', (done) => {
+    it('throws a helpful error if you pass an incomplete producer', (done: any) => {
       try {
         const incompleteProducer = <Producer<any>> <any> {
           start: () => {},
@@ -316,7 +316,7 @@ describe('Stream', () => {
   });
 
   describe('setDebugListener', () => {
-    it('should not trigger a stream execution', (done) => {
+    it('should not trigger a stream execution', (done: any) => {
       const stream = xs.of(1, 2, 3);
       const listener: Listener<number> = {
         next: () => done('should not be called'),
@@ -328,7 +328,7 @@ describe('Stream', () => {
       setTimeout(() => done(), 200);
     });
 
-    it('should spy an existing stream execution', (done) => {
+    it('should spy an existing stream execution', (done: any) => {
       const stream = xs.periodic(200).take(8);
       const listener = { next: () => { }, error: () => { }, complete: () => { } };
       const expected = [0, 1, 2];
@@ -353,7 +353,7 @@ describe('Stream', () => {
   });
 
   describe('addListener', () => {
-    it('should accept a partial listener with just next', (done) => {
+    it('should accept a partial listener with just next', (done: any) => {
       const stream = fromDiagram('--a--b----c----d---|');
       const expected = ['a', 'b', 'c', 'd'];
 
@@ -370,7 +370,7 @@ describe('Stream', () => {
       stream.addListener(listener as any);
     });
 
-    it('should accept a partial listener with just error', (done) => {
+    it('should accept a partial listener with just error', (done: any) => {
       const stream = fromDiagram('--a--b----c----d---#', {errorValue: 'oops'});
 
       let listener = {
@@ -383,7 +383,7 @@ describe('Stream', () => {
       stream.addListener(listener as any);
     });
 
-    it('should accept a partial listener with just complete', (done) => {
+    it('should accept a partial listener with just complete', (done: any) => {
       const stream = fromDiagram('--a--b----c----d---|');
 
       let listener = {
@@ -397,7 +397,7 @@ describe('Stream', () => {
   });
 
   describe('subscribe', () => {
-    it('should return a subscription', (done) => {
+    it('should return a subscription', (done: any) => {
       const stream = xs.empty();
       const noop = (): void => void 0;
       const listener = {

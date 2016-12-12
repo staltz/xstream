@@ -6,7 +6,7 @@ import * as assert from 'assert';
 import * as most from 'most';
 
 describe('xs.from', () => {
-  it('should convert a resolved promise to a stream', (done) => {
+  it('should convert a resolved promise to a stream', (done: any) => {
     const stream = xs.from(Promise.resolve('yes'));
     let nextSent = false;
 
@@ -23,7 +23,7 @@ describe('xs.from', () => {
     });
   });
 
-  it('should convert a rejected promise to a stream', (done) => {
+  it('should convert a rejected promise to a stream', (done: any) => {
     const stream = xs.from(Promise.reject('no'));
 
     stream.addListener({
@@ -36,7 +36,7 @@ describe('xs.from', () => {
     });
   });
 
-  it('should convert an array to a stream', (done) => {
+  it('should convert an array to a stream', (done: any) => {
     const stream = xs.from([10, 20, 30, 40, 50])
       .map(i => String(i));
     let expected = ['10', '20', '30', '40', '50'];
@@ -53,7 +53,7 @@ describe('xs.from', () => {
     });
   });
 
-  it('should convert an observable to a stream', (done) => {
+  it('should convert an observable to a stream', (done: any) => {
     const observable = most.from<number>([10, 20, 30, 40, 50]);
     const stream = xs.from(observable as Observable<number>)
       .map(i => String(i));

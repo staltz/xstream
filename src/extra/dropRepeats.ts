@@ -112,7 +112,7 @@ export class DropRepeatsOperator<T> implements Operator<T, T> {
  * checks if it is equal to previous event, by returning a boolean.
  * @return {Stream}
  */
-export default function dropRepeats<T>(isEqual: (<T>(x: T, y: T) => boolean) | undefined = void 0): <T>(ins: Stream<T>) => Stream<T> {
+export default function dropRepeats(isEqual: (<T>(x: T, y: T) => boolean) | undefined = void 0): <T>(ins: Stream<T>) => Stream<T> {
   return function dropRepeatsOperator<T>(ins: Stream<T>): Stream<T> {
     return new Stream<T>(new DropRepeatsOperator<T>(ins, isEqual));
   };

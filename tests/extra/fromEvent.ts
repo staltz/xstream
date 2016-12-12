@@ -90,7 +90,7 @@ describe('fromEvent (extra) - DOMEvent', () => {
     assert.strictEqual(target.capture, false);
   });
 
-  it('should propagate events', (done) => {
+  it('should propagate events', (done: any) => {
     const target = new FakeEventTarget();
     const stream = fromEvent(target, 'test').take(3);
 
@@ -113,7 +113,7 @@ describe('fromEvent (extra) - DOMEvent', () => {
     target.emit(4);
   });
 
-  it('should call removeEventListener with expected parameters', (done) => {
+  it('should call removeEventListener with expected parameters', (done: any) => {
     const target = new FakeEventTarget();
     const stream = fromEvent(target, 'test', true);
 
@@ -144,7 +144,7 @@ describe('fromEvent (extra) - EventEmitter', () => {
     assert.strictEqual(target.event, 'test');
   });
 
-  it('should propagate events', (done) => {
+  it('should propagate events', (done: any) => {
     const target = new FakeEventEmitter();
     const stream = fromEvent(target, 'test').take(3);
 
@@ -167,7 +167,7 @@ describe('fromEvent (extra) - EventEmitter', () => {
     target.emit( 'test', 4 );
   });
 
-  it('should call removeListener with expected parameters', (done) => {
+  it('should call removeListener with expected parameters', (done: any) => {
     const target = new FakeEventEmitter();
     const stream = fromEvent(target, 'test');
 
@@ -186,7 +186,7 @@ describe('fromEvent (extra) - EventEmitter', () => {
     target.emit( 'test', 2 );
   });
 
-  it('should aggregate arguments from emitters', (done) => {
+  it('should aggregate arguments from emitters', (done: any) => {
     const target = new FakeEventEmitter();
     const stream = fromEvent(target, 'test').take(2);
 

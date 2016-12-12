@@ -6,7 +6,7 @@ import * as assert from 'assert';
 
 describe('flattenConcurrently (extra)', () => {
   describe('with map', () => {
-    it('should expand each periodic event with 3 sync events', (done) => {
+    it('should expand each periodic event with 3 sync events', (done: any) => {
       const stream = xs.periodic(100).take(3)
         .map(i => xs.of(1 + i, 2 + i, 3 + i))
         .compose(flattenConcurrently);
@@ -24,7 +24,7 @@ describe('flattenConcurrently (extra)', () => {
       });
     });
 
-    it('should return a flat stream with correct TypeScript types', (done) => {
+    it('should return a flat stream with correct TypeScript types', (done: any) => {
       const streamStrings: Stream<string> = Stream.create({
         start: (listener: Listener<string>) => {},
         stop: () => {}
@@ -41,7 +41,7 @@ describe('flattenConcurrently (extra)', () => {
       done();
     });
 
-    it('should expand 3 sync events as a periodic each', (done) => {
+    it('should expand 3 sync events as a periodic each', (done: any) => {
       const stream = xs.of(0, 1, 2)
         .map(i => xs.periodic(100 * (i + 1) + 10 * i).take(2).map(x => `${i}${x}`))
         .compose(flattenConcurrently);
@@ -63,7 +63,7 @@ describe('flattenConcurrently (extra)', () => {
       });
     });
 
-    it('should expand 3 async events as a periodic each', (done) => {
+    it('should expand 3 async events as a periodic each', (done: any) => {
       const stream = xs.periodic(140).take(3)
         .map(i =>
           xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
@@ -87,7 +87,7 @@ describe('flattenConcurrently (extra)', () => {
       });
     });
 
-    it('should expand 3 async events as a periodic each, no optimization', (done) => {
+    it('should expand 3 async events as a periodic each, no optimization', (done: any) => {
       const stream = xs.periodic(140).take(3)
         .map(i =>
           xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
@@ -113,7 +113,7 @@ describe('flattenConcurrently (extra)', () => {
       });
     });
 
-    it('should propagate user mistakes in project as errors', (done) => {
+    it('should propagate user mistakes in project as errors', (done: any) => {
       const source = xs.periodic(30).take(1);
       const stream = source.map(
         x => {
@@ -136,7 +136,7 @@ describe('flattenConcurrently (extra)', () => {
   });
 
   describe('with filter+map fusion', () => {
-    it('should execute the predicate, the projection, and the flattening', (done) => {
+    it('should execute the predicate, the projection, and the flattening', (done: any) => {
       let predicateCallCount = 0;
       let projectCallCount = 0;
 

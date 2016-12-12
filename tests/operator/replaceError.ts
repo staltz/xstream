@@ -4,7 +4,7 @@ import xs, {Stream, MemoryStream, Producer} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.replaceError', () => {
-  it('should replace a single error with an array stream', (done) => {
+  it('should replace a single error with an array stream', (done: any) => {
     const source = xs.of<any>('a', 'b', 'c', 2, 'd').map(i => i.toLowerCase());
     const other = xs.of(10, 20, 30);
     const stream = source.replaceError(err => other);
@@ -22,7 +22,7 @@ describe('Stream.prototype.replaceError', () => {
     });
   });
 
-  it('should allow retrying on a hot producer', (done) => {
+  it('should allow retrying on a hot producer', (done: any) => {
     const events: Array<{type: string, value?: any}> = [
       {type: 'next', value: 10},
       {type: 'next', value: 20},
@@ -69,7 +69,7 @@ describe('Stream.prototype.replaceError', () => {
     });
   });
 
-  it('should repeat a cold producer if retrying', (done) => {
+  it('should repeat a cold producer if retrying', (done: any) => {
     const events: Array<{type: string, value?: any}> = [
       {type: 'next', value: 10},
       {type: 'next', value: 20},
@@ -116,7 +116,7 @@ describe('Stream.prototype.replaceError', () => {
     });
   });
 
-  it('should propagate user mistakes in replace() as errors', (done) => {
+  it('should propagate user mistakes in replace() as errors', (done: any) => {
     const source = xs.throw({message: 'oops'});
     const stream = source.replaceError(
       err => xs.of((<string> err).toLowerCase())
@@ -134,7 +134,7 @@ describe('Stream.prototype.replaceError', () => {
     });
   });
 
-  it('should return a Stream if input stream is a Stream', (done) => {
+  it('should return a Stream if input stream is a Stream', (done: any) => {
     const input = xs.of(1, 2, 3);
     assert.strictEqual(input instanceof Stream, true);
     const stream: Stream<number> = input.replaceError(err => xs.never());
@@ -142,7 +142,7 @@ describe('Stream.prototype.replaceError', () => {
     done();
   });
 
-  it('should return a MemoryStream if input stream is a MemoryStream', (done) => {
+  it('should return a MemoryStream if input stream is a MemoryStream', (done: any) => {
     const input = xs.of(1, 2, 3).remember();
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream: MemoryStream<number> = input.replaceError(err => xs.never());

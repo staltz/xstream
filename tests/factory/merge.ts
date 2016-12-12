@@ -4,7 +4,7 @@ import xs, {Stream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('xs.merge', () => {
-  it('should merge OR-style two streams together', (done) => {
+  it('should merge OR-style two streams together', (done: any) => {
     const stream = xs.merge(
       xs.periodic(100).take(2),
       xs.periodic(120).take(2)
@@ -22,7 +22,7 @@ describe('xs.merge', () => {
     });
   });
 
-  it('should complete only when all member streams have completed', (done) => {
+  it('should complete only when all member streams have completed', (done: any) => {
     const stream1 = xs.periodic(30).take(1);
     const stream2 = xs.periodic(50).take(4);
     const stream = xs.merge(stream1, stream2);
@@ -39,7 +39,7 @@ describe('xs.merge', () => {
     });
   });
 
-  it('should complete properly when stopped asynchronously and restarted synchronously', (done) => {
+  it('should complete properly when stopped asynchronously and restarted synchronously', (done: any) => {
     const initial = xs.of('foo');
     const stream = xs.merge(initial);
 
@@ -59,7 +59,7 @@ describe('xs.merge', () => {
     });
   });
 
-  it('should return a Stream when merging a MemoryStream with a Stream', (done) => {
+  it('should return a Stream when merging a MemoryStream with a Stream', (done: any) => {
     const input1 = xs.periodic(50).take(4).remember();
     const input2 = xs.periodic(80).take(3);
     const stream: Stream<number> = xs.merge(input1, input2);
@@ -67,7 +67,7 @@ describe('xs.merge', () => {
     done();
   });
 
-  it('should return a Stream when merging a MemoryStream with a MemoryStream', (done) => {
+  it('should return a Stream when merging a MemoryStream with a MemoryStream', (done: any) => {
     const input1 = xs.periodic(50).take(4).remember();
     const input2 = xs.periodic(80).take(3).remember();
     const stream: Stream<number> = xs.merge(input1, input2);

@@ -4,7 +4,7 @@ import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.map', () => {
-  it('should transform values from input stream to output stream', (done) => {
+  it('should transform values from input stream to output stream', (done: any) => {
     const stream = xs.periodic(100).map(i => 10 * i).take(3);
     const expected = [0, 10, 20];
 
@@ -20,7 +20,7 @@ describe('Stream.prototype.map', () => {
     });
   });
 
-  it('should propagate user mistakes in project as errors', (done) => {
+  it('should propagate user mistakes in project as errors', (done: any) => {
     const source = xs.periodic(30).take(1);
     const stream = source.map(
       x => (<string> <any> x).toLowerCase()
@@ -38,7 +38,7 @@ describe('Stream.prototype.map', () => {
     });
   });
 
-  it('should clean up Operator producer when complete', (done) => {
+  it('should clean up Operator producer when complete', (done: any) => {
     const stream = xs.of(1, 2, 3).map(i => i * 10);
     const expected = [10, 20, 30];
     let completeCalled = false;
@@ -59,7 +59,7 @@ describe('Stream.prototype.map', () => {
     done();
   });
 
-  it('should return a Stream if input stream is a Stream', (done) => {
+  it('should return a Stream if input stream is a Stream', (done: any) => {
     const input = xs.of(1, 2, 3);
     assert.strictEqual(input instanceof Stream, true);
     const stream: Stream<number> = input.map(x => x * 10);
@@ -67,7 +67,7 @@ describe('Stream.prototype.map', () => {
     done();
   });
 
-  it('should return a MemoryStream if input stream is a MemoryStream', (done) => {
+  it('should return a MemoryStream if input stream is a MemoryStream', (done: any) => {
     const input = xs.of(1, 2, 3).remember();
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream = input.map(x => x * 10);
@@ -75,7 +75,7 @@ describe('Stream.prototype.map', () => {
     done();
   });
 
-  it('should clean up Operator producer when failed', (done) => {
+  it('should clean up Operator producer when failed', (done: any) => {
     const stream = xs.of<any>('a', 'b', 3).map(i => i.toUpperCase());
     const expected = ['A', 'B'];
     let errorCalled = false;
@@ -99,7 +99,7 @@ describe('Stream.prototype.map', () => {
     done();
   });
 
-  it('should not repeat the map project function (e.g. no map+map fusion)', (done) => {
+  it('should not repeat the map project function (e.g. no map+map fusion)', (done: any) => {
     const stream = xs.create();
     let firstMapCalled = 0;
 
@@ -131,7 +131,7 @@ describe('Stream.prototype.map', () => {
     });
   });
 
-  it('should not repeat the map project function (e.g. no filter+map+map fusion)', (done) => {
+  it('should not repeat the map project function (e.g. no filter+map+map fusion)', (done: any) => {
     const stream = xs.create();
     let firstMapCalled = 0;
 

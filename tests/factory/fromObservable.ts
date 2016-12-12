@@ -6,7 +6,7 @@ import * as assert from 'assert';
 import * as most from 'most';
 
 describe('xs.fromObservable', () => {
-  it('should convert an observable to a stream', (done) => {
+  it('should convert an observable to a stream', (done: any) => {
     const observable = most.from([10, 20, 30, 40, 50]);
     const stream = xs.fromObservable(observable)
       .map(i => String(i));

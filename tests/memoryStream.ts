@@ -1,12 +1,10 @@
 /// <reference path="../typings/globals/mocha/index.d.ts" />
 /// <reference path="../typings/globals/node/index.d.ts" />
-import xs, {Producer, Listener, Stream} from '../src/index';
+import xs, {Listener} from '../src/index';
 import * as assert from 'assert';
 
-const noop = () => {};
-
 describe('MemoryStream', () => {
-  it('should allow use like a subject, from xs.createWithMemory()', (done) => {
+  it('should allow use like a subject, from xs.createWithMemory()', (done: any) => {
     const stream = xs.createWithMemory();
 
     stream.shamefullySendNext(1);
@@ -22,7 +20,7 @@ describe('MemoryStream', () => {
     stream.shamefullySendComplete();
   });
 
-  it('should be createable giving a custom producer object', (done) => {
+  it('should be createable giving a custom producer object', (done: any) => {
     const expected = [10, 20, 30];
     let producerStopped: boolean = false;
 
@@ -53,7 +51,7 @@ describe('MemoryStream', () => {
     });
   });
 
-  it('should broadcast the producer to multiple listeners', (done) => {
+  it('should broadcast the producer to multiple listeners', (done: any) => {
     const stream = xs.createWithMemory({
       start(listener: Listener<number>) {
         setTimeout(() => listener.next(0), 100);
@@ -95,7 +93,7 @@ describe('MemoryStream', () => {
     }, 400);
   });
 
-  it('should reset completely after it has completed', (done) => {
+  it('should reset completely after it has completed', (done: any) => {
     const stream = xs.createWithMemory({
       start(listener: Listener<number>) {
         listener.next(1);
@@ -135,7 +133,7 @@ describe('MemoryStream', () => {
     });
   });
 
-  it('should teardown upstream MemoryStream memory on late async stop', (done) => {
+  it('should teardown upstream MemoryStream memory on late async stop', (done: any) => {
     const stream = xs.periodic(500).mapTo('world').startWith('hello').take(2);
     const expected1 = ['hello', 'world'];
 
@@ -171,7 +169,7 @@ describe('MemoryStream', () => {
    * create leaky executions of the stream. This was reported as bug #53 in
    * GitHub.
    */
-  it('should not allow an operator listener to be indefinitely attached', (done) => {
+  it('should not allow an operator listener to be indefinitely attached', (done: any) => {
     let debugCalled = 0;
     const debugExpected = [42, 0];
     const source$ = xs.periodic(100).startWith(42)
@@ -215,7 +213,7 @@ describe('MemoryStream', () => {
     }, 500);
   });
 
-  it('should emit remembered value also when cancelling a stop', (done) => {
+  it('should emit remembered value also when cancelling a stop', (done: any) => {
     const expectedA = [1];
     const expectedB = [1, 2];
     let completeCalled = 0;

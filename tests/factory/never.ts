@@ -3,7 +3,7 @@
 import xs from '../../src/index';
 
 describe('xs.never()', () => {
-  it('should create a stream with 0 events never ends', (done) => {
+  it('should create a stream with 0 events never ends', (done: any) => {
     const stream = xs.never();
 
     const listener = {

@@ -5,7 +5,7 @@ import fromDiagram from '../../src/extra/fromDiagram';
 import * as assert from 'assert';
 
 describe('fromDiagram (extra)', () => {
-  it('should create a nice finite stream with string values', (done) => {
+  it('should create a nice finite stream with string values', (done: any) => {
     const stream = fromDiagram('--a--b----c----d---|')
     const expected = ['a', 'b', 'c', 'd'];
 
@@ -21,7 +21,7 @@ describe('fromDiagram (extra)', () => {
     });
   });
 
-  it('should create a stream that emits an error', (done) => {
+  it('should create a stream that emits an error', (done: any) => {
     const stream = fromDiagram('--a--b----c----d---#')
     const expected = ['a', 'b', 'c', 'd'];
 
@@ -37,7 +37,7 @@ describe('fromDiagram (extra)', () => {
     });
   });
 
-  it('should create a stream using strings as keys for values', (done) => {
+  it('should create a stream using strings as keys for values', (done: any) => {
     const stream = fromDiagram('--a--b----c--|', {
       values: {a: 10, b: 20, c: 30}
     });
@@ -55,7 +55,7 @@ describe('fromDiagram (extra)', () => {
     });
   });
 
-  it('should support 0 as a value behind a key in the values object', (done) => {
+  it('should support 0 as a value behind a key in the values object', (done: any) => {
     const stream = fromDiagram('--a--b----c--|', {
       values: {a: 0, b: 1, c: 2}
     });
@@ -73,7 +73,7 @@ describe('fromDiagram (extra)', () => {
     });
   });
 
-  it('should support null as a value behind a key in the values object', (done) => {
+  it('should support null as a value behind a key in the values object', (done: any) => {
     const stream = fromDiagram('--a--b----c--|', {
       values: {a: null, b: 1, c: 2}
     });
@@ -91,7 +91,7 @@ describe('fromDiagram (extra)', () => {
     });
   });
 
-  it('should create a stream with some sense of order', (done) => {
+  it('should create a stream with some sense of order', (done: any) => {
     const stream1 = fromDiagram('-a---c--|');
     const stream2 = fromDiagram('---b---d|');
     const stream = xs.merge(stream1, stream2);
@@ -109,7 +109,7 @@ describe('fromDiagram (extra)', () => {
     });
   });
 
-  it('should create an infinite stream some sense of order', (done) => {
+  it('should create an infinite stream some sense of order', (done: any) => {
     const stream1 = fromDiagram('-a---c---');
     const stream2 = fromDiagram('---b---d-');
     const stream = xs.merge(stream1, stream2);

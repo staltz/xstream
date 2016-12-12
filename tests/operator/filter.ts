@@ -4,7 +4,7 @@ import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.filter', () => {
-  it('should filter in only even numbers from an input stream', (done) => {
+  it('should filter in only even numbers from an input stream', (done: any) => {
     const stream = xs.periodic(50).filter(i => i % 2 === 0);
     const expected = [0, 2, 4, 6];
     let listener = {
@@ -21,7 +21,7 @@ describe('Stream.prototype.filter', () => {
     stream.addListener(listener);
   });
 
-  it('should propagate user mistakes in predicate as errors', (done) => {
+  it('should propagate user mistakes in predicate as errors', (done: any) => {
     const source = xs.periodic(30).take(1);
     const stream = source.filter(
       x => (<string> <any> x).toLowerCase() === 'a'
@@ -38,7 +38,7 @@ describe('Stream.prototype.filter', () => {
     });
   });
 
-  it('should clean up Operator producer when complete', (done) => {
+  it('should clean up Operator producer when complete', (done: any) => {
     const stream = xs.of(1, 2, 3).filter(i => i !== 2);
     const expected = [1, 3];
     let completeCalled = false;
@@ -59,7 +59,7 @@ describe('Stream.prototype.filter', () => {
     done();
   });
 
-  it('should allow multiple filters to be fused', (done) => {
+  it('should allow multiple filters to be fused', (done: any) => {
     const isEven = (x: number) => x % 2 === 0;
     const isGreaterThan5 = (x: number) => x > 5;
 
@@ -81,7 +81,7 @@ describe('Stream.prototype.filter', () => {
     });
   });
 
-  it('should should have filter+map fusion metadata', (done) => {
+  it('should should have filter+map fusion metadata', (done: any) => {
     const isEven = (x: number) => x % 2 === 0;
     const stream = xs.of(1, 2, 3, 4, 5, 6, 7, 8)
       .filter(isEven)
@@ -91,7 +91,7 @@ describe('Stream.prototype.filter', () => {
     done();
   });
 
-  it('should should have filter+mapTo fusion metadata', (done) => {
+  it('should should have filter+mapTo fusion metadata', (done: any) => {
     const isEven = (x: number) => x % 2 === 0;
     const stream = xs.of(1, 2, 3, 4, 5, 6, 7, 8)
       .filter(isEven)
@@ -101,7 +101,7 @@ describe('Stream.prototype.filter', () => {
     done();
   });
 
-  it('should call functions in correct order for filter+filter fusion', (done) => {
+  it('should call functions in correct order for filter+filter fusion', (done: any) => {
     const object$ = xs.of<any>(
       { foo: { a: 10 } },
       { foo: { bar: { b: 20 } } },
@@ -128,7 +128,7 @@ describe('Stream.prototype.filter', () => {
     });
   });
 
-  it('should return a Stream if input stream is a Stream', (done) => {
+  it('should return a Stream if input stream is a Stream', (done: any) => {
     const input = xs.of<number>(1, 2, 3);
     assert.strictEqual(input instanceof Stream, true);
     const stream: Stream<number> = input.filter(x => x % 2 === 0);
@@ -136,7 +136,7 @@ describe('Stream.prototype.filter', () => {
     done();
   });
 
-  it('should return a Stream if input stream is a MemoryStream', (done) => {
+  it('should return a Stream if input stream is a MemoryStream', (done: any) => {
     const input = xs.of<number>(1, 2, 3).remember();
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream: Stream<number> = input.filter(x => x % 2 === 0);
@@ -144,7 +144,7 @@ describe('Stream.prototype.filter', () => {
     done();
   });
 
-  it('should return stream of constrained type if predicate is type guard', (done) => {
+  it('should return stream of constrained type if predicate is type guard', (done: any) => {
     class Animal { }
     class Dog extends Animal {
       thisIsADog: boolean;

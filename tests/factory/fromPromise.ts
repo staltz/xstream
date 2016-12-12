@@ -5,7 +5,7 @@ import xs from '../../src/index';
 import * as assert from 'assert';
 
 describe('xs.fromPromise', () => {
-  it('should convert a resolved promise to a stream', (done) => {
+  it('should convert a resolved promise to a stream', (done: any) => {
     const stream = xs.fromPromise(Promise.resolve('yes'));
     let nextSent = false;
 
@@ -22,7 +22,7 @@ describe('xs.fromPromise', () => {
     });
   });
 
-  it('should convert a rejected promise to a stream', (done) => {
+  it('should convert a rejected promise to a stream', (done: any) => {
     const stream = xs.fromPromise(Promise.reject('no'));
 
     stream.addListener({

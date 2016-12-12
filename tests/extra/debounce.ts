@@ -5,7 +5,7 @@ import debounce from '../../src/extra/debounce';
 import * as assert from 'assert';
 
 describe('debounce (extra)', () => {
-  it('should delay events until a period of silence has passed', (done) => {
+  it('should delay events until a period of silence has passed', (done: any) => {
     const producer: Producer<number> = {
       start(out: Listener<number>) {
         out.next(1);

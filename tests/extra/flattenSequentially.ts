@@ -6,7 +6,7 @@ import * as assert from 'assert';
 
 describe('flattenSequentially (extra)', () => {
   describe('with map', () => {
-    it('should expand each periodic event with 3 sync events', (done) => {
+    it('should expand each periodic event with 3 sync events', (done: any) => {
       const stream = xs.periodic(100).take(3)
         .map(i => xs.of(1 + i, 2 + i, 3 + i))
         .compose(flattenSequentially);
@@ -24,7 +24,7 @@ describe('flattenSequentially (extra)', () => {
       stream.addListener(listener);
     });
 
-    it('should expand each sync event as a periodic stream and concatenate', (done) => {
+    it('should expand each sync event as a periodic stream and concatenate', (done: any) => {
       const stream = xs.of(1, 2, 3)
         .map(i => xs.periodic(100).take(3).map(x => `${i}${x}`))
         .compose(flattenSequentially);
@@ -42,7 +42,7 @@ describe('flattenSequentially (extra)', () => {
       stream.addListener(listener);
     });
 
-    it('should expand 3 sync events as a periodic each', (done) => {
+    it('should expand 3 sync events as a periodic each', (done: any) => {
       const stream = xs.of(1, 2, 3)
         .map(i => xs.periodic(100 * i).take(2).map(x => `${i}${x}`))
         .compose(flattenSequentially);
@@ -64,7 +64,7 @@ describe('flattenSequentially (extra)', () => {
       stream.addListener(listener);
     });
 
-    it('should expand 3 async events as a periodic each', (done) => {
+    it('should expand 3 async events as a periodic each', (done: any) => {
       const stream = xs.periodic(140).take(3)
         .map(i =>
           xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
@@ -87,7 +87,7 @@ describe('flattenSequentially (extra)', () => {
       });
     });
 
-    it('should expand 3 async events as a periodic each, no optimization', (done) => {
+    it('should expand 3 async events as a periodic each, no optimization', (done: any) => {
       const stream = xs.periodic(140).take(3)
         .map(i =>
           xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
@@ -113,7 +113,7 @@ describe('flattenSequentially (extra)', () => {
       stream.addListener(listener);
     });
 
-    it('should propagate user mistakes in project as errors', (done) => {
+    it('should propagate user mistakes in project as errors', (done: any) => {
       const source = xs.periodic(30).take(1);
       const stream = source.map(
         x => {
@@ -134,7 +134,7 @@ describe('flattenSequentially (extra)', () => {
       });
     });
 
-    it('should emit data from inner streams after synchronous outer completes', (done) => {
+    it('should emit data from inner streams after synchronous outer completes', (done: any) => {
       const outer = xs.of(42);
       const stream = outer.map(i => xs.periodic(50).take(2).mapTo(i))
         .compose(flattenSequentially);
@@ -152,7 +152,7 @@ describe('flattenSequentially (extra)', () => {
       });
     });
 
-    it('should stop inner emissions if result stops', (done) => {
+    it('should stop inner emissions if result stops', (done: any) => {
       const expectedInner = [0, 1];
 
       const stream = xs.of(1)

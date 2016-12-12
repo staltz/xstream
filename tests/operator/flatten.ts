@@ -6,7 +6,7 @@ import * as assert from 'assert';
 
 describe('Stream.prototype.flatten', () => {
   describe('with map+debug to break the fusion', () => {
-    it('should not restart inner stream if switching to the same inner stream', (done) => {
+    it('should not restart inner stream if switching to the same inner stream', (done: any) => {
       const outer = fromDiagram('-A---------B----------C--------|');
       const nums = fromDiagram(  '-a-b-c-----------------------|', {
         values: {a: 1, b: 2, c: 3}
@@ -31,7 +31,7 @@ describe('Stream.prototype.flatten', () => {
   });
 
   describe('with map', () => {
-    it('should expand each periodic event with 3 sync events', (done) => {
+    it('should expand each periodic event with 3 sync events', (done: any) => {
       const source: Stream<Stream<number>> = xs.periodic(100).take(3)
         .map((i: number) => xs.of(1 + i, 2 + i, 3 + i));
       const stream: Stream<number> = source.flatten();
@@ -49,7 +49,7 @@ describe('Stream.prototype.flatten', () => {
       });
     });
 
-    it('should have an ins field as metadata', (done) => {
+    it('should have an ins field as metadata', (done: any) => {
       const source: Stream<number> = xs.periodic(100).take(3);
       const stream: Stream<number> = source
         .map((i: number) => xs.of(1 + i, 2 + i, 3 + i))
@@ -58,7 +58,7 @@ describe('Stream.prototype.flatten', () => {
       done();
     });
 
-    it('should return a flat stream with correct TypeScript types', (done) => {
+    it('should return a flat stream with correct TypeScript types', (done: any) => {
       const streamStrings: Stream<string> = Stream.create({
         start: (listener: Listener<string>) => {},
         stop: () => {}
@@ -74,7 +74,7 @@ describe('Stream.prototype.flatten', () => {
       done();
     });
 
-    it('should expand 3 sync events as a periodic, only last one passes', (done) => {
+    it('should expand 3 sync events as a periodic, only last one passes', (done: any) => {
       const stream = xs.fromArray([1, 2, 3])
         .map(i => xs.periodic(100 * i).take(2).map(x => `${i}${x}`))
         .flatten();
@@ -96,7 +96,7 @@ describe('Stream.prototype.flatten', () => {
       });
     });
 
-    it('should expand 3 async events as a periodic each', (done) => {
+    it('should expand 3 async events as a periodic each', (done: any) => {
       const stream = xs.periodic(140).take(3)
         .map(i =>
           xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
@@ -120,7 +120,7 @@ describe('Stream.prototype.flatten', () => {
       });
     });
 
-    it('should expand 3 async events as a periodic each, no optimization', (done) => {
+    it('should expand 3 async events as a periodic each, no optimization', (done: any) => {
       const stream = xs.periodic(140).take(3)
         .map(i =>
           xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
@@ -146,7 +146,7 @@ describe('Stream.prototype.flatten', () => {
       });
     });
 
-    it('should propagate user mistakes in project as errors', (done) => {
+    it('should propagate user mistakes in project as errors', (done: any) => {
       const source = xs.periodic(30).take(1);
       const stream = source.map(
         x => {
@@ -167,7 +167,7 @@ describe('Stream.prototype.flatten', () => {
       });
     });
 
-    it('should not leak when used in a withLatestFrom-like case', (done) => {
+    it('should not leak when used in a withLatestFrom-like case', (done: any) => {
       const a$ = xs.periodic(100);
       const b$ = xs.periodic(220);
 
@@ -196,7 +196,7 @@ describe('Stream.prototype.flatten', () => {
       }, 800);
     });
 
-    it('should not error when stopping, and outer stream was empty', (done) => {
+    it('should not error when stopping, and outer stream was empty', (done: any) => {
       const outer = xs.never();
       const stream = outer.map(x => xs.of(1, 2, 3)).flatten();
       const listener = {
@@ -213,7 +213,7 @@ describe('Stream.prototype.flatten', () => {
       setTimeout(() => done(), 500);
     });
 
-    it('should allow switching inners asynchronously without restarting source', (done) => {
+    it('should allow switching inners asynchronously without restarting source', (done: any) => {
       const outer = fromDiagram(   '-A---------B----------C------|');
       const periodic = fromDiagram('---a-b--c----d--e--f----g--h-|', {
         values: { a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8 }
@@ -243,7 +243,7 @@ describe('Stream.prototype.flatten', () => {
       });
     });
 
-    it('should not restart inner stream if switching to the same inner stream', (done) => {
+    it('should not restart inner stream if switching to the same inner stream', (done: any) => {
       const outer = fromDiagram('-A---------B----------C--------|');
       const nums = fromDiagram(  '-a-b-c-----------------------|', {
         values: {a: 1, b: 2, c: 3}
@@ -266,7 +266,7 @@ describe('Stream.prototype.flatten', () => {
       });
     });
 
-    it('should not run multiple executions of the inner', (done) => {
+    it('should not run multiple executions of the inner', (done: any) => {
       const inner = xs.periodic(350).take(2).map(i => i * 100);
       const outer = xs.periodic(200).take(4);
       const stream = outer.map(() => inner).flatten();
@@ -286,7 +286,7 @@ describe('Stream.prototype.flatten', () => {
   });
 
   describe('with filter+map fusion', () => {
-    it('should execute the predicate, the projection, and the flattening', (done) => {
+    it('should execute the predicate, the projection, and the flattening', (done: any) => {
       let predicateCallCount = 0;
       let projectCallCount = 0;
 
@@ -321,7 +321,7 @@ describe('Stream.prototype.flatten', () => {
   });
 
   describe('with mapTo', () => {
-    it('should have the correct \'type\' metadata on the operator producer', (done) => {
+    it('should have the correct \'type\' metadata on the operator producer', (done: any) => {
       const source: Stream<Stream<number>> = xs.periodic(100).take(3)
         .mapTo(xs.of(1, 2, 3));
       const stream: Stream<number> = source.flatten();
@@ -329,7 +329,7 @@ describe('Stream.prototype.flatten', () => {
       done();
     });
 
-    it('should not restart inner stream if switching to the same inner stream', (done) => {
+    it('should not restart inner stream if switching to the same inner stream', (done: any) => {
       const outer = fromDiagram('-A---------B----------C--------|');
       const nums = fromDiagram(  '-a-b-c-----------------------|', {
         values: {a: 1, b: 2, c: 3}

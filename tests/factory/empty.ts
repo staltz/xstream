@@ -3,7 +3,7 @@
 import xs from '../../src/index';
 
 describe('xs.empty()', function() {
-  it('should create a stream with 0 events that has already completed', (done) => {
+  it('should create a stream with 0 events that has already completed', (done: any) => {
     const stream = xs.empty();
 
     stream.addListener({

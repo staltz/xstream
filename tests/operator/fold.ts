@@ -4,7 +4,7 @@ import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.fold', () => {
-  it('should accumulating a value over time', (done) => {
+  it('should accumulating a value over time', (done: any) => {
     const stream = xs.periodic(50).take(4).fold((x: number, y: number) => x + y, 0);
     const expected = [0, 0, 1, 3, 6];
     let listener = {
@@ -21,7 +21,7 @@ describe('Stream.prototype.fold', () => {
     stream.addListener(listener);
   });
 
-  it('should propagate user mistakes in accumulate as errors', (done) => {
+  it('should propagate user mistakes in accumulate as errors', (done: any) => {
     const source = xs.periodic(30).take(1);
     const stream = source.fold(
       (x, y) => <number> <any> (<string> <any> x).toLowerCase(),
@@ -44,7 +44,7 @@ describe('Stream.prototype.fold', () => {
     });
   });
 
-  it('should return a MemoryStream if input stream is a Stream', (done) => {
+  it('should return a MemoryStream if input stream is a Stream', (done: any) => {
     const input = xs.of<number>(1, 2, 3);
     assert.strictEqual(input instanceof Stream, true);
     const stream: MemoryStream<number> = input.fold((acc, x) => acc + x, 0);
@@ -52,7 +52,7 @@ describe('Stream.prototype.fold', () => {
     done();
   });
 
-  it('should return a MemoryStream if input stream is a MemoryStream', (done) => {
+  it('should return a MemoryStream if input stream is a MemoryStream', (done: any) => {
     const input = xs.of<number>(1, 2, 3).remember();
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream: MemoryStream<number> = input.fold((acc, x) => acc + x, 0);

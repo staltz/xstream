@@ -4,7 +4,7 @@ import xs from '../../src/index';
 import * as assert from 'assert';
 
 describe('xs.of', () => {
-  it('should convert multiple items to a stream', (done) => {
+  it('should convert multiple items to a stream', (done: any) => {
     const stream = xs.of(10, 20, 30, 40, 50)
       .map(i => String(i));
     let expected = ['10', '20', '30', '40', '50'];

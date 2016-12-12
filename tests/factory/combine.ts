@@ -4,7 +4,7 @@ import xs, {Stream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('xs.combine', () => {
-  it('should combine AND-style two streams together', (done) => {
+  it('should combine AND-style two streams together', (done: any) => {
     const stream1 = xs.periodic(100).take(2);
     const stream2 = xs.periodic(120).take(2);
     const stream = xs.combine(stream1, stream2);
@@ -27,7 +27,7 @@ describe('xs.combine', () => {
     });
   });
 
-  it('should have correct TypeScript signature', (done) => {
+  it('should have correct TypeScript signature', (done: any) => {
     const stream1 = xs.create<string>({
       start: listener => {},
       stop: () => {}
@@ -42,7 +42,7 @@ describe('xs.combine', () => {
     done();
   });
 
-  it('should complete only when all member streams have completed', (done) => {
+  it('should complete only when all member streams have completed', (done: any) => {
     const stream1 = xs.periodic(30).take(1);
     const stream2 = xs.periodic(50).take(4);
     const stream = xs.combine(stream1, stream2).map(arr => arr.join(''))
@@ -59,7 +59,7 @@ describe('xs.combine', () => {
     });
   });
 
-  it('should emit an empty array if combining zero streams', (done) => {
+  it('should emit an empty array if combining zero streams', (done: any) => {
     const stream = xs.combine();
 
     stream.addListener({
@@ -74,7 +74,7 @@ describe('xs.combine', () => {
     });
   });
 
-  it('should just wrap the value if combining one stream', (done) => {
+  it('should just wrap the value if combining one stream', (done: any) => {
     const source = xs.periodic(100).take(3);
     const stream = xs.combine(source);
     let expected = [[0], [1], [2]];
@@ -96,7 +96,7 @@ describe('xs.combine', () => {
     });
   });
 
-  it('should not break future listeners when CombineProducer tears down', (done) => {
+  it('should not break future listeners when CombineProducer tears down', (done: any) => {
     //     --0--1-2--|  innerA
     //     ---0---1--|  innerB
     // ----0----1-2--|  outer
@@ -150,7 +150,7 @@ describe('xs.combine', () => {
     });
   });
 
-  it('should return a Stream when combining a MemoryStream with a Stream', (done) => {
+  it('should return a Stream when combining a MemoryStream with a Stream', (done: any) => {
     const input1 = xs.periodic(50).take(4).remember();
     const input2 = xs.periodic(80).take(3);
     const stream: Stream<[number, number]> = xs.combine(input1, input2);
@@ -158,7 +158,7 @@ describe('xs.combine', () => {
     done();
   });
 
-  it('should return a Stream when combining a MemoryStream with a MemoryStream', (done) => {
+  it('should return a Stream when combining a MemoryStream with a MemoryStream', (done: any) => {
     const input1 = xs.periodic(50).take(4).remember();
     const input2 = xs.periodic(80).take(3).remember();
     const stream: Stream<[number, number]> = xs.combine(input1, input2);

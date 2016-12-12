@@ -5,7 +5,7 @@ import delay from '../../src/extra/delay';
 import * as assert from 'assert';
 
 describe('delay (extra)', () => {
-  it('should delay periodic events by a given time period', (done) => {
+  it('should delay periodic events by a given time period', (done: any) => {
     const stream = xs.periodic(100).take(3).compose(delay(200));
     const expected = [0, 1, 2];
     let completeCalled = false;
@@ -28,7 +28,7 @@ describe('delay (extra)', () => {
     }, 550);
   });
 
-  it('should delay synchronous events by a given time period', (done) => {
+  it('should delay synchronous events by a given time period', (done: any) => {
     const stream = xs.of(10, 20, 30).compose(delay(100));
     const expected = [10, 20, 30];
     let completeCalled = false;

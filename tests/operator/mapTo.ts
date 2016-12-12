@@ -4,7 +4,7 @@ import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.mapTo', () => {
-  it('should transform events to a constant value', (done) => {
+  it('should transform events to a constant value', (done: any) => {
     const stream = xs.periodic(100).mapTo(10);
     const expected = [10, 10, 10];
     let listener = {
@@ -20,8 +20,8 @@ describe('Stream.prototype.mapTo', () => {
     };
     stream.addListener(listener);
   });
-  
-  it('should return a Stream if input stream is a Stream', (done) => {
+
+  it('should return a Stream if input stream is a Stream', (done: any) => {
     const input = xs.of(1, 2, 3);
     assert.strictEqual(input instanceof Stream, true);
     const stream: Stream<number> = input.mapTo(10);
@@ -29,7 +29,7 @@ describe('Stream.prototype.mapTo', () => {
     done();
   });
 
-  it('should return a MemoryStream if input stream is a MemoryStream', (done) => {
+  it('should return a MemoryStream if input stream is a MemoryStream', (done: any) => {
     const input = xs.of(1, 2, 3).remember();
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream: MemoryStream<number> = input.mapTo(10);
@@ -37,7 +37,7 @@ describe('Stream.prototype.mapTo', () => {
     done();
   });
 
-  it('should have \'type\' metadata on the operator producer', (done) => {
+  it('should have \'type\' metadata on the operator producer', (done: any) => {
     const stream = xs.periodic(100).mapTo(10);
     assert.strictEqual(stream['_prod']['type'], 'mapTo');
     done();

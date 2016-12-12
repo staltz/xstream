@@ -14,7 +14,7 @@ describe('Stream.prototype.debug', () => {
     sandbox.restore();
   });
 
-  it('should allow inspecting the operator chain', (done) => {
+  it('should allow inspecting the operator chain', (done: any) => {
     const expected = [0, 1, 2];
     const stream = xs.periodic(50).take(3).debug(x => {
       assert.equal(x, expected.shift());
@@ -33,7 +33,7 @@ describe('Stream.prototype.debug', () => {
     stream.addListener(listener);
   });
 
-  it('should use console.log if no argument given', (done) => {
+  it('should use console.log if no argument given', (done: any) => {
     let stub = sandbox.stub(console, 'log');
 
     const expected = [0, 1, 2];
@@ -56,7 +56,7 @@ describe('Stream.prototype.debug', () => {
     });
   });
 
-  it('should return a Stream if input stream is a Stream', (done) => {
+  it('should return a Stream if input stream is a Stream', (done: any) => {
     const input = xs.of<number>(1, 2, 3);
     assert.strictEqual(input instanceof Stream, true);
     const stream: Stream<number> = input.debug('stream');
@@ -64,7 +64,7 @@ describe('Stream.prototype.debug', () => {
     done();
   });
 
-  it('should return a MemoryStream if input stream is a MemoryStream', (done) => {
+  it('should return a MemoryStream if input stream is a MemoryStream', (done: any) => {
     const input = xs.of<number>(1, 2, 3).remember();
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream: MemoryStream<number> = input.debug('stream');
@@ -72,7 +72,7 @@ describe('Stream.prototype.debug', () => {
     done();
   });
 
-  it('should propagate user mistakes in spy as errors', (done) => {
+  it('should propagate user mistakes in spy as errors', (done: any) => {
     const source = xs.periodic(30).take(1);
     const stream = source.debug(
       x => <number> <any> (<string> <any> x).toLowerCase()
