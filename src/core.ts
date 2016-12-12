@@ -56,8 +56,12 @@ export interface Listener<T> {
   complete: () => void;
 }
 
-export type Observable<T> = {
-  subscribe(listener: Listener<T>): { unsubscribe: () => void; }
+export interface Subscription {
+  unsubscribe(): void;
+}
+
+export interface Observable<T> {
+  subscribe(listener: Listener<T>): Subscription;
 };
 
 export type FromInput<T> = Promise<T> | Stream<T> | Array<T> | Observable<T>;
@@ -79,7 +83,7 @@ function and<T>(f1: (t: T) => boolean, f2: (t: T) => boolean): (t: T) => boolean
   };
 }
 
-export class Subscription<T> {
+export class StreamSubscription<T> implements Subscription {
   constructor(private _stream: Stream<T>, private _listener: Listener<T>) {}
 
   unsubscribe(): void {
@@ -89,21 +93,26 @@ export class Subscription<T> {
 
 class ObservableProducer<T> implements InternalProducer<T> {
   public type = 'fromObservable';
-  public ins: any;
+  public ins: Observable<T>;
   public out: Stream<T>;
-  private _subscription: { unsubscribe: () => void; };
+  private active: boolean;
+  private _sub: Subscription | undefined;
 
-  constructor(observable: any) {
+  constructor(observable: Observable<T>) {
     this.ins = observable;
+    this.active = false;
   }
 
   _start(out: Stream<T>) {
     this.out = out;
-    this._subscription = this.ins.subscribe(new ObservableListener(out));
+    this.active = true;
+    this._sub = this.ins.subscribe(new ObservableListener(out));
+    if (!this.active) this._sub.unsubscribe();
   }
 
   _stop() {
-    this._subscription.unsubscribe();
+    if (this._sub) this._sub.unsubscribe();
+    this.active = false;
   }
 }
 
@@ -1354,10 +1363,10 @@ export class Stream<T> implements InternalListener<T> {
    * @param {Listener} listener
    * @returns {Subscription}
    */
-  subscribe(listener: Listener<T>): Subscription<T> {
+  subscribe(listener: Listener<T>): Subscription {
     this.addListener(listener);
 
-    return new Subscription<T>(this, listener);
+    return new StreamSubscription<T>(this, listener);
   }
 
   /**

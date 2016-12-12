@@ -23,4 +23,22 @@ describe('xs.fromObservable', () => {
       },
     });
   });
+
+  it('should support synchronous unsubscribe on completion', (done: any) => {
+    const stream = xs.fromObservable(xs.of(10, 20, 30));
+    let expected = [10, 20, 30];
+
+    stream.addListener({
+      next(x: number) {
+        assert.strictEqual(x, expected.shift());
+      },
+      error(err: any) {
+        done(err);
+      },
+      complete() {
+        assert.strictEqual(expected.length, 0);
+        done();
+      },
+    });
+  });
 });
