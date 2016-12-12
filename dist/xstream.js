@@ -5,7 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var symbol_observable_1 = require('symbol-observable');
+var symbol_observable_1 = require("symbol-observable");
 var NO = {};
 function noop() { }
 function copy(a) {
@@ -21,15 +21,15 @@ exports.NO_IL = {
     _e: noop,
     _c: noop,
 };
+;
 
 function internalizeProducer(producer) {
-    producer._start =
-        function _start(il) {
-            il.next = il._n;
-            il.error = il._e;
-            il.complete = il._c;
-            this.start(il);
-        };
+    producer._start = function _start(il) {
+        il.next = il._n;
+        il.error = il._e;
+        il.complete = il._c;
+        this.start(il);
+    };
     producer._stop = producer.stop;
 }
 function and(f1, f2) {
@@ -37,28 +37,34 @@ function and(f1, f2) {
         return f1(t) && f2(t);
     };
 }
-var Subscription = (function () {
-    function Subscription(_stream, _listener) {
+var StreamSubscription = (function () {
+    function StreamSubscription(_stream, _listener) {
         this._stream = _stream;
         this._listener = _listener;
     }
-    Subscription.prototype.unsubscribe = function () {
+    StreamSubscription.prototype.unsubscribe = function () {
         this._stream.removeListener(this._listener);
     };
-    return Subscription;
+    return StreamSubscription;
 }());
-exports.Subscription = Subscription;
+exports.StreamSubscription = StreamSubscription;
 var ObservableProducer = (function () {
     function ObservableProducer(observable) {
         this.type = 'fromObservable';
         this.ins = observable;
+        this.active = false;
     }
     ObservableProducer.prototype._start = function (out) {
         this.out = out;
-        this._subscription = this.ins.subscribe(new ObservableListener(out));
+        this.active = true;
+        this._sub = this.ins.subscribe(new ObservableListener(out));
+        if (!this.active)
+            this._sub.unsubscribe();
     };
     ObservableProducer.prototype._stop = function () {
-        this._subscription.unsubscribe();
+        if (this._sub)
+            this._sub.unsubscribe();
+        this.active = false;
     };
     return ObservableProducer;
 }());
@@ -367,7 +373,7 @@ var OtherIL = (function () {
         this.out = out;
         this.op = op;
     }
-    OtherIL.prototype._n = function (t) {
+    OtherIL.prototype._n = function () {
         this.op.end();
     };
     OtherIL.prototype._e = function (err) {
@@ -746,9 +752,10 @@ exports.MapOperator = MapOperator;
 var FilterMapOperator = (function (_super) {
     __extends(FilterMapOperator, _super);
     function FilterMapOperator(passes, project, ins) {
-        _super.call(this, project, ins);
-        this.type = 'filter+map';
-        this.passes = passes;
+        var _this = _super.call(this, project, ins) || this;
+        _this.type = 'filter+map';
+        _this.passes = passes;
+        return _this;
     }
     FilterMapOperator.prototype._n = function (t) {
         if (!this.passes(t))
@@ -1052,7 +1059,7 @@ var Stream = (function () {
     
     Stream.prototype.subscribe = function (listener) {
         this.addListener(listener);
-        return new Subscription(this, listener);
+        return new StreamSubscription(this, listener);
     };
     
     Stream.prototype[symbol_observable_1.default] = function () {
@@ -1111,7 +1118,7 @@ var Stream = (function () {
     Stream.of = function () {
         var items = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            items[_i - 0] = arguments[_i];
+            items[_i] = arguments[_i];
         }
         return Stream.fromArray(items);
     };
@@ -1238,36 +1245,37 @@ var Stream = (function () {
         }
         else {
             this._d = true;
-            listener._n = listener.next;
-            listener._e = listener.error;
-            listener._c = listener.complete;
+            listener._n = listener.next || noop;
+            listener._e = listener.error || noop;
+            listener._c = listener.complete || noop;
             this._dl = listener;
         }
     };
-    
-    Stream.merge = function merge() {
-        var streams = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            streams[_i - 0] = arguments[_i];
-        }
-        return new Stream(new MergeProducer(streams));
-    };
-    
-    Stream.combine = function combine() {
-        var streams = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            streams[_i - 0] = arguments[_i];
-        }
-        return new Stream(new CombineProducer(streams));
-    };
     return Stream;
 }());
+
+Stream.merge = function merge() {
+    var streams = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        streams[_i] = arguments[_i];
+    }
+    return new Stream(new MergeProducer(streams));
+};
+
+Stream.combine = function combine() {
+    var streams = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        streams[_i] = arguments[_i];
+    }
+    return new Stream(new CombineProducer(streams));
+};
 exports.Stream = Stream;
 var MemoryStream = (function (_super) {
     __extends(MemoryStream, _super);
     function MemoryStream(producer) {
-        _super.call(this, producer);
-        this._has = false;
+        var _this = _super.call(this, producer) || this;
+        _this._has = false;
+        return _this;
     }
     MemoryStream.prototype._n = function (x) {
         this._v = x;
@@ -1336,7 +1344,7 @@ exports.default = Stream;
 
 },{"symbol-observable":3}],2:[function(require,module,exports){
 "use strict";
-var core_1 = require('./core');
+var core_1 = require("./core");
 exports.Stream = core_1.Stream;
 exports.MemoryStream = core_1.MemoryStream;
 Object.defineProperty(exports, "__esModule", { value: true });

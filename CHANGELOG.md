@@ -1,3 +1,14 @@
+<a name="9.1.0"></a>
+# [9.1.0](https://github.com/staltz/xstream/compare/v9.0.0...v9.1.0) (2016-12-12)
+
+
+### Bug Fixes
+
+* **fromObservable:** support synchronous unsubscribe on completion ([e82b8da](https://github.com/staltz/xstream/commit/e82b8da))
+* **src:** update to TypeScript 2.1 ([b3a0cf6](https://github.com/staltz/xstream/commit/b3a0cf6))
+
+
+
 <a name="9.0.0"></a>
 # [9.0.0](https://github.com/staltz/xstream/compare/v8.0.0...v9.0.0) (2016-11-28)
 
