@@ -29,6 +29,17 @@ export interface InternalProducer<T> {
   _stop: () => void;
 }
 
+export interface Producer<T> {
+  start: (listener: Listener<T>) => void;
+  stop: () => void;
+}
+
+export interface Listener<T> {
+  next: (x: T) => void;
+  error: (err: any) => void;
+  complete: () => void;
+}
+
 export interface OutSender<T> {
   out: Stream<T>;
 }
@@ -43,17 +54,6 @@ export interface Aggregator<T, U> extends InternalProducer<U>, OutSender<U> {
   type: string;
   insArr: Array<Stream<T>>;
   _start: (out: Stream<U>) => void;
-}
-
-export interface Producer<T> {
-  start: (listener: Listener<T>) => void;
-  stop: () => void;
-}
-
-export interface Listener<T> {
-  next: (x: T) => void;
-  error: (err: any) => void;
-  complete: () => void;
 }
 
 export interface Subscription {
