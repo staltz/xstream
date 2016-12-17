@@ -21,7 +21,7 @@ describe('Stream.prototype.take', () => {
     stream.addListener(listener);
   });
 
-  it('should return a Stream if input stream is a tream', (done: any) => {
+  it('should return a Stream if input stream is a Stream', (done: any) => {
     const input = xs.of(1, 2, 3);
     assert.strictEqual(input instanceof Stream, true);
     const stream: Stream<number> = input.take(2);
