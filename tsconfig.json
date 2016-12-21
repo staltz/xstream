@@ -24,7 +24,6 @@
   },
   "files": [
     "typings/index.d.ts",
-    "src/core.ts",
     "src/extra/concat.ts",
     "src/extra/debounce.ts",
     "src/extra/delay.ts",

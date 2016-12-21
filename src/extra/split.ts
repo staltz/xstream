@@ -1,4 +1,4 @@
-import {Operator, InternalListener, Stream, OutSender, NO_IL} from '../core';
+import {Operator, InternalListener, Stream, OutSender, NO_IL} from '../index';
 
 class SeparatorIL<T> implements InternalListener<any>, OutSender<Stream<T>> {
   constructor(public out: Stream<Stream<T>>,

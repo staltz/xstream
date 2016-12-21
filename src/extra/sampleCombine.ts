@@ -1,4 +1,4 @@
-import {InternalListener, Operator, Stream} from '../core';
+import {InternalListener, Operator, Stream} from '../index';
 
 export interface SampleCombineSignature {
   (): <T>(s: Stream<T>) => Stream<[T]>;
