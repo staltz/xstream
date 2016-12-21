@@ -12,6 +12,12 @@ function copy<T>(a: Array<T>): Array<T> {
   return b;
 }
 
+function and<T>(f1: (t: T) => boolean, f2: (t: T) => boolean): (t: T) => boolean {
+  return function andFn(t: T): boolean {
+    return f1(t) && f2(t);
+  };
+}
+
 export interface InternalListener<T> {
   _n: (v: T) => void;
   _e: (err: any) => void;
@@ -64,8 +70,6 @@ export interface Observable<T> {
   subscribe(listener: Listener<T>): Subscription;
 };
 
-export type FromInput<T> = Promise<T> | Stream<T> | Array<T> | Observable<T>;
-
 // mutates the input
 function internalizeProducer<T>(producer: Producer<T> & Partial<InternalProducer<T>>) {
   producer._start = function _start(il: InternalListener<T> & Partial<Listener<T>>) {
@@ -77,13 +81,7 @@ function internalizeProducer<T>(producer: Producer<T> & Partial<InternalProducer
   producer._stop = producer.stop;
 }
 
-function and<T>(f1: (t: T) => boolean, f2: (t: T) => boolean): (t: T) => boolean {
-  return function andFn(t: T): boolean {
-    return f1(t) && f2(t);
-  };
-}
-
-class StreamSubscription<T> implements Subscription {
+class StreamSub<T> implements Subscription {
   constructor(private _stream: Stream<T>, private _listener: Listener<T>) {}
 
   unsubscribe(): void {
@@ -91,32 +89,7 @@ class StreamSubscription<T> implements Subscription {
   }
 }
 
-class ObservableProducer<T> implements InternalProducer<T> {
-  public type = 'fromObservable';
-  public ins: Observable<T>;
-  public out: Stream<T>;
-  private active: boolean;
-  private _sub: Subscription | undefined;
-
-  constructor(observable: Observable<T>) {
-    this.ins = observable;
-    this.active = false;
-  }
-
-  _start(out: Stream<T>) {
-    this.out = out;
-    this.active = true;
-    this._sub = this.ins.subscribe(new ObservableListener(out));
-    if (!this.active) this._sub.unsubscribe();
-  }
-
-  _stop() {
-    if (this._sub) this._sub.unsubscribe();
-    this.active = false;
-  }
-}
-
-class ObservableListener<T> implements Listener<T> {
+class Observer<T> implements Listener<T> {
   constructor(private _listener: InternalListener<T>) {}
 
   next(value: T) {
@@ -132,55 +105,28 @@ class ObservableListener<T> implements Listener<T> {
   }
 }
 
-class MergeProducer<T> implements Aggregator<T, T>, InternalListener<T> {
-  public type = 'merge';
-  public insArr: Array<Stream<T>>;
+class FromObservable<T> implements InternalProducer<T> {
+  public type = 'fromObservable';
+  public ins: Observable<T>;
   public out: Stream<T>;
-  private ac: number; // ac is activeCount
+  private active: boolean;
+  private _sub: Subscription | undefined;
 
-  constructor(insArr: Array<Stream<T>>) {
-    this.insArr = insArr;
-    this.out = NO as Stream<T>;
-    this.ac = 0;
+  constructor(observable: Observable<T>) {
+    this.ins = observable;
+    this.active = false;
   }
 
-  _start(out: Stream<T>): void {
+  _start(out: Stream<T>) {
     this.out = out;
-    const s = this.insArr;
-    const L = s.length;
-    this.ac = L;
-    for (let i = 0; i < L; i++) {
-      s[i]._add(this);
-    }
+    this.active = true;
+    this._sub = this.ins.subscribe(new Observer(out));
+    if (!this.active) this._sub.unsubscribe();
   }
 
-  _stop(): void {
-    const s = this.insArr;
-    const L = s.length;
-    for (let i = 0; i < L; i++) {
-      s[i]._remove(this);
-    }
-    this.out = NO as Stream<T>;
-  }
-
-  _n(t: T) {
-    const u = this.out;
-    if (u === NO) return;
-    u._n(t);
-  }
-
-  _e(err: any) {
-    const u = this.out;
-    if (u === NO) return;
-    u._e(err);
-  }
-
-  _c() {
-    if (--this.ac <= 0) {
-      const u = this.out;
-      if (u === NO) return;
-      u._c();
-    }
+  _stop() {
+    if (this._sub) this._sub.unsubscribe();
+    this.active = false;
   }
 }
 
@@ -251,6 +197,58 @@ export interface MergeSignature {
     s9: Stream<T9>,
     s10: Stream<T10>): Stream<T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 | T10>;
   <T>(...stream: Array<Stream<T>>): Stream<T>;
+}
+
+class Merge<T> implements Aggregator<T, T>, InternalListener<T> {
+  public type = 'merge';
+  public insArr: Array<Stream<T>>;
+  public out: Stream<T>;
+  private ac: number; // ac is activeCount
+
+  constructor(insArr: Array<Stream<T>>) {
+    this.insArr = insArr;
+    this.out = NO as Stream<T>;
+    this.ac = 0;
+  }
+
+  _start(out: Stream<T>): void {
+    this.out = out;
+    const s = this.insArr;
+    const L = s.length;
+    this.ac = L;
+    for (let i = 0; i < L; i++) {
+      s[i]._add(this);
+    }
+  }
+
+  _stop(): void {
+    const s = this.insArr;
+    const L = s.length;
+    for (let i = 0; i < L; i++) {
+      s[i]._remove(this);
+    }
+    this.out = NO as Stream<T>;
+  }
+
+  _n(t: T) {
+    const u = this.out;
+    if (u === NO) return;
+    u._n(t);
+  }
+
+  _e(err: any) {
+    const u = this.out;
+    if (u === NO) return;
+    u._e(err);
+  }
+
+  _c() {
+    if (--this.ac <= 0) {
+      const u = this.out;
+      if (u === NO) return;
+      u._c();
+    }
+  }
 }
 
 export interface CombineSignature {
@@ -325,9 +323,9 @@ export interface CombineSignature {
 class CombineListener<T> implements InternalListener<T>, OutSender<Array<T>> {
   private i: number;
   public out: Stream<Array<T>>;
-  private p: CombineProducer<T>;
+  private p: Combine<T>;
 
-  constructor(i: number, out: Stream<Array<T>>, p: CombineProducer<T>) {
+  constructor(i: number, out: Stream<Array<T>>, p: Combine<T>) {
     this.i = i;
     this.out = out;
     this.p = p;
@@ -357,7 +355,7 @@ class CombineListener<T> implements InternalListener<T>, OutSender<Array<T>> {
   }
 }
 
-class CombineProducer<R> implements Aggregator<any, Array<R>> {
+class Combine<R> implements Aggregator<any, Array<R>> {
   public type = 'combine';
   public insArr: Array<Stream<any>>;
   public out: Stream<Array<R>>;
@@ -410,7 +408,7 @@ class CombineProducer<R> implements Aggregator<any, Array<R>> {
   }
 }
 
-class FromArrayProducer<T> implements InternalProducer<T> {
+class FromArray<T> implements InternalProducer<T> {
   public type = 'fromArray';
   public a: Array<T>;
 
@@ -430,7 +428,7 @@ class FromArrayProducer<T> implements InternalProducer<T> {
   }
 }
 
-class FromPromiseProducer<T> implements InternalProducer<T> {
+class FromPromise<T> implements InternalProducer<T> {
   public type = 'fromPromise';
   public on: boolean;
   public p: Promise<T>;
@@ -463,7 +461,7 @@ class FromPromiseProducer<T> implements InternalProducer<T> {
   }
 }
 
-class PeriodicProducer implements InternalProducer<number> {
+class Periodic implements InternalProducer<number> {
   public type = 'periodic';
   public period: number;
   private intervalID: any;
@@ -475,9 +473,9 @@ class PeriodicProducer implements InternalProducer<number> {
     this.i = 0;
   }
 
-  _start(stream: InternalListener<number>): void {
+  _start(out: InternalListener<number>): void {
     const self = this;
-    function intervalHandler() { stream._n(self.i++); }
+    function intervalHandler() { out._n(self.i++); }
     this.intervalID = setInterval(intervalHandler, this.period);
   }
 
@@ -488,7 +486,7 @@ class PeriodicProducer implements InternalProducer<number> {
   }
 }
 
-class DebugOperator<T> implements Operator<T, T> {
+class Debug<T> implements Operator<T, T> {
   public type = 'debug';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -552,7 +550,7 @@ class DebugOperator<T> implements Operator<T, T> {
   }
 }
 
-class DropOperator<T> implements Operator<T, T> {
+class Drop<T> implements Operator<T, T> {
   public type = 'drop';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -596,11 +594,11 @@ class DropOperator<T> implements Operator<T, T> {
   }
 }
 
-class OtherIL<T> implements InternalListener<any> {
+class EndWhenListener<T> implements InternalListener<any> {
   private out: Stream<T>;
-  private op: EndWhenOperator<T>;
+  private op: EndWhen<T>;
 
-  constructor(out: Stream<T>, op: EndWhenOperator<T>) {
+  constructor(out: Stream<T>, op: EndWhen<T>) {
     this.out = out;
     this.op = op;
   }
@@ -618,7 +616,7 @@ class OtherIL<T> implements InternalListener<any> {
   }
 }
 
-class EndWhenOperator<T> implements Operator<T, T> {
+class EndWhen<T> implements Operator<T, T> {
   public type = 'endWhen';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -634,7 +632,7 @@ class EndWhenOperator<T> implements Operator<T, T> {
 
   _start(out: Stream<T>): void {
     this.out = out;
-    this.o._add(this.oil = new OtherIL(out, this));
+    this.o._add(this.oil = new EndWhenListener(out, this));
     this.ins._add(this);
   }
 
@@ -668,7 +666,7 @@ class EndWhenOperator<T> implements Operator<T, T> {
   }
 }
 
-class FilterOperator<T> implements Operator<T, T> {
+class Filter<T> implements Operator<T, T> {
   public type = 'filter';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -715,9 +713,9 @@ class FilterOperator<T> implements Operator<T, T> {
 
 class FlattenListener<T> implements InternalListener<T> {
   private out: Stream<T>;
-  private op: FlattenOperator<T>;
+  private op: Flatten<T>;
 
-  constructor(out: Stream<T>, op: FlattenOperator<T>) {
+  constructor(out: Stream<T>, op: Flatten<T>) {
     this.out = out;
     this.op = op;
   }
@@ -736,7 +734,7 @@ class FlattenListener<T> implements InternalListener<T> {
   }
 }
 
-class FlattenOperator<T> implements Operator<Stream<T>, T> {
+class Flatten<T> implements Operator<Stream<T>, T> {
   public type = 'flatten';
   public ins: Stream<Stream<T>>;
   public out: Stream<T>;
@@ -795,7 +793,7 @@ class FlattenOperator<T> implements Operator<Stream<T>, T> {
   }
 }
 
-class FoldOperator<T, R> implements Operator<T, R> {
+class Fold<T, R> implements Operator<T, R> {
   public type = 'fold';
   public ins: Stream<T>;
   public out: Stream<R>;
@@ -846,7 +844,7 @@ class FoldOperator<T, R> implements Operator<T, R> {
   }
 }
 
-class LastOperator<T> implements Operator<T, T> {
+class Last<T> implements Operator<T, T> {
   public type = 'last';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -895,11 +893,11 @@ class LastOperator<T> implements Operator<T, T> {
   }
 }
 
-class MapFlattenInner<R> implements InternalListener<R> {
+class MapFlattenListener<R> implements InternalListener<R> {
   private out: Stream<R>;
-  private op: MapFlattenOperator<any, R>;
+  private op: MapFlatten<any, R>;
 
-  constructor(out: Stream<R>, op: MapFlattenOperator<any, R>) {
+  constructor(out: Stream<R>, op: MapFlatten<any, R>) {
     this.out = out;
     this.op = op;
   }
@@ -918,16 +916,16 @@ class MapFlattenInner<R> implements InternalListener<R> {
   }
 }
 
-class MapFlattenOperator<T, R> implements Operator<T, R> {
+class MapFlatten<T, R> implements Operator<T, R> {
   public type: string;
   public ins: Stream<T>;
   public out: Stream<R>;
-  public mapOp: MapOperator<T, Stream<R>>;
+  public mapOp: MapOp<T, Stream<R>>;
   public inner: Stream<R>; // Current inner Stream
   private il: InternalListener<R>; // Current inner InternalListener
   private open: boolean;
 
-  constructor(mapOp: MapOperator<T, Stream<R>>) {
+  constructor(mapOp: MapOp<T, Stream<R>>) {
     this.type = `${mapOp.type}+flatten`;
     this.ins = mapOp.ins;
     this.out = NO as Stream<R>;
@@ -973,7 +971,7 @@ class MapFlattenOperator<T, R> implements Operator<T, R> {
       return;
     }
     if (inner !== NO && il !== NO_IL) inner._remove(il);
-    (this.inner = s)._add(this.il = new MapFlattenInner(u, this));
+    (this.inner = s)._add(this.il = new MapFlattenListener(u, this));
   }
 
   _e(err: any) {
@@ -988,7 +986,7 @@ class MapFlattenOperator<T, R> implements Operator<T, R> {
   }
 }
 
-class MapOperator<T, R> implements Operator<T, R> {
+class MapOp<T, R> implements Operator<T, R> {
   public type = 'map';
   public ins: Stream<T>;
   public out: Stream<R>;
@@ -1033,7 +1031,7 @@ class MapOperator<T, R> implements Operator<T, R> {
   }
 }
 
-class FilterMapOperator<T, R> extends MapOperator<T, R> {
+class FilterMapFusion<T, R> extends MapOp<T, R> {
   public type = 'filter+map';
   public passes: (t: T) => boolean;
 
@@ -1054,7 +1052,7 @@ class FilterMapOperator<T, R> extends MapOperator<T, R> {
   }
 }
 
-class RememberOperator<T> implements InternalProducer<T> {
+class Remember<T> implements InternalProducer<T> {
   public type = 'remember';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -1075,7 +1073,7 @@ class RememberOperator<T> implements InternalProducer<T> {
   }
 }
 
-class ReplaceErrorOperator<T> implements Operator<T, T> {
+class ReplaceError<T> implements Operator<T, T> {
   public type = 'replaceError';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -1121,7 +1119,7 @@ class ReplaceErrorOperator<T> implements Operator<T, T> {
   }
 }
 
-class StartWithOperator<T> implements InternalProducer<T> {
+class StartWith<T> implements InternalProducer<T> {
   public type = 'startWith';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -1145,7 +1143,7 @@ class StartWithOperator<T> implements InternalProducer<T> {
   }
 }
 
-class TakeOperator<T> implements Operator<T, T> {
+class Take<T> implements Operator<T, T> {
   public type = 'take';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -1366,7 +1364,7 @@ export class Stream<T> implements InternalListener<T> {
   subscribe(listener: Listener<T>): Subscription {
     this.addListener(listener);
 
-    return new StreamSubscription<T>(this, listener);
+    return new StreamSub<T>(this, listener);
   }
 
   /**
@@ -1480,7 +1478,7 @@ export class Stream<T> implements InternalListener<T> {
    * @param {Array|Promise|Observable} input The input to make a stream from.
    * @return {Stream}
    */
-  static from<T>(input: FromInput<T>): Stream<T> {
+  static from<T>(input: Promise<T> | Stream<T> | Array<T> | Observable<T>): Stream<T> {
     if (typeof input[$$observable] === 'function') {
       return Stream.fromObservable<T>(input);
     } else if (typeof (input as Promise<T>).then === 'function') {
@@ -1529,7 +1527,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static fromArray<T>(array: Array<T>): Stream<T> {
-    return new Stream<T>(new FromArrayProducer<T>(array));
+    return new Stream<T>(new FromArray<T>(array));
   }
 
   /**
@@ -1549,7 +1547,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static fromPromise<T>(promise: Promise<T>): Stream<T> {
-    return new Stream<T>(new FromPromiseProducer<T>(promise));
+    return new Stream<T>(new FromPromise<T>(promise));
   }
 
   /**
@@ -1560,7 +1558,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static fromObservable<T>(observable: any): Stream<T> {
-    return new Stream<T>(new ObservableProducer(observable));
+    return new Stream<T>(new FromObservable(observable));
   }
 
   /**
@@ -1580,7 +1578,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static periodic(period: number): Stream<number> {
-    return new Stream<number>(new PeriodicProducer(period));
+    return new Stream<number>(new Periodic(period));
   }
 
   /**
@@ -1606,7 +1604,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static merge: MergeSignature = function merge(...streams: Array<Stream<any>>) {
-    return new Stream<any>(new MergeProducer(streams));
+    return new Stream<any>(new Merge(streams));
   } as MergeSignature;
 
   /**
@@ -1650,16 +1648,16 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static combine: CombineSignature = function combine(...streams: Array<Stream<any>>) {
-    return new Stream<Array<any>>(new CombineProducer<any>(streams));
+    return new Stream<Array<any>>(new Combine<any>(streams));
   } as CombineSignature;
 
   protected _map<U>(project: (t: T) => U): Stream<U> | MemoryStream<U> {
     const p = this._prod;
     const ctor = this.ctor();
-    if (p instanceof FilterOperator) {
-      return new ctor<U>(new FilterMapOperator<T, U>(p.passes, project, p.ins));
+    if (p instanceof Filter) {
+      return new ctor<U>(new FilterMapFusion<T, U>(p.passes, project, p.ins));
     }
-    return new ctor<U>(new MapOperator<T, U>(project, this));
+    return new ctor<U>(new MapOp<T, U>(project, this));
   }
 
   /**
@@ -1730,13 +1728,13 @@ export class Stream<T> implements InternalListener<T> {
    */
   filter(passes: (t: T) => boolean): Stream<T> {
     const p = this._prod;
-    if (p instanceof FilterOperator) {
-      return new Stream<T>(new FilterOperator<T>(
-        and((p as FilterOperator<T>).passes, passes),
-        (p as FilterOperator<T>).ins
+    if (p instanceof Filter) {
+      return new Stream<T>(new Filter<T>(
+        and((p as Filter<T>).passes, passes),
+        (p as Filter<T>).ins
       ));
     }
-    return new Stream<T>(new FilterOperator<T>(passes, this));
+    return new Stream<T>(new Filter<T>(passes, this));
   }
 
   /**
@@ -1756,7 +1754,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   take(amount: number): Stream<T> {
-    return new (this.ctor())<T>(new TakeOperator<T>(amount, this));
+    return new (this.ctor())<T>(new Take<T>(amount, this));
   }
 
   /**
@@ -1777,7 +1775,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   drop(amount: number): Stream<T> {
-    return new Stream<T>(new DropOperator<T>(amount, this));
+    return new Stream<T>(new Drop<T>(amount, this));
   }
 
   /**
@@ -1795,7 +1793,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   last(): Stream<T> {
-    return new Stream<T>(new LastOperator<T>(this));
+    return new Stream<T>(new Last<T>(this));
   }
 
   /**
@@ -1815,7 +1813,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {MemoryStream}
    */
   startWith(initial: T): MemoryStream<T> {
-    return new MemoryStream<T>(new StartWithOperator<T>(this, initial));
+    return new MemoryStream<T>(new StartWith<T>(this, initial));
   }
 
   /**
@@ -1838,7 +1836,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   endWhen(other: Stream<any>): Stream<T> {
-    return new (this.ctor())<T>(new EndWhenOperator<T>(other, this));
+    return new (this.ctor())<T>(new EndWhen<T>(other, this));
   }
 
   /**
@@ -1871,7 +1869,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {MemoryStream}
    */
   fold<R>(accumulate: (acc: R, t: T) => R, seed: R): MemoryStream<R> {
-    return new MemoryStream<R>(new FoldOperator<T, R>(accumulate, seed, this));
+    return new MemoryStream<R>(new Fold<T, R>(accumulate, seed, this));
   }
 
   /**
@@ -1898,7 +1896,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   replaceError(replace: (err: any) => Stream<T>): Stream<T> {
-    return new (this.ctor())<T>(new ReplaceErrorOperator<T>(replace, this));
+    return new (this.ctor())<T>(new ReplaceError<T>(replace, this));
   }
 
   /**
@@ -1929,9 +1927,9 @@ export class Stream<T> implements InternalListener<T> {
   flatten<R>(): T {
     const p = this._prod;
     return new Stream<R>(
-      p instanceof MapOperator && !(p instanceof FilterMapOperator) ?
-        new MapFlattenOperator(p as MapOperator<any, Stream<R>>) :
-        new FlattenOperator(this as any as Stream<Stream<R>>)
+      p instanceof MapOp && !(p instanceof FilterMapFusion) ?
+        new MapFlatten(p as MapOp<any, Stream<R>>) :
+        new Flatten(this as any as Stream<Stream<R>>)
     ) as T & Stream<R>;
   }
 
@@ -1958,7 +1956,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {MemoryStream}
    */
   remember(): MemoryStream<T> {
-    return new MemoryStream<T>(new RememberOperator<T>(this));
+    return new MemoryStream<T>(new Remember<T>(this));
   }
 
   debug(): Stream<T>;
@@ -1991,7 +1989,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   debug(labelOrSpy?: string | ((t: T) => any)): Stream<T> {
-    return new (this.ctor())<T>(new DebugOperator<T>(this, labelOrSpy));
+    return new (this.ctor())<T>(new Debug<T>(this, labelOrSpy));
   }
 
   /**
