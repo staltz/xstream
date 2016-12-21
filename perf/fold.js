@@ -54,7 +54,7 @@ suite
   })
   .add('Array', function() {
     return arrayScan(sum, 0, a).reduce(passthrough, 0);
-  });
+  })
 
 runners.runSuite(suite);
 

@@ -6,7 +6,6 @@ var rxjs = require('@reactivex/rxjs')
 var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
-var highland = require('highland');
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
@@ -58,7 +57,7 @@ suite
   .add('rx 5', function(deferred) {
     runners.runRx5(deferred,
       rxjs.Observable.combineLatest(rx1, rx2, rx3, add3).filter(even));
-  }, options);
+  }, options)
 
 runners.runSuite(suite);
 

@@ -65,7 +65,7 @@ suite
   }, options)
   .add('bacon', function(deferred) {
     runners.runBacon(deferred, bacon.fromArray(a).flatMapLatest(bacon.fromArray).reduce(0, sum));
-  }, options);
+  }, options)
 
 runners.runSuite(suite);
 

@@ -56,7 +56,7 @@ suite
   })
   .add('Array', function() {
     return a.map(add1).filter(odd).map(add1).map(add1).filter(even).reduce(sum, 0);
-  });
+  })
 
 runners.runSuite(suite);
 

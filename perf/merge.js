@@ -83,7 +83,7 @@ suite
   .add('Array', function() {
     // "Merge" synchronous arrays by concatenation
     return Array.prototype.concat.apply([], a).reduce(sum, 0);
-  });
+  })
 
 runners.runSuite(suite);
 
