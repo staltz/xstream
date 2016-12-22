@@ -5,8 +5,9 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var symbol_observable_1 = require("symbol-observable");
+var symbol_observable_1 = require('symbol-observable');
 var NO = {};
+exports.NO = NO;
 function noop() { }
 function copy(a) {
     var l = a.length;
@@ -16,81 +17,90 @@ function copy(a) {
     }
     return b;
 }
-exports.NO_IL = {
-    _n: noop,
-    _e: noop,
-    _c: noop,
-};
-;
-
-function internalizeProducer(producer) {
-    producer._start = function _start(il) {
-        il.next = il._n;
-        il.error = il._e;
-        il.complete = il._c;
-        this.start(il);
-    };
-    producer._stop = producer.stop;
-}
 function and(f1, f2) {
     return function andFn(t) {
         return f1(t) && f2(t);
     };
 }
-var StreamSubscription = (function () {
-    function StreamSubscription(_stream, _listener) {
+function _try(c, t, u) {
+    try {
+        return c.f(t);
+    }
+    catch (e) {
+        u._e(e);
+        return NO;
+    }
+}
+var NO_IL = {
+    _n: noop,
+    _e: noop,
+    _c: noop,
+};
+exports.NO_IL = NO_IL;
+
+function internalizeProducer(producer) {
+    producer._start =
+        function _start(il) {
+            il.next = il._n;
+            il.error = il._e;
+            il.complete = il._c;
+            this.start(il);
+        };
+    producer._stop = producer.stop;
+}
+var StreamSub = (function () {
+    function StreamSub(_stream, _listener) {
         this._stream = _stream;
         this._listener = _listener;
     }
-    StreamSubscription.prototype.unsubscribe = function () {
+    StreamSub.prototype.unsubscribe = function () {
         this._stream.removeListener(this._listener);
     };
-    return StreamSubscription;
+    return StreamSub;
 }());
-exports.StreamSubscription = StreamSubscription;
-var ObservableProducer = (function () {
-    function ObservableProducer(observable) {
+var Observer = (function () {
+    function Observer(_listener) {
+        this._listener = _listener;
+    }
+    Observer.prototype.next = function (value) {
+        this._listener._n(value);
+    };
+    Observer.prototype.error = function (err) {
+        this._listener._e(err);
+    };
+    Observer.prototype.complete = function () {
+        this._listener._c();
+    };
+    return Observer;
+}());
+var FromObservable = (function () {
+    function FromObservable(observable) {
         this.type = 'fromObservable';
         this.ins = observable;
         this.active = false;
     }
-    ObservableProducer.prototype._start = function (out) {
+    FromObservable.prototype._start = function (out) {
         this.out = out;
         this.active = true;
-        this._sub = this.ins.subscribe(new ObservableListener(out));
+        this._sub = this.ins.subscribe(new Observer(out));
         if (!this.active)
             this._sub.unsubscribe();
     };
-    ObservableProducer.prototype._stop = function () {
+    FromObservable.prototype._stop = function () {
         if (this._sub)
             this._sub.unsubscribe();
         this.active = false;
     };
-    return ObservableProducer;
+    return FromObservable;
 }());
-var ObservableListener = (function () {
-    function ObservableListener(_listener) {
-        this._listener = _listener;
-    }
-    ObservableListener.prototype.next = function (value) {
-        this._listener._n(value);
-    };
-    ObservableListener.prototype.error = function (err) {
-        this._listener._e(err);
-    };
-    ObservableListener.prototype.complete = function () {
-        this._listener._c();
-    };
-    return ObservableListener;
-}());
-var MergeProducer = (function () {
-    function MergeProducer(insArr) {
+var Merge = (function () {
+    function Merge(insArr) {
         this.type = 'merge';
         this.insArr = insArr;
         this.out = NO;
         this.ac = 0;
     }
-    MergeProducer.prototype._start = function (out) {
+    Merge.prototype._start = function (out) {
         this.out = out;
         var s = this.insArr;
         var L = s.length;
@@ -99,7 +109,7 @@ var MergeProducer = (function () {
             s[i]._add(this);
         }
     };
-    MergeProducer.prototype._stop = function () {
+    Merge.prototype._stop = function () {
         var s = this.insArr;
         var L = s.length;
         for (var i = 0; i < L; i++) {
@@ -107,19 +117,19 @@ var MergeProducer = (function () {
         }
         this.out = NO;
     };
-    MergeProducer.prototype._n = function (t) {
+    Merge.prototype._n = function (t) {
         var u = this.out;
         if (u === NO)
             return;
         u._n(t);
     };
-    MergeProducer.prototype._e = function (err) {
+    Merge.prototype._e = function (err) {
         var u = this.out;
         if (u === NO)
             return;
         u._e(err);
     };
-    MergeProducer.prototype._c = function () {
+    Merge.prototype._c = function () {
         if (--this.ac <= 0) {
             var u = this.out;
             if (u === NO)
@@ -127,9 +137,8 @@ var MergeProducer = (function () {
             u._c();
         }
     };
-    return MergeProducer;
+    return Merge;
 }());
-exports.MergeProducer = MergeProducer;
 var CombineListener = (function () {
     function CombineListener(i, out, p) {
         this.i = i;
@@ -161,9 +170,8 @@ var CombineListener = (function () {
     };
     return CombineListener;
 }());
-exports.CombineListener = CombineListener;
-var CombineProducer = (function () {
-    function CombineProducer(insArr) {
+var Combine = (function () {
+    function Combine(insArr) {
         this.type = 'combine';
         this.insArr = insArr;
         this.out = NO;
@@ -171,13 +179,13 @@ var CombineProducer = (function () {
         this.Nc = this.Nn = 0;
         this.vals = [];
     }
-    CombineProducer.prototype.up = function (t, i) {
+    Combine.prototype.up = function (t, i) {
         var v = this.vals[i];
         var Nn = !this.Nn ? 0 : v === NO ? --this.Nn : this.Nn;
         this.vals[i] = t;
         return Nn === 0;
     };
-    CombineProducer.prototype._start = function (out) {
+    Combine.prototype._start = function (out) {
         this.out = out;
         var s = this.insArr;
         var n = this.Nc = this.Nn = s.length;
@@ -193,7 +201,7 @@ var CombineProducer = (function () {
             }
         }
     };
-    CombineProducer.prototype._stop = function () {
+    Combine.prototype._stop = function () {
         var s = this.insArr;
         var n = s.length;
         var ils = this.ils;
@@ -204,33 +212,31 @@ var CombineProducer = (function () {
         this.ils = [];
         this.vals = [];
     };
-    return CombineProducer;
+    return Combine;
 }());
-exports.CombineProducer = CombineProducer;
-var FromArrayProducer = (function () {
-    function FromArrayProducer(a) {
+var FromArray = (function () {
+    function FromArray(a) {
         this.type = 'fromArray';
         this.a = a;
     }
-    FromArrayProducer.prototype._start = function (out) {
+    FromArray.prototype._start = function (out) {
         var a = this.a;
         for (var i = 0, l = a.length; i < l; i++) {
             out._n(a[i]);
         }
         out._c();
     };
-    FromArrayProducer.prototype._stop = function () {
+    FromArray.prototype._stop = function () {
     };
-    return FromArrayProducer;
+    return FromArray;
 }());
-exports.FromArrayProducer = FromArrayProducer;
-var FromPromiseProducer = (function () {
-    function FromPromiseProducer(p) {
+var FromPromise = (function () {
+    function FromPromise(p) {
         this.type = 'fromPromise';
         this.on = false;
         this.p = p;
     }
-    FromPromiseProducer.prototype._start = function (out) {
+    FromPromise.prototype._start = function (out) {
         var prod = this;
         this.on = true;
         this.p.then(function (v) {
@@ -244,35 +250,33 @@ var FromPromiseProducer = (function () {
             setTimeout(function () { throw err; });
         });
     };
-    FromPromiseProducer.prototype._stop = function () {
+    FromPromise.prototype._stop = function () {
         this.on = false;
     };
-    return FromPromiseProducer;
+    return FromPromise;
 }());
-exports.FromPromiseProducer = FromPromiseProducer;
-var PeriodicProducer = (function () {
-    function PeriodicProducer(period) {
+var Periodic = (function () {
+    function Periodic(period) {
         this.type = 'periodic';
         this.period = period;
         this.intervalID = -1;
         this.i = 0;
     }
-    PeriodicProducer.prototype._start = function (stream) {
+    Periodic.prototype._start = function (out) {
         var self = this;
-        function intervalHandler() { stream._n(self.i++); }
+        function intervalHandler() { out._n(self.i++); }
         this.intervalID = setInterval(intervalHandler, this.period);
     };
-    PeriodicProducer.prototype._stop = function () {
+    Periodic.prototype._stop = function () {
         if (this.intervalID !== -1)
             clearInterval(this.intervalID);
         this.intervalID = -1;
         this.i = 0;
     };
-    return PeriodicProducer;
+    return Periodic;
 }());
-exports.PeriodicProducer = PeriodicProducer;
-var DebugOperator = (function () {
-    function DebugOperator(ins, arg) {
+var Debug = (function () {
+    function Debug(ins, arg) {
         this.type = 'debug';
         this.ins = ins;
         this.out = NO;
@@ -285,15 +289,15 @@ var DebugOperator = (function () {
             this.s = arg;
         }
     }
-    DebugOperator.prototype._start = function (out) {
+    Debug.prototype._start = function (out) {
         this.out = out;
         this.ins._add(this);
     };
-    DebugOperator.prototype._stop = function () {
+    Debug.prototype._stop = function () {
         this.ins._remove(this);
         this.out = NO;
     };
-    DebugOperator.prototype._n = function (t) {
+    Debug.prototype._n = function (t) {
         var u = this.out;
         if (u === NO)
             return;
@@ -314,161 +318,154 @@ var DebugOperator = (function () {
         }
         u._n(t);
     };
-    DebugOperator.prototype._e = function (err) {
+    Debug.prototype._e = function (err) {
         var u = this.out;
         if (u === NO)
             return;
         u._e(err);
     };
-    DebugOperator.prototype._c = function () {
+    Debug.prototype._c = function () {
         var u = this.out;
         if (u === NO)
             return;
         u._c();
     };
-    return DebugOperator;
+    return Debug;
 }());
-exports.DebugOperator = DebugOperator;
-var DropOperator = (function () {
-    function DropOperator(max, ins) {
+var Drop = (function () {
+    function Drop(max, ins) {
         this.type = 'drop';
         this.ins = ins;
         this.out = NO;
         this.max = max;
         this.dropped = 0;
     }
-    DropOperator.prototype._start = function (out) {
+    Drop.prototype._start = function (out) {
         this.out = out;
         this.dropped = 0;
         this.ins._add(this);
     };
-    DropOperator.prototype._stop = function () {
+    Drop.prototype._stop = function () {
         this.ins._remove(this);
         this.out = NO;
     };
-    DropOperator.prototype._n = function (t) {
+    Drop.prototype._n = function (t) {
         var u = this.out;
         if (u === NO)
             return;
         if (this.dropped++ >= this.max)
             u._n(t);
     };
-    DropOperator.prototype._e = function (err) {
+    Drop.prototype._e = function (err) {
         var u = this.out;
         if (u === NO)
             return;
         u._e(err);
     };
-    DropOperator.prototype._c = function () {
+    Drop.prototype._c = function () {
         var u = this.out;
         if (u === NO)
             return;
         u._c();
     };
-    return DropOperator;
+    return Drop;
 }());
-exports.DropOperator = DropOperator;
-var OtherIL = (function () {
-    function OtherIL(out, op) {
+var EndWhenListener = (function () {
+    function EndWhenListener(out, op) {
         this.out = out;
         this.op = op;
     }
-    OtherIL.prototype._n = function () {
+    EndWhenListener.prototype._n = function () {
         this.op.end();
     };
-    OtherIL.prototype._e = function (err) {
+    EndWhenListener.prototype._e = function (err) {
         this.out._e(err);
     };
-    OtherIL.prototype._c = function () {
+    EndWhenListener.prototype._c = function () {
         this.op.end();
     };
-    return OtherIL;
+    return EndWhenListener;
 }());
-var EndWhenOperator = (function () {
-    function EndWhenOperator(o, ins) {
+var EndWhen = (function () {
+    function EndWhen(o, ins) {
         this.type = 'endWhen';
         this.ins = ins;
         this.out = NO;
         this.o = o;
-        this.oil = exports.NO_IL;
+        this.oil = NO_IL;
     }
-    EndWhenOperator.prototype._start = function (out) {
+    EndWhen.prototype._start = function (out) {
         this.out = out;
-        this.o._add(this.oil = new OtherIL(out, this));
+        this.o._add(this.oil = new EndWhenListener(out, this));
         this.ins._add(this);
     };
-    EndWhenOperator.prototype._stop = function () {
+    EndWhen.prototype._stop = function () {
         this.ins._remove(this);
         this.o._remove(this.oil);
         this.out = NO;
-        this.oil = exports.NO_IL;
+        this.oil = NO_IL;
     };
-    EndWhenOperator.prototype.end = function () {
+    EndWhen.prototype.end = function () {
         var u = this.out;
         if (u === NO)
             return;
         u._c();
     };
-    EndWhenOperator.prototype._n = function (t) {
+    EndWhen.prototype._n = function (t) {
         var u = this.out;
         if (u === NO)
             return;
         u._n(t);
     };
-    EndWhenOperator.prototype._e = function (err) {
+    EndWhen.prototype._e = function (err) {
         var u = this.out;
         if (u === NO)
             return;
         u._e(err);
     };
-    EndWhenOperator.prototype._c = function () {
+    EndWhen.prototype._c = function () {
         this.end();
     };
-    return EndWhenOperator;
+    return EndWhen;
 }());
-exports.EndWhenOperator = EndWhenOperator;
-var FilterOperator = (function () {
-    function FilterOperator(passes, ins) {
+var Filter = (function () {
+    function Filter(passes, ins) {
         this.type = 'filter';
         this.ins = ins;
         this.out = NO;
-        this.passes = passes;
+        this.f = passes;
     }
-    FilterOperator.prototype._start = function (out) {
+    Filter.prototype._start = function (out) {
         this.out = out;
         this.ins._add(this);
     };
-    FilterOperator.prototype._stop = function () {
+    Filter.prototype._stop = function () {
         this.ins._remove(this);
         this.out = NO;
     };
-    FilterOperator.prototype._n = function (t) {
+    Filter.prototype._n = function (t) {
         var u = this.out;
         if (u === NO)
             return;
-        try {
-            if (this.passes(t))
-                u._n(t);
-        }
-        catch (e) {
-            u._e(e);
-        }
+        var r = _try(this, t, u);
+        if (r === NO || !r)
+            return;
+        u._n(t);
     };
-    FilterOperator.prototype._e = function (err) {
+    Filter.prototype._e = function (err) {
         var u = this.out;
         if (u === NO)
             return;
         u._e(err);
     };
-    FilterOperator.prototype._c = function () {
+    Filter.prototype._c = function () {
         var u = this.out;
         if (u === NO)
             return;
         u._c();
     };
-    return FilterOperator;
+    return Filter;
 }());
-exports.FilterOperator = FilterOperator;
 var FlattenListener = (function () {
     function FlattenListener(out, op) {
         this.out = out;
@@ -486,134 +483,131 @@ var FlattenListener = (function () {
     };
     return FlattenListener;
 }());
-var FlattenOperator = (function () {
-    function FlattenOperator(ins) {
+var Flatten = (function () {
+    function Flatten(ins) {
         this.type = 'flatten';
         this.ins = ins;
         this.out = NO;
         this.open = true;
         this.inner = NO;
-        this.il = exports.NO_IL;
+        this.il = NO_IL;
     }
-    FlattenOperator.prototype._start = function (out) {
+    Flatten.prototype._start = function (out) {
         this.out = out;
         this.open = true;
         this.inner = NO;
-        this.il = exports.NO_IL;
+        this.il = NO_IL;
         this.ins._add(this);
     };
-    FlattenOperator.prototype._stop = function () {
+    Flatten.prototype._stop = function () {
         this.ins._remove(this);
         if (this.inner !== NO)
             this.inner._remove(this.il);
         this.out = NO;
         this.open = true;
         this.inner = NO;
-        this.il = exports.NO_IL;
+        this.il = NO_IL;
     };
-    FlattenOperator.prototype.less = function () {
+    Flatten.prototype.less = function () {
         var u = this.out;
         if (u === NO)
             return;
         if (!this.open && this.inner === NO)
             u._c();
     };
-    FlattenOperator.prototype._n = function (s) {
+    Flatten.prototype._n = function (s) {
         var u = this.out;
         if (u === NO)
             return;
         var _a = this, inner = _a.inner, il = _a.il;
-        if (inner !== NO && il !== exports.NO_IL)
+        if (inner !== NO && il !== NO_IL)
             inner._remove(il);
         (this.inner = s)._add(this.il = new FlattenListener(u, this));
     };
-    FlattenOperator.prototype._e = function (err) {
+    Flatten.prototype._e = function (err) {
         var u = this.out;
         if (u === NO)
             return;
         u._e(err);
     };
-    FlattenOperator.prototype._c = function () {
+    Flatten.prototype._c = function () {
         this.open = false;
         this.less();
     };
-    return FlattenOperator;
+    return Flatten;
 }());
-exports.FlattenOperator = FlattenOperator;
-var FoldOperator = (function () {
-    function FoldOperator(f, seed, ins) {
+var Fold = (function () {
+    function Fold(f, seed, ins) {
+        var _this = this;
         this.type = 'fold';
         this.ins = ins;
         this.out = NO;
-        this.f = f;
+        this.f = function (t) { return f(_this.acc, t); };
         this.acc = this.seed = seed;
     }
-    FoldOperator.prototype._start = function (out) {
+    Fold.prototype._start = function (out) {
         this.out = out;
         this.acc = this.seed;
         out._n(this.acc);
         this.ins._add(this);
     };
-    FoldOperator.prototype._stop = function () {
+    Fold.prototype._stop = function () {
         this.ins._remove(this);
         this.out = NO;
         this.acc = this.seed;
     };
-    FoldOperator.prototype._n = function (t) {
+    Fold.prototype._n = function (t) {
         var u = this.out;
         if (u === NO)
             return;
-        try {
-            u._n(this.acc = this.f(this.acc, t));
-        }
-        catch (e) {
-            u._e(e);
-        }
+        var r = _try(this, t, u);
+        if (r === NO)
+            return;
+        u._n(this.acc = r);
     };
-    FoldOperator.prototype._e = function (err) {
+    Fold.prototype._e = function (err) {
         var u = this.out;
         if (u === NO)
             return;
         u._e(err);
     };
-    FoldOperator.prototype._c = function () {
+    Fold.prototype._c = function () {
         var u = this.out;
         if (u === NO)
             return;
         u._c();
     };
-    return FoldOperator;
+    return Fold;
 }());
-exports.FoldOperator = FoldOperator;
-var LastOperator = (function () {
-    function LastOperator(ins) {
+var Last = (function () {
+    function Last(ins) {
         this.type = 'last';
         this.ins = ins;
         this.out = NO;
         this.has = false;
         this.val = NO;
     }
-    LastOperator.prototype._start = function (out) {
+    Last.prototype._start = function (out) {
         this.out = out;
         this.has = false;
         this.ins._add(this);
     };
-    LastOperator.prototype._stop = function () {
+    Last.prototype._stop = function () {
         this.ins._remove(this);
         this.out = NO;
         this.val = NO;
     };
-    LastOperator.prototype._n = function (t) {
+    Last.prototype._n = function (t) {
         this.has = true;
         this.val = t;
     };
-    LastOperator.prototype._e = function (err) {
+    Last.prototype._e = function (err) {
         var u = this.out;
         if (u === NO)
             return;
         u._e(err);
     };
-    LastOperator.prototype._c = function () {
+    Last.prototype._c = function () {
         var u = this.out;
         if (u === NO)
             return;
@@ -625,52 +619,51 @@ var LastOperator = (function () {
             u._e('TODO show proper error');
         }
     };
-    return LastOperator;
+    return Last;
 }());
-exports.LastOperator = LastOperator;
-var MapFlattenInner = (function () {
-    function MapFlattenInner(out, op) {
+var MapFlattenListener = (function () {
+    function MapFlattenListener(out, op) {
         this.out = out;
         this.op = op;
     }
-    MapFlattenInner.prototype._n = function (r) {
+    MapFlattenListener.prototype._n = function (r) {
         this.out._n(r);
     };
-    MapFlattenInner.prototype._e = function (err) {
+    MapFlattenListener.prototype._e = function (err) {
         this.out._e(err);
     };
-    MapFlattenInner.prototype._c = function () {
+    MapFlattenListener.prototype._c = function () {
         this.op.inner = NO;
         this.op.less();
     };
-    return MapFlattenInner;
+    return MapFlattenListener;
 }());
-var MapFlattenOperator = (function () {
-    function MapFlattenOperator(mapOp) {
+var MapFlatten = (function () {
+    function MapFlatten(mapOp) {
         this.type = mapOp.type + "+flatten";
         this.ins = mapOp.ins;
         this.out = NO;
         this.mapOp = mapOp;
         this.inner = NO;
-        this.il = exports.NO_IL;
+        this.il = NO_IL;
         this.open = true;
     }
-    MapFlattenOperator.prototype._start = function (out) {
+    MapFlatten.prototype._start = function (out) {
         this.out = out;
         this.inner = NO;
-        this.il = exports.NO_IL;
+        this.il = NO_IL;
         this.open = true;
         this.mapOp.ins._add(this);
     };
-    MapFlattenOperator.prototype._stop = function () {
+    MapFlatten.prototype._stop = function () {
         this.mapOp.ins._remove(this);
         if (this.inner !== NO)
             this.inner._remove(this.il);
         this.out = NO;
         this.inner = NO;
-        this.il = exports.NO_IL;
+        this.il = NO_IL;
     };
-    MapFlattenOperator.prototype.less = function () {
+    MapFlatten.prototype.less = function () {
         if (!this.open && this.inner === NO) {
             var u = this.out;
             if (u === NO)
@@ -678,188 +671,172 @@ var MapFlattenOperator = (function () {
             u._c();
         }
     };
-    MapFlattenOperator.prototype._n = function (v) {
+    MapFlatten.prototype._n = function (v) {
         var u = this.out;
         if (u === NO)
             return;
         var _a = this, inner = _a.inner, il = _a.il;
-        var s;
-        try {
-            s = this.mapOp.project(v);
-        }
-        catch (e) {
-            u._e(e);
+        var s = _try(this.mapOp, v, u);
+        if (s === NO)
             return;
-        }
-        if (inner !== NO && il !== exports.NO_IL)
+        if (inner !== NO && il !== NO_IL)
             inner._remove(il);
-        (this.inner = s)._add(this.il = new MapFlattenInner(u, this));
+        (this.inner = s)._add(this.il = new MapFlattenListener(u, this));
     };
-    MapFlattenOperator.prototype._e = function (err) {
+    MapFlatten.prototype._e = function (err) {
         var u = this.out;
         if (u === NO)
             return;
         u._e(err);
     };
-    MapFlattenOperator.prototype._c = function () {
+    MapFlatten.prototype._c = function () {
         this.open = false;
         this.less();
     };
-    return MapFlattenOperator;
+    return MapFlatten;
 }());
-exports.MapFlattenOperator = MapFlattenOperator;
-var MapOperator = (function () {
-    function MapOperator(project, ins) {
+var MapOp = (function () {
+    function MapOp(project, ins) {
         this.type = 'map';
         this.ins = ins;
         this.out = NO;
-        this.project = project;
+        this.f = project;
     }
-    MapOperator.prototype._start = function (out) {
+    MapOp.prototype._start = function (out) {
         this.out = out;
         this.ins._add(this);
     };
-    MapOperator.prototype._stop = function () {
+    MapOp.prototype._stop = function () {
         this.ins._remove(this);
         this.out = NO;
     };
-    MapOperator.prototype._n = function (t) {
+    MapOp.prototype._n = function (t) {
         var u = this.out;
         if (u === NO)
             return;
-        try {
-            u._n(this.project(t));
-        }
-        catch (e) {
-            u._e(e);
-        }
+        var r = _try(this, t, u);
+        if (r === NO)
+            return;
+        u._n(r);
     };
-    MapOperator.prototype._e = function (err) {
+    MapOp.prototype._e = function (err) {
         var u = this.out;
         if (u === NO)
             return;
         u._e(err);
     };
-    MapOperator.prototype._c = function () {
+    MapOp.prototype._c = function () {
         var u = this.out;
         if (u === NO)
             return;
         u._c();
     };
-    return MapOperator;
+    return MapOp;
 }());
-exports.MapOperator = MapOperator;
-var FilterMapOperator = (function (_super) {
-    __extends(FilterMapOperator, _super);
-    function FilterMapOperator(passes, project, ins) {
-        var _this = _super.call(this, project, ins) || this;
-        _this.type = 'filter+map';
-        _this.passes = passes;
-        return _this;
+var FilterMapFusion = (function (_super) {
+    __extends(FilterMapFusion, _super);
+    function FilterMapFusion(passes, project, ins) {
+        _super.call(this, project, ins);
+        this.type = 'filter+map';
+        this.passes = passes;
     }
-    FilterMapOperator.prototype._n = function (t) {
+    FilterMapFusion.prototype._n = function (t) {
         if (!this.passes(t))
             return;
         var u = this.out;
         if (u === NO)
             return;
-        try {
-            u._n(this.project(t));
-        }
-        catch (e) {
-            u._e(e);
-        }
+        var r = _try(this, t, u);
+        if (r === NO)
+            return;
+        u._n(r);
     };
-    return FilterMapOperator;
-}(MapOperator));
-exports.FilterMapOperator = FilterMapOperator;
-var RememberOperator = (function () {
-    function RememberOperator(ins) {
+    return FilterMapFusion;
+}(MapOp));
+var Remember = (function () {
+    function Remember(ins) {
         this.type = 'remember';
         this.ins = ins;
         this.out = NO;
     }
-    RememberOperator.prototype._start = function (out) {
+    Remember.prototype._start = function (out) {
         this.out = out;
         this.ins._add(out);
     };
-    RememberOperator.prototype._stop = function () {
+    Remember.prototype._stop = function () {
         this.ins._remove(this.out);
         this.out = NO;
     };
-    return RememberOperator;
+    return Remember;
 }());
-exports.RememberOperator = RememberOperator;
-var ReplaceErrorOperator = (function () {
-    function ReplaceErrorOperator(fn, ins) {
+var ReplaceError = (function () {
+    function ReplaceError(replacer, ins) {
         this.type = 'replaceError';
         this.ins = ins;
         this.out = NO;
-        this.fn = fn;
+        this.f = replacer;
     }
-    ReplaceErrorOperator.prototype._start = function (out) {
+    ReplaceError.prototype._start = function (out) {
         this.out = out;
         this.ins._add(this);
     };
-    ReplaceErrorOperator.prototype._stop = function () {
+    ReplaceError.prototype._stop = function () {
         this.ins._remove(this);
         this.out = NO;
     };
-    ReplaceErrorOperator.prototype._n = function (t) {
+    ReplaceError.prototype._n = function (t) {
         var u = this.out;
         if (u === NO)
             return;
         u._n(t);
     };
-    ReplaceErrorOperator.prototype._e = function (err) {
+    ReplaceError.prototype._e = function (err) {
         var u = this.out;
         if (u === NO)
             return;
         try {
             this.ins._remove(this);
-            (this.ins = this.fn(err))._add(this);
+            (this.ins = this.f(err))._add(this);
         }
         catch (e) {
             u._e(e);
         }
     };
-    ReplaceErrorOperator.prototype._c = function () {
+    ReplaceError.prototype._c = function () {
         var u = this.out;
         if (u === NO)
             return;
         u._c();
     };
-    return ReplaceErrorOperator;
+    return ReplaceError;
 }());
-exports.ReplaceErrorOperator = ReplaceErrorOperator;
-var StartWithOperator = (function () {
-    function StartWithOperator(ins, val) {
+var StartWith = (function () {
+    function StartWith(ins, val) {
         this.type = 'startWith';
         this.ins = ins;
         this.out = NO;
         this.val = val;
     }
-    StartWithOperator.prototype._start = function (out) {
+    StartWith.prototype._start = function (out) {
         this.out = out;
         this.out._n(this.val);
         this.ins._add(out);
     };
-    StartWithOperator.prototype._stop = function () {
+    StartWith.prototype._stop = function () {
         this.ins._remove(this.out);
         this.out = NO;
     };
-    return StartWithOperator;
+    return StartWith;
 }());
-exports.StartWithOperator = StartWithOperator;
-var TakeOperator = (function () {
-    function TakeOperator(max, ins) {
+var Take = (function () {
+    function Take(max, ins) {
         this.type = 'take';
         this.ins = ins;
         this.out = NO;
         this.max = max;
         this.taken = 0;
     }
-    TakeOperator.prototype._start = function (out) {
+    Take.prototype._start = function (out) {
         this.out = out;
         this.taken = 0;
         if (this.max <= 0) {
@@ -869,37 +846,37 @@ var TakeOperator = (function () {
             this.ins._add(this);
         }
     };
-    TakeOperator.prototype._stop = function () {
+    Take.prototype._stop = function () {
         this.ins._remove(this);
         this.out = NO;
     };
-    TakeOperator.prototype._n = function (t) {
+    Take.prototype._n = function (t) {
         var u = this.out;
         if (u === NO)
             return;
-        if (this.taken++ < this.max - 1) {
+        var m = ++this.taken;
+        if (m < this.max) {
             u._n(t);
         }
-        else {
+        else if (m === this.max) {
             u._n(t);
             u._c();
         }
     };
-    TakeOperator.prototype._e = function (err) {
+    Take.prototype._e = function (err) {
         var u = this.out;
         if (u === NO)
             return;
         u._e(err);
     };
-    TakeOperator.prototype._c = function () {
+    Take.prototype._c = function () {
         var u = this.out;
         if (u === NO)
             return;
         u._c();
     };
-    return TakeOperator;
+    return Take;
 }());
-exports.TakeOperator = TakeOperator;
 var Stream = (function () {
     function Stream(producer) {
         this._prod = producer || NO;
@@ -1059,7 +1036,7 @@ var Stream = (function () {
     
     Stream.prototype.subscribe = function (listener) {
         this.addListener(listener);
-        return new StreamSubscription(this, listener);
+        return new StreamSub(this, listener);
     };
     
     Stream.prototype[symbol_observable_1.default] = function () {
@@ -1118,33 +1095,33 @@ var Stream = (function () {
     Stream.of = function () {
         var items = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            items[_i] = arguments[_i];
+            items[_i - 0] = arguments[_i];
         }
         return Stream.fromArray(items);
     };
     
     Stream.fromArray = function (array) {
-        return new Stream(new FromArrayProducer(array));
+        return new Stream(new FromArray(array));
     };
     
     Stream.fromPromise = function (promise) {
-        return new Stream(new FromPromiseProducer(promise));
+        return new Stream(new FromPromise(promise));
     };
     
     Stream.fromObservable = function (observable) {
-        return new Stream(new ObservableProducer(observable));
+        return new Stream(new FromObservable(observable));
     };
     
     Stream.periodic = function (period) {
-        return new Stream(new PeriodicProducer(period));
+        return new Stream(new Periodic(period));
     };
     Stream.prototype._map = function (project) {
         var p = this._prod;
         var ctor = this.ctor();
-        if (p instanceof FilterOperator) {
-            return new ctor(new FilterMapOperator(p.passes, project, p.ins));
+        if (p instanceof Filter) {
+            return new ctor(new FilterMapFusion(p.f, project, p.ins));
         }
-        return new ctor(new MapOperator(project, this));
+        return new ctor(new MapOp(project, this));
     };
     
     Stream.prototype.map = function (project) {
@@ -1160,45 +1137,45 @@ var Stream = (function () {
     
     Stream.prototype.filter = function (passes) {
         var p = this._prod;
-        if (p instanceof FilterOperator) {
-            return new Stream(new FilterOperator(and(p.passes, passes), p.ins));
+        if (p instanceof Filter) {
+            return new Stream(new Filter(and(p.f, passes), p.ins));
         }
-        return new Stream(new FilterOperator(passes, this));
+        return new Stream(new Filter(passes, this));
     };
     
     Stream.prototype.take = function (amount) {
-        return new (this.ctor())(new TakeOperator(amount, this));
+        return new (this.ctor())(new Take(amount, this));
     };
     
     Stream.prototype.drop = function (amount) {
-        return new Stream(new DropOperator(amount, this));
+        return new Stream(new Drop(amount, this));
     };
     
     Stream.prototype.last = function () {
-        return new Stream(new LastOperator(this));
+        return new Stream(new Last(this));
     };
     
     Stream.prototype.startWith = function (initial) {
-        return new MemoryStream(new StartWithOperator(this, initial));
+        return new MemoryStream(new StartWith(this, initial));
     };
     
     Stream.prototype.endWhen = function (other) {
-        return new (this.ctor())(new EndWhenOperator(other, this));
+        return new (this.ctor())(new EndWhen(other, this));
     };
     
     Stream.prototype.fold = function (accumulate, seed) {
-        return new MemoryStream(new FoldOperator(accumulate, seed, this));
+        return new MemoryStream(new Fold(accumulate, seed, this));
     };
     
     Stream.prototype.replaceError = function (replace) {
-        return new (this.ctor())(new ReplaceErrorOperator(replace, this));
+        return new (this.ctor())(new ReplaceError(replace, this));
     };
     
     Stream.prototype.flatten = function () {
         var p = this._prod;
-        return new Stream(p instanceof MapOperator && !(p instanceof FilterMapOperator) ?
-            new MapFlattenOperator(p) :
-            new FlattenOperator(this));
+        return new Stream(p instanceof MapOp && !(p instanceof FilterMapFusion) ?
+            new MapFlatten(p) :
+            new Flatten(this));
     };
     
     Stream.prototype.compose = function (operator) {
@@ -1206,11 +1183,11 @@ var Stream = (function () {
     };
     
     Stream.prototype.remember = function () {
-        return new MemoryStream(new RememberOperator(this));
+        return new MemoryStream(new Remember(this));
     };
     
     Stream.prototype.debug = function (labelOrSpy) {
-        return new (this.ctor())(new DebugOperator(this, labelOrSpy));
+        return new (this.ctor())(new Debug(this, labelOrSpy));
     };
     
     Stream.prototype.imitate = function (target) {
@@ -1251,31 +1228,30 @@ var Stream = (function () {
             this._dl = listener;
         }
     };
+    
+    Stream.merge = function merge() {
+        var streams = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            streams[_i - 0] = arguments[_i];
+        }
+        return new Stream(new Merge(streams));
+    };
+    
+    Stream.combine = function combine() {
+        var streams = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            streams[_i - 0] = arguments[_i];
+        }
+        return new Stream(new Combine(streams));
+    };
     return Stream;
 }());
-
-Stream.merge = function merge() {
-    var streams = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        streams[_i] = arguments[_i];
-    }
-    return new Stream(new MergeProducer(streams));
-};
-
-Stream.combine = function combine() {
-    var streams = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        streams[_i] = arguments[_i];
-    }
-    return new Stream(new CombineProducer(streams));
-};
 exports.Stream = Stream;
 var MemoryStream = (function (_super) {
     __extends(MemoryStream, _super);
     function MemoryStream(producer) {
-        var _this = _super.call(this, producer) || this;
-        _this._has = false;
-        return _this;
+        _super.call(this, producer);
+        this._has = false;
     }
     MemoryStream.prototype._n = function (x) {
         this._v = x;
@@ -1342,18 +1318,10 @@ exports.MemoryStream = MemoryStream;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Stream;
 
-},{"symbol-observable":3}],2:[function(require,module,exports){
-"use strict";
-var core_1 = require("./core");
-exports.Stream = core_1.Stream;
-exports.MemoryStream = core_1.MemoryStream;
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = core_1.Stream;
-
-},{"./core":1}],3:[function(require,module,exports){
+},{"symbol-observable":2}],2:[function(require,module,exports){
 module.exports = require('./lib/index');
 
-},{"./lib/index":4}],4:[function(require,module,exports){
+},{"./lib/index":3}],3:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -1385,7 +1353,7 @@ if (typeof self !== 'undefined') {
 var result = (0, _ponyfill2['default'])(root);
 exports['default'] = result;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./ponyfill":5}],5:[function(require,module,exports){
+},{"./ponyfill":4}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1409,5 +1377,5 @@ function symbolObservablePonyfill(root) {
 
 	return result;
 };
-},{}]},{},[2])(2)
+},{}]},{},[1])(1)
 });
