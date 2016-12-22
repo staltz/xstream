@@ -74,7 +74,7 @@ export interface Subscription {
 
 export interface Observable<T> {
   subscribe(listener: Listener<T>): Subscription;
-};
+}
 
 // mutates the input
 function internalizeProducer<T>(producer: Producer<T>) {
@@ -1182,9 +1182,10 @@ class Take<T> implements Operator<T, T> {
   _n(t: T) {
     const u = this.out;
     if (u === NO) return;
-    if (this.taken++ < this.max - 1) {
+    const m = ++this.taken;
+    if (m < this.max) {
       u._n(t);
-    } else {
+    } else if (m === this.max) {
       u._n(t);
       u._c();
     }
