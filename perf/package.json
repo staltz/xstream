@@ -19,11 +19,12 @@
     "@reactivex/rxjs": "5.0.x",
     "baconjs": "0.7.x",
     "benchmark": "github:bestiejs/benchmark.js#master",
+    "highland": "2.10.x",
     "kefir": "3.6.x",
     "lodash": "4.17.x",
-    "highland": "2.10.x",
     "most": "1.1.x",
-    "rx": "4.1.x"
+    "rx": "4.1.x",
+    "v8-profiler-trigger": "^1.0.0"
   },
   "devDependencies": {
     "npm-run-all": "^3.1.2"
