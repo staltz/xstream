@@ -18,6 +18,19 @@ function and<T>(f1: (t: T) => boolean, f2: (t: T) => boolean): (t: T) => boolean
   };
 }
 
+interface FContainer<T, R> {
+  f(t: T): R;
+}
+
+function _try<T, R>(c: FContainer<T, R>, t: T, u: Stream<any>): R | {} {
+  try {
+    return c.f(t);
+  } catch (e) {
+    u._e(e);
+    return NO;
+  }
+}
+
 export interface InternalListener<T> {
   _n: (v: T) => void;
   _e: (err: any) => void;
@@ -677,12 +690,12 @@ class Filter<T> implements Operator<T, T> {
   public type = 'filter';
   public ins: Stream<T>;
   public out: Stream<T>;
-  public passes: (t: T) => boolean;
+  public f: (t: T) => boolean;
 
   constructor(passes: (t: T) => boolean, ins: Stream<T>) {
     this.ins = ins;
     this.out = NO as Stream<T>;
-    this.passes = passes;
+    this.f = passes;
   }
 
   _start(out: Stream<T>): void {
@@ -698,11 +711,9 @@ class Filter<T> implements Operator<T, T> {
   _n(t: T) {
     const u = this.out;
     if (u === NO) return;
-    try {
-      if (this.passes(t)) u._n(t);
-    } catch (e) {
-      u._e(e);
-    }
+    const r = _try(this, t, u);
+    if (r === NO || !r) return;
+    u._n(t);
   }
 
   _e(err: any) {
@@ -804,14 +815,14 @@ class Fold<T, R> implements Operator<T, R> {
   public type = 'fold';
   public ins: Stream<T>;
   public out: Stream<R>;
-  public f: (acc: R, t: T) => R;
+  public f: (t: T) => R;
   public seed: R;
   private acc: R; // initialized as seed
 
   constructor(f: (acc: R, t: T) => R, seed: R, ins: Stream<T>) {
     this.ins = ins;
     this.out = NO as Stream<R>;
-    this.f = f;
+    this.f = (t: T) => f(this.acc, t);
     this.acc = this.seed = seed;
   }
 
@@ -831,11 +842,9 @@ class Fold<T, R> implements Operator<T, R> {
   _n(t: T) {
     const u = this.out;
     if (u === NO) return;
-    try {
-      u._n(this.acc = this.f(this.acc, t));
-    } catch (e) {
-      u._e(e);
-    }
+    const r = _try(this, t, u);
+    if (r === NO) return;
+    u._n(this.acc = r as R);
   }
 
   _e(err: any) {
@@ -970,15 +979,10 @@ class MapFlatten<T, R> implements Operator<T, R> {
     const u = this.out;
     if (u === NO) return;
     const {inner, il} = this;
-    let s: Stream<R>;
-    try {
-      s = this.mapOp.project(v);
-    } catch (e) {
-      u._e(e);
-      return;
-    }
+    const s = _try(this.mapOp, v, u);
+    if (s === NO) return;
     if (inner !== NO && il !== NO_IL) inner._remove(il);
-    (this.inner = s)._add(this.il = new MapFlattenListener(u, this));
+    (this.inner = s as Stream<R>)._add(this.il = new MapFlattenListener(u, this));
   }
 
   _e(err: any) {
@@ -997,12 +1001,12 @@ class MapOp<T, R> implements Operator<T, R> {
   public type = 'map';
   public ins: Stream<T>;
   public out: Stream<R>;
-  public project: (t: T) => R;
+  public f: (t: T) => R;
 
   constructor(project: (t: T) => R, ins: Stream<T>) {
     this.ins = ins;
     this.out = NO as Stream<R>;
-    this.project = project;
+    this.f = project;
   }
 
   _start(out: Stream<R>): void {
@@ -1018,11 +1022,9 @@ class MapOp<T, R> implements Operator<T, R> {
   _n(t: T) {
     const u = this.out;
     if (u === NO) return;
-    try {
-      u._n(this.project(t));
-    } catch (e) {
-      u._e(e);
-    }
+    const r = _try(this, t, u);
+    if (r === NO) return;
+    u._n(r as R);
   }
 
   _e(err: any) {
@@ -1051,11 +1053,9 @@ class FilterMapFusion<T, R> extends MapOp<T, R> {
     if (!this.passes(t)) return;
     const u = this.out;
     if (u === NO) return;
-    try {
-      u._n(this.project(t));
-    } catch (e) {
-      u._e(e);
-    }
+    const r = _try(this, t, u);
+    if (r === NO) return;
+    u._n(r as R);
   }
 }
 
@@ -1084,12 +1084,12 @@ class ReplaceError<T> implements Operator<T, T> {
   public type = 'replaceError';
   public ins: Stream<T>;
   public out: Stream<T>;
-  public fn: (err: any) => Stream<T>;
+  public f: (err: any) => Stream<T>;
 
-  constructor(fn: (err: any) => Stream<T>, ins: Stream<T>) {
+  constructor(replacer: (err: any) => Stream<T>, ins: Stream<T>) {
     this.ins = ins;
     this.out = NO as Stream<T>;
-    this.fn = fn;
+    this.f = replacer;
   }
 
   _start(out: Stream<T>): void {
@@ -1113,7 +1113,7 @@ class ReplaceError<T> implements Operator<T, T> {
     if (u === NO) return;
     try {
       this.ins._remove(this);
-      (this.ins = this.fn(err))._add(this);
+      (this.ins = this.f(err))._add(this);
     } catch (e) {
       u._e(e);
     }
@@ -1663,7 +1663,7 @@ export class Stream<T> implements InternalListener<T> {
     const p = this._prod;
     const ctor = this.ctor();
     if (p instanceof Filter) {
-      return new ctor<U>(new FilterMapFusion<T, U>(p.passes, project, p.ins));
+      return new ctor<U>(new FilterMapFusion<T, U>(p.f, project, p.ins));
     }
     return new ctor<U>(new MapOp<T, U>(project, this));
   }
@@ -1738,7 +1738,7 @@ export class Stream<T> implements InternalListener<T> {
     const p = this._prod;
     if (p instanceof Filter) {
       return new Stream<T>(new Filter<T>(
-        and((p as Filter<T>).passes, passes),
+        and((p as Filter<T>).f, passes),
         (p as Filter<T>).ins
       ));
     }
