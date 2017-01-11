@@ -29,6 +29,7 @@ index.d.ts
 index.js
 index.js.map
 /extra/
+/factory/
 
 # Generated directories
 .sass-cache/
