@@ -1,19 +1,15 @@
-<a name="10.0.0"></a>
-# [10.0.0](https://github.com/staltz/xstream/compare/v9.1.0...v10.0.0) (2016-12-12)
+<a name="10.1.0"></a>
+# [10.1.0](https://github.com/staltz/xstream/compare/v9.3.0...v10.1.0) (2017-01-31)
 
 
 ### Bug Fixes
 
-* **src:** usage of TypeScript v2.1 is a breaking change ([3e74cb1](https://github.com/staltz/xstream/commit/3e74cb1))
+* **flatten:** fix type inference hinting ([df6d720](https://github.com/staltz/xstream/commit/df6d720))
 
-
-### BREAKING CHANGES
-
-* src: This version of xstream can only be used with TypeScript v2.1 or higher.
 
 
 <a name="9.3.0"></a>
-# [9.3.0](https://github.com/staltz/xstream/compare/v9.1.0...v9.3.0) (2016-12-22)
+# [9.3.0](https://github.com/staltz/xstream/compare/v10.0.0...v9.3.0) (2016-12-22)
 
 
 ### Bug Fixes
@@ -26,6 +22,21 @@
 * update benchmarks ([b12065d](https://github.com/staltz/xstream/commit/b12065d))
 * **core:** improve performance by encapsulating try/catch ([31fab06](https://github.com/staltz/xstream/commit/31fab06))
 * **core:** merge together core.ts and index.ts ([a03e418](https://github.com/staltz/xstream/commit/a03e418))
+
+
+
+<a name="10.0.0"></a>
+# [10.0.0](https://github.com/staltz/xstream/compare/v9.1.0...v10.0.0) (2016-12-21)
+
+
+### Bug Fixes
+
+* **src:** usage of TypeScript v2.1 is a breaking change ([c69327e](https://github.com/staltz/xstream/commit/c69327e))
+
+
+### BREAKING CHANGES
+
+* src: This version of xstream can only be used with TypeScript v2.1 or higher.
 
 
 

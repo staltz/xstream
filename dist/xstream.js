@@ -5,7 +5,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var symbol_observable_1 = require('symbol-observable');
+var symbol_observable_1 = require("symbol-observable");
 var NO = {};
 exports.NO = NO;
 function noop() { }
@@ -39,13 +39,12 @@ var NO_IL = {
 exports.NO_IL = NO_IL;
 
 function internalizeProducer(producer) {
-    producer._start =
-        function _start(il) {
-            il.next = il._n;
-            il.error = il._e;
-            il.complete = il._c;
-            this.start(il);
-        };
+    producer._start = function _start(il) {
+        il.next = il._n;
+        il.error = il._e;
+        il.complete = il._c;
+        this.start(il);
+    };
     producer._stop = producer.stop;
 }
 var StreamSub = (function () {
@@ -736,9 +735,10 @@ var MapOp = (function () {
 var FilterMapFusion = (function (_super) {
     __extends(FilterMapFusion, _super);
     function FilterMapFusion(passes, project, ins) {
-        _super.call(this, project, ins);
-        this.type = 'filter+map';
-        this.passes = passes;
+        var _this = _super.call(this, project, ins) || this;
+        _this.type = 'filter+map';
+        _this.passes = passes;
+        return _this;
     }
     FilterMapFusion.prototype._n = function (t) {
         if (!this.passes(t))
@@ -1095,7 +1095,7 @@ var Stream = (function () {
     Stream.of = function () {
         var items = [];
         for (var _i = 0; _i < arguments.length; _i++) {
-            items[_i - 0] = arguments[_i];
+            items[_i] = arguments[_i];
         }
         return Stream.fromArray(items);
     };
@@ -1228,30 +1228,31 @@ var Stream = (function () {
             this._dl = listener;
         }
     };
-    
-    Stream.merge = function merge() {
-        var streams = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            streams[_i - 0] = arguments[_i];
-        }
-        return new Stream(new Merge(streams));
-    };
-    
-    Stream.combine = function combine() {
-        var streams = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            streams[_i - 0] = arguments[_i];
-        }
-        return new Stream(new Combine(streams));
-    };
     return Stream;
 }());
+
+Stream.merge = function merge() {
+    var streams = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        streams[_i] = arguments[_i];
+    }
+    return new Stream(new Merge(streams));
+};
+
+Stream.combine = function combine() {
+    var streams = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        streams[_i] = arguments[_i];
+    }
+    return new Stream(new Combine(streams));
+};
 exports.Stream = Stream;
 var MemoryStream = (function (_super) {
     __extends(MemoryStream, _super);
     function MemoryStream(producer) {
-        _super.call(this, producer);
-        this._has = false;
+        var _this = _super.call(this, producer) || this;
+        _this._has = false;
+        return _this;
     }
     MemoryStream.prototype._n = function (x) {
         this._v = x;
