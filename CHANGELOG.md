@@ -12,6 +12,22 @@
 * src: This version of xstream can only be used with TypeScript v2.1 or higher.
 
 
+<a name="9.3.0"></a>
+# [9.3.0](https://github.com/staltz/xstream/compare/v9.1.0...v9.3.0) (2016-12-22)
+
+
+### Bug Fixes
+
+* **take:** terminate stream emission when TakeOperator recursively call itself ([3581857](https://github.com/staltz/xstream/commit/3581857))
+
+
+### Performance Improvements
+
+* update benchmarks ([b12065d](https://github.com/staltz/xstream/commit/b12065d))
+* **core:** improve performance by encapsulating try/catch ([31fab06](https://github.com/staltz/xstream/commit/31fab06))
+* **core:** merge together core.ts and index.ts ([a03e418](https://github.com/staltz/xstream/commit/a03e418))
+
+
 
 <a name="9.1.0"></a>
 # [9.1.0](https://github.com/staltz/xstream/compare/v9.0.0...v9.1.0) (2016-12-12)

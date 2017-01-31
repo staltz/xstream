@@ -1,26 +1,32 @@
 {
   "name": "xstream-perf",
   "version": "0.0.0",
-  "description": "Perf tests for most.js",
+  "description": "Perf tests for xstream",
   "author": "Andre Staltz <andre+npm@staltz.com> (http://andre.staltz.com/)",
   "license": "MIT",
   "scripts": {
     "filter-map-fusion": "node ./filter-map-fusion",
     "filter-map-reduce": "node ./filter-map-reduce",
-    "flatMap": "node ./flatMap.js",
-    "merge": "node ./merge.js",
-    "scan": "node ./scan.js",
-    "switchMap": "node ./switchMap",
-    "start": "npm run filter-map-reduce && npm run filter-map-fusion && npm run flatMap && npm run merge && npm run scan && npm run switchMap"
+    "flattenConcurrently": "node ./flattenConcurrently",
+    "merge": "node ./merge",
+    "combine": "node ./combine",
+    "fold": "node ./fold",
+    "flatten": "node ./flatten",
+    "dataflow": "node ./dataflow",
+    "start": "npm-run-all filter-map-reduce merge combine flatten fold dataflow flattenConcurrently filter-map-fusion"
   },
   "dependencies": {
-    "@reactivex/rxjs": "^5.0.0-beta.11",
-    "baconjs": "^0.7.85",
+    "@reactivex/rxjs": "5.0.x",
+    "baconjs": "0.7.x",
     "benchmark": "github:bestiejs/benchmark.js#master",
-    "highland": "^2.9.0",
-    "kefir": "^3.4.0",
-    "lodash": "^4.15.0",
-    "most": "^1.0.1",
-    "rx": "^4.1.0"
+    "highland": "2.10.x",
+    "kefir": "3.6.x",
+    "lodash": "4.17.x",
+    "most": "1.1.x",
+    "rx": "4.1.x",
+    "v8-profiler-trigger": "^1.0.0"
+  },
+  "devDependencies": {
+    "npm-run-all": "^3.1.2"
   }
 }

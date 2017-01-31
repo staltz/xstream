@@ -79,4 +79,40 @@ describe('Stream.prototype.take', () => {
       },
     });
   });
+
+  it('should terminate properly when "next" function recursively calls itself', (done: any) => {
+    const producer = {
+      start: (listener: any) => {
+        this.listener = listener;
+        listener.next(1);
+      },
+      _n: (value: any) => {
+        const listener = this.listener;
+        listener && listener.next(value);
+      },
+      _e: (value: string) => {
+        const listener = this.listener;
+        listener && listener.error(value);
+      },
+      stop: () => this.listener = null,
+      listener: null
+    };
+    const stream = xs.create(producer);
+
+    let nextCount = 0;
+    stream.take(1).addListener({
+      next: (x: number) => {
+        nextCount++;
+        if (nextCount > 1) {
+          producer._e('next should not be called more than once');
+        } else {
+          producer._n(x);
+        }
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        done();
+      }
+    });
+  });
 });

@@ -1,4 +1,4 @@
-import {Operator, Stream, InternalListener} from '../core';
+import {Operator, Stream, InternalListener} from '../index';
 
 class FSInner<T> implements InternalListener<T> {
   constructor(private out: Stream<T>,

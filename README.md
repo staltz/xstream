@@ -495,7 +495,7 @@ Adds a Listener to the Stream.
 
 #### Arguments:
 
-- `listener: Listener\<T>`
+- `listener: Listener`
 
 - - -
 

@@ -25,9 +25,6 @@ coverage
 build/Release
 
 # Generated code
-core.d.ts
-core.js
-core.js.map
 index.d.ts
 index.js
 index.js.map

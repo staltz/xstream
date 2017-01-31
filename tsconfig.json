@@ -10,7 +10,13 @@
     "module": "commonjs",
     "noEmitHelpers": false,
     "target": "ES5",
-    "outDir": "./"
+    "outDir": "./",
+    "lib": [
+      "dom",
+      "es5",
+      "es2015.collection",
+      "es2015.promise"
+    ]
   },
   "formatCodeOptions": {
     "indentSize": 2,
@@ -18,7 +24,6 @@
   },
   "files": [
     "typings/index.d.ts",
-    "src/core.ts",
     "src/extra/concat.ts",
     "src/extra/debounce.ts",
     "src/extra/delay.ts",

@@ -7,6 +7,7 @@ var kefir = require('kefir');
 var bacon = require('baconjs');
 var lodash = require('lodash');
 var highland = require('highland');
+var flattenConcurrently = require('../extra/flattenConcurrently').default;
 
 var runners = require('./runners');
 var kefirFromArray = runners.kefirFromArray;
@@ -45,7 +46,7 @@ var options = {
 suite
   .add('xstream', function(deferred) {
     runners.runXStream(deferred,
-      xs.fromArray(a).map(xs.fromArray).flattenConcurrently().fold(sum, 0).last());
+      xs.fromArray(a).map(xs.fromArray).compose(flattenConcurrently).fold(sum, 0).last());
   }, options)
   .add('most', function(deferred) {
     runners.runMost(deferred, most.from(a).flatMap(most.from).reduce(sum, 0));
@@ -72,7 +73,7 @@ suite
   })
   .add('Array', function() {
     return arrayFlatMap(identity, a).reduce(sum, 0);
-  });
+  })
 
 runners.runSuite(suite);
 

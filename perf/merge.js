@@ -69,13 +69,6 @@ suite
     var streams = a.map(bacon.fromArray);
     runners.runBacon(deferred, bacon.mergeAll(streams).reduce(0, sum));
   }, options)
-  .add('highland', function(deferred) {
-    // HELP WANTED: Is there a better way to do this in highland?
-    // The two approaches below perform similarly
-    var streams = a.map(highland);
-    runners.runHighland(deferred, highland(streams).merge().reduce(0, sum));
-    //runners.runHighland(deferred, highland(streams).flatMap(identity).reduce(0, sum));
-  }, options)
   .add('lodash', function() {
     // "Merge" synchronous arrays by concatenation
     return lodash(a).flatten().reduce(sum, 0);
@@ -83,7 +76,7 @@ suite
   .add('Array', function() {
     // "Merge" synchronous arrays by concatenation
     return Array.prototype.concat.apply([], a).reduce(sum, 0);
-  });
+  })
 
 runners.runSuite(suite);
 

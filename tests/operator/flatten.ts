@@ -34,7 +34,7 @@ describe('Stream.prototype.flatten', () => {
     it('should expand each periodic event with 3 sync events', (done: any) => {
       const source: Stream<Stream<number>> = xs.periodic(100).take(3)
         .map((i: number) => xs.of(1 + i, 2 + i, 3 + i));
-      const stream: Stream<number> = source.flatten();
+      const stream = source.flatten();
       const expected = [1, 2, 3, 2, 3, 4, 3, 4, 5];
 
       stream.addListener({

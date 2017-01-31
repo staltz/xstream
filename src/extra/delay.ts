@@ -1,4 +1,4 @@
-import {Operator, Stream} from '../core';
+import {Operator, Stream} from '../index';
 
 class DelayOperator<T> implements Operator<T, T> {
   public type = 'delay';

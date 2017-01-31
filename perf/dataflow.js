@@ -83,7 +83,7 @@ suite
     var label = bacon.fromArray(['initial', 'Count is ']);
     var view = bacon.combineWith(renderWithArgs, label, count);
     runners.runBacon(deferred, view);
-  }, options);
+  }, options)
 
 runners.runSuite(suite);
 

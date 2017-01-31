@@ -2,7 +2,7 @@
 var generateDocs = require('./generate-docs');
 
 generateDocs({
-  src: './core.js',
+  src: './index.js',
   output: './markdown/generated-methods.md',
   template: './tools/template-methods.md.ejs'
 });
