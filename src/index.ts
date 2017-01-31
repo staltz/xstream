@@ -37,12 +37,6 @@ export interface InternalListener<T> {
   _c: () => void;
 }
 
-export interface PartialListener<T> {
-  next?: (x: T) => void;
-  error?: (err: any) => void;
-  complete?: () => void;
-}
-
 const NO_IL: InternalListener<any> = {
   _n: noop,
   _e: noop,
@@ -90,15 +84,14 @@ export interface Observable<T> {
 }
 
 // mutates the input
-function internalizeProducer<T>(producer: Producer<T>) {
-  (producer as InternalProducer<T> & Producer<T>)._start =
-    function _start(il: InternalListener<T>) {
-      (il as InternalListener<T> & Listener<T>).next = il._n;
-      (il as InternalListener<T> & Listener<T>).error = il._e;
-      (il as InternalListener<T> & Listener<T>).complete = il._c;
-      this.start(il as InternalListener<T> & Listener<T>);
-    };
-  (producer as InternalProducer<T> & Producer<T>)._stop = producer.stop;
+function internalizeProducer<T>(producer: Producer<T> & Partial<InternalProducer<T>>) {
+  producer._start = function _start(il: InternalListener<T> & Partial<Listener<T>>) {
+    il.next = il._n;
+    il.error = il._e;
+    il.complete = il._c;
+    this.start(il);
+  };
+  producer._stop = producer.stop;
 }
 
 class StreamSub<T> implements Subscription {
@@ -1346,11 +1339,11 @@ export class Stream<T> implements InternalListener<T> {
    *
    * @param {Listener} listener
    */
-  addListener(listener: PartialListener<T>): void {
-    (listener as InternalListener<T> & Listener<T>)._n = listener.next || noop;
-    (listener as InternalListener<T> & Listener<T>)._e = listener.error || noop;
-    (listener as InternalListener<T> & Listener<T>)._c = listener.complete || noop;
-    this._add(listener as InternalListener<T> & Listener<T>);
+  addListener(listener: Partial<Listener<T>>): void {
+    (listener as InternalListener<T>)._n = listener.next || noop;
+    (listener as InternalListener<T>)._e = listener.error || noop;
+    (listener as InternalListener<T>)._c = listener.complete || noop;
+    this._add(listener as InternalListener<T>);
   }
 
   /**
@@ -1358,8 +1351,8 @@ export class Stream<T> implements InternalListener<T> {
    *
    * @param {Listener<T>} listener
    */
-  removeListener(listener: Listener<T>): void {
-    this._remove(listener as InternalListener<T> & Listener<T>);
+  removeListener(listener: Partial<Listener<T>>): void {
+    this._remove(listener as InternalListener<T>);
   }
 
   /**
@@ -2136,16 +2129,16 @@ export class Stream<T> implements InternalListener<T> {
    *
    * @param {Listener<T>} listener
    */
-  setDebugListener(listener: Listener<T> | null | undefined) {
+  setDebugListener(listener: Partial<Listener<T>> | null | undefined) {
     if (!listener) {
       this._d = false;
       this._dl = NO as InternalListener<T>;
     } else {
       this._d = true;
-      (listener as InternalListener<T> & Listener<T>)._n = listener.next || noop;
-      (listener as InternalListener<T> & Listener<T>)._e = listener.error || noop;
-      (listener as InternalListener<T> & Listener<T>)._c = listener.complete || noop;
-      this._dl = listener as InternalListener<T> & Listener<T>;
+      (listener as InternalListener<T>)._n = listener.next || noop;
+      (listener as InternalListener<T>)._e = listener.error || noop;
+      (listener as InternalListener<T>)._c = listener.complete || noop;
+      this._dl = listener as InternalListener<T>;
     }
   }
 }
