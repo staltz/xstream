@@ -1932,12 +1932,12 @@ export class Stream<T> implements InternalListener<T> {
    *
    * @return {Stream}
    */
-  flatten<R>(): T {
+  flatten<R>(this: Stream<Stream<R>>): T {
     const p = this._prod;
     return new Stream<R>(
       p instanceof MapOp && !(p instanceof FilterMapFusion) ?
         new MapFlatten(p as MapOp<any, Stream<R>>) :
-        new Flatten(this as any as Stream<Stream<R>>)
+        new Flatten(this)
     ) as T & Stream<R>;
   }
 
