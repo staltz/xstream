@@ -78,7 +78,7 @@ conventionalChangelog({
   append: true,
   transform: function (commit, cb) {
     var toPush = null;
-    if (commit.type === 'fix' || commit.type === 'feat') {
+    if (commit.type === 'fix' || commit.type === 'feat' || commit.type === 'perf') {
       status.increment = Math.max(status.increment, 2);
       toPush = commit;
     }
