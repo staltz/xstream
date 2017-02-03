@@ -1220,7 +1220,7 @@ export class Stream<T> implements InternalListener<T> {
     const a = this._ils;
     const L = a.length;
     if (this._d) this._dl._n(t);
-    if (L == 1) a[0]._n(t); else {
+    if (L == 1) a[0]._n(t); else if (L == 0) return; else {
       const b = cp(a);
       for (let i = 0; i < L; i++) b[i]._n(t);
     }
@@ -1233,7 +1233,7 @@ export class Stream<T> implements InternalListener<T> {
     const L = a.length;
     this._x();
     if (this._d) this._dl._e(err);
-    if (L == 1) a[0]._e(err); else {
+    if (L == 1) a[0]._e(err); else if (L == 0) return; else {
       const b = cp(a);
       for (let i = 0; i < L; i++) b[i]._e(err);
     }
@@ -1245,7 +1245,7 @@ export class Stream<T> implements InternalListener<T> {
     const L = a.length;
     this._x();
     if (this._d) this._dl._c();
-    if (L == 1) a[0]._c(); else {
+    if (L == 1) a[0]._c(); else if (L == 0) return; else {
       const b = cp(a);
       for (let i = 0; i < L; i++) b[i]._c();
     }
