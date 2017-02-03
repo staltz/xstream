@@ -6,9 +6,7 @@ function noop() {}
 function cp<T>(a: Array<T>): Array<T> {
   const l = a.length;
   const b = Array(l);
-  for (let i = 0; i < l; ++i) {
-    b[i] = a[i];
-  }
+  for (let i = 0; i < l; ++i) b[i] = a[i];
   return b;
 }
 
@@ -229,17 +227,13 @@ class Merge<T> implements Aggregator<T, T>, InternalListener<T> {
     const s = this.insArr;
     const L = s.length;
     this.ac = L;
-    for (let i = 0; i < L; i++) {
-      s[i]._add(this);
-    }
+    for (let i = 0; i < L; i++) s[i]._add(this);
   }
 
   _stop(): void {
     const s = this.insArr;
     const L = s.length;
-    for (let i = 0; i < L; i++) {
-      s[i]._remove(this);
-    }
+    for (let i = 0; i < L; i++) s[i]._remove(this);
     this.out = NO as Stream<T>;
   }
 
@@ -348,9 +342,7 @@ class CombineListener<T> implements InternalListener<T>, OutSender<Array<T>> {
   _n(t: T): void {
     const p = this.p, out = this.out;
     if (out === NO) return;
-    if (p.up(t, this.i)) {
-      out._n(p.vals);
-    }
+    if (p.up(t, this.i)) out._n(p.vals);
   }
 
   _e(err: any): void {
@@ -362,9 +354,7 @@ class CombineListener<T> implements InternalListener<T>, OutSender<Array<T>> {
   _c(): void {
     const p = this.p;
     if (p.out === NO) return;
-    if (--p.Nc === 0) {
-      p.out._c();
-    }
+    if (--p.Nc === 0) p.out._c();
   }
 }
 
@@ -412,9 +402,7 @@ class Combine<R> implements Aggregator<any, Array<R>> {
     const s = this.insArr;
     const n = s.length;
     const ils = this.ils;
-    for (let i = 0; i < n; i++) {
-      s[i]._remove(ils[i]);
-    }
+    for (let i = 0; i < n; i++) s[i]._remove(ils[i]);
     this.out = NO as Stream<Array<R>>;
     this.ils = [];
     this.vals = [];
@@ -431,9 +419,7 @@ class FromArray<T> implements InternalProducer<T> {
 
   _start(out: InternalListener<T>): void {
     const a = this.a;
-    for (let i = 0, l = a.length; i < l; i++) {
-      out._n(a[i]);
-    }
+    for (let i = 0, n = a.length; i < n; i++) out._n(a[i]);
     out._c();
   }
 
@@ -463,7 +449,7 @@ class FromPromise<T> implements InternalProducer<T> {
       },
       (e: any) => {
         out._e(e);
-      }
+      },
     ).then(noop, (err: any) => {
       setTimeout(() => { throw err; });
     });
@@ -515,11 +501,7 @@ class Debug<T> implements Operator<T, T> {
     this.out = NO as Stream<T>;
     this.s = noop;
     this.l = '';
-    if (typeof arg === 'string') {
-      this.l = arg;
-    } else if (typeof arg === 'function') {
-      this.s = arg;
-    }
+    if (typeof arg === 'string') this.l = arg; else if (typeof arg === 'function') this.s = arg;
   }
 
   _start(out: Stream<T>): void {
@@ -542,11 +524,7 @@ class Debug<T> implements Operator<T, T> {
       } catch (e) {
         u._e(e);
       }
-    } else if (l) {
-      console.log(l + ':', t);
-    } else {
-      console.log(t);
-    }
+    } else if (l) console.log(l + ':', t); else console.log(t);
     u._n(t);
   }
 
@@ -896,9 +874,7 @@ class Last<T> implements Operator<T, T> {
     if (this.has) {
       u._n(this.val);
       u._c();
-    } else {
-      u._e('TODO show proper error');
-    }
+    } else u._e(new Error('last() failed because input stream completed'));
   }
 }
 
@@ -1160,11 +1136,7 @@ class Take<T> implements Operator<T, T> {
   _start(out: Stream<T>): void {
     this.out = out;
     this.taken = 0;
-    if (this.max <= 0) {
-      out._c();
-    } else {
-      this.ins._add(this);
-    }
+    if (this.max <= 0) out._c(); else this.ins._add(this);
   }
 
   _stop(): void {
@@ -1176,9 +1148,7 @@ class Take<T> implements Operator<T, T> {
     const u = this.out;
     if (u === NO) return;
     const m = ++this.taken;
-    if (m < this.max) {
-      u._n(t);
-    } else if (m === this.max) {
+    if (m < this.max) u._n(t); else if (m === this.max) {
       u._n(t);
       u._c();
     }
@@ -1302,9 +1272,7 @@ export class Stream<T> implements InternalListener<T> {
   // force it to end its execution and dispose resources. This method
   // assumes as a precondition that this._ils has just one listener.
   _pruneCycles() {
-    if (this._hasNoSinks(this, [])) {
-      this._remove(this._ils[0]);
-    }
+    if (this._hasNoSinks(this, [])) this._remove(this._ils[0]);
   }
 
   // Checks whether *there is no* path starting from `x` that leads to an end
@@ -1312,22 +1280,18 @@ export class Stream<T> implements InternalListener<T> {
   // listener of A. This means these paths constitute a cycle somehow. Is given
   // a trace of all visited nodes so far.
   _hasNoSinks(x: InternalListener<any>, trace: Array<any>): boolean {
-    if (trace.indexOf(x) !== -1) {
-      return true;
-    } else if ((x as any as OutSender<any>).out === this) {
-      return true;
-    } else if ((x as any as OutSender<any>).out && (x as any as OutSender<any>).out !== NO) {
-      return this._hasNoSinks((x as any as OutSender<any>).out, trace.concat(x));
-    } else if ((x as Stream<any>)._ils) {
-      for (let i = 0, N = (x as Stream<any>)._ils.length; i < N; i++) {
-        if (!this._hasNoSinks((x as Stream<any>)._ils[i], trace.concat(x))) {
+    if (trace.indexOf(x) !== -1)
+      return true; else
+    if ((x as any as OutSender<any>).out === this)
+      return true; else
+    if ((x as any as OutSender<any>).out && (x as any as OutSender<any>).out !== NO)
+      return this._hasNoSinks((x as any as OutSender<any>).out, trace.concat(x)); else
+    if ((x as Stream<any>)._ils) {
+      for (let i = 0, N = (x as Stream<any>)._ils.length; i < N; i++)
+        if (!this._hasNoSinks((x as Stream<any>)._ils[i], trace.concat(x)))
           return false;
-        }
-      }
       return true;
-    } else {
-      return false;
-    }
+    } else return false;
   }
 
   private ctor(): typeof Stream {
@@ -1364,7 +1328,6 @@ export class Stream<T> implements InternalListener<T> {
    */
   subscribe(listener: Listener<T>): Subscription {
     this.addListener(listener);
-
     return new StreamSub<T>(this, listener);
   }
 
@@ -1388,9 +1351,8 @@ export class Stream<T> implements InternalListener<T> {
   static create<T>(producer?: Producer<T>): Stream<T> {
     if (producer) {
       if (typeof producer.start !== 'function'
-      || typeof producer.stop !== 'function') {
+      || typeof producer.stop !== 'function')
         throw new Error('producer requires both start and stop functions');
-      }
       internalizeProducer(producer); // mutates the input
     }
     return new Stream(producer as InternalProducer<T> & Producer<T>);
@@ -1405,9 +1367,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {MemoryStream}
    */
   static createWithMemory<T>(producer?: Producer<T>): MemoryStream<T> {
-    if (producer) {
-      internalizeProducer(producer); // mutates the input
-    }
+    if (producer) internalizeProducer(producer); // mutates the input
     return new MemoryStream<T>(producer as InternalProducer<T> & Producer<T>);
   }
 
@@ -1480,13 +1440,12 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static from<T>(input: Promise<T> | Stream<T> | Array<T> | Observable<T>): Stream<T> {
-    if (typeof input[$$observable] === 'function') {
-      return Stream.fromObservable<T>(input as Observable<T>);
-    } else if (typeof (input as Promise<T>).then === 'function') {
-      return Stream.fromPromise<T>(input as Promise<T>);
-    } else if (Array.isArray(input)) {
+    if (typeof input[$$observable] === 'function')
+      return Stream.fromObservable<T>(input as Observable<T>); else
+    if (typeof (input as Promise<T>).then === 'function')
+      return Stream.fromPromise<T>(input as Promise<T>); else
+    if (Array.isArray(input))
       return Stream.fromArray<T>(input);
-    }
 
     throw new TypeError(`Type of input to from() must be an Array, Promise, or Observable`);
   }
@@ -1656,9 +1615,7 @@ export class Stream<T> implements InternalListener<T> {
   protected _map<U>(project: (t: T) => U): Stream<U> | MemoryStream<U> {
     const p = this._prod;
     const ctor = this.ctor();
-    if (p instanceof Filter) {
-      return new ctor<U>(new FilterMapFusion<T, U>(p.f, project, p.ins));
-    }
+    if (p instanceof Filter) return new ctor<U>(new FilterMapFusion<T, U>(p.f, project, p.ins));
     return new ctor<U>(new MapOp<T, U>(project, this));
   }
 
@@ -1730,12 +1687,11 @@ export class Stream<T> implements InternalListener<T> {
    */
   filter(passes: (t: T) => boolean): Stream<T> {
     const p = this._prod;
-    if (p instanceof Filter) {
+    if (p instanceof Filter)
       return new Stream<T>(new Filter<T>(
         and((p as Filter<T>).f, passes),
         (p as Filter<T>).ins
       ));
-    }
     return new Stream<T>(new Filter<T>(passes, this));
   }
 
@@ -2059,15 +2015,12 @@ export class Stream<T> implements InternalListener<T> {
    * not be a MemoryStream.
    */
   imitate(target: Stream<T>): void {
-    if (target instanceof MemoryStream) {
+    if (target instanceof MemoryStream)
       throw new Error('A MemoryStream was given to imitate(), but it only ' +
       'supports a Stream. Read more about this restriction here: ' +
       'https://github.com/staltz/xstream#faq');
-    }
     this._target = target;
-    for (let ils = this._ils, N = ils.length, i = 0; i < N; i++) {
-      target._add(ils[i]);
-    }
+    for (let ils = this._ils, N = ils.length, i = 0; i < N; i++) target._add(ils[i]);
     this._ils = [];
   }
 
