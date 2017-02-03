@@ -1481,7 +1481,7 @@ export class Stream<T> implements InternalListener<T> {
    */
   static from<T>(input: Promise<T> | Stream<T> | Array<T> | Observable<T>): Stream<T> {
     if (typeof input[$$observable] === 'function') {
-      return Stream.fromObservable<T>(input);
+      return Stream.fromObservable<T>(input as Observable<T>);
     } else if (typeof (input as Promise<T>).then === 'function') {
       return Stream.fromPromise<T>(input as Promise<T>);
     } else if (Array.isArray(input)) {
@@ -1558,8 +1558,9 @@ export class Stream<T> implements InternalListener<T> {
    * @param {any} observable The observable to be converted as a stream.
    * @return {Stream}
    */
-  static fromObservable<T>(observable: any): Stream<T> {
-    return new Stream<T>(new FromObservable(observable));
+  static fromObservable<T>(obs: {subscribe: any}): Stream<T> {
+    if ((obs as Stream<T>).endWhen) return obs as Stream<T>;
+    return new Stream<T>(new FromObservable(obs));
   }
 
   /**
