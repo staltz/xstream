@@ -1,3 +1,15 @@
+<a name="10.2.0"></a>
+# [10.2.0](https://github.com/staltz/xstream/compare/v10.1.0...v10.2.0) (2017-02-03)
+
+
+### Performance Improvements
+
+* **fromObservable:** avoid converting from xs stream to xs stream ([04031c6](https://github.com/staltz/xstream/commit/04031c6))
+* **index:** drop curly braces wherever possible ([26d0299](https://github.com/staltz/xstream/commit/26d0299))
+* **Stream:** speed up Stream next, error, complete handlers ([b32ffe3](https://github.com/staltz/xstream/commit/b32ffe3))
+
+
+
 <a name="10.1.0"></a>
 # [10.1.0](https://github.com/staltz/xstream/compare/v9.3.0...v10.1.0) (2017-01-31)
 
