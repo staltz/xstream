@@ -1745,6 +1745,41 @@ export class Stream<T> implements InternalListener<T> {
     return new Stream<T>(new Filter<T>(passes, this));
   }
 
+  reject<S extends T>(passes: (t: T) => t is S): Stream<S>;
+  reject(passes: (t: T) => boolean): Stream<T>;
+  /**
+   * The complement of `filter`. Only allows events that fail the test given by
+   * the `passes` argument.
+   *
+   * Each event from the input stream is given to the `passes` function. If the
+   * function returns `false`, the event is forwarded to the output stream,
+   * otherwise it is ignored and not forwarded.
+   *
+   * Marble diagram:
+   *
+   * ```text
+   * --1---2--3-----4-----5---6--7-8--
+   *     reject(i => i % 2 === 0)
+   * --1------3-----------5------7----
+   * ```
+   *
+   * @param {Function} passes A function of type `(t: T) +> boolean` that takes
+   * an event from the input stream and checks if it fails, by returning a
+   * boolean.
+   * @return {Stream}
+   */
+  reject(passes: (t: T) => boolean): Stream<T> {
+    const p = this._prod;
+    const fails = (v: T) => !passes(v)
+    if (p instanceof Filter) {
+      return new Stream<T>(new Filter<T>(
+        and((p as Filter<T>).f, fails),
+        (p as Filter<T>).ins
+      ));
+    }
+    return new Stream<T>(new Filter<T>(fails, this));
+  }
+
   /**
    * Lets the first `amount` many events from the input stream pass to the
    * output stream, then makes the output stream complete.
