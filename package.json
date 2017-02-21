@@ -22,7 +22,7 @@
     "postreadme": "npm run extra-docs",
     "predist": "rm -rf dist/ && mkdirp dist/ && npm run compile",
     "dist": "browserify index.js --standalone xstream | node tools/strip-comments.js > dist/xstream.js",
-    "postdist": "uglifyjs dist/xstream.js -o dist/xstream.min.js",
+    "postdist": "node tools/minify.js",
     "start": "npm install && npm prune",
     "check-release": "node tools/check-release.js",
     "prepublish": "npm run compile",
@@ -56,6 +56,7 @@
     "conventional-changelog-cli": "1.2.x",
     "cz-conventional-changelog": "1.2.x",
     "es6-promise": "4.0.5",
+    "google-closure-compiler-js": "^20161201.0.0",
     "markdown-doctest": "0.9.1",
     "markdox": "0.1.10",
     "mkdirp": "0.5.1",
@@ -68,7 +69,6 @@
     "tslint": "4.0.2",
     "typescript": "2.1.5",
     "typings": "2.0.0",
-    "uglify-js": "2.7.5",
     "validate-commit-msg": "2.4.x"
   },
   "publishConfig": {
