@@ -146,8 +146,14 @@ var CombineListener = (function () {
         var p = this.p, out = this.out;
         if (out === NO)
             return;
-        if (p.up(t, this.i))
-            out._n(p.vals);
+        if (p.up(t, this.i)) {
+            var a = p.vals;
+            var l = a.length;
+            var b = Array(l);
+            for (var i = 0; i < l; ++i)
+                b[i] = a[i];
+            out._n(b);
+        }
     };
     CombineListener.prototype._e = function (err) {
         var out = this.out;

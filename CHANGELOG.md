@@ -1,3 +1,18 @@
+<a name="10.3.0"></a>
+# [10.3.0](https://github.com/staltz/xstream/compare/v10.2.0...v10.3.0) (2017-03-03)
+
+
+### Bug Fixes
+
+* **combine:** do array cloning to avoid several bugs ([e8b2eef](https://github.com/staltz/xstream/commit/e8b2eef))
+
+
+### Performance Improvements
+
+* **dist:** use Google Closure Compiler instead of uglify-js ([ed6f793](https://github.com/staltz/xstream/commit/ed6f793))
+
+
+
 <a name="10.2.0"></a>
 # [10.2.0](https://github.com/staltz/xstream/compare/v10.1.0...v10.2.0) (2017-02-03)
 
