@@ -884,94 +884,6 @@ class Last<T> implements Operator<T, T> {
   }
 }
 
-class MapFlattenListener<R> implements InternalListener<R> {
-  private out: Stream<R>;
-  private op: MapFlatten<any, R>;
-
-  constructor(out: Stream<R>, op: MapFlatten<any, R>) {
-    this.out = out;
-    this.op = op;
-  }
-
-  _n(r: R) {
-    this.out._n(r);
-  }
-
-  _e(err: any) {
-    this.out._e(err);
-  }
-
-  _c() {
-    this.op.inner = NO as Stream<R>;
-    this.op.less();
-  }
-}
-
-class MapFlatten<T, R> implements Operator<T, R> {
-  public type: string;
-  public ins: Stream<T>;
-  public out: Stream<R>;
-  public mapOp: MapOp<T, Stream<R>>;
-  public inner: Stream<R>; // Current inner Stream
-  private il: InternalListener<R>; // Current inner InternalListener
-  private open: boolean;
-
-  constructor(mapOp: MapOp<T, Stream<R>>) {
-    this.type = `${mapOp.type}+flatten`;
-    this.ins = mapOp.ins;
-    this.out = NO as Stream<R>;
-    this.mapOp = mapOp;
-    this.inner = NO as Stream<R>;
-    this.il = NO_IL;
-    this.open = true;
-  }
-
-  _start(out: Stream<R>): void {
-    this.out = out;
-    this.inner = NO as Stream<R>;
-    this.il = NO_IL;
-    this.open = true;
-    this.mapOp.ins._add(this);
-  }
-
-  _stop(): void {
-    this.mapOp.ins._remove(this);
-    if (this.inner !== NO) this.inner._remove(this.il);
-    this.out = NO as Stream<R>;
-    this.inner = NO as Stream<R>;
-    this.il = NO_IL;
-  }
-
-  less(): void {
-    if (!this.open && this.inner === NO) {
-      const u = this.out;
-      if (u === NO) return;
-      u._c();
-    }
-  }
-
-  _n(v: T) {
-    const u = this.out;
-    if (u === NO) return;
-    const {inner, il} = this;
-    const s = _try(this.mapOp, v, u);
-    if (s === NO) return;
-    if (inner !== NO && il !== NO_IL) inner._remove(il);
-    (this.inner = s as Stream<R>)._add(this.il = new MapFlattenListener(u, this));
-  }
-
-  _e(err: any) {
-    const u = this.out;
-    if (u === NO) return;
-    u._e(err);
-  }
-
-  _c() {
-    this.open = false;
-    this.less();
-  }
-}
-
 class MapOp<T, R> implements Operator<T, R> {
   public type = 'map';
   public ins: Stream<T>;
@@ -1012,25 +924,6 @@ class MapOp<T, R> implements Operator<T, R> {
     const u = this.out;
     if (u === NO) return;
     u._c();
-  }
-}
-
-class FilterMapFusion<T, R> extends MapOp<T, R> {
-  public type = 'filter+map';
-  public passes: (t: T) => boolean;
-
-  constructor(passes: (t: T) => boolean, project: (t: T) => R, ins: Stream<T>) {
-    super(project, ins);
-    this.passes = passes;
-  }
-
-  _n(t: T) {
-    if (!this.passes(t)) return;
-    const u = this.out;
-    if (u === NO) return;
-    const r = _try(this, t, u);
-    if (r === NO) return;
-    u._n(r as R);
   }
 }
 
@@ -1619,10 +1512,7 @@ export class Stream<T> implements InternalListener<T> {
   } as CombineSignature;
 
   protected _map<U>(project: (t: T) => U): Stream<U> | MemoryStream<U> {
-    const p = this._prod;
-    const ctor = this.ctor();
-    if (p instanceof Filter) return new ctor<U>(new FilterMapFusion<T, U>(p.f, project, p.ins));
-    return new ctor<U>(new MapOp<T, U>(project, this));
+    return new (this.ctor())<U>(new MapOp<T, U>(project, this));
   }
 
   /**
@@ -1665,7 +1555,7 @@ export class Stream<T> implements InternalListener<T> {
   mapTo<U>(projectedValue: U): Stream<U> {
     const s = this.map(() => projectedValue);
     const op: Operator<T, U> = s._prod as Operator<T, U>;
-    op.type = op.type.replace('map', 'mapTo');
+    op.type = 'mapTo';
     return s;
   }
 
@@ -1890,11 +1780,7 @@ export class Stream<T> implements InternalListener<T> {
    */
   flatten<R>(this: Stream<Stream<R>>): T {
     const p = this._prod;
-    return new Stream<R>(
-      p instanceof MapOp && !(p instanceof FilterMapFusion) ?
-        new MapFlatten(p as MapOp<any, Stream<R>>) :
-        new Flatten(this)
-    ) as T & Stream<R>;
+    return new Stream<R>(new Flatten(this)) as T & Stream<R>;
   }
 
   /**

@@ -49,15 +49,6 @@ describe('Stream.prototype.flatten', () => {
       });
     });
 
-    it('should have an ins field as metadata', (done: any) => {
-      const source: Stream<number> = xs.periodic(100).take(3);
-      const stream: Stream<number> = source
-        .map((i: number) => xs.of(1 + i, 2 + i, 3 + i))
-        .flatten();
-      assert.strictEqual(stream['_prod']['ins'], source);
-      done();
-    });
-
     it('should return a flat stream with correct TypeScript types', (done: any) => {
       const streamStrings: Stream<string> = Stream.create({
         start: (listener: Listener<string>) => {},
@@ -285,7 +276,7 @@ describe('Stream.prototype.flatten', () => {
     });
   });
 
-  describe('with filter+map fusion', () => {
+  describe('with filter and map', () => {
     it('should execute the predicate, the projection, and the flattening', (done: any) => {
       let predicateCallCount = 0;
       let projectCallCount = 0;
@@ -321,14 +312,6 @@ describe('Stream.prototype.flatten', () => {
   });
 
   describe('with mapTo', () => {
-    it('should have the correct \'type\' metadata on the operator producer', (done: any) => {
-      const source: Stream<Stream<number>> = xs.periodic(100).take(3)
-        .mapTo(xs.of(1, 2, 3));
-      const stream: Stream<number> = source.flatten();
-      assert.strictEqual(stream['_prod']['type'], 'mapTo+flatten');
-      done();
-    });
-
     it('should not restart inner stream if switching to the same inner stream', (done: any) => {
       const outer = fromDiagram('-A---------B----------C--------|');
       const nums = fromDiagram(  '-a-b-c-----------------------|', {

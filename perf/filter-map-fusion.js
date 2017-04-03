@@ -19,7 +19,7 @@ for(var i = 0; i< a.length; ++i) {
   a[i] = i;
 }
 
-var suite = Benchmark.Suite('filter -> map -> reduce ' + n + ' integers');
+var suite = Benchmark.Suite('filter -> map -> fusion ' + n + ' integers');
 var options = {
   defer: true,
   onError: function(e) {
