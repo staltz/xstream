@@ -614,80 +614,6 @@ var Last = (function () {
     };
     return Last;
 }());
-var MapFlattenListener = (function () {
-    function MapFlattenListener(out, op) {
-        this.out = out;
-        this.op = op;
-    }
-    MapFlattenListener.prototype._n = function (r) {
-        this.out._n(r);
-    };
-    MapFlattenListener.prototype._e = function (err) {
-        this.out._e(err);
-    };
-    MapFlattenListener.prototype._c = function () {
-        this.op.inner = NO;
-        this.op.less();
-    };
-    return MapFlattenListener;
-}());
-var MapFlatten = (function () {
-    function MapFlatten(mapOp) {
-        this.type = mapOp.type + "+flatten";
-        this.ins = mapOp.ins;
-        this.out = NO;
-        this.mapOp = mapOp;
-        this.inner = NO;
-        this.il = NO_IL;
-        this.open = true;
-    }
-    MapFlatten.prototype._start = function (out) {
-        this.out = out;
-        this.inner = NO;
-        this.il = NO_IL;
-        this.open = true;
-        this.mapOp.ins._add(this);
-    };
-    MapFlatten.prototype._stop = function () {
-        this.mapOp.ins._remove(this);
-        if (this.inner !== NO)
-            this.inner._remove(this.il);
-        this.out = NO;
-        this.inner = NO;
-        this.il = NO_IL;
-    };
-    MapFlatten.prototype.less = function () {
-        if (!this.open && this.inner === NO) {
-            var u = this.out;
-            if (u === NO)
-                return;
-            u._c();
-        }
-    };
-    MapFlatten.prototype._n = function (v) {
-        var u = this.out;
-        if (u === NO)
-            return;
-        var _a = this, inner = _a.inner, il = _a.il;
-        var s = _try(this.mapOp, v, u);
-        if (s === NO)
-            return;
-        if (inner !== NO && il !== NO_IL)
-            inner._remove(il);
-        (this.inner = s)._add(this.il = new MapFlattenListener(u, this));
-    };
-    MapFlatten.prototype._e = function (err) {
-        var u = this.out;
-        if (u === NO)
-            return;
-        u._e(err);
-    };
-    MapFlatten.prototype._c = function () {
-        this.open = false;
-        this.less();
-    };
-    return MapFlatten;
-}());
 var MapOp = (function () {
     function MapOp(project, ins) {
         this.type = 'map';
@@ -726,27 +652,6 @@ var MapOp = (function () {
     };
     return MapOp;
 }());
-var FilterMapFusion = (function (_super) {
-    __extends(FilterMapFusion, _super);
-    function FilterMapFusion(passes, project, ins) {
-        var _this = _super.call(this, project, ins) || this;
-        _this.type = 'filter+map';
-        _this.passes = passes;
-        return _this;
-    }
-    FilterMapFusion.prototype._n = function (t) {
-        if (!this.passes(t))
-            return;
-        var u = this.out;
-        if (u === NO)
-            return;
-        var r = _try(this, t, u);
-        if (r === NO)
-            return;
-        u._n(r);
-    };
-    return FilterMapFusion;
-}(MapOp));
 var Remember = (function () {
     function Remember(ins) {
         this.type = 'remember';
@@ -1103,11 +1008,7 @@ var Stream = (function () {
         return new Stream(new Periodic(period));
     };
     Stream.prototype._map = function (project) {
-        var p = this._prod;
-        var ctor = this.ctor();
-        if (p instanceof Filter)
-            return new ctor(new FilterMapFusion(p.f, project, p.ins));
-        return new ctor(new MapOp(project, this));
+        return new (this.ctor())(new MapOp(project, this));
     };
     
     Stream.prototype.map = function (project) {
@@ -1117,7 +1018,7 @@ var Stream = (function () {
     Stream.prototype.mapTo = function (projectedValue) {
         var s = this.map(function () { return projectedValue; });
         var op = s._prod;
-        op.type = op.type.replace('map', 'mapTo');
+        op.type = 'mapTo';
         return s;
     };
     
@@ -1158,9 +1059,7 @@ var Stream = (function () {
     
     Stream.prototype.flatten = function () {
         var p = this._prod;
-        return new Stream(p instanceof MapOp && !(p instanceof FilterMapFusion) ?
-            new MapFlatten(p) :
-            new Flatten(this));
+        return new Stream(new Flatten(this));
     };
     
     Stream.prototype.compose = function (operator) {

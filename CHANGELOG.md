@@ -1,3 +1,13 @@
+<a name="10.4.0"></a>
+# [10.4.0](https://github.com/staltz/xstream/compare/v10.3.0...v10.4.0) (2017-04-03)
+
+
+### Bug Fixes
+
+* **map:** remove operator fusion to avoid bugs ([f16e6a9](https://github.com/staltz/xstream/commit/f16e6a9))
+
+
+
 <a name="10.3.0"></a>
 # [10.3.0](https://github.com/staltz/xstream/compare/v10.2.0...v10.3.0) (2017-03-03)
 
