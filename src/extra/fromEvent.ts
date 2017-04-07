@@ -1,4 +1,4 @@
-/// <reference path="../../typings/globals/node/index.d.ts" />
+/// <reference types="node" />
 import {EventEmitter} from 'events';
 import {Stream, InternalProducer, InternalListener} from '../index';
 

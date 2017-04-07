@@ -1,5 +1,5 @@
-/// <reference path="../../typings/globals/mocha/index.d.ts" />
-/// <reference path="../../typings/globals/node/index.d.ts" />
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs, {Stream} from '../../src/index';
 import tween from '../../src/extra/tween';
 import * as assert from 'assert';

@@ -1,5 +1,5 @@
-/// <reference path="../../typings/globals/mocha/index.d.ts" />
-/// <reference path="../../typings/globals/node/index.d.ts" />
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs from '../../src/index';
 import dropUntil from '../../src/extra/dropUntil';
 import delay from '../../src/extra/delay';

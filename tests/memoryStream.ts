@@ -1,5 +1,5 @@
-/// <reference path="../typings/globals/mocha/index.d.ts" />
-/// <reference path="../typings/globals/node/index.d.ts" />
+/// <reference types="mocha"/>
+/// <reference types="node"/>
 import xs, {Listener} from '../src/index';
 import * as assert from 'assert';
 

@@ -1,6 +1,6 @@
-/// <reference path="../../typings/globals/mocha/index.d.ts" />
-/// <reference path="../../typings/globals/node/index.d.ts" />
-import xs, {Stream} from '../../src/index';
+/// <reference types="mocha"/>
+/// <reference types="node" />
+import xs, { Stream } from '../../src/index';
 import split from '../../src/extra/split';
 import concat from '../../src/extra/concat';
 import * as assert from 'assert';
@@ -24,7 +24,7 @@ describe('split (extra)', () => {
             if (innerExpected) {
               assert.equal(x, innerExpected.shift());
             } else {
-              assert.fail('innerExpected should be defined');
+              assert.fail(undefined, innerExpected, 'e should be defined', '=');
             }
           },
           error: (err: any) => done(err),
@@ -32,7 +32,7 @@ describe('split (extra)', () => {
             if (innerExpected) {
               assert.equal(innerExpected.length, 0);
             } else {
-              assert.fail('innerExpected should be defined');
+              assert.fail(undefined, innerExpected, 'e should be defined', '=');
             }
           }
         });

@@ -14,7 +14,6 @@
     "doctest": "markdown-doctest",
     "setup-browser-tests": "browserify browser-tests/index.ts -p [ tsify ] > browser-tests/tests-bundle.js",
     "teardown-browser-tests": "rm browser-tests/tests-bundle.js",
-    "precompile": "typings install",
     "compile": "tsc",
     "page-content": "npm run compile && rm -rf .ignore/ && mkdirp .ignore/ && npm run changelog && node tools/make-toc.js && node tools/make-factories.js && node tools/make-methods.js && cat markdown/header.md markdown/generated-toc.md markdown/overview.md markdown/generated-factories.md markdown/generated-methods.md markdown/footer.md > .ignore/content.md",
     "extra-docs": "node tools/make-extras.js && rm EXTRA_DOCS.md && cp markdown/generated-extras.md EXTRA_DOCS.md",
@@ -49,6 +48,9 @@
     "symbol-observable": "^1.0.2"
   },
   "devDependencies": {
+    "@types/mocha": "^2.2.40",
+    "@types/node": "^7.0.12",
+    "@types/sinon": "^2.1.2",
     "assert": "1.3.x",
     "browserify": "13.0.x",
     "commitizen": "2.9.x",
@@ -68,7 +70,6 @@
     "tsify": "2.0.3",
     "tslint": "4.0.2",
     "typescript": "2.1.5",
-    "typings": "2.0.0",
     "validate-commit-msg": "2.4.x"
   },
   "publishConfig": {
