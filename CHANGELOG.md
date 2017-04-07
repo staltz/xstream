@@ -1,3 +1,13 @@
+<a name="10.5.0"></a>
+# [10.5.0](https://github.com/staltz/xstream/compare/v10.4.0...v10.5.0) (2017-04-07)
+
+
+### Features
+
+* **src:** move to [@types](https://github.com/types) declaration files ([ff2c637](https://github.com/staltz/xstream/commit/ff2c637)), closes [#176](https://github.com/staltz/xstream/issues/176)
+
+
+
 <a name="10.4.0"></a>
 # [10.4.0](https://github.com/staltz/xstream/compare/v10.3.0...v10.4.0) (2017-04-03)
 
@@ -73,7 +83,7 @@
 
 ### BREAKING CHANGES
 
-* src: This version of xstream can only be used with TypeScript v2.1 or higher.
+* **src:** This version of xstream can only be used with TypeScript v2.1 or higher.
 
 
 
@@ -100,11 +110,11 @@
 
 ### BREAKING CHANGES
 
-* flattenSequentially: ![maybe won't](https://img.shields.io/badge/will%20it%20affect%20me%3F-maybe%20won't-yellowgreen.svg)
+* **flattenSequentially:** ![maybe won't](https://img.shields.io/badge/will%20it%20affect%20me%3F-maybe%20won't-yellowgreen.svg)
 This is likely a breaking change for people using flattenSequentially,
 specially given that xstream core was fixed so that errors are not swallowed.
 Most flattenSequentially code should still work, but upgrade carefully anyway.
-* stream: ![maybe
+* **stream:** ![maybe
 will](https://img.shields.io/badge/will%20it%20affect%20me%3F-maybe%20will-yellow.svg)
 This changes the behavior of most xstream code because errors are no
 longer swallowed. When you update xstream to this version, you may
@@ -125,7 +135,7 @@ but only now are surfaced.
 
 ### BREAKING CHANGES
 
-* flattenSequentially: If your code was relying on buggy behavior, you may need to migrate carefully. Check your usages of
+* **flattenSequentially:** If your code was relying on buggy behavior, you may need to migrate carefully. Check your usages of
 flattenSequentially and how the outer stream completes.
 ![maybe
 won't](https://img.shields.io/badge/will%20it%20affect%20me%3F-maybe%20won't-yellowgreen.svg)
@@ -146,12 +156,12 @@ ISSUES CLOSED: #141.
 
 ### BREAKING CHANGES
 
-* map: This change will remove map+map fusions. Your application code may or
+* **map:** This change will remove map+map fusions. Your application code may or
 may not rely on the bugs that map+map fusion caused, so we advise to
 update carefully, testing your application code as you go. Generally
 this is very straightforward and safe to update, as there are no visible
 API changes.
-* MemoryStream: This is generally safe to update, but note that the behavior around
+* **MemoryStream:** This is generally safe to update, but note that the behavior around
 MemoryStream, startWith, take, imitate etc may have slightly changed, so
 it is recommended to run tests on your application and see if it is
 working, in case your application code was relying on buggy behavior.
@@ -279,7 +289,7 @@ working, in case your application code was relying on buggy behavior.
 
 ### BREAKING CHANGES
 
-* core: in this version, when a stream completes or errors, its producer has already been
+* **core:** in this version, when a stream completes or errors, its producer has already been
 stopped. In previous versions, the stream first completes, propagates the complete to other
 listeners and operators, and then its producer is stopped. You may barely notice this breaking
 change when updating your code. Most existing code will still work like before.
@@ -522,11 +532,11 @@ change when updating your code. Most existing code will still work like before.
 
 ### BREAKING CHANGES
 
-* combine: combine() now takes only streams as argument, no more project function. combine() will return an
+* **combine:** combine() now takes only streams as argument, no more project function. combine() will return an
 stream that emits arrays of the collected values from each input stream. To transform that array,
 you should now use map() operator after combine(), to take the array of collected values and return
 a combination value. See tests for examples.
-* imitate: MimicStream and xs.createMimic() were removed entirely. The imitate() method now exists on every
+* **imitate:** MimicStream and xs.createMimic() were removed entirely. The imitate() method now exists on every
 Stream instance. To use the proxy stream technique, use xs.create() to create the proxy, then call
 proxy.imitate(other).
 
@@ -583,9 +593,9 @@ proxy.imitate(other).
 
 ### BREAKING CHANGES
 
-* core: Instance operators stream.combine() and stream.merge() removed. Use
+* **core:** Instance operators stream.combine() and stream.merge() removed. Use
 xs.combine() and xs.merge() instead.
-* core: debug() now returns a MemoryStream if the input was also a MemoryStream.
+* **core:** debug() now returns a MemoryStream if the input was also a MemoryStream.
 endWhen() now returns a MemoryStream if the input was also a MemoryStream.
 fold() now returns always a MemoryStream, not Stream.
 imitate() only works on conventional Stream, will throw error on
@@ -611,12 +621,12 @@ take() now returns a MemoryStream if the input was also a MemoryStream.
 
 ### BREAKING CHANGES
 
-* extra: Usage of flattenSequentially have changed, from
+* **extra:** Usage of flattenSequentially have changed, from
 compose(flattenSequentially()) to compose(flattenSequentially) and from
 compose(pairwise()) and compose(pairwise).
-* extra: flattenConcurrently must be separately imported as an extra operator and
+* **extra:** flattenConcurrently must be separately imported as an extra operator and
 used with .compose()
-* imitate: imitate() method on Stream removed. New type introduced: MimicStream,
+* **imitate:** imitate() method on Stream removed. New type introduced: MimicStream,
 which can be created through xs.createMimic(). A MimicStream has the
 method imitate(), which has the same API as before, but imitate does not
 trigger any Stream/Producer to start.
@@ -847,7 +857,7 @@ trigger any Stream/Producer to start.
 
 ### BREAKING CHANGES
 
-* package: Import extra operators from xstream/extra/the-operator-you-want not from
+* **package:** Import extra operators from xstream/extra/the-operator-you-want not from
 xstream/lib/extra/the-operator-you-want
 
 
