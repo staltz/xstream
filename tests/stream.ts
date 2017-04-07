@@ -1,5 +1,5 @@
-/// <reference path="../typings/globals/mocha/index.d.ts" />
-/// <reference path="../typings/globals/node/index.d.ts" />
+/// <reference types="mocha"/>
+/// <reference types="node"/>
 import xs, {Producer, Listener, Stream} from '../src/index';
 import fromDiagram from '../src/extra/fromDiagram';
 import * as assert from 'assert';

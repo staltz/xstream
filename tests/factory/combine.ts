@@ -1,5 +1,5 @@
-/// <reference path="../../typings/globals/mocha/index.d.ts" />
-/// <reference path="../../typings/globals/node/index.d.ts" />
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs, {Stream} from '../../src/index';
 import * as assert from 'assert';
 
@@ -16,7 +16,7 @@ describe('xs.combine', () => {
           assert.equal(x[0], e[0]);
           assert.equal(x[1], e[1]);
         } else {
-          assert.fail('e should be defined');
+          assert.fail(undefined, e, 'e should be defined', '=');
         }
       },
       error: done,
@@ -85,7 +85,7 @@ describe('xs.combine', () => {
         if (e) {
           assert.equal(x[0], e[0]);
         } else {
-          assert.fail('e should be defined');
+          assert.fail(undefined, e, 'e should be defined', '=');
         }
       },
       error: done,

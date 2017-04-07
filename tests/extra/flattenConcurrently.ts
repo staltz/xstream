@@ -1,5 +1,5 @@
-/// <reference path="../../typings/globals/mocha/index.d.ts" />
-/// <reference path="../../typings/globals/node/index.d.ts" />
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs, {Stream, Listener} from '../../src/index';
 import flattenConcurrently from '../../src/extra/flattenConcurrently';
 import * as assert from 'assert';

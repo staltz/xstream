@@ -1,6 +1,6 @@
-/// <reference path="../../typings/globals/mocha/index.d.ts" />
-/// <reference path="../../typings/globals/node/index.d.ts" />
-import xs, {Stream} from '../../src/index';
+/// <reference types="mocha"/>
+/// <reference types="node" />
+import xs, { Stream } from '../../src/index';
 import sampleCombine from '../../src/extra/sampleCombine';
 import * as assert from 'assert';
 
@@ -17,7 +17,7 @@ describe('sampleCombine (extra)', () => {
           assert.equal(x[0], e[0]);
           assert.equal(x[1], e[1]);
         } else {
-          assert.fail('e should be defined');
+          assert.fail(undefined, e, 'e should be defined', '=');
         }
       },
       error: done,
@@ -30,13 +30,13 @@ describe('sampleCombine (extra)', () => {
 
   it('should have correct TypeScript signature', (done: any) => {
     const stream1 = xs.create<string>({
-      start: listener => {},
-      stop: () => {}
+      start: listener => { },
+      stop: () => { }
     });
 
     const stream2 = xs.create<string>({
-      start: listener => {},
-      stop: () => {}
+      start: listener => { },
+      stop: () => { }
     });
 
     const combined: Stream<[string, string]> = stream1
@@ -89,7 +89,7 @@ describe('sampleCombine (extra)', () => {
         if (e) {
           assert.equal(x[0], e[0]);
         } else {
-          assert.fail('e should be defined');
+          assert.fail(undefined, e, 'e should be defined', '=');
         }
       },
       error: done,

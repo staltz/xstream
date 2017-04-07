@@ -1,5 +1,5 @@
-/// <reference path="../../typings/globals/mocha/index.d.ts" />
-/// <reference path="../../typings/globals/node/index.d.ts" />
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import {EventEmitter} from 'events';
 import fromEvent from '../../src/extra/fromEvent';
 import * as assert from 'assert';
@@ -41,8 +41,8 @@ class FakeEventTarget implements EventTarget {
 
 class FakeEventEmitter extends EventEmitter {
   public handler: Function | undefined;
-  public event: string;
-  public removedEvent: string;
+  public event: string | symbol;
+  public removedEvent: string | symbol;
 
   constructor() {
     super();
@@ -56,13 +56,13 @@ class FakeEventEmitter extends EventEmitter {
     return true;
   }
 
-  addListener(e: string, handler: Function): FakeEventEmitter {
+  addListener(e: string, handler: Function): this {
     this.event = e;
     this.handler = handler;
     return this;
   }
 
-  removeListener(e: string, handler: Function): FakeEventEmitter {
+  removeListener(e: string, handler: Function): this {
     this.removedEvent = e;
     this.handler = void 0;
     return this;

@@ -1,5 +1,5 @@
-/// <reference path="../../typings/globals/mocha/index.d.ts" />
-/// <reference path="../../typings/globals/node/index.d.ts" />
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs, {Stream, MemoryStream, Producer} from '../../src/index';
 import * as assert from 'assert';
 
@@ -40,7 +40,7 @@ describe('Stream.prototype.replaceError', () => {
         while (events.length > 0) {
           const event = events.shift();
           if (!event) {
-            assert.fail('event should not be undefined');
+            assert.fail(undefined, event, 'event should not be undefined', '=');
           } else {
             switch (event.type) {
               case 'next': listener.next(event.value); break;
