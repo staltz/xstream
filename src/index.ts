@@ -436,9 +436,9 @@ class FromArray<T> implements InternalProducer<T> {
 class FromPromise<T> implements InternalProducer<T> {
   public type = 'fromPromise';
   public on: boolean;
-  public p: Promise<T>;
+  public p: PromiseLike<T>;
 
-  constructor(p: Promise<T>) {
+  constructor(p: PromiseLike<T>) {
     this.on = false;
     this.p = p;
   }
@@ -1335,14 +1335,14 @@ export class Stream<T> implements InternalListener<T> {
    * Creates a stream from an Array, Promise, or an Observable.
    *
    * @factory true
-   * @param {Array|Promise|Observable} input The input to make a stream from.
+   * @param {Array|PromiseLike|Observable} input The input to make a stream from.
    * @return {Stream}
    */
-  static from<T>(input: Promise<T> | Stream<T> | Array<T> | Observable<T>): Stream<T> {
+  static from<T>(input: PromiseLike<T> | Stream<T> | Array<T> | Observable<T>): Stream<T> {
     if (typeof input[$$observable] === 'function')
       return Stream.fromObservable<T>(input as Observable<T>); else
-    if (typeof (input as Promise<T>).then === 'function')
-      return Stream.fromPromise<T>(input as Promise<T>); else
+    if (typeof (input as PromiseLike<T>).then === 'function')
+      return Stream.fromPromise<T>(input as PromiseLike<T>); else
     if (Array.isArray(input))
       return Stream.fromArray<T>(input);
 
@@ -1402,10 +1402,10 @@ export class Stream<T> implements InternalListener<T> {
    * ```
    *
    * @factory true
-   * @param {Promise} promise The promise to be converted as a stream.
+   * @param {PromiseLike} promise The promise to be converted as a stream.
    * @return {Stream}
    */
-  static fromPromise<T>(promise: Promise<T>): Stream<T> {
+  static fromPromise<T>(promise: PromiseLike<T>): Stream<T> {
     return new Stream<T>(new FromPromise<T>(promise));
   }
 
