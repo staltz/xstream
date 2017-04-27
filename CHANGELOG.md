@@ -1,3 +1,13 @@
+<a name="10.6.0"></a>
+# [10.6.0](https://github.com/staltz/xstream/compare/v10.5.0...v10.6.0) (2017-04-27)
+
+
+### Features
+
+* **fromPromise:** widen support for promise types ([12da02d](https://github.com/staltz/xstream/commit/12da02d))
+
+
+
 <a name="10.5.0"></a>
 # [10.5.0](https://github.com/staltz/xstream/compare/v10.4.0...v10.5.0) (2017-04-07)
 
