@@ -305,7 +305,7 @@ Creates a stream from an Array, Promise, or an Observable.
 
 #### Arguments:
 
-- `input: Array|Promise|Observable` The input to make a stream from.
+- `input: Array|PromiseLike|Observable` The input to make a stream from.
 
 #### Returns:  Stream 
 
@@ -367,7 +367,7 @@ fromPromise( ----42 )
 
 #### Arguments:
 
-- `promise: Promise` The promise to be converted as a stream.
+- `promise: PromiseLike` The promise to be converted as a stream.
 
 #### Returns:  Stream 
 
