@@ -1,3 +1,8 @@
+<a name="10.7.0"></a>
+# [10.7.0](https://github.com/staltz/xstream/compare/v10.6.0...v10.7.0) (2017-05-02)
+
+
+
 <a name="10.6.0"></a>
 # [10.6.0](https://github.com/staltz/xstream/compare/v10.5.0...v10.6.0) (2017-04-27)
 
