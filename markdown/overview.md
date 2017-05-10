@@ -1,6 +1,6 @@
 # Overview
 
-XStream has four fundamental types: Stream, Listener, Producer, and MemoryStream.
+XStream has four fundamental types: [Stream](#stream), [Listener](#listener), [Producer](#producer), and [MemoryStream](#memorystream).
 
 ## Stream
 
