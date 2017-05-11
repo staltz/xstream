@@ -63,7 +63,7 @@ describe('buffer (extra)', () => {
 
     it('should emit when separator is completed', (done) => {
         const source = xs.periodic(20).take(5);
-        const separator = xs.empty().compose(delay(120));
+        const separator = xs.empty().compose(delay(150));
         const buffered = source.compose(buffer(separator));
         const expected = [[0, 1, 2, 3, 4]];
 
@@ -82,10 +82,10 @@ describe('buffer (extra)', () => {
     });
 
     it('should accumulate what source emits and emit when separator emits', (done) => {
-        const source = xs.periodic(50).take(10);
-        const separator = xs.periodic(170).take(3);
+        const source = xs.periodic(100).take(10);
+        const separator = xs.periodic(350).take(3);
         const buffered = source.compose(buffer(separator));
-        const expected = [[0, 1, 2], [3, 4, 5], [6, 7, 8]];
+        const expected = [[0, 1, 2], [3, 4, 5], [6, 7, 8, 9]];
 
         buffered.addListener({
             next(buff) {
