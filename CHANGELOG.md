@@ -1,3 +1,18 @@
+<a name="10.8.0"></a>
+# [10.8.0](https://github.com/staltz/xstream/compare/v10.7.0...v10.8.0) (2017-05-12)
+
+
+### Bug Fixes
+
+* **buffer:** fix semantics of buffer when source completes ([3063ae9](https://github.com/staltz/xstream/commit/3063ae9))
+
+
+### Features
+
+* **extra:** buffer operator that splits input stream into arrays by separator stream ([6df1974](https://github.com/staltz/xstream/commit/6df1974))
+
+
+
 <a name="10.7.0"></a>
 # [10.7.0](https://github.com/staltz/xstream/compare/v10.6.0...v10.7.0) (2017-05-02)
 
