@@ -1,73 +1,68 @@
-import {Operator, Stream, Subscription, InternalListener, OutSender, NO_IL} from '../index';
+import {Operator, Stream, InternalListener, OutSender, NO_IL} from '../index';
 
 class SeparatorIL<T> implements InternalListener<any>, OutSender<Array<T>> {
-    constructor(public out: Stream<Array<T>>,
-                private op: BufferOperator<T>) {
-    }
+  constructor(public out: Stream<Array<T>>, private op: BufferOperator<T>) {
+  }
 
-    _n(t: any) {
-        this.op.flush();
-    }
+  _n(t: any) {
+    this.op.flush();
+  }
 
-    _e(err: any) {
-        this.out._e(err);
-    }
+  _e(err: any) {
+    this.out._e(err);
+  }
 
-    _c() {
-        this.op.flush();
-        this.out._c();
-    }
+  _c() {
+    this.op.flush();
+    this.out._c();
+  }
 }
 
 class BufferOperator<T> implements Operator<T, Array<T>> {
+  public type = 'buffer';
+  public out: Stream<Array<T>> = null as any;
+  private sil: InternalListener<any>;
+  private acc: Array<T> = [];
 
-    public type = 'buffer';
-    public out: Stream<Array<T>> = null as any;
+  constructor(public s: Stream<any>, public ins: Stream<T>) {
+  }
 
-    private sil: InternalListener<any>;
-    private acc: Array<T> = [];
-
-    constructor(
-        public s: Stream<any>,
-        public ins: Stream<T>
-        ) {}
-
-    flush() {
-        if (this.acc.length > 0) {
-            this.out._n(this.acc);
-            this.acc = [];
-        }
+  flush() {
+    if (this.acc.length > 0) {
+      this.out._n(this.acc);
+      this.acc = [];
     }
+  }
 
-    _start(out: Stream<Array<T>>): void {
-        this.out = out;
-        this.ins._add(this);
-        this.sil = new SeparatorIL(out, this);
-        this.s._add(this.sil);
-    }
+  _start(out: Stream<Array<T>>): void {
+    this.out = out;
+    this.ins._add(this);
+    this.sil = new SeparatorIL(out, this);
+    this.s._add(this.sil);
+  }
 
-    _stop(): void {
-        this.flush();
-        this.ins._remove(this);
-        this.out = null as any;
-        this.s._remove(this.sil);
-        this.sil = NO_IL;
-    }
+  _stop(): void {
+    this.flush();
+    this.ins._remove(this);
+    this.out = null as any;
+    this.s._remove(this.sil);
+    this.sil = NO_IL;
+  }
 
-    _n(t: T) {
-        this.acc.push(t);
-    }
+  _n(t: T) {
+    this.acc.push(t);
+  }
 
-    _e(err: any) {
-        const u = this.out;
-        if (!u) return;
-        u._e(err);
-    }
+  _e(err: any) {
+    const u = this.out;
+    if (!u) return;
+    u._e(err);
+  }
 
-    _c() {
-        const out = this.out;
-        if (!out) return;
-    }
+  _c() {
+    const out = this.out;
+    if (!out) return;
+  }
 }
 
 /**
@@ -78,18 +73,8 @@ class BufferOperator<T> implements Operator<T, Array<T>> {
  *
  * ```text
  * --1--2--3--4--5--6--7--8--9|
- *  split( -a---------b---------c| )
- *          :         :         :
- * ---------[ 1       :         :
- *          , 2       :         :
- *          , 3       :         :
- *          ]---------[ 4       :
- *                    , 5       :
- *                    , 6       :
- *                    ]---------[ 7
- *                              , 8
- *                              , 9
- *                              ]|
+ * buffer( -a---------b---------c| )
+ * ---------[1,2,3]---[4,5,6]---[7,8,9]|
  * ```
  *
  * Example:
@@ -117,6 +102,8 @@ class BufferOperator<T> implements Operator<T, Array<T>> {
  * split the output stream.
  * @return {Stream}
  */
-export default function buffer<T>(s: Stream<any>): <T>(ins: Stream<T>) => Stream<Array<T>> {
-    return (ins: Stream<T>) => new Stream<Array<T>>(new BufferOperator<T>(s, ins));
+export default function buffer(s: Stream<any>): <T>(ins: Stream<T>) => Stream<Array<T>> {
+  return function bufferOperator<T>(ins: Stream<T>) {
+    return new Stream<Array<T>>(new BufferOperator<T>(s, ins));
+  };
 }
