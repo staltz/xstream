@@ -33,10 +33,11 @@ describe('buffer (extra)', () => {
     });
   });
 
-  it('should complete when separator is completed after the source', (done) => {
-    const source = xs.empty().compose(delay(10));
-    const separator = xs.empty().compose(delay(20));
+  it('should flush and complete when source is completed', (done) => {
+    const source = xs.of(1, 2).compose(delay(10));
+    const separator = xs.empty().compose(delay(50));
     const buffered = source.compose(buffer(separator));
+    const expected = [[1, 2]];
 
     let separatorComplete = false;
 
@@ -47,14 +48,15 @@ describe('buffer (extra)', () => {
     });
 
     buffered.addListener({
-      next() {
-        done('should not emit');
+      next(buff: Array<any>) {
+        assert.deepEqual(buff, expected.shift());
       },
       error(e) {
         done(`should not throw ${e}`);
       },
       complete() {
-        assert(separatorComplete);
+        assert.strictEqual(expected.length, 0);
+        assert.strictEqual(separatorComplete, false);
         done();
       }
     });

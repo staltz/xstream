@@ -62,6 +62,8 @@ class BufferOperator<T> implements Operator<T, Array<T>> {
   _c() {
     const out = this.out;
     if (!out) return;
+    this.flush();
+    out._c();
   }
 }
 
