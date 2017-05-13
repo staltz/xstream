@@ -51,32 +51,24 @@ stream.removeListener(listener)
 
 ## Producer
 
-A Producer is like a machine that produces events to be broadcast on a Stream.
-
-Events from a Stream must come from somewhere, right? That's why we need Producers. They are objects with two functions attached: `start(listener)` and `stop()`. Once you call `start` with a `listener`, the Producer will start generating events and it will send those to the listener. When you call `stop()`, the Producer should quit doing its own thing.
-
-Streams are also Listeners (actually they are "InternalListeners", not Listeners, but that's a detail you can ignore), so you can theoretically give a Stream as the listener in `producer.start(streamAsListener)`. Then, essentially the Producer is now generating events that will be broadcast on the Stream. Nice, huh? Now a bunch of listeners can be attached to the Stream and they can all get those events originally coming from the Producer. That's why `xs.create(producer)` receives a Producer to be the heart of a new Stream. Check this out:
+Events emitted by a *stream* must come from somewhere. This is where *producers* come in.  A *producer* is an object with two functions: `start(listener)` and `stop()`. These functions will be called internally, by the *stream* (see [section on that](#how-a-stream-starts-and-stops)). Once `start` is called with a `listener`, the *producer* should start generating values and providing them as `listener.next(value)`. When `stop()` is called, the Producer should stop doing that.
 
 ```js
-var producer = {
+const producer = {
   start: function (listener) {
     this.id = setInterval(() => listener.next('yo'), 1000)
   },
 
   stop: function () {
     clearInterval(this.id)
-  },
-
-  id: 0,
+  }
 }
 
-// This fellow delivers a 'yo' next event every 1 second
+// This stream emits a 'yo' next event every 1 second
 var stream = xs.create(producer)
 ```
 
-But remember, a Producer has only one listener, but a Stream may have many listeners.
-
-You may wonder "when is `start` and `stop` called", and that's actually a fairly tricky topic, so let's get back to that soon. First let me tell you about MemoryStreams.
+The `start` function of the *producer* is called when the *stream* starts. Yet, a stream can have many listeners. So, obviously, the  `listener` provided to it is not the user-provided *listener* (because there can be more than one). Instead, the `listener` provided to `start` can be regarded as a proxy, which propagates the values to all of the *listeners*.
 
 ## MemoryStream
 
