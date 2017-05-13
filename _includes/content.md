@@ -231,7 +231,7 @@ Creates a new Stream given a Producer.
 
 - `producer: Producer` An optional Producer that dictates how to start, generate events, and stop the Stream.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -243,7 +243,7 @@ Creates a new MemoryStream given a Producer.
 
 - `producer: Producer` An optional Producer that dictates how to start, generate events, and stop the Stream.
 
-#### Returns:  MemoryStream 
+#### Returns:  MemoryStream
 
 - - -
 
@@ -258,7 +258,7 @@ Marble diagram:
 -----------------------
 ```
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -274,7 +274,7 @@ empty
 -|
 ```
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -295,7 +295,7 @@ throw(X)
 
 - `error` The error event to emit on the created stream.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -307,7 +307,7 @@ Creates a stream from an Array, Promise, or an Observable.
 
 - `input: Array|PromiseLike|Observable` The input to make a stream from.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -328,7 +328,7 @@ of(1,2,3)
 - `a` The first value you want to emit as an event on the stream.
 - `b` The second value you want to emit as an event on the stream. One or more of these values may be given as arguments.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -348,7 +348,7 @@ fromArray([1,2,3])
 
 - `array: Array` The array to be converted as a stream.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -369,7 +369,7 @@ fromPromise( ----42 )
 
 - `promise: PromiseLike` The promise to be converted as a stream.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -381,7 +381,7 @@ Converts an Observable into a Stream.
 
 - `observable: any` The observable to be converted as a stream.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -401,7 +401,7 @@ Marble diagram:
 
 - `period: number` The interval in milliseconds to use as a rate of emission.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -427,7 +427,7 @@ Marble diagram:
 - `stream1: Stream` A stream to merge together with other streams.
 - `stream2: Stream` A stream to merge together with other streams. Two or more streams may be given as arguments.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -441,6 +441,14 @@ streams. When any of the input streams emits an event, that event together
 with all the other saved events are combined into an array. That array will
 be emitted on the output stream. It's essentially a way of joining together
 the events from multiple streams.
+
+Note: to minimize garbage collection, *combine* uses the same array instance for each emission.  If you need to compare emissions over time, cache the values with `map` first:
+
+```js
+xs.combine(stream1, stream2).map(
+  combinedEmissions => ([ ...combinedEmissions ])
+).compose(pairwise)...
+```
 
 Marble diagram:
 
@@ -471,7 +479,7 @@ xs.combine(stream1, stream2).map(
 - `stream1: Stream` A stream to combine together with other streams.
 - `stream2: Stream` A stream to combine together with other streams. Multiple streams, not just two, may be given as arguments.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -509,7 +517,7 @@ listener.
 
 - `listener: Listener`
 
-#### Returns:  Subscription 
+#### Returns:  Subscription
 
 - - -
 
@@ -531,7 +539,7 @@ Marble diagram:
 - `project: Function` A function of type `(t: T) => U` that takes event `t` of type `T` from the input Stream and produces an event of type `U`, to
 be emitted on the output Stream.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -552,7 +560,7 @@ Marble diagram:
 
 - `projectedValue` A value to emit on the output Stream whenever the input Stream emits any value.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -577,7 +585,7 @@ Marble diagram:
 - `passes: Function` A function of type `(t: T) +> boolean` that takes an event from the input stream and checks if it passes, by returning a
 boolean.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -598,7 +606,7 @@ Marble diagram:
 
 - `amount: number` How many events to allow from the input stream before completing the output stream.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -620,7 +628,7 @@ Marble diagram:
 
 - `amount: number` How many events to ignore from the input stream before forwarding all events from the input stream to the output stream.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -637,7 +645,7 @@ Marble diagram:
 -----------------d|
 ```
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -659,7 +667,7 @@ Marble diagram:
 
 - `initial` The value or event to prepend.
 
-#### Returns:  MemoryStream 
+#### Returns:  MemoryStream
 
 - - -
 
@@ -683,7 +691,7 @@ Marble diagram:
 
 - `other` Some other stream that is used to know when should the output stream of this operator complete.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -717,7 +725,7 @@ Marble diagram:
 input stream and produces the new accumulated value.
 - `seed` The initial accumulated value, of type `R`.
 
-#### Returns:  MemoryStream 
+#### Returns:  MemoryStream
 
 - - -
 
@@ -745,7 +753,7 @@ Marble diagram:
 stream and returns a new stream. The output stream will behave like the
 stream that this function returns.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -773,7 +781,7 @@ Marble diagram:
 -----a--b------1----2---3--
 ```
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -789,7 +797,7 @@ Instead of writing `outStream = f(inStream)` you can write
 
 - `operator: function` A function that takes a stream as input and returns a stream as well.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
@@ -799,7 +807,7 @@ Returns an output stream that behaves like the input stream, but also
 remembers the most recent event that happens on the input stream, so that a
 newly added listener will immediately receive that memorised event.
 
-#### Returns:  MemoryStream 
+#### Returns:  MemoryStream
 
 - - -
 
@@ -830,7 +838,7 @@ Marble diagram:
 - `labelOrSpy: function` A string to use as the label when printing debug information on the console, or a 'spy' function that takes an event
 as argument, and does not need to return anything.
 
-#### Returns:  Stream 
+#### Returns:  Stream
 
 - - -
 
