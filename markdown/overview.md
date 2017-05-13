@@ -4,12 +4,19 @@ XStream has four fundamental types: [Stream](#stream), [Listener](#listener), [P
 
 ## Stream
 
-A Stream is an **event emitter** with multiple Listeners. When an event happens on the
-Stream, it is broadcast to all its Listeners at the same time.
+A Stream is an *event emitter*. It can have any number of *listeners*. When an event occurs on the
+Stream, it is broadcast to all its *listeners*, synchronously and sequentially.
 
-Streams have methods attached to them called *operators*, such as `map`, `filter`, `fold`, `take`, etc. When called, an operator creates and returns another Stream. Once the first Stream broadcasts an event, the event will pass through the operator logic and the output Stream may perhaps broadcast its own event based on the source one.
+Most of the methods of Stream are *operators*. For example, `map`, `filter`, `fold`, and `take`. When called on a stream (a *source stream*), most operators
 
-You can also trigger an event to happen on a Stream with the `shamefullySend*` methods. But you don't want to do that. Really, avoid doing that because it's not the reactive way and you'll be missing the point of this library. Ok?
+1. create and return a new Stream (*output stream*) that is somehow based on the stream that they were called on.
+1. do not modify the stream that they were called on.
+
+Once the *source stream* broadcasts an event, the event will pass through the operator logic and the *output stream* might broadcast its own event based on the source one (it depends on what that specific operator does).
+
+### A note on `shamefullySend*`
+
+It is possible to trigger an event on a Stream with the `shamefullySend*` methods. But that is *not recommended*, because it would not be ’reactive’, thus missing the point of this library.
 
 ## Listener
 
