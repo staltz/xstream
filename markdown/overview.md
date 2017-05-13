@@ -13,16 +13,16 @@ You can also trigger an event to happen on a Stream with the `shamefullySend*` m
 
 ## Listener
 
-A Listener is an object with one to three functions attached to it: `next`, `error`, and `complete`. There is usually one function for each type of event a Stream may emit but only `next` is always required.
+A *listener* is an object with one to three functions attached to it: `next`, `error`, and `complete`. These correspond to the types of events emitted by a *stream*. Only `next` is required.
 
-- `next` events are the typical type, they deliver a value.
-- `error` events abort (stop) the execution of the Stream, and happen when something goes wrong in the Stream (or upstream somewhere in the chain of operators)
-- `complete` events signal the peaceful stop of the execution of the Stream.
+- `next` events are the ’typical’ type—they deliver a value.
+- `error` occurs when something goes wrong in the *stream* (or upstream somewhere in the chain of operators). They abort (stop) the execution of the *stream*.
+- `complete` events signal the peaceful stop of the execution of the *stream*.
 
-This is an example of a typical listener:
+Here is an example of a typical listener:
 
 ```js
-var listener = {
+const listener = {
   next: (value) => {
     console.log('The Stream gave me a value: ', value);
   },
@@ -35,14 +35,14 @@ var listener = {
 }
 ```
 
-And this is how you would attach that Listener to a Stream:
+And this is how you would attach that *listener* to a Stream:
 
 <!-- skip-example -->
 ```js
 stream.addListener(listener)
 ```
 
-And when you think the Listener is done, you can remove it from the Stream:
+And when you think the *listener* is done, you can remove it from the Stream:
 
 <!-- skip-example -->
 ```js
