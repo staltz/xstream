@@ -29,8 +29,8 @@
     "src/extra/delay.ts",
     "src/extra/dropRepeats.ts",
     "src/extra/dropUntil.ts",
-    "src/extra/flattenSequentially.ts",
     "src/extra/flattenConcurrently.ts",
+    "src/extra/flattenSequentially.ts",
     "src/extra/fromDiagram.ts",
     "src/extra/fromEvent.ts",
     "src/extra/pairwise.ts",
@@ -38,6 +38,9 @@
     "src/extra/split.ts",
     "src/extra/throttle.ts",
     "src/extra/tween.ts",
+    "src/factory/signature/combineSignature.ts",
+    "src/factory/signature/index.ts",
+    "src/factory/signature/mergeSignature.ts",
     "src/index.ts"
   ],
   "filesGlob": [
