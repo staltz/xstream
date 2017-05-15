@@ -37,6 +37,7 @@
     "src/extra/split.ts",
     "src/extra/throttle.ts",
     "src/extra/tween.ts",
+    "src/extra/uniqueBy.ts",
     "src/index.ts"
   ],
   "filesGlob": [
