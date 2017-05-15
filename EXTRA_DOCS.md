@@ -16,7 +16,7 @@
 - [`split`](#split) (operator)
 - [`throttle`](#throttle) (operator)
 - [`tween`](#tween) (factory)
-
+- [`uniqueBy`](#uniqueBy) (operator)
 # How to use extras
 
 The following are standalone stream operators and stream factories that may be separately imported and utilized in your project.
@@ -796,3 +796,41 @@ linear), `interval: number` (optional, defaults to 15).
 
 - - -
 
+### <a id="uniqueBy"></a> `uniqueBy(serialize)`
+
+Emits only unique items with uniqueness determined by a passed function
+
+Marble diagram:
+
+```text
+--{id: 1}--{id: 2}--{id: 3}--{id: 4}--{id: 3}--{id: 2}--{id: 1}--{id: 5}|
+ uniqueBy(o => o.id)
+--{id: 1}--{id: 2}--{id: 3}--{id: 4}-----------------------------{id: 5}|
+```
+
+Example:
+
+```js
+import uniqueBy from 'xstream/extra/uniqueBy';
+
+const head = (a) => a[0];
+const source = xs.of([1], [2], [3], [4], [3], [2], [1], [5]);
+const result = source.compose(uniqueBy(head));
+
+result.addListener({
+  next: a => console.log(a),
+  error: err => console.error(err),
+  complete: () => console.log('completed')
+});
+```
+
+Result:
+
+```text
+[1]
+[2]
+[3]
+[4]
+[5]
+completed
+```
