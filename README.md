@@ -108,7 +108,7 @@ var xs = require('xstream').default
 
 ## Extra factories and operators
 
-To keep the core of XStream small and simple, less frequently-used methods are available under the `xstream/extra` directory, and must be imported separately. See [EXTRA_DOCS](https://github.com/staltz/xstream/blob/master/EXTRA_DOCS.md) for documentation.
+To keep the core of xstream small and simple, less frequently-used methods are available under the `xstream/extra` directory, and must be imported separately. See [EXTRA_DOCS](https://github.com/staltz/xstream/blob/master/EXTRA_DOCS.md) for documentation.
 
 # Overview
 
@@ -977,10 +977,6 @@ this one if you know what you're doing.
 - `listener: Listener\<T>`
 
 - - -
-
-# Extra operators and factories
-
-The operators and factories listed above are the core functions. `xstream` has plenty of extra operators, [documented here](https://github.com/staltz/xstream/blob/master/EXTRA_DOCS.md).
 
 # FAQ
 
