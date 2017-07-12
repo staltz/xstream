@@ -90,8 +90,8 @@ class ThrottleOperator<T> implements Operator<T, T> {
  * @param {number} period The amount of silence required in milliseconds.
  * @return {Stream}
  */
-export default function throttle(period: number): <T>(ins: Stream<T>) => Stream<T> {
-  return function throttleOperator<T>(ins: Stream<T>) {
+export default function throttle<T>(period: number): (ins: Stream<T>) => Stream<T> {
+  return function throttleOperator(ins: Stream<T>) {
     return new Stream<T>(new ThrottleOperator(period, ins));
   };
 }

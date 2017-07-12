@@ -110,8 +110,8 @@ export class DropUntilOperator<T> implements Operator<T, T> {
  * output stream of this operator start emitting.
  * @return {Stream}
  */
-export default function dropUntil(other: Stream<any>): <T>(ins: Stream<T>) => Stream<T> {
-  return function dropUntilOperator<T>(ins: Stream<T>): Stream<T> {
+export default function dropUntil<T>(other: Stream<any>): (ins: Stream<T>) => Stream<T> {
+  return function dropUntilOperator(ins: Stream<T>): Stream<T> {
     return new Stream<T>(new DropUntilOperator(other, ins));
   };
 }
