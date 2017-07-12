@@ -2,6 +2,7 @@
 
 ## Extras
 
+- [`buffer`](#buffer) (operator)
 - [`concat`](#concat) (factory)
 - [`debounce`](#debounce) (operator)
 - [`delay`](#delay) (operator)
@@ -37,6 +38,48 @@ import fromEvent from 'xstream/extra/fromEvent'
 
 const clickStream = fromEvent(document, 'click')
 ```
+
+- - -
+
+### <a id="buffer"></a> `buffer(separator)`
+
+Buffers a stream using a separator stream. Returns a stream that emits
+arrays.
+
+Marble diagram:
+
+```text
+--1--2--3--4--5--6--7--8--9|
+buffer( -a---------b---------c| )
+---------[1,2,3]---[4,5,6]---[7,8,9]|
+```
+
+Example:
+
+```js
+import buffer from 'xstream/extra/buffer'
+
+const source = xs.periodic(50).take(10);
+const separator = xs.periodic(170).take(3);
+const buffered = source.compose(buffer(separator));
+
+buffered.addListener({
+  next: arr => console.log(arr),
+  error: err => console.error(err)
+});
+```
+
+```text
+> [0, 1, 2]
+> [3, 4, 5]
+> [6, 7, 8]
+```
+
+#### Arguments:
+
+- `separator: Stream` Some other stream that is used to know when to split the output stream.
+
+#### Returns:  Stream 
 
 - - -
 

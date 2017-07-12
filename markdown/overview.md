@@ -1,3 +1,7 @@
+## Extra factories and operators
+
+To keep the core of xstream small and simple, less frequently-used methods are available under the `xstream/extra` directory, and must be imported separately. See [EXTRA_DOCS](https://github.com/staltz/xstream/blob/master/EXTRA_DOCS.md) for documentation.
+
 # Overview
 
 XStream has four fundamental types: [Stream](#stream), [Listener](#listener), [Producer](#producer), and [MemoryStream](#memorystream).

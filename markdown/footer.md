@@ -1,7 +1,3 @@
-# Extra operators and factories
-
-The operators and factories listed above are the core functions. `xstream` has plenty of extra operators, [documented here](https://github.com/staltz/xstream/blob/master/EXTRA_DOCS.md).
-
 # FAQ
 
 **Q: Why does `imitate()` support a Stream but not a MemoryStream?**

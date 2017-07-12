@@ -819,7 +819,7 @@ newly added listener will immediately receive that memorised event.
 ### <a id="debug"></a> `debug(labelOrSpy)`
 
 Returns an output stream that identically behaves like the input stream,
-but also runs a `spy` function fo each event, to help you debug your app.
+but also runs a `spy` function for each event, to help you debug your app.
 
 *debug* takes a `spy` function as argument, and runs that for each event
 happening on the input stream. If you don't provide the `spy` argument,
