@@ -104,8 +104,8 @@ class BufferOperator<T> implements Operator<T, Array<T>> {
  * split the output stream.
  * @return {Stream}
  */
-export default function buffer(s: Stream<any>): <T>(ins: Stream<T>) => Stream<Array<T>> {
-  return function bufferOperator<T>(ins: Stream<T>) {
+export default function buffer<T>(s: Stream<any>): (ins: Stream<T>) => Stream<Array<T>> {
+  return function bufferOperator(ins: Stream<T>) {
     return new Stream<Array<T>>(new BufferOperator<T>(s, ins));
   };
 }

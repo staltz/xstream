@@ -128,8 +128,8 @@ export class SplitOperator<T> implements Operator<T, Stream<T>> {
  * split the output stream.
  * @return {Stream}
  */
-export default function split(separator: Stream<any>): <T>(ins: Stream<T>) => Stream<Stream<T>> {
-  return function splitOperator<T>(ins: Stream<T>): Stream<Stream<T>> {
+export default function split<T>(separator: Stream<any>): (ins: Stream<T>) => Stream<Stream<T>> {
+  return function splitOperator(ins: Stream<T>): Stream<Stream<T>> {
     return new Stream<Stream<T>>(new SplitOperator(separator, ins));
   };
 }

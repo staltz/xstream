@@ -90,8 +90,8 @@ class DebounceOperator<T> implements Operator<T, T> {
  * @param {number} period The amount of silence required in milliseconds.
  * @return {Stream}
  */
-export default function debounce(period: number): <T>(ins: Stream<T>) => Stream<T> {
-  return function debounceOperator<T>(ins: Stream<T>) {
+export default function debounce<T>(period: number): (ins: Stream<T>) => Stream<T> {
+  return function debounceOperator(ins: Stream<T>) {
     return new Stream<T>(new DebounceOperator(period, ins));
   };
 }
