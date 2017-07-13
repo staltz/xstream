@@ -1794,7 +1794,7 @@ export class Stream<T> implements InternalListener<T> {
    * returns a stream as well.
    * @return {Stream}
    */
-  compose<U>(operator: (stream: Stream<T>) => Stream<U>): Stream<U> {
+  compose<U>(operator: (stream: Stream<T>) => U): U {
     return operator(this);
   }
 
