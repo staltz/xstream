@@ -1,3 +1,13 @@
+<a name="10.9.0"></a>
+# [10.9.0](https://github.com/staltz/xstream/compare/v10.8.0...v10.9.0) (2017-07-13)
+
+
+### Features
+
+* **compose:** support any return value for compose method ([330aaba](https://github.com/staltz/xstream/commit/330aaba))
+
+
+
 <a name="10.8.0"></a>
 # [10.8.0](https://github.com/staltz/xstream/compare/v10.7.0...v10.8.0) (2017-05-12)
 
