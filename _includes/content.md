@@ -97,6 +97,10 @@ var xs = require('xstream').default
 - [`shamefullySendComplete`](#shamefullySendComplete)
 - [`setDebugListener`](#setDebugListener)
 
+## Extra factories and operators
+
+To keep the core of xstream small and simple, less frequently-used methods are available under the `xstream/extra` directory, and must be imported separately. See [EXTRA_DOCS](https://github.com/staltz/xstream/blob/master/EXTRA_DOCS.md) for documentation.
+
 # Overview
 
 XStream has four fundamental types: [Stream](#stream), [Listener](#listener), [Producer](#producer), and [MemoryStream](#memorystream).
@@ -806,7 +810,7 @@ newly added listener will immediately receive that memorised event.
 ### <a id="debug"></a> `debug(labelOrSpy)`
 
 Returns an output stream that identically behaves like the input stream,
-but also runs a `spy` function fo each event, to help you debug your app.
+but also runs a `spy` function for each event, to help you debug your app.
 
 *debug* takes a `spy` function as argument, and runs that for each event
 happening on the input stream. If you don't provide the `spy` argument,
@@ -964,10 +968,6 @@ this one if you know what you're doing.
 - `listener: Listener\<T>`
 
 - - -
-
-# Extra operators and factories
-
-The operators and factories listed above are the core functions. `xstream` has plenty of extra operators, [documented here](https://github.com/staltz/xstream/blob/master/EXTRA_DOCS.md).
 
 # FAQ
 
