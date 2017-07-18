@@ -64,6 +64,12 @@ describe('dropRepeats (extra)', () => {
     });
   });
 
+  it('should return the correct TypeScript types', (done: any) => {
+    const first: Stream<Event> = xs.never();
+    const second: Stream<Event> = first.compose(dropRepeats((x, y) => false));
+    done();
+  });
+
   it('should support dropping duplicates of combine arrays', (done: any) => {
     const A: Stream<string> = fromDiagram('---a---b------b------|');
     const B: Stream<string> = fromDiagram('-x---y---y------z--y-|');
