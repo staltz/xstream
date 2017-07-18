@@ -85,8 +85,8 @@ class DelayOperator<T> implements Operator<T, T> {
  * @param {number} period The amount of silence required in milliseconds.
  * @return {Stream}
  */
-export default function delay(period: number): <T>(ins: Stream<T>) => Stream<T> {
-  return function delayOperator<T>(ins: Stream<T>): Stream<T> {
+export default function delay<T>(period: number): (ins: Stream<T>) => Stream<T> {
+  return function delayOperator(ins: Stream<T>): Stream<T> {
     return new Stream<T>(new DelayOperator(period, ins));
   };
 }
