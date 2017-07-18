@@ -1576,7 +1576,7 @@ export class Stream<T> implements InternalListener<T> {
    * ------2--------4---------6----8--
    * ```
    *
-   * @param {Function} passes A function of type `(t: T) +> boolean` that takes
+   * @param {Function} passes A function of type `(t: T) => boolean` that takes
    * an event from the input stream and checks if it passes, by returning a
    * boolean.
    * @return {Stream}
