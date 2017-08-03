@@ -27,6 +27,27 @@ describe('xs.combine', () => {
     });
   });
 
+  it('should return new Array not reusing instance for each emission', (done: any) => {
+    const stream1 = xs.periodic(100).take(2);
+    const stream2 = xs.periodic(120).take(2);
+    const stream = xs.combine(stream1, stream2);
+    let expected = [0,0];
+    let last: any = undefined;
+    stream.addListener({
+      next: (x) => {
+        if (!last) last = x;
+        else assert.notStrictEqual(x, last, 'are same instance')
+      },
+      error: done,
+      complete: () => {
+        assert.notStrictEqual(last, undefined, 'must be 1st Array ([0,0])');
+        assert.equal(last[0],expected[0]);
+        assert.equal(last[1],expected[1]);
+        done();
+      },
+    });
+  });
+
   it('should have correct TypeScript signature', (done: any) => {
     const stream1 = xs.create<string>({
       start: listener => {},

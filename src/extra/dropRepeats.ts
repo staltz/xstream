@@ -4,10 +4,12 @@ const empty = {};
 export class DropRepeatsOperator<T> implements Operator<T, T> {
   public type = 'dropRepeats';
   public out: Stream<T> = null as any;
+  public isEq: (x: T, y: T) => boolean;
   private v: T = <any> empty;
 
   constructor(public ins: Stream<T>,
-              public fn: ((x: T, y: T) => boolean) | undefined) {
+              fn: ((x: T, y: T) => boolean) | undefined) {
+    this.isEq = typeof fn === 'function' ? fn : (x, y) => x === y;
   }
 
   _start(out: Stream<T>): void {
@@ -19,10 +21,6 @@ export class DropRepeatsOperator<T> implements Operator<T, T> {
     this.ins._remove(this);
     this.out = null as any;
     this.v = empty as any;
-  }
-
-  isEq(x: T, y: T) {
-    return this.fn ? this.fn(x, y) : x === y;
   }
 
   _n(t: T) {
