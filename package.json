@@ -58,7 +58,7 @@
     "conventional-changelog-cli": "1.2.x",
     "cz-conventional-changelog": "1.2.x",
     "es6-promise": "4.0.5",
-    "google-closure-compiler-js": "^20161201.0.0",
+    "google-closure-compiler-js": "^20170910.0.0",
     "markdown-doctest": "0.9.1",
     "markdox": "0.1.10",
     "mkdirp": "0.5.1",
@@ -66,10 +66,10 @@
     "most": "1.0.3",
     "sinon": "1.16.0",
     "strip-comments": "0.4.4",
-    "ts-node": "3.2.x",
+    "ts-node": "3.3.x",
     "tsify": "3.0.x",
-    "tslint": "4.0.2",
-    "typescript": "2.4.1",
+    "tslint": "5.7.0",
+    "typescript": "2.5.2",
     "validate-commit-msg": "2.4.x"
   },
   "publishConfig": {

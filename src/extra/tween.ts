@@ -42,7 +42,7 @@ function createEasing(fn: NumericFunction): Easings {
       return interpolate(y, from, to);
     }
   };
-};
+}
 
 let easingPower2 = createEasing(x => x * x);
 let easingPower3 = createEasing(x => x * x * x);
