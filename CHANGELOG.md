@@ -1,3 +1,28 @@
+<a name="11.0.0"></a>
+# [11.0.0](https://github.com/staltz/xstream/compare/v10.9.0...v11.0.0) (2017-09-27)
+
+
+### Bug Fixes
+
+* **delay:** simplify delay (extra operator) generics ([a78ed05](https://github.com/staltz/xstream/commit/a78ed05))
+* **extra:** Simplify extra operator generics ([20e2cc3](https://github.com/staltz/xstream/commit/20e2cc3)), closes [#202](https://github.com/staltz/xstream/issues/202)
+* **package:** update TypeScript to v2.5 ([7bd9d3b](https://github.com/staltz/xstream/commit/7bd9d3b))
+* **types:** update TypeScript to v2.4.x ([65c70b8](https://github.com/staltz/xstream/commit/65c70b8))
+
+
+### Performance Improvements
+
+* **dropRepeats:** set equality function only once ([4bbe9a4](https://github.com/staltz/xstream/commit/4bbe9a4))
+
+
+### BREAKING CHANGES
+
+* **types:** if you use TypeScript, update carefully since TypeScript v2.4 is used in this
+version of xstream which might not support TypeScript v2.3 or lower. If you use JavaScript, there
+are zero breaking changes.
+
+
+
 <a name="10.9.0"></a>
 # [10.9.0](https://github.com/staltz/xstream/compare/v10.8.0...v10.9.0) (2017-07-13)
 

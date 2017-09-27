@@ -572,7 +572,7 @@ Marble diagram:
 
 #### Arguments:
 
-- `passes: Function` A function of type `(t: T) +> boolean` that takes an event from the input stream and checks if it passes, by returning a
+- `passes: Function` A function of type `(t: T) => boolean` that takes an event from the input stream and checks if it passes, by returning a
 boolean.
 
 #### Returns:  Stream 

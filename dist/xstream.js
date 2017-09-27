@@ -1,10 +1,16 @@
 (function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.xstream = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var symbol_observable_1 = require("symbol-observable");
 var NO = {};
 exports.NO = NO;
@@ -46,7 +52,7 @@ function internalizeProducer(producer) {
     };
     producer._stop = producer.stop;
 }
-var StreamSub = (function () {
+var StreamSub =  (function () {
     function StreamSub(_stream, _listener) {
         this._stream = _stream;
         this._listener = _listener;
@@ -56,7 +62,7 @@ var StreamSub = (function () {
     };
     return StreamSub;
 }());
-var Observer = (function () {
+var Observer =  (function () {
     function Observer(_listener) {
         this._listener = _listener;
     }
@@ -71,7 +77,7 @@ var Observer = (function () {
     };
     return Observer;
 }());
-var FromObservable = (function () {
+var FromObservable =  (function () {
     function FromObservable(observable) {
         this.type = 'fromObservable';
         this.ins = observable;
@@ -91,7 +97,7 @@ var FromObservable = (function () {
     };
     return FromObservable;
 }());
-var Merge = (function () {
+var Merge =  (function () {
     function Merge(insArr) {
         this.type = 'merge';
         this.insArr = insArr;
@@ -135,7 +141,7 @@ var Merge = (function () {
     };
     return Merge;
 }());
-var CombineListener = (function () {
+var CombineListener =  (function () {
     function CombineListener(i, out, p) {
         this.i = i;
         this.out = out;
@@ -170,7 +176,7 @@ var CombineListener = (function () {
     };
     return CombineListener;
 }());
-var Combine = (function () {
+var Combine =  (function () {
     function Combine(insArr) {
         this.type = 'combine';
         this.insArr = insArr;
@@ -213,7 +219,7 @@ var Combine = (function () {
     };
     return Combine;
 }());
-var FromArray = (function () {
+var FromArray =  (function () {
     function FromArray(a) {
         this.type = 'fromArray';
         this.a = a;
@@ -228,7 +234,7 @@ var FromArray = (function () {
     };
     return FromArray;
 }());
-var FromPromise = (function () {
+var FromPromise =  (function () {
     function FromPromise(p) {
         this.type = 'fromPromise';
         this.on = false;
@@ -253,7 +259,7 @@ var FromPromise = (function () {
     };
     return FromPromise;
 }());
-var Periodic = (function () {
+var Periodic =  (function () {
     function Periodic(period) {
         this.type = 'periodic';
         this.period = period;
@@ -273,7 +279,7 @@ var Periodic = (function () {
     };
     return Periodic;
 }());
-var Debug = (function () {
+var Debug =  (function () {
     function Debug(ins, arg) {
         this.type = 'debug';
         this.ins = ins;
@@ -326,7 +332,7 @@ var Debug = (function () {
     };
     return Debug;
 }());
-var Drop = (function () {
+var Drop =  (function () {
     function Drop(max, ins) {
         this.type = 'drop';
         this.ins = ins;
@@ -364,7 +370,7 @@ var Drop = (function () {
     };
     return Drop;
 }());
-var EndWhenListener = (function () {
+var EndWhenListener =  (function () {
     function EndWhenListener(out, op) {
         this.out = out;
         this.op = op;
@@ -380,7 +386,7 @@ var EndWhenListener = (function () {
     };
     return EndWhenListener;
 }());
-var EndWhen = (function () {
+var EndWhen =  (function () {
     function EndWhen(o, ins) {
         this.type = 'endWhen';
         this.ins = ins;
@@ -422,7 +428,7 @@ var EndWhen = (function () {
     };
     return EndWhen;
 }());
-var Filter = (function () {
+var Filter =  (function () {
     function Filter(passes, ins) {
         this.type = 'filter';
         this.ins = ins;
@@ -460,7 +466,7 @@ var Filter = (function () {
     };
     return Filter;
 }());
-var FlattenListener = (function () {
+var FlattenListener =  (function () {
     function FlattenListener(out, op) {
         this.out = out;
         this.op = op;
@@ -477,7 +483,7 @@ var FlattenListener = (function () {
     };
     return FlattenListener;
 }());
-var Flatten = (function () {
+var Flatten =  (function () {
     function Flatten(ins) {
         this.type = 'flatten';
         this.ins = ins;
@@ -530,7 +536,7 @@ var Flatten = (function () {
     };
     return Flatten;
 }());
-var Fold = (function () {
+var Fold =  (function () {
     function Fold(f, seed, ins) {
         var _this = this;
         this.type = 'fold';
@@ -573,7 +579,7 @@ var Fold = (function () {
     };
     return Fold;
 }());
-var Last = (function () {
+var Last =  (function () {
     function Last(ins) {
         this.type = 'last';
         this.ins = ins;
@@ -614,7 +620,7 @@ var Last = (function () {
     };
     return Last;
 }());
-var MapOp = (function () {
+var MapOp =  (function () {
     function MapOp(project, ins) {
         this.type = 'map';
         this.ins = ins;
@@ -652,7 +658,7 @@ var MapOp = (function () {
     };
     return MapOp;
 }());
-var Remember = (function () {
+var Remember =  (function () {
     function Remember(ins) {
         this.type = 'remember';
         this.ins = ins;
@@ -668,7 +674,7 @@ var Remember = (function () {
     };
     return Remember;
 }());
-var ReplaceError = (function () {
+var ReplaceError =  (function () {
     function ReplaceError(replacer, ins) {
         this.type = 'replaceError';
         this.ins = ins;
@@ -709,7 +715,7 @@ var ReplaceError = (function () {
     };
     return ReplaceError;
 }());
-var StartWith = (function () {
+var StartWith =  (function () {
     function StartWith(ins, val) {
         this.type = 'startWith';
         this.ins = ins;
@@ -727,7 +733,7 @@ var StartWith = (function () {
     };
     return StartWith;
 }());
-var Take = (function () {
+var Take =  (function () {
     function Take(max, ins) {
         this.type = 'take';
         this.ins = ins;
@@ -773,7 +779,7 @@ var Take = (function () {
     };
     return Take;
 }());
-var Stream = (function () {
+var Stream =  (function () {
     function Stream(producer) {
         this._prod = producer || NO;
         this._ils = [];
@@ -1110,26 +1116,26 @@ var Stream = (function () {
             this._dl = listener;
         }
     };
+    
+    Stream.merge = function merge() {
+        var streams = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            streams[_i] = arguments[_i];
+        }
+        return new Stream(new Merge(streams));
+    };
+    
+    Stream.combine = function combine() {
+        var streams = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            streams[_i] = arguments[_i];
+        }
+        return new Stream(new Combine(streams));
+    };
     return Stream;
 }());
-
-Stream.merge = function merge() {
-    var streams = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        streams[_i] = arguments[_i];
-    }
-    return new Stream(new Merge(streams));
-};
-
-Stream.combine = function combine() {
-    var streams = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-        streams[_i] = arguments[_i];
-    }
-    return new Stream(new Combine(streams));
-};
 exports.Stream = Stream;
-var MemoryStream = (function (_super) {
+var MemoryStream =  (function (_super) {
     __extends(MemoryStream, _super);
     function MemoryStream(producer) {
         var _this = _super.call(this, producer) || this;
@@ -1198,7 +1204,6 @@ var MemoryStream = (function (_super) {
     return MemoryStream;
 }(Stream));
 exports.MemoryStream = MemoryStream;
-Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Stream;
 
 },{"symbol-observable":2}],2:[function(require,module,exports){
