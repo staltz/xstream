@@ -3,6 +3,8 @@ var eventsModule = require('events');
 
 function noop () {}
 
+console.warn = noop;
+
 class FakeEventTarget {
   constructor() {}
 
@@ -54,7 +56,8 @@ module.exports = {
     setInterval: noop,
     console: {
       log: noop,
-      error: noop
+      error: noop,
+      warn: noop
     },
     document: new FakeEventTarget(),
     listener: {

@@ -7,6 +7,7 @@ class ThrottleOperator<T> implements Operator<T, T> {
 
   constructor(public dt: number,
               public ins: Stream<T>) {
+    console.warn('All time based operators have been deprecated, please migrate to @cycle/time');
   }
 
   _start(out: Stream<T>): void {

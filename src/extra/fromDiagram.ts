@@ -26,6 +26,8 @@ export class DiagramProducer implements InternalProducer<any> {
     this.timeUnit = (opt && opt.timeUnit) ? opt.timeUnit : 20;
     this.values = (opt && opt.values) ? opt.values : {};
     this.tasks = [];
+
+    console.warn('All time based operators have been deprecated, please migrate to @cycle/time');
   }
 
   _start(out: InternalListener<any>) {

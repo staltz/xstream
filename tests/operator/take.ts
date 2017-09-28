@@ -1,11 +1,14 @@
 /// <reference types="mocha"/>
 /// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
+
+console.warn = () => {};
 
 describe('Stream.prototype.take', () => {
   it('should allow specifying max amount to take from input stream', (done: any) => {
-    const stream = xs.periodic(50).take(4);
+    const stream = periodic(50).take(4);
     const expected = [0, 1, 2, 3];
     let listener = {
       next: (x: number) => {
@@ -38,7 +41,7 @@ describe('Stream.prototype.take', () => {
   });
 
   it('should not break sibling listeners when TakeOperator tears down', (done: any) => {
-    const source = xs.periodic(50);
+    const source = periodic(50);
     const streamA = source.take(3);
     const streamB = source.take(6);
     const expectedA = [0, 1, 2];
@@ -67,7 +70,7 @@ describe('Stream.prototype.take', () => {
   });
 
   it('should just complete if given max=0', (done: any) => {
-    const stream = xs.periodic(50).take(0);
+    const stream = periodic(50).take(0);
 
     stream.addListener({
       next: (x: number) => {

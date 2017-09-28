@@ -1,11 +1,14 @@
 /// <reference types="mocha"/>
 /// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
+
+console.warn = () => {};
 
 describe('Stream.prototype.mapTo', () => {
   it('should transform events to a constant value', (done: any) => {
-    const stream = xs.periodic(100).mapTo(10);
+    const stream = periodic(100).mapTo(10);
     const expected = [10, 10, 10];
     let listener = {
       next: (x: number) => {
@@ -38,7 +41,7 @@ describe('Stream.prototype.mapTo', () => {
   });
 
   it('should have \'type\' metadata on the operator producer', (done: any) => {
-    const stream = xs.periodic(100).mapTo(10);
+    const stream = periodic(100).mapTo(10);
     assert.strictEqual(stream['_prod']['type'], 'mapTo');
     done();
   });
