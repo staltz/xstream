@@ -2,7 +2,10 @@
 /// <reference types="node" />
 import xs, {Stream, Listener} from '../../src/index';
 import fromDiagram from '../../src/extra/fromDiagram';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
+
+console.warn = () => {};
 
 describe('Stream.prototype.flatten', () => {
   describe('with map+debug to break the fusion', () => {
@@ -32,7 +35,7 @@ describe('Stream.prototype.flatten', () => {
 
   describe('with map', () => {
     it('should expand each periodic event with 3 sync events', (done: any) => {
-      const source: Stream<Stream<number>> = xs.periodic(100).take(3)
+      const source: Stream<Stream<number>> = periodic(100).take(3)
         .map((i: number) => xs.of(1 + i, 2 + i, 3 + i));
       const stream = source.flatten();
       const expected = [1, 2, 3, 2, 3, 4, 3, 4, 5];
@@ -67,7 +70,7 @@ describe('Stream.prototype.flatten', () => {
 
     it('should expand 3 sync events as a periodic, only last one passes', (done: any) => {
       const stream = xs.fromArray([1, 2, 3])
-        .map(i => xs.periodic(100 * i).take(2).map(x => `${i}${x}`))
+        .map(i => periodic(100 * i).take(2).map(x => `${i}${x}`))
         .flatten();
       // ---x---x---x---x---x---x
       // ---10--11
@@ -88,9 +91,9 @@ describe('Stream.prototype.flatten', () => {
     });
 
     it('should expand 3 async events as a periodic each', (done: any) => {
-      const stream = xs.periodic(140).take(3)
+      const stream = periodic(140).take(3)
         .map(i =>
-          xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
+          periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
         )
         .flatten();
       // ---x---x---x---x---x---x---x---x---x---x---x---x
@@ -112,9 +115,9 @@ describe('Stream.prototype.flatten', () => {
     });
 
     it('should expand 3 async events as a periodic each, no optimization', (done: any) => {
-      const stream = xs.periodic(140).take(3)
+      const stream = periodic(140).take(3)
         .map(i =>
-          xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
+          periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
         )
         .filter(() => true) // breaks the optimization map+flattenConcurrently
         .flatten();
@@ -138,7 +141,7 @@ describe('Stream.prototype.flatten', () => {
     });
 
     it('should propagate user mistakes in project as errors', (done: any) => {
-      const source = xs.periodic(30).take(1);
+      const source = periodic(30).take(1);
       const stream = source.map(
         x => {
           const y = (<string> <any> x).toLowerCase();
@@ -159,8 +162,8 @@ describe('Stream.prototype.flatten', () => {
     });
 
     it('should not leak when used in a withLatestFrom-like case', (done: any) => {
-      const a$ = xs.periodic(100);
-      const b$ = xs.periodic(220);
+      const a$ = periodic(100);
+      const b$ = periodic(220);
 
       let innerAEmissions = 0;
 
@@ -258,8 +261,8 @@ describe('Stream.prototype.flatten', () => {
     });
 
     it('should not run multiple executions of the inner', (done: any) => {
-      const inner = xs.periodic(350).take(2).map(i => i * 100);
-      const outer = xs.periodic(200).take(4);
+      const inner = periodic(350).take(2).map(i => i * 100);
+      const outer = periodic(200).take(4);
       const stream = outer.map(() => inner).flatten();
 
       const expected = [0, 100];
@@ -281,14 +284,14 @@ describe('Stream.prototype.flatten', () => {
       let predicateCallCount = 0;
       let projectCallCount = 0;
 
-      const stream = xs.periodic(140).take(3)
+      const stream = periodic(140).take(3)
         .filter(i => {
           predicateCallCount += 1;
           return i % 2 === 0;
         })
         .map(i => {
           projectCallCount += 1;
-          return xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`);
+          return periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`);
         })
         .flatten();
       // ---x---x---x---x---x---x---x---x---x---x---x---x

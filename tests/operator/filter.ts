@@ -1,11 +1,14 @@
 /// <reference types="mocha"/>
 /// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
+
+console.warn = () => {};
 
 describe('Stream.prototype.filter', () => {
   it('should filter in only even numbers from an input stream', (done: any) => {
-    const stream = xs.periodic(50).filter(i => i % 2 === 0);
+    const stream = periodic(50).filter(i => i % 2 === 0);
     const expected = [0, 2, 4, 6];
     let listener = {
       next: (x: number) => {
@@ -22,7 +25,7 @@ describe('Stream.prototype.filter', () => {
   });
 
   it('should propagate user mistakes in predicate as errors', (done: any) => {
-    const source = xs.periodic(30).take(1);
+    const source = periodic(30).take(1);
     const stream = source.filter(
       x => (<string> <any> x).toLowerCase() === 'a'
     );

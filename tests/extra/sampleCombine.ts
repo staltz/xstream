@@ -2,12 +2,15 @@
 /// <reference types="node" />
 import xs, { Stream } from '../../src/index';
 import sampleCombine from '../../src/extra/sampleCombine';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
+
+console.warn = () => {};
 
 describe('sampleCombine (extra)', () => {
   it('should combine AND-style two streams together', (done: any) => {
-    const stream1 = xs.periodic(100).take(3).startWith(-1);
-    const stream2 = xs.periodic(99).take(3);
+    const stream1 = periodic(100).take(3).startWith(-1);
+    const stream2 = periodic(99).take(3);
     const stream = stream1.compose(sampleCombine(stream2));
     let expected = [[0, 0], [1, 1], [2, 2]];
     stream.addListener({
@@ -45,8 +48,8 @@ describe('sampleCombine (extra)', () => {
   });
 
   it('should complete only when the sample stream has completed', (done: any) => {
-    const stream1 = xs.periodic(100).take(4);
-    const stream2 = xs.periodic(99).take(1);
+    const stream1 = periodic(100).take(4);
+    const stream2 = periodic(99).take(1);
     const stream = stream1.compose(sampleCombine(stream2)).map(arr => arr.join(''));
     let expected = ['00', '10', '20', '30'];
     stream.addListener({
@@ -62,8 +65,8 @@ describe('sampleCombine (extra)', () => {
   });
 
   it('should not pick values from sampled streams before they have emitted', (done: any) => {
-    const stream1 = xs.periodic(100).take(4);
-    const stream2 = xs.periodic(150).take(1);
+    const stream1 = periodic(100).take(4);
+    const stream2 = periodic(150).take(1);
     const stream = stream1.compose(sampleCombine(stream2)).map(arr => arr.join(''));
     let expected = ['10', '20', '30'];
     stream.addListener({
@@ -79,7 +82,7 @@ describe('sampleCombine (extra)', () => {
   });
 
   it('should just wrap the value if combining one stream', (done: any) => {
-    const source = xs.periodic(100).take(3);
+    const source = periodic(100).take(3);
     const stream = source.compose(sampleCombine());
     let expected = [[0], [1], [2]];
 
@@ -158,16 +161,16 @@ describe('sampleCombine (extra)', () => {
   });
 
   it('should return a Stream when combining a MemoryStream with a Stream', (done: any) => {
-    const input1 = xs.periodic(80).take(4).remember();
-    const input2 = xs.periodic(50).take(3);
+    const input1 = periodic(80).take(4).remember();
+    const input2 = periodic(50).take(3);
     const stream: Stream<[number, number]> = input1.compose(sampleCombine(input2));
     assert.strictEqual(stream instanceof Stream, true);
     done();
   });
 
   it('should return a Stream when combining a MemoryStream with a MemoryStream', (done: any) => {
-    const input1 = xs.periodic(80).take(4).remember();
-    const input2 = xs.periodic(50).take(3).remember();
+    const input1 = periodic(80).take(4).remember();
+    const input2 = periodic(50).take(3).remember();
     const stream: Stream<[number, number]> = input1.compose(sampleCombine(input2));
     assert.strictEqual(stream instanceof Stream, true);
     done();

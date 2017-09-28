@@ -466,31 +466,6 @@ class FromPromise<T> implements InternalProducer<T> {
   }
 }
 
-class Periodic implements InternalProducer<number> {
-  public type = 'periodic';
-  public period: number;
-  private intervalID: any;
-  private i: number;
-
-  constructor(period: number) {
-    this.period = period;
-    this.intervalID = -1;
-    this.i = 0;
-  }
-
-  _start(out: InternalListener<number>): void {
-    const self = this;
-    function intervalHandler() { out._n(self.i++); }
-    this.intervalID = setInterval(intervalHandler, this.period);
-  }
-
-  _stop(): void {
-    if (this.intervalID !== -1) clearInterval(this.intervalID);
-    this.intervalID = -1;
-    this.i = 0;
-  }
-}
-
 class Debug<T> implements Operator<T, T> {
   public type = 'debug';
   public ins: Stream<T>;
@@ -1419,26 +1394,6 @@ export class Stream<T> implements InternalListener<T> {
   static fromObservable<T>(obs: {subscribe: any}): Stream<T> {
     if ((obs as Stream<T>).endWhen) return obs as Stream<T>;
     return new Stream<T>(new FromObservable(obs));
-  }
-
-  /**
-   * Creates a stream that periodically emits incremental numbers, every
-   * `period` milliseconds.
-   *
-   * Marble diagram:
-   *
-   * ```text
-   *     periodic(1000)
-   * ---0---1---2---3---4---...
-   * ```
-   *
-   * @factory true
-   * @param {number} period The interval in milliseconds to use as a rate of
-   * emission.
-   * @return {Stream}
-   */
-  static periodic(period: number): Stream<number> {
-    return new Stream<number>(new Periodic(period));
   }
 
   /**

@@ -2,7 +2,10 @@
 /// <reference types="node"/>
 import xs, {Producer, Listener, Stream} from '../src/index';
 import fromDiagram from '../src/extra/fromDiagram';
+import periodic from '../src/extra/periodic';
 import * as assert from 'assert';
+
+console.warn = () => {};
 
 describe('Stream', () => {
   it('should have all the core static operators', () => {
@@ -16,7 +19,6 @@ describe('Stream', () => {
     assert.equal(typeof xs.fromArray, 'function');
     assert.equal(typeof xs.fromPromise, 'function');
     assert.equal(typeof xs.fromObservable, 'function');
-    assert.equal(typeof xs.periodic, 'function');
     assert.equal(typeof xs.merge, 'function');
     assert.equal(typeof xs.combine, 'function');
   });
@@ -101,7 +103,7 @@ describe('Stream', () => {
   });
 
   it('should be possible to addListener and removeListener with 1 listener', (done: any) => {
-    const stream = xs.periodic(100);
+    const stream = periodic(100);
     const expected = [0, 1, 2];
     let listener = {
       next: (x: number) => {
@@ -118,7 +120,7 @@ describe('Stream', () => {
   });
 
   it('should broadcast events to two listeners', (done: any) => {
-    const stream = xs.periodic(100);
+    const stream = periodic(100);
     const expected1 = [0, 1, 2];
     const expected2 = [1, 2];
 
@@ -152,7 +154,7 @@ describe('Stream', () => {
   });
 
   it('should not stop if listener is synchronously removed and re-added', (done: any) => {
-    const stream = xs.periodic(100);
+    const stream = periodic(100);
     const expected = [0, 1, 2];
     let listener = {
       next: (x: number) => {
@@ -174,7 +176,7 @@ describe('Stream', () => {
   });
 
   it('should restart if listener is asynchronously removed and re-added', (done: any) => {
-    const stream = xs.periodic(100);
+    const stream = periodic(100);
     let expected = [0, 1, 2];
     let listener = {
       next: (x: number) => {
@@ -329,7 +331,7 @@ describe('Stream', () => {
     });
 
     it('should spy an existing stream execution', (done: any) => {
-      const stream = xs.periodic(200).take(8);
+      const stream = periodic(200).take(8);
       const listener = { next: () => { }, error: () => { }, complete: () => { } };
       const expected = [0, 1, 2];
 

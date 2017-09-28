@@ -1,5 +1,6 @@
 import {Stream} from '../index';
 import concat from './concat';
+import periodic from './periodic';
 
 export type Ease = (x: number, from: number, to: number) => number;
 export type Easings = {
@@ -201,8 +202,10 @@ function tween({
   ease = tweenFactory.linear.ease,
   interval = DEFAULT_INTERVAL
 }: TweenConfig): Stream<number> {
+    console.warn('All time based operators have been deprecated, please migrate to @cycle/time');
+
   const totalTicks = Math.round(duration / interval);
-  return Stream.periodic(interval)
+  return periodic(interval)
     .take(totalTicks)
     .map(tick => ease(tick / totalTicks, from, to))
     .compose(s => concat<number>(s, Stream.of(to)));

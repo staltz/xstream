@@ -1,11 +1,14 @@
 /// <reference types="mocha"/>
 /// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
+
+console.warn = () => {};
 
 describe('Stream.prototype.fold', () => {
   it('should accumulating a value over time', (done: any) => {
-    const stream = xs.periodic(50).take(4).fold((x: number, y: number) => x + y, 0);
+    const stream = periodic(50).take(4).fold((x: number, y: number) => x + y, 0);
     const expected = [0, 0, 1, 3, 6];
     let listener = {
       next: (x: number) => {
@@ -22,7 +25,7 @@ describe('Stream.prototype.fold', () => {
   });
 
   it('should propagate user mistakes in accumulate as errors', (done: any) => {
-    const source = xs.periodic(30).take(1);
+    const source = periodic(30).take(1);
     const stream = source.fold(
       (x, y) => <number> <any> (<string> <any> x).toLowerCase(),
       0

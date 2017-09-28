@@ -2,12 +2,15 @@
 /// <reference types="node" />
 import xs, {Stream, Listener} from '../../src/index';
 import flattenConcurrently from '../../src/extra/flattenConcurrently';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
+
+console.warn = () => {};
 
 describe('flattenConcurrently (extra)', () => {
   describe('with map', () => {
     it('should expand each periodic event with 3 sync events', (done: any) => {
-      const stream = xs.periodic(100).take(3)
+      const stream = periodic(100).take(3)
         .map(i => xs.of(1 + i, 2 + i, 3 + i))
         .compose(flattenConcurrently);
       const expected = [1, 2, 3, 2, 3, 4, 3, 4, 5];
@@ -43,7 +46,7 @@ describe('flattenConcurrently (extra)', () => {
 
     it('should expand 3 sync events as a periodic each', (done: any) => {
       const stream = xs.of(0, 1, 2)
-        .map(i => xs.periodic(100 * (i + 1) + 10 * i).take(2).map(x => `${i}${x}`))
+        .map(i => periodic(100 * (i + 1) + 10 * i).take(2).map(x => `${i}${x}`))
         .compose(flattenConcurrently);
       // ---x---x---x---x---x---x
       // ---00--01
@@ -64,9 +67,9 @@ describe('flattenConcurrently (extra)', () => {
     });
 
     it('should expand 3 async events as a periodic each', (done: any) => {
-      const stream = xs.periodic(140).take(3)
+      const stream = periodic(140).take(3)
         .map(i =>
-          xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
+          periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
         )
         .compose(flattenConcurrently);
       // ---x---x---x---x---x---x---x---x---x---x---x---x
@@ -88,9 +91,9 @@ describe('flattenConcurrently (extra)', () => {
     });
 
     it('should expand 3 async events as a periodic each, no optimization', (done: any) => {
-      const stream = xs.periodic(140).take(3)
+      const stream = periodic(140).take(3)
         .map(i =>
-          xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
+          periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`)
         )
         .filter(() => true) // breaks the optimization map+flattenConcurrently
         .compose(flattenConcurrently);
@@ -114,7 +117,7 @@ describe('flattenConcurrently (extra)', () => {
     });
 
     it('should propagate user mistakes in project as errors', (done: any) => {
-      const source = xs.periodic(30).take(1);
+      const source = periodic(30).take(1);
       const stream = source.map(
         x => {
           const y = (<string> <any> x).toLowerCase();
@@ -140,14 +143,14 @@ describe('flattenConcurrently (extra)', () => {
       let predicateCallCount = 0;
       let projectCallCount = 0;
 
-      const stream = xs.periodic(140).take(3)
+      const stream = periodic(140).take(3)
         .filter(i => {
           predicateCallCount += 1;
           return i % 2 === 0;
         })
         .map(i => {
           projectCallCount += 1;
-          return xs.periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`);
+          return periodic(100 * (i < 2 ? 1 : i)).take(3).map(x => `${i}${x}`);
         })
         .compose(flattenConcurrently);
       // ---x---x---x---x---x---x---x---x---x---x---x---x
