@@ -2,12 +2,15 @@
 /// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
 import delay from '../../src/extra/delay';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
+
+console.warn = () => {};
 
 describe('Stream.prototype.endWhen', () => {
   it('should complete the stream when another stream emits next', (done: any) => {
-    const source = xs.periodic(50);
-    const other = xs.periodic(220).take(1);
+    const source = periodic(50);
+    const other = periodic(220).take(1);
     const stream = source.endWhen(other);
     const expected = [0, 1, 2, 3];
 
@@ -24,7 +27,7 @@ describe('Stream.prototype.endWhen', () => {
   });
 
   it('should complete the stream when another stream emits complete', (done: any) => {
-    const source = xs.periodic(50);
+    const source = periodic(50);
     const other = xs.empty().compose(delay(220));
     const stream = source.endWhen(other);
     const expected = [0, 1, 2, 3];

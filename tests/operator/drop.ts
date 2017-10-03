@@ -1,11 +1,14 @@
 /// <reference types="mocha"/>
 /// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
+
+console.warn = () => {};
 
 describe('Stream.prototype.drop', () => {
   it('should allow specifying max amount to drop from input stream', (done: any) => {
-    const stream = xs.periodic(50).drop(4);
+    const stream = periodic(50).drop(4);
     const expected = [4, 5, 6];
     let listener = {
       next: (x: number) => {

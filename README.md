@@ -25,15 +25,16 @@ __  _____| |_ _ __ ___  __ _ _ __ ___
 
 ```js
 import xs from 'xstream'
+import periodic from 'xstream/extra/periodic';
 
 // Tick every second incremental numbers,
 // only pass even numbers, then map them to their square,
 // and stop after 5 seconds has passed
 
-var stream = xs.periodic(1000)
+var stream = periodic(1000)
   .filter(i => i % 2 === 0)
   .map(i => i * i)
-  .endWhen(xs.periodic(5000).take(1))
+  .endWhen(periodic(5000).take(1))
 
 // So far, the stream is idle.
 // As soon as it gets its first listener, it starts executing.
@@ -78,7 +79,6 @@ var xs = require('xstream').default
 - [`fromArray`](#fromArray)
 - [`fromPromise`](#fromPromise)
 - [`fromObservable`](#fromObservable)
-- [`periodic`](#periodic)
 - [`merge`](#merge)
 - [`combine`](#combine)
 
@@ -234,7 +234,7 @@ It's still useful to eventually (asynchronously) stop a Stream's internal Produc
 
 # Factories
 
-Factories are functions that create Streams, such as `xs.create()`, `xs.periodic()`, etc.
+Factories are functions that create Streams, such as `xs.create()`, `xs.merge()`, etc.
 
 ### <a id="create"></a> `create(producer)`
 
@@ -393,26 +393,6 @@ Converts an Observable into a Stream.
 #### Arguments:
 
 - `observable: any` The observable to be converted as a stream.
-
-#### Returns:  Stream 
-
-- - -
-
-### <a id="periodic"></a> `periodic(period)`
-
-Creates a stream that periodically emits incremental numbers, every
-`period` milliseconds.
-
-Marble diagram:
-
-```text
-    periodic(1000)
----0---1---2---3---4---...
-```
-
-#### Arguments:
-
-- `period: number` The interval in milliseconds to use as a rate of emission.
 
 #### Returns:  Stream 
 

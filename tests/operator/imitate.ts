@@ -2,7 +2,10 @@
 /// <reference types="node" />
 import xs, {Producer, Listener, Stream, MemoryStream} from '../../src/index';
 import delay from '../../src/extra/delay';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
+
+console.warn = () => {};
 
 describe('Stream.prototype.imitate', () => {
   it('should be able to model a circular dependency in the stream graph', (done: any) => {
@@ -157,7 +160,7 @@ describe('Stream.prototype.imitate', () => {
   });
 
   it('should not cause stack overflow while detecting cycles', (done: any) => {
-    const outside = xs.periodic(150);
+    const outside = periodic(150);
     const secondMimic = xs.create<number>();
     const first = xs.merge(outside, secondMimic.map(x => x * 10));
     const second = first.map(x => x + 1).compose(delay(100));
@@ -244,7 +247,7 @@ describe('Stream.prototype.imitate', () => {
 
   it('should not by itself start the target stream execution', (done: any) => {
     let nextDelivered = false;
-    const stream = xs.periodic(50).take(3).debug(() => {
+    const stream = periodic(50).take(3).debug(() => {
       nextDelivered = true;
     });
     const proxyStream = xs.create<number>();
@@ -258,7 +261,7 @@ describe('Stream.prototype.imitate', () => {
   });
 
   it('should throw an error when given a MemoryStream', (done: any) => {
-    const stream = xs.periodic(50).take(3).remember();
+    const stream = periodic(50).take(3).remember();
     assert.strictEqual(stream instanceof MemoryStream, true);
     const proxyStream = xs.create<number>();
     assert.throws(() => {
@@ -282,6 +285,6 @@ describe('Stream.prototype.imitate', () => {
       },
     });
 
-    mimic.imitate(xs.periodic(50).take(3));
+    mimic.imitate(periodic(50).take(3));
   });
 });

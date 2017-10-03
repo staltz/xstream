@@ -2,6 +2,9 @@
 /// <reference types="node"/>
 import xs, {Listener} from '../src/index';
 import * as assert from 'assert';
+import periodic from '../src/extra/periodic';
+
+console.warn = () => {};
 
 describe('MemoryStream', () => {
   it('should allow use like a subject, from xs.createWithMemory()', (done: any) => {
@@ -134,7 +137,7 @@ describe('MemoryStream', () => {
   });
 
   it('should teardown upstream MemoryStream memory on late async stop', (done: any) => {
-    const stream = xs.periodic(500).mapTo('world').startWith('hello').take(2);
+    const stream = periodic(500).mapTo('world').startWith('hello').take(2);
     const expected1 = ['hello', 'world'];
 
     function addSecondListener() {
@@ -172,7 +175,7 @@ describe('MemoryStream', () => {
   it('should not allow an operator listener to be indefinitely attached', (done: any) => {
     let debugCalled = 0;
     const debugExpected = [42, 0];
-    const source$ = xs.periodic(100).startWith(42)
+    const source$ = periodic(100).startWith(42)
       .debug(x => {
         debugCalled += 1;
         assert.strictEqual(debugExpected.length > 0, true);

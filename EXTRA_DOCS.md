@@ -16,6 +16,7 @@
 - [`sampleCombine`](#sampleCombine) (operator)
 - [`split`](#split) (operator)
 - [`throttle`](#throttle) (operator)
+- [`periodic`](#periodic) (factory)
 - [`tween`](#tween) (factory)
 
 # How to use extras
@@ -58,9 +59,10 @@ Example:
 
 ```js
 import buffer from 'xstream/extra/buffer'
+import periodic from 'xstream/extra/periodic';
 
-const source = xs.periodic(50).take(10);
-const separator = xs.periodic(170).take(3);
+const source = periodic(50).take(10);
+const separator = periodic(170).take(3);
 const buffered = source.compose(buffer(separator));
 
 buffered.addListener({
@@ -300,10 +302,11 @@ Example:
 
 ```js
 import dropUntil from 'xstream/extra/dropUntil'
+import periodic from 'xstream/extra/periodic';
 
-const other = xs.periodic(220).take(1)
+const other = periodic(220).take(1)
 
-const stream = xs.periodic(50)
+const stream = periodic(50)
   .take(6)
   .compose(dropUntil(other))
 
@@ -598,10 +601,11 @@ Examples:
 
 ```js
 import sampleCombine from 'xstream/extra/sampleCombine'
+import periodic from 'xstream/extra/periodic';
 import xs from 'xstream'
 
-const sampler = xs.periodic(1000).take(3)
-const other = xs.periodic(100)
+const sampler = periodic(1000).take(3)
+const other = periodic(100)
 
 const stream = sampler.compose(sampleCombine(other))
 
@@ -620,10 +624,11 @@ stream.addListener({
 
 ```js
 import sampleCombine from 'xstream/extra/sampleCombine'
+import periodic from 'xstream/extra/periodic';
 import xs from 'xstream'
 
-const sampler = xs.periodic(1000).take(3)
-const other = xs.periodic(100).take(2)
+const sampler = periodic(1000).take(3)
+const other = periodic(100).take(2)
 
 const stream = sampler.compose(sampleCombine(other))
 
@@ -670,9 +675,10 @@ Example:
 ```js
 import split from 'xstream/extra/split'
 import concat from 'xstream/extra/concat'
+import periodic from 'xstream/extra/periodic';
 
-const source = xs.periodic(50).take(10)
-const separator = concat(xs.periodic(167).take(2), xs.never())
+const source = periodic(50).take(10)
+const separator = concat(periodic(167).take(2), xs.never())
 const result = source.compose(split(separator))
 
 result.addListener({
@@ -753,6 +759,26 @@ stream.addListener({
 - `period: number` The amount of silence required in milliseconds.
 
 #### Returns:  Stream 
+
+- - -
+
+### <a id="periodic"></a> `periodic(period)`
+
+Creates a stream that periodically emits incremental numbers, every
+`period` milliseconds.
+
+Marble diagram:
+
+```text
+    periodic(1000)
+---0---1---2---3---4---...
+```
+
+#### Arguments:
+
+- `period: number` The interval in milliseconds to use as a rate of emission.
+
+#### Returns:  Stream
 
 - - -
 

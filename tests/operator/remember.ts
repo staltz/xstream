@@ -1,12 +1,15 @@
 /// <reference types="mocha"/>
 /// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
 function noop() {};
 
+console.warn = () => {};
+
 describe('Stream.prototype.remember', () => {
   it('should replay the second event to a new listener', (done: any) => {
-    const stream = xs.periodic(50).take(4).remember();
+    const stream = periodic(50).take(4).remember();
 
     stream.addListener({next: noop, error: noop, complete: noop});
 
@@ -29,7 +32,7 @@ describe('Stream.prototype.remember', () => {
     let expectedA = [10];
     let expectedB = [10];
 
-    const source = xs.never().endWhen(xs.periodic(300))
+    const source = xs.never().endWhen(periodic(300))
       .fold((acc, x) => acc + x, 10)
       .map(x => x)
       .remember();

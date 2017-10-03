@@ -1,8 +1,11 @@
 /// <reference types="mocha"/>
 /// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+
+console.warn = () => {};
 
 var sandbox: sinon.SinonSandbox;
 describe('Stream.prototype.debug', () => {
@@ -16,7 +19,7 @@ describe('Stream.prototype.debug', () => {
 
   it('should allow inspecting the operator chain', (done: any) => {
     const expected = [0, 1, 2];
-    const stream = xs.periodic(50).take(3).debug(x => {
+    const stream = periodic(50).take(3).debug(x => {
       assert.equal(x, expected.shift());
     });
     let listener = {
@@ -37,7 +40,7 @@ describe('Stream.prototype.debug', () => {
     let stub = sandbox.stub(console, 'log');
 
     const expected = [0, 1, 2];
-    const stream = xs.periodic(50).take(3).debug();
+    const stream = periodic(50).take(3).debug();
 
     assert.doesNotThrow(() => {
       stream.addListener({
@@ -73,7 +76,7 @@ describe('Stream.prototype.debug', () => {
   });
 
   it('should propagate user mistakes in spy as errors', (done: any) => {
-    const source = xs.periodic(30).take(1);
+    const source = periodic(30).take(1);
     const stream = source.debug(
       x => <number> <any> (<string> <any> x).toLowerCase()
     );

@@ -1,12 +1,13 @@
 /// <reference types="mocha"/>
 /// <reference types="node" />
 import xs, {Stream} from '../../src/index';
+import periodic from '../../src/extra/periodic';
 import * as assert from 'assert';
 
 describe('xs.combine', () => {
   it('should combine AND-style two streams together', (done: any) => {
-    const stream1 = xs.periodic(100).take(2);
-    const stream2 = xs.periodic(120).take(2);
+    const stream1 = periodic(100).take(2);
+    const stream2 = periodic(120).take(2);
     const stream = xs.combine(stream1, stream2);
     let expected = [[0,0], [1,0], [1,1]];
     stream.addListener({
@@ -28,8 +29,8 @@ describe('xs.combine', () => {
   });
 
   it('should return new Array not reusing instance for each emission', (done: any) => {
-    const stream1 = xs.periodic(100).take(2);
-    const stream2 = xs.periodic(120).take(2);
+    const stream1 = periodic(100).take(2);
+    const stream2 = periodic(120).take(2);
     const stream = xs.combine(stream1, stream2);
     let expected = [0,0];
     let last: any = undefined;
@@ -64,8 +65,8 @@ describe('xs.combine', () => {
   });
 
   it('should complete only when all member streams have completed', (done: any) => {
-    const stream1 = xs.periodic(30).take(1);
-    const stream2 = xs.periodic(50).take(4);
+    const stream1 = periodic(30).take(1);
+    const stream2 = periodic(50).take(4);
     const stream = xs.combine(stream1, stream2).map(arr => arr.join(''))
     let expected = ['00', '01', '02', '03'];
     stream.addListener({
@@ -96,7 +97,7 @@ describe('xs.combine', () => {
   });
 
   it('should just wrap the value if combining one stream', (done: any) => {
-    const source = xs.periodic(100).take(3);
+    const source = periodic(100).take(3);
     const stream = xs.combine(source);
     let expected = [[0], [1], [2]];
 
@@ -172,16 +173,16 @@ describe('xs.combine', () => {
   });
 
   it('should return a Stream when combining a MemoryStream with a Stream', (done: any) => {
-    const input1 = xs.periodic(50).take(4).remember();
-    const input2 = xs.periodic(80).take(3);
+    const input1 = periodic(50).take(4).remember();
+    const input2 = periodic(80).take(3);
     const stream: Stream<[number, number]> = xs.combine(input1, input2);
     assert.strictEqual(stream instanceof Stream, true);
     done();
   });
 
   it('should return a Stream when combining a MemoryStream with a MemoryStream', (done: any) => {
-    const input1 = xs.periodic(50).take(4).remember();
-    const input2 = xs.periodic(80).take(3).remember();
+    const input1 = periodic(50).take(4).remember();
+    const input2 = periodic(80).take(3).remember();
     const stream: Stream<[number, number]> = xs.combine(input1, input2);
     assert.strictEqual(stream instanceof Stream, true);
     done();
