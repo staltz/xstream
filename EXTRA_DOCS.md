@@ -11,7 +11,7 @@
 - [`flattenConcurrently`](#flattenConcurrently) (operator)
 - [`flattenSequentially`](#flattenSequentially) (operator)
 - [`fromDiagram`](#fromDiagram) (factory)
-- [`fromEvent`](#fromEvent) (operator)
+- [`fromEvent`](#fromEvent) (factory)
 - [`pairwise`](#pairwise) (operator)
 - [`sampleCombine`](#sampleCombine) (operator)
 - [`split`](#split) (operator)
