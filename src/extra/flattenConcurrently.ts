@@ -91,3 +91,13 @@ export class FlattenConcOperator<T> implements Operator<Stream<T>, T> {
 export default function flattenConcurrently<T>(ins: Stream<Stream<T>>): Stream<T> {
   return new Stream<T>(new FlattenConcOperator(ins));
 }
+
+declare module '../index' {
+  interface Stream<T> {
+    flattenConcurrently<R>(this: Stream<Stream<R>>): T;
+  }
+}
+
+Stream.prototype.flattenConcurrently = function (): any {
+  return this.compose(flattenConcurrently);
+};

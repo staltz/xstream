@@ -109,3 +109,13 @@ export default function buffer<T>(s: Stream<any>): (ins: Stream<T>) => Stream<Ar
     return new Stream<Array<T>>(new BufferOperator<T>(s, ins));
   };
 }
+
+declare module '../index' {
+  interface Stream<T> {
+    buffer<T>(s: Stream<any>): Stream<Array<T>>;
+  }
+}
+
+Stream.prototype.buffer = function (s: any): any {
+  return this.compose(buffer(s));
+};

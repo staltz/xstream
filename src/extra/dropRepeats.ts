@@ -115,3 +115,13 @@ export default function dropRepeats<T>(isEqual: ((x: T, y: T) => boolean) | unde
     return new Stream<T>(new DropRepeatsOperator<T>(ins, isEqual));
   };
 }
+
+declare module '../index' {
+  interface Stream<T> {
+    dropRepeats<T>(isEqual?: ((x: T, y: T) => boolean) | undefined): Stream<T>;
+  }
+}
+
+Stream.prototype.dropRepeats = function (isEqual: any): any {
+  return this.compose(dropRepeats(isEqual));
+};

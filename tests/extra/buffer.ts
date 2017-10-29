@@ -36,7 +36,7 @@ describe('buffer (extra)', () => {
   it('should flush and complete when source is completed', (done) => {
     const source = xs.of(1, 2).compose(delay(10));
     const separator = xs.empty().compose(delay(50));
-    const buffered = source.compose(buffer(separator));
+    const buffered = source.buffer(separator);
     const expected = [[1, 2]];
 
     let separatorComplete = false;
