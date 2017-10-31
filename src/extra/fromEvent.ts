@@ -122,6 +122,7 @@ function isEmitter(element: any): boolean {
  * > ['bar', 'baz', 'buzz']
  * ```
  *
+ * @factory true
  * @param {EventTarget|EventEmitter} element The element upon which to listen.
  * @param {string} eventName The name of the event for which to listen.
  * @param {boolean?} useCapture An optional boolean that indicates that events of
