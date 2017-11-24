@@ -27,7 +27,7 @@ describe('xs.from', () => {
     const stream = xs.from(Promise.reject('no'));
 
     stream.addListener({
-      next: (x: string) => done('next should not be called'),
+      next: (x) => done('next should not be called'),
       error: (err: any) => {
         assert.strictEqual(err, 'no');
         done();

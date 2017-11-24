@@ -40,7 +40,7 @@ describe('dropRepeats (extra)', () => {
   });
 
   it('should drop consecutive duplicate numbers, with a circular stream dependency', (done: any) => {
-    const streamProxy = xs.create();
+    const streamProxy = xs.create<number>();
     const input = xs.of(0, 0, 1, 1, 1);
     const stream = xs.merge(streamProxy, input).compose(dropRepeats());
     streamProxy.imitate(stream);

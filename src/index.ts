@@ -41,8 +41,8 @@ const NO_IL: InternalListener<any> = {
   _c: noop,
 };
 
-export interface InternalProducer<T> {
-  _start: (listener: InternalListener<T>) => void;
+export interface InternalProducer<T, L extends InternalListener<T> = InternalListener<T>> {
+  _start: (listener: L) => void;
   _stop: () => void;
 }
 
@@ -50,13 +50,13 @@ export interface OutSender<T> {
   out: Stream<T>;
 }
 
-export interface Operator<T, R> extends InternalProducer<R>, InternalListener<T>, OutSender<R> {
+export interface Operator<T, R> extends InternalProducer<R, Stream<R>>, InternalListener<T>, OutSender<R> {
   type: string;
   ins: Stream<T>;
   _start: (out: Stream<R>) => void;
 }
 
-export interface Aggregator<T, U> extends InternalProducer<U>, OutSender<U> {
+export interface Aggregator<T, U> extends InternalProducer<U, Stream<U>>, OutSender<U> {
   type: string;
   insArr: Array<Stream<T>>;
   _start: (out: Stream<U>) => void;
@@ -116,7 +116,7 @@ class Observer<T> implements Listener<T> {
   }
 }
 
-class FromObservable<T> implements InternalProducer<T> {
+class FromObservable<T> implements InternalProducer<T, Stream<T>> {
   public type = 'fromObservable';
   public ins: Observable<T>;
   public out: Stream<T>;
@@ -927,7 +927,7 @@ class MapOp<T, R> implements Operator<T, R> {
   }
 }
 
-class Remember<T> implements InternalProducer<T> {
+class Remember<T> implements InternalProducer<T, Stream<T>> {
   public type = 'remember';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -994,7 +994,7 @@ class ReplaceError<T> implements Operator<T, T> {
   }
 }
 
-class StartWith<T> implements InternalProducer<T> {
+class StartWith<T> implements InternalProducer<T, Stream<T>> {
   public type = 'startWith';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -1067,7 +1067,7 @@ class Take<T> implements Operator<T, T> {
 }
 
 export class Stream<T> implements InternalListener<T> {
-  public _prod: InternalProducer<T>;
+  public _prod: InternalProducer<T, Stream<T>>;
   protected _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
   protected _stopID: any;
   protected _dl: InternalListener<T>; // the debug listener
@@ -1075,7 +1075,7 @@ export class Stream<T> implements InternalListener<T> {
   protected _target: Stream<T>; // imitation target if this Stream will imitate
   protected _err: any;
 
-  constructor(producer?: InternalProducer<T>) {
+  constructor(producer?: InternalProducer<T, Stream<T>>) {
     this._prod = producer || NO as InternalProducer<T>;
     this._ils = [];
     this._stopID = NO;
@@ -1977,7 +1977,7 @@ export class Stream<T> implements InternalListener<T> {
 export class MemoryStream<T> extends Stream<T> {
   private _v: T;
   private _has: boolean = false;
-  constructor(producer: InternalProducer<T>) {
+  constructor(producer: InternalProducer<T, Stream<T>>) {
     super(producer);
   }
 

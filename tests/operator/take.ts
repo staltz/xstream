@@ -97,7 +97,7 @@ describe('Stream.prototype.take', () => {
       stop: () => this.listener = null,
       listener: null
     };
-    const stream = xs.create(producer);
+    const stream = xs.create<number>(producer);
 
     let nextCount = 0;
     stream.take(1).addListener({

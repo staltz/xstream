@@ -35,7 +35,7 @@ describe('Stream.prototype.replaceError', () => {
       {type: 'complete'},
     ];
 
-    const source = xs.create({
+    const source = xs.create<any>({
       start: (listener) => {
         while (events.length > 0) {
           const event = events.shift();
@@ -58,7 +58,7 @@ describe('Stream.prototype.replaceError', () => {
     const expected = [10, 20, 30, 40, 50, 60];
 
     stream.addListener({
-      next: (x: number) => {
+      next: (x) => {
         assert.equal(x, expected.shift());
       },
       error: (err: any) => done(err),

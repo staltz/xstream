@@ -78,7 +78,7 @@ describe('Stream', () => {
     const expected = [10, 20, 30];
     let listenerGotEnd: boolean = false;
 
-    const stream = xs.create();
+    const stream = xs.create<number>();
 
     stream.addListener({
       next: (x: number) => {
@@ -201,7 +201,7 @@ describe('Stream', () => {
 
   it('should synchronously stop producer when completed', (done: any) => {
     let on = false;
-    const stream = xs.create({
+    const stream = xs.create<number>({
       start: (listener) => {
         on = true;
         listener.next(10);
@@ -248,7 +248,7 @@ describe('Stream', () => {
 
   it('should synchronously stop producer when error thrown', (done: any) => {
     let on = false;
-    const stream = xs.create({
+    const stream = xs.create<number>({
       start: (listener) => {
         on = true;
         listener.next(10);
