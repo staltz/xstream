@@ -1,3 +1,14 @@
+<a name="11.1.0"></a>
+# [11.1.0](https://github.com/staltz/xstream/compare/v11.0.0...v11.1.0) (2017-12-12)
+
+
+### Bug Fixes
+
+* **package:** add yarn.lock file to avoid ambiguities ([d745aa6](https://github.com/staltz/xstream/commit/d745aa6))
+* **package:** lock symbol-observable to 1.0.4 ([9de613a](https://github.com/staltz/xstream/commit/9de613a)), closes [#234](https://github.com/staltz/xstream/issues/234) [benlesh/symbol-observable#34](https://github.com/benlesh/symbol-observable/issues/34)
+
+
+
 <a name="11.0.0"></a>
 # [11.0.0](https://github.com/staltz/xstream/compare/v10.9.0...v11.0.0) (2017-09-27)
 
@@ -12,7 +23,7 @@
 
 ### Performance Improvements
 
-* **dropRepeats:** set equality function only once ([4bbe9a4](https://github.com/staltz/xstream/commit/4bbe9a4))
+* **dropRepeats:** set equality function only once ([4bbe9a4](https://github.com/staltz/xstream/commit/4bbe9a4)), closes [#213](https://github.com/staltz/xstream/issues/213)
 
 
 ### BREAKING CHANGES
@@ -29,7 +40,7 @@ are zero breaking changes.
 
 ### Features
 
-* **compose:** support any return value for compose method ([330aaba](https://github.com/staltz/xstream/commit/330aaba))
+* **compose:** support any return value for compose method ([330aaba](https://github.com/staltz/xstream/commit/330aaba)), closes [#207](https://github.com/staltz/xstream/issues/207)
 
 
 
@@ -59,7 +70,7 @@ are zero breaking changes.
 
 ### Features
 
-* **fromPromise:** widen support for promise types ([12da02d](https://github.com/staltz/xstream/commit/12da02d))
+* **fromPromise:** widen support for promise types ([12da02d](https://github.com/staltz/xstream/commit/12da02d)), closes [#187](https://github.com/staltz/xstream/issues/187)
 
 
 
@@ -69,7 +80,7 @@ are zero breaking changes.
 
 ### Features
 
-* **src:** move to [@types](https://github.com/types) declaration files ([ff2c637](https://github.com/staltz/xstream/commit/ff2c637)), closes [#176](https://github.com/staltz/xstream/issues/176)
+* **src:** move to [@types](https://github.com/types) declaration files ([ff2c637](https://github.com/staltz/xstream/commit/ff2c637)), closes [#180](https://github.com/staltz/xstream/issues/180) [#176](https://github.com/staltz/xstream/issues/176)
 
 
 
@@ -79,7 +90,7 @@ are zero breaking changes.
 
 ### Bug Fixes
 
-* **map:** remove operator fusion to avoid bugs ([f16e6a9](https://github.com/staltz/xstream/commit/f16e6a9))
+* **map:** remove operator fusion to avoid bugs ([f16e6a9](https://github.com/staltz/xstream/commit/f16e6a9)), closes [#165](https://github.com/staltz/xstream/issues/165) [#178](https://github.com/staltz/xstream/issues/178) [#165](https://github.com/staltz/xstream/issues/165) [#178](https://github.com/staltz/xstream/issues/178)
 
 
 
@@ -89,7 +100,7 @@ are zero breaking changes.
 
 ### Bug Fixes
 
-* **combine:** do array cloning to avoid several bugs ([e8b2eef](https://github.com/staltz/xstream/commit/e8b2eef))
+* **combine:** do array cloning to avoid several bugs ([e8b2eef](https://github.com/staltz/xstream/commit/e8b2eef)), closes [/github.com/cyclejs/cyclejs/issues/537#issuecomment-283935639](https://github.com//github.com/cyclejs/cyclejs/issues/537/issues/issuecomment-283935639)
 
 
 ### Performance Improvements
@@ -126,7 +137,7 @@ are zero breaking changes.
 
 ### Bug Fixes
 
-* **take:** terminate stream emission when TakeOperator recursively call itself ([3581857](https://github.com/staltz/xstream/commit/3581857))
+* **take:** terminate stream emission when TakeOperator recursively call itself ([3581857](https://github.com/staltz/xstream/commit/3581857)), closes [#158](https://github.com/staltz/xstream/issues/158)
 
 
 ### Performance Improvements
@@ -195,7 +206,7 @@ but only now are surfaced.
 
 ### Bug Fixes
 
-* **flattenSequentially:** fix behaviour of outer stream completion ([fd31d49](https://github.com/staltz/xstream/commit/fd31d49))
+* **flattenSequentially:** fix behaviour of outer stream completion ([fd31d49](https://github.com/staltz/xstream/commit/fd31d49)), closes [#141](https://github.com/staltz/xstream/issues/141)
 
 
 ### BREAKING CHANGES
@@ -205,8 +216,6 @@ flattenSequentially and how the outer stream completes.
 ![maybe
 won't](https://img.shields.io/badge/will%20it%20affect%20me%3F-maybe%20won't-yellowgreen.svg)
 
-ISSUES CLOSED: #141.
-
 
 
 <a name="7.0.0"></a>
@@ -215,7 +224,7 @@ ISSUES CLOSED: #141.
 
 ### Bug Fixes
 
-* **map:** remove map+map fusion optimization ([1ca6a5c](https://github.com/staltz/xstream/commit/1ca6a5c)), closes [#98](https://github.com/staltz/xstream/issues/98) [#108](https://github.com/staltz/xstream/issues/108) [#93](https://github.com/staltz/xstream/issues/93)
+* **map:** remove map+map fusion optimization ([1ca6a5c](https://github.com/staltz/xstream/commit/1ca6a5c)), closes [#98](https://github.com/staltz/xstream/issues/98) [#108](https://github.com/staltz/xstream/issues/108) [#93](https://github.com/staltz/xstream/issues/93) [#98](https://github.com/staltz/xstream/issues/98) [#108](https://github.com/staltz/xstream/issues/108) [#93](https://github.com/staltz/xstream/issues/93)
 * **MemoryStream:** fix a leaking execution bug ([47e67ff](https://github.com/staltz/xstream/commit/47e67ff)), closes [#53](https://github.com/staltz/xstream/issues/53)
 
 
@@ -239,7 +248,7 @@ working, in case your application code was relying on buggy behavior.
 
 ### Features
 
-* **Stream:** accept partially defined listeners ([e9d005d](https://github.com/staltz/xstream/commit/e9d005d))
+* **Stream:** accept partially defined listeners ([e9d005d](https://github.com/staltz/xstream/commit/e9d005d)), closes [#67](https://github.com/staltz/xstream/issues/67)
 
 
 
@@ -329,7 +338,7 @@ working, in case your application code was relying on buggy behavior.
 
 ### Features
 
-* **filter:** support type guard predicates ([34e529a](https://github.com/staltz/xstream/commit/34e529a))
+* **filter:** support type guard predicates ([34e529a](https://github.com/staltz/xstream/commit/34e529a)), closes [#112](https://github.com/staltz/xstream/issues/112)
 
 
 
@@ -397,7 +406,7 @@ change when updating your code. Most existing code will still work like before.
 
 ### Bug Fixes
 
-* **dropRepeats:** handle circular dependencies ([38052da](https://github.com/staltz/xstream/commit/38052da))
+* **dropRepeats:** handle circular dependencies ([38052da](https://github.com/staltz/xstream/commit/38052da)), closes [#101](https://github.com/staltz/xstream/issues/101)
 
 
 
@@ -447,7 +456,7 @@ change when updating your code. Most existing code will still work like before.
 
 ### Bug Fixes
 
-* **merge:** support union types ([5327cb0](https://github.com/staltz/xstream/commit/5327cb0)), closes [staltz/xstream#80](https://github.com/staltz/xstream/issues/80)
+* **merge:** support union types ([5327cb0](https://github.com/staltz/xstream/commit/5327cb0)), closes [#82](https://github.com/staltz/xstream/issues/82) [staltz/xstream#80](https://github.com/staltz/xstream/issues/80)
 
 
 
@@ -457,7 +466,7 @@ change when updating your code. Most existing code will still work like before.
 
 ### Bug Fixes
 
-* **remember:** bypass on MemoryStream ([34b8ddc](https://github.com/staltz/xstream/commit/34b8ddc))
+* **remember:** bypass on MemoryStream ([34b8ddc](https://github.com/staltz/xstream/commit/34b8ddc)), closes [#83](https://github.com/staltz/xstream/issues/83)
 
 
 
@@ -467,7 +476,7 @@ change when updating your code. Most existing code will still work like before.
 
 ### Bug Fixes
 
-* **merge:** fix completion and disposal ([5bbcade](https://github.com/staltz/xstream/commit/5bbcade))
+* **merge:** fix completion and disposal ([5bbcade](https://github.com/staltz/xstream/commit/5bbcade)), closes [#76](https://github.com/staltz/xstream/issues/76)
 * **operators:** improve resistence against disposal bugs ([ff36fbd](https://github.com/staltz/xstream/commit/ff36fbd))
 
 
@@ -478,7 +487,7 @@ change when updating your code. Most existing code will still work like before.
 
 ### Features
 
-* **fromEvent:** support NodeJS Event Emitters ([c203801](https://github.com/staltz/xstream/commit/c203801))
+* **fromEvent:** support NodeJS Event Emitters ([c203801](https://github.com/staltz/xstream/commit/c203801)), closes [#73](https://github.com/staltz/xstream/issues/73) [staltz/xstream#65](https://github.com/staltz/xstream/issues/65)
 
 
 
@@ -811,7 +820,7 @@ trigger any Stream/Producer to start.
 
 ### Performance Improvements
 
-* **combine:** apply some perf optimizations to combine ([ee4ec4c](https://github.com/staltz/xstream/commit/ee4ec4c))
+* **combine:** apply some perf optimizations to combine ([ee4ec4c](https://github.com/staltz/xstream/commit/ee4ec4c)), closes [#14](https://github.com/staltz/xstream/issues/14)
 
 
 
@@ -846,7 +855,7 @@ trigger any Stream/Producer to start.
 
 ### Bug Fixes
 
-* **remember:** return MemoryStream, not Stream ([4f50922](https://github.com/staltz/xstream/commit/4f50922))
+* **remember:** return MemoryStream, not Stream ([4f50922](https://github.com/staltz/xstream/commit/4f50922)), closes [#32](https://github.com/staltz/xstream/issues/32)
 
 
 
@@ -856,7 +865,7 @@ trigger any Stream/Producer to start.
 
 ### Bug Fixes
 
-* **combine:** fix CombineFactorySignature ([c65bd0b](https://github.com/staltz/xstream/commit/c65bd0b))
+* **combine:** fix CombineFactorySignature ([c65bd0b](https://github.com/staltz/xstream/commit/c65bd0b)), closes [#28](https://github.com/staltz/xstream/issues/28)
 
 
 
@@ -866,7 +875,7 @@ trigger any Stream/Producer to start.
 
 ### Bug Fixes
 
-* **remember:** build safety against map+map fusion ([079602c](https://github.com/staltz/xstream/commit/079602c))
+* **remember:** build safety against map+map fusion ([079602c](https://github.com/staltz/xstream/commit/079602c)), closes [#27](https://github.com/staltz/xstream/issues/27)
 
 
 
@@ -882,7 +891,7 @@ trigger any Stream/Producer to start.
 
 ### Features
 
-* **create:** Throw an error if for incomplete producer ([39c7c80](https://github.com/staltz/xstream/commit/39c7c80))
+* **create:** Throw an error if for incomplete producer ([39c7c80](https://github.com/staltz/xstream/commit/39c7c80)), closes [#22](https://github.com/staltz/xstream/issues/22)
 
 
 

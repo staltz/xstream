@@ -11,7 +11,7 @@
 - [`flattenConcurrently`](#flattenConcurrently) (operator)
 - [`flattenSequentially`](#flattenSequentially) (operator)
 - [`fromDiagram`](#fromDiagram) (factory)
-- [`fromEvent`](#fromEvent) (operator)
+- [`fromEvent`](#fromEvent) (factory)
 - [`pairwise`](#pairwise) (operator)
 - [`sampleCombine`](#sampleCombine) (operator)
 - [`split`](#split) (operator)
@@ -453,6 +453,10 @@ Creates a stream based on either:
 When creating a stream from EventEmitters, if the source event has more than
 one argument all the arguments will be aggregated into an array in the
 result stream.
+
+(Tip: when using this factory with TypeScript, you will need types for
+Node.js because fromEvent knows how to handle both DOM events and Node.js
+EventEmitter. Just install `@types/node`)
 
 Marble diagram:
 
