@@ -45,7 +45,7 @@
   },
   "homepage": "https://github.com/staltz/xstream#readme",
   "dependencies": {
-    "symbol-observable": "1.0.4"
+    "symbol-observable": "1.2.0"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.40",
