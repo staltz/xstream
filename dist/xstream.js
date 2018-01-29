@@ -1207,9 +1207,6 @@ exports.MemoryStream = MemoryStream;
 exports.default = Stream;
 
 },{"symbol-observable":2}],2:[function(require,module,exports){
-module.exports = require('./lib/index');
-
-},{"./lib/index":3}],3:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -1217,7 +1214,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _ponyfill = require('./ponyfill');
+var _ponyfill = require('./ponyfill.js');
 
 var _ponyfill2 = _interopRequireDefault(_ponyfill);
 
@@ -1241,7 +1238,7 @@ if (typeof self !== 'undefined') {
 var result = (0, _ponyfill2['default'])(root);
 exports['default'] = result;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./ponyfill":4}],4:[function(require,module,exports){
+},{"./ponyfill.js":3}],3:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
