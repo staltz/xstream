@@ -6,6 +6,7 @@
     "declaration": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
+    "strictFunctionTypes": true,
     "suppressImplicitAnyIndexErrors": true,
     "module": "commonjs",
     "noEmitHelpers": false,
