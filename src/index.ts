@@ -2049,4 +2049,5 @@ export class MemoryStream<T> extends Stream<T> {
 }
 
 export {NO, NO_IL};
-export default Stream;
+const xs = Stream
+export default xs;
