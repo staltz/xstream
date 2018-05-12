@@ -1418,7 +1418,8 @@ export class Stream<T> implements InternalListener<T> {
    */
   static fromObservable<T>(obs: {subscribe: any}): Stream<T> {
     if ((obs as Stream<T>).endWhen) return obs as Stream<T>;
-    return new Stream<T>(new FromObservable(obs));
+    const o = typeof obs[$$observable] === 'function' ? obs[$$observable]() : obs;
+    return new Stream<T>(new FromObservable(o));
   }
 
   /**
