@@ -125,3 +125,13 @@ export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
 export default function flattenSequentially<T>(ins: Stream<Stream<T>>): Stream<T> {
   return new Stream<T>(new FlattenSeqOperator(ins));
 }
+
+declare module '../index' {
+  interface Stream<T> {
+    flattenSequentially<R>(this: Stream<Stream<R>>): T;
+  }
+}
+
+Stream.prototype.flattenSequentially = function (): any {
+  return this.compose(flattenSequentially);
+};

@@ -40,7 +40,7 @@ describe('dropRepeats (extra)', () => {
 
   it('should drop consecutive \'duplicate\' strings, with a custom isEqual', (done: any) => {
     const stream = xs.of('a', 'b', 'a', 'A', 'B', 'b')
-      .compose(dropRepeats((x: string, y: string) => x.toLowerCase() === y.toLowerCase()));
+      .dropRepeats((x: string, y: string) => x.toLowerCase() === y.toLowerCase());
     const expected = ['a', 'b', 'a', 'B'];
 
     stream.addListener({

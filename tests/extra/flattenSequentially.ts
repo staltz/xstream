@@ -9,7 +9,7 @@ describe('flattenSequentially (extra)', () => {
     it('should expand each periodic event with 3 sync events', (done: any) => {
       const stream = xs.periodic(100).take(3)
         .map(i => xs.of(1 + i, 2 + i, 3 + i))
-        .compose(flattenSequentially);
+        .flattenSequentially();
       const expected = [1, 2, 3, 2, 3, 4, 3, 4, 5];
       const listener = {
         next: (x: number) => {
