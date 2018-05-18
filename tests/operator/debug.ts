@@ -4,7 +4,7 @@ import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-var sandbox: sinon.SinonSandbox;
+let sandbox: sinon.SinonSandbox;
 describe('Stream.prototype.debug', () => {
   beforeEach(function () {
     sandbox = sinon.sandbox.create();

@@ -6,7 +6,7 @@ import * as assert from 'assert';
 
 describe('fromDiagram (extra)', () => {
   it('should create a nice finite stream with string values', (done: any) => {
-    const stream = fromDiagram('--a--b----c----d---|')
+    const stream = fromDiagram('--a--b----c----d---|');
     const expected = ['a', 'b', 'c', 'd'];
 
     stream.addListener({
@@ -22,7 +22,7 @@ describe('fromDiagram (extra)', () => {
   });
 
   it('should create a stream that emits an error', (done: any) => {
-    const stream = fromDiagram('--a--b----c----d---#')
+    const stream = fromDiagram('--a--b----c----d---#');
     const expected = ['a', 'b', 'c', 'd'];
 
     stream.addListener({

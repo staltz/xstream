@@ -139,7 +139,7 @@ describe('Stream.prototype.imitate', () => {
         }
       });
     const result$ = source$.compose(delay(100)).compose(s => <Stream<number>> s);
-    proxy$.imitate(result$)
+    proxy$.imitate(result$);
 
     source$.take(4).addListener({
       next: (x: number) => {

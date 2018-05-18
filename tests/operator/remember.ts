@@ -2,7 +2,7 @@
 /// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
-function noop() {};
+function noop() {}
 
 describe('Stream.prototype.remember', () => {
   it('should replay the second event to a new listener', (done: any) => {
@@ -39,7 +39,7 @@ describe('Stream.prototype.remember', () => {
     const streamA = source.map(x => x);
 
     const streamB = source
-      .debug(x => { assert.strictEqual(x, expectedB.shift()); })
+      .debug(x => { assert.strictEqual(x, expectedB.shift()); });
 
     streamA.addListener({
       next: (x: number) => {
@@ -100,7 +100,7 @@ describe('Stream.prototype.remember', () => {
     const stream: MemoryStream<number> = input.remember();
     assert.strictEqual(stream instanceof MemoryStream, true);
     done();
-  })
+  });
 
   it('should not fail if original stream has no producer, and start is called', (done: any) => {
     const input = xs.create<number>();

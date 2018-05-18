@@ -16,9 +16,9 @@ describe('throttle (extra)', () => {
             out.next(7);
             setTimeout(() => {
               out.next(9);
-            }, 150)
-          }, 20)
-        }, 200)
+            }, 150);
+          }, 20);
+        }, 200);
       },
       stop() { }
     };
