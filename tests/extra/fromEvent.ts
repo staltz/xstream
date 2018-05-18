@@ -21,13 +21,13 @@ class FakeEventTarget implements EventTarget {
     this.handler.call(void 0, x);
   }
 
-  addEventListener(e: string, handler: EventListener | undefined, capture: boolean) {
+  addEventListener(e: string, handler: EventListener, capture: boolean) {
     this.event = e;
     this.handler = handler;
     this.capture = capture;
   }
 
-  removeEventListener(e: string, handler: EventListener | undefined, capture: boolean) {
+  removeEventListener(e: string, handler: EventListener, capture: boolean) {
     this.removedEvent = e;
     this.removedCapture = capture;
 

@@ -66,10 +66,10 @@
     "most": "1.0.3",
     "sinon": "1.16.0",
     "strip-comments": "0.4.4",
-    "ts-node": "3.3.x",
-    "tsify": "3.0.x",
+    "ts-node": "6.0.x",
+    "tsify": "4.0.x",
     "tslint": "5.7.0",
-    "typescript": "2.5.2",
+    "typescript": "2.8.x",
     "validate-commit-msg": "2.4.x"
   },
   "publishConfig": {
