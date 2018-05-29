@@ -1,10 +1,18 @@
+<a name="11.4.0"></a>
+## 11.4.0 (2018-05-29)
+
+* fix(core): add xs type default export ([dff47c9](https://github.com/staltz/xstream/commit/dff47c9)), closes [#242](https://github.com/staltz/xstream/issues/242)
+
+
+
 <a name="11.3.0"></a>
 ## 11.3.0 (2018-05-18)
 
+* chore(package): gitignore pnpm shrinkwrap ([7fa8f15](https://github.com/staltz/xstream/commit/7fa8f15))
+* chore(package): release new version ([1900a13](https://github.com/staltz/xstream/commit/1900a13))
+* chore(package): upgrade TypeScript to 2.8 (devDependency) ([11c6385](https://github.com/staltz/xstream/commit/11c6385))
 * fix(fromObservable): use Symbol.observable to get observable ([3a4271c](https://github.com/staltz/xstream/commit/3a4271c))
 * fix(package): inline source maps and inline sources ([b4abefd](https://github.com/staltz/xstream/commit/b4abefd)), closes [#220](https://github.com/staltz/xstream/issues/220)
-* chore(package): gitignore pnpm shrinkwrap ([7fa8f15](https://github.com/staltz/xstream/commit/7fa8f15))
-* chore(package): upgrade TypeScript to 2.8 (devDependency) ([11c6385](https://github.com/staltz/xstream/commit/11c6385))
 * refactor(core): enable autoimport of xs in VSCode ([d3f8df3](https://github.com/staltz/xstream/commit/d3f8df3)), closes [#242](https://github.com/staltz/xstream/issues/242)
 * refactor(tests): comply with TSLint ([acbb2c5](https://github.com/staltz/xstream/commit/acbb2c5))
 * test(dropRepeats): check that it completes ([328fbad](https://github.com/staltz/xstream/commit/328fbad)), closes [#246](https://github.com/staltz/xstream/issues/246)
