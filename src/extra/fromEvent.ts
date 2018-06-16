@@ -41,7 +41,7 @@ export class NodeEventProducer implements InternalProducer<any> {
   }
 }
 
-function isEmitter(element: any): boolean {
+function isEmitter(element: any): element is EventEmitter {
   return element.emit && element.addListener;
 }
 
@@ -134,12 +134,18 @@ function isEmitter(element: any): boolean {
  * dispatched to any EventTarget beneath it in the DOM tree. Defaults to false.
  * @return {Stream}
  */
-export default function fromEvent(element: EventTarget | EventEmitter,
-                                  eventName: string,
-                                  useCapture: boolean = false): Stream<Event|any> {
+
+function fromEvent<T = any>(element: EventEmitter, eventName: string): Stream<T>;
+function fromEvent<T extends Event = Event>(element: EventTarget, eventName: string, useCapture?: boolean): Stream<T>;
+
+function fromEvent<T = any>(element: EventEmitter | EventTarget,
+                            eventName: string,
+                            useCapture: boolean = false): Stream<T> {
   if (isEmitter(element)) {
-    return new Stream<any>(new NodeEventProducer(element as EventEmitter, eventName));
+    return new Stream<T>(new NodeEventProducer(element, eventName));
   } else {
-    return new Stream<Event>(new DOMEventProducer(element as EventTarget, eventName, useCapture));
+    return new Stream<T>(new DOMEventProducer(element, eventName, useCapture) as any);
   }
 }
+
+export default fromEvent;
