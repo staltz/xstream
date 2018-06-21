@@ -42,7 +42,7 @@ const NO_IL: InternalListener<any> = {
 };
 
 export interface InternalProducer<T> {
-  _start: (listener: InternalListener<T>) => void;
+  _start(listener: InternalListener<T>): void;
   _stop: () => void;
 }
 
@@ -53,13 +53,13 @@ export interface OutSender<T> {
 export interface Operator<T, R> extends InternalProducer<R>, InternalListener<T>, OutSender<R> {
   type: string;
   ins: Stream<T>;
-  _start: (out: Stream<R>) => void;
+  _start(out: Stream<R>): void;
 }
 
 export interface Aggregator<T, U> extends InternalProducer<U>, OutSender<U> {
   type: string;
   insArr: Array<Stream<T>>;
-  _start: (out: Stream<U>) => void;
+  _start(out: Stream<U>): void;
 }
 
 export interface Producer<T> {
