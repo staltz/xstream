@@ -1,6 +1,14 @@
+<a name="11.5.0"></a>
+## 11.5.0 (2018-06-22)
+
+* fix(types): do not use arrow syntax for _start ([78272ef](https://github.com/staltz/xstream/commit/78272ef))
+
+
+
 <a name="11.4.0"></a>
 ## 11.4.0 (2018-05-29)
 
+* chore(package): release new version ([06e4267](https://github.com/staltz/xstream/commit/06e4267))
 * fix(core): add xs type default export ([dff47c9](https://github.com/staltz/xstream/commit/dff47c9)), closes [#242](https://github.com/staltz/xstream/issues/242)
 
 
