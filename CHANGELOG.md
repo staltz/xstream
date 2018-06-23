@@ -1,6 +1,14 @@
+<a name="11.7.0"></a>
+## 11.7.0 (2018-06-23)
+
+* fix(fromEvent): Improve typings ([1d265c9](https://github.com/staltz/xstream/commit/1d265c9))
+
+
+
 <a name="11.6.0"></a>
 ## 11.6.0 (2018-06-23)
 
+* chore(package): release new version ([0cadc46](https://github.com/staltz/xstream/commit/0cadc46))
 * fix(subscribe): allow partial listeners (in TypeScript) ([8bfaad7](https://github.com/staltz/xstream/commit/8bfaad7))
 
 
