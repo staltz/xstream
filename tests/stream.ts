@@ -413,5 +413,20 @@ describe('Stream', () => {
 
       done();
     });
+
+    it('should accept a partial listener', (done: any) => {
+      const stream = xs.empty();
+      const noop = (): void => void 0;
+      const listener = {
+        next: noop,
+      };
+
+      const subscription = stream.subscribe(listener);
+
+      assert.equal(typeof subscription, 'object');
+      assert.equal(typeof subscription.unsubscribe, 'function');
+
+      done();
+    });
   });
 });

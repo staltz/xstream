@@ -93,10 +93,10 @@ function internalizeProducer<T>(producer: Producer<T> & Partial<InternalProducer
 }
 
 class StreamSub<T> implements Subscription {
-  constructor(private _stream: Stream<T>, private _listener: Listener<T>) {}
+  constructor(private _stream: Stream<T>, private _listener: InternalListener<T>) {}
 
   unsubscribe(): void {
-    this._stream.removeListener(this._listener);
+    this._stream._remove(this._listener);
   }
 }
 
@@ -1225,9 +1225,9 @@ export class Stream<T> implements InternalListener<T> {
    * @param {Listener} listener
    * @returns {Subscription}
    */
-  subscribe(listener: Listener<T>): Subscription {
+  subscribe(listener: Partial<Listener<T>>): Subscription {
     this.addListener(listener);
-    return new StreamSub<T>(this, listener);
+    return new StreamSub<T>(this, listener as InternalListener<T>);
   }
 
   /**
