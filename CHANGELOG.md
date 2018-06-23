@@ -1,6 +1,14 @@
+<a name="11.6.0"></a>
+## 11.6.0 (2018-06-23)
+
+* fix(subscribe): allow partial listeners (in TypeScript) ([8bfaad7](https://github.com/staltz/xstream/commit/8bfaad7))
+
+
+
 <a name="11.5.0"></a>
 ## 11.5.0 (2018-06-22)
 
+* chore(package): release new version ([7d10c70](https://github.com/staltz/xstream/commit/7d10c70))
 * fix(types): do not use arrow syntax for _start ([78272ef](https://github.com/staltz/xstream/commit/78272ef))
 
 

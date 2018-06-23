@@ -58,7 +58,7 @@ var StreamSub =  (function () {
         this._listener = _listener;
     }
     StreamSub.prototype.unsubscribe = function () {
-        this._stream.removeListener(this._listener);
+        this._stream._remove(this._listener);
     };
     return StreamSub;
 }());
