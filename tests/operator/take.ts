@@ -1,6 +1,6 @@
 /// <reference types="mocha"/>
 /// <reference types="node" />
-import xs, {Stream, MemoryStream, Producer} from '../../src/index';
+import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.take', () => {
