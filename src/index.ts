@@ -1,4 +1,3 @@
-
 import $$observable from 'symbol-observable';
 
 const NO = {};
