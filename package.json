@@ -1,6 +1,6 @@
 {
   "name": "xstream",
-  "version": "11.0.0",
+  "version": "11.7.0",
   "description": "An extremely intuitive, small, and fast functional reactive stream library for JavaScript",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -10,7 +10,8 @@
     "lint": "tslint -c tslint.json src/**/*.ts src/extra/*.ts",
     "premocha": "npm run compile",
     "mocha": "mocha tests/*.ts tests/**/*.ts --require ts-node/register",
-    "test": "npm run lint && npm run mocha && npm run doctest",
+    "test-types": "tsc tests/types.ts --noEmit",
+    "test": "npm run lint && npm run test-types && npm run mocha && npm run doctest",
     "doctest": "markdown-doctest",
     "setup-browser-tests": "browserify browser-tests/index.ts -p [ tsify ] > browser-tests/tests-bundle.js",
     "teardown-browser-tests": "rm browser-tests/tests-bundle.js",
@@ -45,7 +46,7 @@
   },
   "homepage": "https://github.com/staltz/xstream#readme",
   "dependencies": {
-    "symbol-observable": "^1.0.4"
+    "symbol-observable": "1.2.0"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.40",
@@ -66,10 +67,10 @@
     "most": "1.0.3",
     "sinon": "1.16.0",
     "strip-comments": "0.4.4",
-    "ts-node": "3.3.x",
-    "tsify": "3.0.x",
+    "ts-node": "6.0.x",
+    "tsify": "4.0.x",
     "tslint": "5.7.0",
-    "typescript": "2.6.1",
+    "typescript": "2.8.x",
     "validate-commit-msg": "2.4.x"
   },
   "publishConfig": {

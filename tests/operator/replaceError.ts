@@ -23,7 +23,7 @@ describe('Stream.prototype.replaceError', () => {
   });
 
   it('should allow retrying on a hot producer', (done: any) => {
-    const events: Array<{type: string, value?: any}> = [
+    const events: Array<{type: 'next', value: number} | {type: 'error', value: string} | {type: 'complete'}> = [
       {type: 'next', value: 10},
       {type: 'next', value: 20},
       {type: 'next', value: 30},
@@ -35,7 +35,7 @@ describe('Stream.prototype.replaceError', () => {
       {type: 'complete'},
     ];
 
-    const source = xs.create<any>({
+    const source = xs.create<number>({
       start: (listener) => {
         while (events.length > 0) {
           const event = events.shift();
@@ -58,7 +58,7 @@ describe('Stream.prototype.replaceError', () => {
     const expected = [10, 20, 30, 40, 50, 60];
 
     stream.addListener({
-      next: (x) => {
+      next: (x: number) => {
         assert.equal(x, expected.shift());
       },
       error: (err: any) => done(err),

@@ -22,7 +22,7 @@ describe('delay (extra)', () => {
     setTimeout(() => assert.equal(expected.length, 2), 350);
     setTimeout(() => assert.equal(expected.length, 1), 450);
     setTimeout(() => {
-      assert.equal(expected.length, 0)
+      assert.equal(expected.length, 0);
       assert.equal(completeCalled, true);
       done();
     }, 550);
@@ -43,7 +43,7 @@ describe('delay (extra)', () => {
 
     setTimeout(() => assert.equal(expected.length, 3), 50);
     setTimeout(() => {
-      assert.equal(expected.length, 0)
+      assert.equal(expected.length, 0);
       assert.equal(completeCalled, true);
       done();
     }, 150);

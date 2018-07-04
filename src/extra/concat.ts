@@ -1,6 +1,6 @@
 import {Stream, InternalProducer, InternalListener, OutSender} from '../index';
 
-class ConcatProducer<T> implements InternalProducer<T, Stream<T>>, InternalListener<T>, OutSender<T> {
+class ConcatProducer<T> implements InternalProducer<T>, InternalListener<T>, OutSender<T> {
   public type = 'concat';
   public out: Stream<T> = null as any;
   private i: number = 0;

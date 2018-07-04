@@ -1,6 +1,6 @@
 /// <reference types="mocha"/>
 /// <reference types="node" />
-import xs, {Stream, MemoryStream} from '../../src/index';
+import xs, {Stream, MemoryStream, Producer} from '../../src/index';
 import * as assert from 'assert';
 
 describe('Stream.prototype.take', () => {
@@ -88,11 +88,11 @@ describe('Stream.prototype.take', () => {
       },
       _n: (value: any) => {
         const listener = this.listener;
-        listener && listener.next(value);
+        if (listener) listener.next(value);
       },
       _e: (value: string) => {
         const listener = this.listener;
-        listener && listener.error(value);
+        if (listener) listener.error(value);
       },
       stop: () => this.listener = null,
       listener: null

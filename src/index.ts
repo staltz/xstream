@@ -1,3 +1,4 @@
+
 import $$observable from 'symbol-observable';
 
 const NO = {};
@@ -41,8 +42,8 @@ const NO_IL: InternalListener<any> = {
   _c: noop,
 };
 
-export interface InternalProducer<T, L extends InternalListener<T> = InternalListener<T>> {
-  _start: (listener: L) => void;
+export interface InternalProducer<T> {
+  _start(listener: InternalListener<T>): void;
   _stop: () => void;
 }
 
@@ -50,16 +51,16 @@ export interface OutSender<T> {
   out: Stream<T>;
 }
 
-export interface Operator<T, R> extends InternalProducer<R, Stream<R>>, InternalListener<T>, OutSender<R> {
+export interface Operator<T, R> extends InternalProducer<R>, InternalListener<T>, OutSender<R> {
   type: string;
   ins: Stream<T>;
-  _start: (out: Stream<R>) => void;
+  _start(out: Stream<R>): void;
 }
 
-export interface Aggregator<T, U> extends InternalProducer<U, Stream<U>>, OutSender<U> {
+export interface Aggregator<T, U> extends InternalProducer<U>, OutSender<U> {
   type: string;
   insArr: Array<Stream<T>>;
-  _start: (out: Stream<U>) => void;
+  _start(out: Stream<U>): void;
 }
 
 export interface Producer<T> {
@@ -93,10 +94,10 @@ function internalizeProducer<T>(producer: Producer<T> & Partial<InternalProducer
 }
 
 class StreamSub<T> implements Subscription {
-  constructor(private _stream: Stream<T>, private _listener: Listener<T>) {}
+  constructor(private _stream: Stream<T>, private _listener: InternalListener<T>) {}
 
   unsubscribe(): void {
-    this._stream.removeListener(this._listener);
+    this._stream._remove(this._listener);
   }
 }
 
@@ -116,7 +117,7 @@ class Observer<T> implements Listener<T> {
   }
 }
 
-class FromObservable<T> implements InternalProducer<T, Stream<T>> {
+class FromObservable<T> implements InternalProducer<T> {
   public type = 'fromObservable';
   public ins: Observable<T>;
   public out: Stream<T>;
@@ -927,7 +928,7 @@ class MapOp<T, R> implements Operator<T, R> {
   }
 }
 
-class Remember<T> implements InternalProducer<T, Stream<T>> {
+class Remember<T> implements InternalProducer<T> {
   public type = 'remember';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -994,7 +995,7 @@ class ReplaceError<T> implements Operator<T, T> {
   }
 }
 
-class StartWith<T> implements InternalProducer<T, Stream<T>> {
+class StartWith<T> implements InternalProducer<T> {
   public type = 'startWith';
   public ins: Stream<T>;
   public out: Stream<T>;
@@ -1067,7 +1068,7 @@ class Take<T> implements Operator<T, T> {
 }
 
 export class Stream<T> implements InternalListener<T> {
-  public _prod: InternalProducer<T, Stream<T>>;
+  public _prod: InternalProducer<T>;
   protected _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
   protected _stopID: any;
   protected _dl: InternalListener<T>; // the debug listener
@@ -1075,7 +1076,7 @@ export class Stream<T> implements InternalListener<T> {
   protected _target: Stream<T>; // imitation target if this Stream will imitate
   protected _err: any;
 
-  constructor(producer?: InternalProducer<T, Stream<T>>) {
+  constructor(producer?: InternalProducer<T>) {
     this._prod = producer || NO as InternalProducer<T>;
     this._ils = [];
     this._stopID = NO;
@@ -1225,9 +1226,9 @@ export class Stream<T> implements InternalListener<T> {
    * @param {Listener} listener
    * @returns {Subscription}
    */
-  subscribe(listener: Listener<T>): Subscription {
+  subscribe(listener: Partial<Listener<T>>): Subscription {
     this.addListener(listener);
-    return new StreamSub<T>(this, listener);
+    return new StreamSub<T>(this, listener as InternalListener<T>);
   }
 
   /**
@@ -1418,7 +1419,8 @@ export class Stream<T> implements InternalListener<T> {
    */
   static fromObservable<T>(obs: {subscribe: any}): Stream<T> {
     if ((obs as Stream<T>).endWhen) return obs as Stream<T>;
-    return new Stream<T>(new FromObservable(obs));
+    const o = typeof obs[$$observable] === 'function' ? obs[$$observable]() : obs;
+    return new Stream<T>(new FromObservable(o));
   }
 
   /**
@@ -1977,7 +1979,7 @@ export class Stream<T> implements InternalListener<T> {
 export class MemoryStream<T> extends Stream<T> {
   private _v: T;
   private _has: boolean = false;
-  constructor(producer: InternalProducer<T, Stream<T>>) {
+  constructor(producer: InternalProducer<T>) {
     super(producer);
   }
 
@@ -2049,4 +2051,6 @@ export class MemoryStream<T> extends Stream<T> {
 }
 
 export {NO, NO_IL};
-export default Stream;
+const xs = Stream;
+type xs<T> = Stream<T>;
+export default xs;

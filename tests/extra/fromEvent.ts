@@ -3,7 +3,7 @@
 import {EventEmitter} from 'events';
 import fromEvent from '../../src/extra/fromEvent';
 import * as assert from 'assert';
-function noop() {};
+function noop() {}
 
 class FakeEventTarget implements EventTarget {
   public handler: EventListener | undefined;
@@ -21,13 +21,13 @@ class FakeEventTarget implements EventTarget {
     this.handler.call(void 0, x);
   }
 
-  addEventListener(e: string, handler: EventListener | undefined, capture: boolean) {
+  addEventListener(e: string, handler: EventListener, capture: boolean) {
     this.event = e;
     this.handler = handler;
     this.capture = capture;
   }
 
-  removeEventListener(e: string, handler: EventListener | undefined, capture: boolean) {
+  removeEventListener(e: string, handler: EventListener, capture: boolean) {
     this.removedEvent = e;
     this.removedCapture = capture;
 
@@ -37,7 +37,7 @@ class FakeEventTarget implements EventTarget {
   dispatchEvent(event: Event) {
     return true;
   }
-};
+}
 
 class FakeEventEmitter extends EventEmitter {
   public handler: Function | undefined;
@@ -67,7 +67,7 @@ class FakeEventEmitter extends EventEmitter {
     this.handler = void 0;
     return this;
   }
-};
+}
 
 describe('fromEvent (extra) - DOMEvent', () => {
   it('should call addEventListener with expected parameters', () => {

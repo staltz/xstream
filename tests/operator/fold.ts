@@ -57,6 +57,6 @@ describe('Stream.prototype.fold', () => {
     assert.strictEqual(input instanceof MemoryStream, true);
     const stream: MemoryStream<number> = input.fold((acc, x) => acc + x, 0);
     assert.strictEqual(stream instanceof MemoryStream, true);
-    done();;
-  })
+    done();
+  });
 });

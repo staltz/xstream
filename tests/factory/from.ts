@@ -24,10 +24,10 @@ describe('xs.from', () => {
   });
 
   it('should convert a rejected promise to a stream', (done: any) => {
-    const stream = xs.from(Promise.reject('no'));
+    const stream = xs.from<string>(Promise.reject('no'));
 
     stream.addListener({
-      next: (x) => done('next should not be called'),
+      next: (x: string) => done('next should not be called'),
       error: (err: any) => {
         assert.strictEqual(err, 'no');
         done();

@@ -21,6 +21,22 @@ describe('dropRepeats (extra)', () => {
       },
     });
   });
+  
+  it('should complete when input completes', (done: any) => {
+    const stream = xs.of(1).compose(dropRepeats());
+    const expected = [1];
+
+    stream.addListener({
+      next: (x: number) => {
+        assert.equal(x, expected.shift());
+      },
+      error: (err: any) => done(err),
+      complete: () => {
+        assert.equal(expected.length, 0);
+        done();
+      },
+    });
+  });
 
   it('should drop consecutive \'duplicate\' strings, with a custom isEqual', (done: any) => {
     const stream = xs.of('a', 'b', 'a', 'A', 'B', 'b')
