@@ -52,7 +52,8 @@ class DebounceOperator<T> implements Operator<T, T> {
     const u = this.out;
     if (!u) return;
     this.clearInterval();
-    if (this.t) u._n(this.t);
+    if (this.t != null) u._n(this.t);
+    this.t = null;
     u._c();
   }
 }
