@@ -13,9 +13,7 @@ class OtherIL<T> implements InternalListener<any>, OutSender<T> {
     this.out._e(err);
   }
 
-  _c() {
-    this.op.up();
-  }
+  _c() {}
 }
 
 export class DropUntilOperator<T> implements Operator<T, T> {
@@ -63,14 +61,14 @@ export class DropUntilOperator<T> implements Operator<T, T> {
   _c() {
     const u = this.out;
     if (!u) return;
-    this.up();
+    this._stop();
     u._c();
   }
 }
 
 /**
  * Starts emitting the input stream when another stream emits a next event. The
- * output stream will complete if/when the other stream completes.
+ * output stream will emit no items if another stream is empty.
  *
  * Marble diagram:
  *
@@ -106,8 +104,8 @@ export class DropUntilOperator<T> implements Operator<T, T> {
  *
  * #### Arguments:
  *
- * @param {Stream} other Some other stream that is used to know when should the
- * output stream of this operator start emitting.
+ * @param {Stream} other Some other stream that is used to know when the output
+ * stream of this operator should start emitting.
  * @return {Stream}
  */
 export default function dropUntil<T>(other: Stream<any>): (ins: Stream<T>) => Stream<T> {
