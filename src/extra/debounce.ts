@@ -4,6 +4,7 @@ class DebounceOperator<T> implements Operator<T, T> {
   public type = 'debounce';
   public out: Stream<T> = null as any;
   private id: any = null;
+  private t: any = null;
 
   constructor(public dt: number,
               public ins: Stream<T>) {
@@ -32,9 +33,11 @@ class DebounceOperator<T> implements Operator<T, T> {
     const u = this.out;
     if (!u) return;
     this.clearInterval();
+    this.t = t;
     this.id = setInterval(() => {
       this.clearInterval();
       u._n(t);
+      this.t = null;
     }, this.dt);
   }
 
@@ -49,6 +52,7 @@ class DebounceOperator<T> implements Operator<T, T> {
     const u = this.out;
     if (!u) return;
     this.clearInterval();
+    if (this.t) u._n(this.t);
     u._c();
   }
 }
