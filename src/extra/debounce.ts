@@ -1,10 +1,10 @@
-import {Operator, Stream} from '../index';
+import {Operator, Stream, NO} from '../index';
 
 class DebounceOperator<T> implements Operator<T, T> {
   public type = 'debounce';
   public out: Stream<T> = null as any;
   private id: any = null;
-  private t: any = null;
+  private t: any = NO;
 
   constructor(public dt: number,
               public ins: Stream<T>) {
@@ -37,7 +37,7 @@ class DebounceOperator<T> implements Operator<T, T> {
     this.id = setInterval(() => {
       this.clearInterval();
       u._n(t);
-      this.t = null;
+      this.t = NO;
     }, this.dt);
   }
 
@@ -52,8 +52,8 @@ class DebounceOperator<T> implements Operator<T, T> {
     const u = this.out;
     if (!u) return;
     this.clearInterval();
-    if (this.t != null) u._n(this.t);
-    this.t = null;
+    if (this.t != NO) u._n(this.t);
+    this.t = NO;
     u._c();
   }
 }
