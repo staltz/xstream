@@ -45,6 +45,9 @@ function isEmitter(element: any): element is EventEmitter {
   return element.emit && element.addListener;
 }
 
+function fromEvent<T = any>(element: EventEmitter, eventName: string): Stream<T>;
+function fromEvent<T extends Event = Event>(element: EventTarget, eventName: string, useCapture?: boolean): Stream<T>;
+
 /**
  * Creates a stream based on either:
  * - DOM events with the name `eventName` from a provided target node
@@ -134,10 +137,6 @@ function isEmitter(element: any): element is EventEmitter {
  * dispatched to any EventTarget beneath it in the DOM tree. Defaults to false.
  * @return {Stream}
  */
-
-function fromEvent<T = any>(element: EventEmitter, eventName: string): Stream<T>;
-function fromEvent<T extends Event = Event>(element: EventTarget, eventName: string, useCapture?: boolean): Stream<T>;
-
 function fromEvent<T = any>(element: EventEmitter | EventTarget,
                             eventName: string,
                             useCapture: boolean = false): Stream<T> {

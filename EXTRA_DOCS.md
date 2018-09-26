@@ -11,6 +11,7 @@
 - [`flattenConcurrently`](#flattenConcurrently) (operator)
 - [`flattenSequentially`](#flattenSequentially) (operator)
 - [`fromDiagram`](#fromDiagram) (factory)
+- [`fromEvent`](#fromEvent) (factory)
 - [`pairwise`](#pairwise) (operator)
 - [`sampleCombine`](#sampleCombine) (operator)
 - [`split`](#split) (operator)
@@ -285,7 +286,7 @@ checks if it is equal to previous event, by returning a boolean.
 ### <a id="dropUntil"></a> `dropUntil(other)`
 
 Starts emitting the input stream when another stream emits a next event. The
-output stream will complete if/when the other stream completes.
+output stream will emit no items if another stream is empty.
 
 Marble diagram:
 
@@ -323,7 +324,7 @@ stream.addListener({
 
 #### Arguments:
 
-- `other: Stream` Some other stream that is used to know when should the output stream of this operator start emitting.
+- `other: Stream` Some other stream that is used to know when the output stream of this operator should start emitting.
 
 #### Returns:  Stream 
 
@@ -438,6 +439,99 @@ the error which `#` represents.
 
 - `diagram: string` A string representing a timeline of values, error, or complete notifications that should happen on the output stream.
 - `options` An options object that allows you to configure some additional details of the creation of the stream.
+
+#### Returns:  Stream 
+
+- - -
+
+### <a id="fromEvent"></a> `fromEvent(element, eventName, useCapture)`
+
+Creates a stream based on either:
+- DOM events with the name `eventName` from a provided target node
+- Events with the name `eventName` from a provided NodeJS EventEmitter
+
+When creating a stream from EventEmitters, if the source event has more than
+one argument all the arguments will be aggregated into an array in the
+result stream.
+
+(Tip: when using this factory with TypeScript, you will need types for
+Node.js because fromEvent knows how to handle both DOM events and Node.js
+EventEmitter. Just install `@types/node`)
+
+Marble diagram:
+
+```text
+  fromEvent(element, eventName)
+---ev--ev----ev---------------
+```
+
+Examples:
+
+```js
+import fromEvent from 'xstream/extra/fromEvent'
+
+const stream = fromEvent(document.querySelector('.button'), 'click')
+  .mapTo('Button clicked!')
+
+stream.addListener({
+  next: i => console.log(i),
+  error: err => console.error(err),
+  complete: () => console.log('completed')
+})
+```
+
+```text
+> 'Button clicked!'
+> 'Button clicked!'
+> 'Button clicked!'
+```
+
+```js
+import fromEvent from 'xstream/extra/fromEvent'
+import {EventEmitter} from 'events'
+
+const MyEmitter = new EventEmitter()
+const stream = fromEvent(MyEmitter, 'foo')
+
+stream.addListener({
+  next: i => console.log(i),
+  error: err => console.error(err),
+  complete: () => console.log('completed')
+})
+
+MyEmitter.emit('foo', 'bar')
+```
+
+```text
+> 'bar'
+```
+
+```js
+import fromEvent from 'xstream/extra/fromEvent'
+import {EventEmitter} from 'events'
+
+const MyEmitter = new EventEmitter()
+const stream = fromEvent(MyEmitter, 'foo')
+
+stream.addListener({
+  next: i => console.log(i),
+  error: err => console.error(err),
+  complete: () => console.log('completed')
+})
+
+MyEmitter.emit('foo', 'bar', 'baz', 'buzz')
+```
+
+```text
+> ['bar', 'baz', 'buzz']
+```
+
+#### Arguments:
+
+- `element: EventTarget|EventEmitter` The element upon which to listen.
+- `eventName: string` The name of the event for which to listen.
+- `useCapture: boolean` An optional boolean that indicates that events of this type will be dispatched to the registered listener before being
+dispatched to any EventTarget beneath it in the DOM tree. Defaults to false.
 
 #### Returns:  Stream 
 
