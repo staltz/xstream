@@ -1,5 +1,3 @@
-/// <reference types="mocha"/>
-/// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
@@ -24,7 +22,7 @@ describe('Stream.prototype.fold', () => {
   it('should propagate user mistakes in accumulate as errors', (done: any) => {
     const source = xs.periodic(30).take(1);
     const stream = source.fold(
-      (x, y) => <number> <any> (<string> <any> x).toLowerCase(),
+      x => <number> <any> (<string> <any> x).toLowerCase(),
       0
     );
     const expected = [0];

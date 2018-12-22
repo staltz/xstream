@@ -1,5 +1,3 @@
-/// <reference types="mocha"/>
-/// <reference types="node" />
 import xs, {Stream} from '../../src/index';
 import * as assert from 'assert';
 
@@ -50,16 +48,17 @@ describe('xs.combine', () => {
 
   it('should have correct TypeScript signature', (done: any) => {
     const stream1 = xs.create<string>({
-      start: listener => {},
+      start: _listener => {},
       stop: () => {}
     });
 
     const stream2 = xs.create<string>({
-      start: listener => {},
+      start: _listener => {},
       stop: () => {}
     });
 
     const combined: Stream<[string, string]> = xs.combine(stream1, stream2);
+    combined.drop(0); // no unused variables
     done();
   });
 

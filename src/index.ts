@@ -87,7 +87,7 @@ function internalizeProducer<T>(producer: Producer<T> & Partial<InternalProducer
     il.next = il._n;
     il.error = il._e;
     il.complete = il._c;
-    this.start(il);
+    this.start(il as Listener<T>);
   };
   producer._stop = producer.stop;
 }
@@ -119,7 +119,7 @@ class Observer<T> implements Listener<T> {
 class FromObservable<T> implements InternalProducer<T> {
   public type = 'fromObservable';
   public ins: Observable<T>;
-  public out: Stream<T>;
+  public out?: Stream<T>;
   private active: boolean;
   private _sub: Subscription | undefined;
 
@@ -1765,7 +1765,6 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   flatten<R>(this: Stream<Stream<R>>): T {
-    const p = this._prod;
     return new Stream<R>(new Flatten(this)) as T & Stream<R>;
   }
 
@@ -1976,7 +1975,7 @@ export class Stream<T> implements InternalListener<T> {
 }
 
 export class MemoryStream<T> extends Stream<T> {
-  private _v: T;
+  private _v?: T;
   private _has: boolean = false;
   constructor(producer: InternalProducer<T>) {
     super(producer);
@@ -1994,14 +1993,14 @@ export class MemoryStream<T> extends Stream<T> {
     const a = this._ils;
     a.push(il);
     if (a.length > 1) {
-      if (this._has) il._n(this._v);
+      if (this._has) il._n(this._v!);
       return;
     }
     if (this._stopID !== NO) {
-      if (this._has) il._n(this._v);
+      if (this._has) il._n(this._v!);
       clearTimeout(this._stopID);
       this._stopID = NO;
-    } else if (this._has) il._n(this._v); else {
+    } else if (this._has) il._n(this._v!); else {
       const p = this._prod;
       if (p !== NO) p._start(this);
     }

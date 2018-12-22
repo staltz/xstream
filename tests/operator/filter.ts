@@ -1,5 +1,3 @@
-/// <reference types="mocha"/>
-/// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
@@ -127,10 +125,10 @@ describe('Stream.prototype.filter', () => {
   it('should return stream of constrained type if predicate is type guard', (done: any) => {
     class Animal { }
     class Dog extends Animal {
-      thisIsADog: boolean;
+      thisIsADog?: boolean;
     }
     class Cat extends Animal {
-      thisIsACat: boolean;
+      thisIsACat?: boolean;
     }
 
     function isDog(a: Animal): a is Dog {
@@ -141,6 +139,7 @@ describe('Stream.prototype.filter', () => {
       new Animal(), new Cat(), new Dog(), new Animal()
     );
     const output: Stream<Dog> = input.filter(isDog);
+    output.drop(0); // no unused variable
     done();
   });
 });

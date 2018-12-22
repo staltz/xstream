@@ -5,7 +5,7 @@ class OtherIL<T> implements InternalListener<any>, OutSender<T> {
               private op: DropUntilOperator<T>) {
   }
 
-  _n(t: T) {
+  _n(_t: T) {
     this.op.up();
   }
 

@@ -4,7 +4,7 @@ class SeparatorIL<T> implements InternalListener<any>, OutSender<Array<T>> {
   constructor(public out: Stream<Array<T>>, private op: BufferOperator<T>) {
   }
 
-  _n(t: any) {
+  _n(_t: any) {
     this.op.flush();
   }
 
@@ -21,7 +21,7 @@ class SeparatorIL<T> implements InternalListener<any>, OutSender<Array<T>> {
 class BufferOperator<T> implements Operator<T, Array<T>> {
   public type = 'buffer';
   public out: Stream<Array<T>> = null as any;
-  private sil: InternalListener<any>;
+  private sil?: InternalListener<any>;
   private acc: Array<T> = [];
 
   constructor(public s: Stream<any>, public ins: Stream<T>) {
@@ -45,7 +45,7 @@ class BufferOperator<T> implements Operator<T, Array<T>> {
     this.flush();
     this.ins._remove(this);
     this.out = null as any;
-    this.s._remove(this.sil);
+    this.s._remove(this.sil!);
     this.sil = NO_IL;
   }
 

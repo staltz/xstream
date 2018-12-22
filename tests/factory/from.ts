@@ -1,5 +1,3 @@
-/// <reference types="mocha"/>
-/// <reference types="node" />
 import {Promise} from 'es6-promise';
 import xs, { Observable } from '../../src/index';
 import * as assert from 'assert';
@@ -27,7 +25,7 @@ describe('xs.from', () => {
     const stream = xs.from(Promise.reject('no'));
 
     stream.addListener({
-      next: (x: string) => done('next should not be called'),
+      next: () => done('next should not be called'),
       error: (err: any) => {
         assert.strictEqual(err, 'no');
         done();

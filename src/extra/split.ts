@@ -5,7 +5,7 @@ class SeparatorIL<T> implements InternalListener<any>, OutSender<Stream<T>> {
               private op: SplitOperator<T>) {
   }
 
-  _n(t: any) {
+  _n(_t: any) {
     this.op.up();
   }
 
