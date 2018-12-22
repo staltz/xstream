@@ -6,7 +6,10 @@
     "inlineSources": true,
     "declaration": true,
     "noImplicitAny": true,
-    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strict": true,
+    "moduleResolution": "node",
     "suppressImplicitAnyIndexErrors": true,
     "module": "commonjs",
     "noEmitHelpers": false,
@@ -37,7 +40,6 @@
     "src/extra/tween.ts",
     "src/index.ts"
   ],
-  "filesGlob": ["typings/index.d.ts", "src/**/*.ts"],
   "atom": {
     "rewriteTsconfig": true
   }

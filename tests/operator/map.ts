@@ -1,5 +1,3 @@
-/// <reference types="mocha"/>
-/// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
@@ -85,7 +83,7 @@ describe('Stream.prototype.map', () => {
         assert.strictEqual(x, expected.shift());
         assert.strictEqual(stream['_prod']['out'], stream);
       },
-      error: (err: any) => {
+      error: () => {
         errorCalled = true;
       },
       complete: () => {
@@ -103,7 +101,7 @@ describe('Stream.prototype.map', () => {
     const stream = xs.create();
     let firstMapCalled = 0;
 
-    const source$ = stream.map(x => {
+    const source$ = stream.map(() => {
       firstMapCalled += 1;
       return {a: 10, b: 20, c: 30};
     });
@@ -135,7 +133,7 @@ describe('Stream.prototype.map', () => {
     const stream = xs.create();
     let firstMapCalled = 0;
 
-    const source$ = stream.filter(x => x !== 42).map(x => {
+    const source$ = stream.filter(x => x !== 42).map(() => {
       firstMapCalled += 1;
       return {a: 10, b: 20, c: 30};
     });

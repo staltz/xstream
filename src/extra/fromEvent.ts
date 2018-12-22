@@ -1,10 +1,9 @@
-/// <reference types="node" />
 import {EventEmitter} from 'events';
 import {Stream, InternalProducer, InternalListener} from '../index';
 
 export class DOMEventProducer implements InternalProducer<Event> {
   public type = 'fromEvent';
-  private listener: EventListener | null;
+  private listener?: EventListener | null;
 
   constructor(private node: EventTarget,
               private eventType: string,
@@ -24,7 +23,7 @@ export class DOMEventProducer implements InternalProducer<Event> {
 
 export class NodeEventProducer implements InternalProducer<any> {
   public type = 'fromEvent';
-  private listener: Function | null;
+  private listener?: Function | null;
 
   constructor(private node: EventEmitter, private eventName: string) { }
 

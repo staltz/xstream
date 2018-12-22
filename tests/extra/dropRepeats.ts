@@ -1,5 +1,3 @@
-/// <reference types="mocha"/>
-/// <reference types="node" />
 import xs, {Stream} from '../../src/index';
 import fromDiagram from '../../src/extra/fromDiagram';
 import dropRepeats from '../../src/extra/dropRepeats';
@@ -21,7 +19,7 @@ describe('dropRepeats (extra)', () => {
       },
     });
   });
-  
+
   it('should complete when input completes', (done: any) => {
     const stream = xs.of(1).compose(dropRepeats());
     const expected = [1];
@@ -56,7 +54,7 @@ describe('dropRepeats (extra)', () => {
   });
 
   it('should drop consecutive duplicate numbers, with a circular stream dependency', (done: any) => {
-    const streamProxy = xs.create();
+    const streamProxy = xs.create<number>();
     const input = xs.of(0, 0, 1, 1, 1);
     const stream = xs.merge(streamProxy, input).compose(dropRepeats());
     streamProxy.imitate(stream);
@@ -71,7 +69,7 @@ describe('dropRepeats (extra)', () => {
     });
 
     input.addListener({
-      next: (x: number) => {},
+      next: () => {},
       error: (err: any) => done(err),
       complete: () => {
         assert.equal(expected.length, 0);
@@ -82,7 +80,8 @@ describe('dropRepeats (extra)', () => {
 
   it('should return the correct TypeScript types', (done: any) => {
     const first: Stream<Event> = xs.never();
-    const second: Stream<Event> = first.compose(dropRepeats((x, y) => false));
+    const second: Stream<Event> = first.compose(dropRepeats((_x, _y) => false));
+    second.drop(0); // no unused variable
     done();
   });
 

@@ -1,5 +1,3 @@
-/// <reference types="mocha"/>
-/// <reference types="node" />
 import xs from '../../src/index';
 import fromDiagram from '../../src/extra/fromDiagram';
 import * as assert from 'assert';
@@ -29,7 +27,7 @@ describe('fromDiagram (extra)', () => {
       next: (x: number) => {
         assert.equal(x, expected.shift());
       },
-      error: (err) => {
+      error: (_err) => {
         assert.equal(expected.length, 0);
         done();
       },
