@@ -1764,8 +1764,8 @@ export class Stream<T> implements InternalListener<T> {
    *
    * @return {Stream}
    */
-  flatten<R>(this: Stream<Stream<R>>): T {
-    return new Stream<R>(new Flatten(this)) as T & Stream<R>;
+  flatten<R>(this: Stream<Stream<R>>): Stream<R> {
+    return new Stream<R>(new Flatten(this));
   }
 
   /**
@@ -1976,7 +1976,7 @@ export class Stream<T> implements InternalListener<T> {
 
 export class MemoryStream<T> extends Stream<T> {
   private _v?: T;
-  private _has: boolean = false;
+  private _has?: boolean = false;
   constructor(producer: InternalProducer<T>) {
     super(producer);
   }

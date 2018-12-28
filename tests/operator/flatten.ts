@@ -335,8 +335,11 @@ describe('Stream.prototype.flatten', () => {
     });
   });
 
-  it.skip('should allow to flatten with inner being a MemoryStream', function() {
-    // @TODO: actually make this next line compile
-    // xs.of(xs.of(1).remember()).flatten();
+  it('should allow to flatten while playing around with MemoryStream(s) and correct type signature', function() {
+    xs.of(xs.of(1)).flatten() // Stream<Stream<number>> => Stream<number>
+    xs.of(xs.of(1).remember()).flatten() // Stream<MemoryStream<number>> => Stream<number>
+    xs.of(xs.of(1)).remember().flatten() // MemoryStream<Stream<number>> => Stream<number>
+    // xs.of(xs.of(1).remember()).remember().flatten() // Doesn't compile
+    xs.of(xs.of(1).remember()).remember().flatten<number>() // MemoryStream<MemoryStream<number>> => Stream<number>
   })
 });
