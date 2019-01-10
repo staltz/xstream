@@ -12,12 +12,7 @@
     "noEmitHelpers": false,
     "target": "ES5",
     "outDir": "./",
-    "lib": [
-      "dom",
-      "es5",
-      "es2015.collection",
-      "es2015.promise"
-    ]
+    "lib": ["dom", "es5", "es2015.collection", "es2015.promise"]
   },
   "formatCodeOptions": {
     "indentSize": 2,
@@ -32,6 +27,7 @@
     "src/extra/dropUntil.ts",
     "src/extra/flattenSequentially.ts",
     "src/extra/flattenConcurrently.ts",
+    "src/extra/flattenConcurrentlyAtMost.ts",
     "src/extra/fromDiagram.ts",
     "src/extra/fromEvent.ts",
     "src/extra/pairwise.ts",
@@ -41,10 +37,7 @@
     "src/extra/tween.ts",
     "src/index.ts"
   ],
-  "filesGlob": [
-    "typings/index.d.ts",
-    "src/**/*.ts"
-  ],
+  "filesGlob": ["typings/index.d.ts", "src/**/*.ts"],
   "atom": {
     "rewriteTsconfig": true
   }
