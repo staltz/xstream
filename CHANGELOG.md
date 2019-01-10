@@ -1,6 +1,17 @@
+<a name="11.8.0"></a>
+## 11.8.0 (2019-01-10)
+
+* feat(debounce): emit pending value on completion ([7ab4b17](https://github.com/staltz/xstream/commit/7ab4b17)), closes [staltz/xstream#257](https://github.com/staltz/xstream/issues/257)
+* feat(flattenConcurrentlyAtMost): add new extra ([ef8ed44](https://github.com/staltz/xstream/commit/ef8ed44)), closes [staltz/xstream#161](https://github.com/staltz/xstream/issues/161)
+* docs(extras): add fromEvent to EXTRA_DOCS.md ([0c3a855](https://github.com/staltz/xstream/commit/0c3a855))
+* fix(dropUntil): align with rxjs skipUntil ([0c0cf40](https://github.com/staltz/xstream/commit/0c0cf40)), closes [staltz/xstream#237](https://github.com/staltz/xstream/issues/237)
+
+
+
 <a name="11.7.0"></a>
 ## 11.7.0 (2018-06-23)
 
+* chore(package): release new version ([141014c](https://github.com/staltz/xstream/commit/141014c))
 * fix(fromEvent): Improve typings ([1d265c9](https://github.com/staltz/xstream/commit/1d265c9))
 
 
