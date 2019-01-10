@@ -1,6 +1,15 @@
+<a name="11.9.0"></a>
+## 11.9.0 (2019-01-10)
+
+* fix(extras): fix inclusion of new operator flattenConcurrentlyAtMost ([089e661](https://github.com/staltz/xstream/commit/089e661))
+* chore(scripts): improve update-gh-pages resilience ([75ca7de](https://github.com/staltz/xstream/commit/75ca7de))
+
+
+
 <a name="11.8.0"></a>
 ## 11.8.0 (2019-01-10)
 
+* chore(package): release new version ([8ab0154](https://github.com/staltz/xstream/commit/8ab0154))
 * feat(debounce): emit pending value on completion ([7ab4b17](https://github.com/staltz/xstream/commit/7ab4b17)), closes [staltz/xstream#257](https://github.com/staltz/xstream/issues/257)
 * feat(flattenConcurrentlyAtMost): add new extra ([ef8ed44](https://github.com/staltz/xstream/commit/ef8ed44)), closes [staltz/xstream#161](https://github.com/staltz/xstream/issues/161)
 * docs(extras): add fromEvent to EXTRA_DOCS.md ([0c3a855](https://github.com/staltz/xstream/commit/0c3a855))
