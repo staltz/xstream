@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs, {Listener, Producer} from '../../src/index';
 import debounce from '../../src/extra/debounce';
 import fromDiagram from '../../src/extra/fromDiagram';

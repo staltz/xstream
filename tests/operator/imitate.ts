@@ -1,4 +1,6 @@
-import xs, {Stream, MemoryStream} from '../../src/index';
+/// <reference types="mocha"/>
+/// <reference types="node" />
+import xs, {Producer, Listener, Stream, MemoryStream} from '../../src/index';
 import delay from '../../src/extra/delay';
 import * as assert from 'assert';
 

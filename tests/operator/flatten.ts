@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs, {Stream, Listener} from '../../src/index';
 import fromDiagram from '../../src/extra/fromDiagram';
 import * as assert from 'assert';
@@ -49,18 +51,17 @@ describe('Stream.prototype.flatten', () => {
 
     it('should return a flat stream with correct TypeScript types', (done: any) => {
       const streamStrings: Stream<string> = Stream.create({
-        start: (_listener: Listener<string>) => {},
+        start: (listener: Listener<string>) => {},
         stop: () => {}
       });
 
       const streamBooleans: Stream<boolean> = Stream.create({
-        start: (_listener: Listener<boolean>) => {},
+        start: (listener: Listener<boolean>) => {},
         stop: () => {}
       });
 
       // Type checked by the compiler. Without Stream<boolean> it does not compile.
-      const flat: Stream<boolean> = streamStrings.map(_x => streamBooleans).flatten();
-      flat.drop(0); // no unused variable
+      const flat: Stream<boolean> = streamStrings.map(x => streamBooleans).flatten();
       done();
     });
 
@@ -165,7 +166,7 @@ describe('Stream.prototype.flatten', () => {
 
       // a$.withLatestFrom(b$, (a, b) => a + b)
       const c$ = b$.map(b =>
-        a$.map(a => a + b).debug(() => { innerAEmissions += 1; })
+        a$.map(a => a + b).debug(a => { innerAEmissions += 1; })
       ).flatten().take(1);
 
       let cEmissions = 0;
@@ -188,7 +189,7 @@ describe('Stream.prototype.flatten', () => {
 
     it('should not error when stopping, and outer stream was empty', (done: any) => {
       const outer = xs.never();
-      const stream = outer.map(() => xs.of(1, 2, 3)).flatten();
+      const stream = outer.map(x => xs.of(1, 2, 3)).flatten();
       const listener = {
         next: () => {},
         error: () => {},
@@ -208,7 +209,7 @@ describe('Stream.prototype.flatten', () => {
       const periodic = fromDiagram('---a-b--c----d--e--f----g--h-|', {
         values: { a: 1, b: 2, c: 3, d: 4, e: 5, f: 6, g: 7, h: 8 }
       });
-      const stream = outer.map<Stream<number>>(x => {
+      const stream = outer.map(x => {
         if (x === 'A') {
           return periodic.map(i => i * 10);
         } else if (x === 'B') {
@@ -339,7 +340,7 @@ describe('Stream.prototype.flatten', () => {
     xs.of(xs.of(1)).flatten() // Stream<Stream<number>> => Stream<number>
     xs.of(xs.of(1).remember()).flatten() // Stream<MemoryStream<number>> => Stream<number>
     xs.of(xs.of(1)).remember().flatten() // MemoryStream<Stream<number>> => Stream<number>
-    // xs.of(xs.of(1).remember()).remember().flatten() // Doesn't compile
+    xs.of(xs.of(1).remember()).remember().flatten() // Flaky typehint: MemoryStream<MemoryStream<number>> => Stream<{}> 
     xs.of(xs.of(1).remember()).remember().flatten<number>() // MemoryStream<MemoryStream<number>> => Stream<number>
   })
 });

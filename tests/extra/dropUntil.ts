@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs from '../../src/index';
 import concat from '../../src/extra/concat';
 import dropUntil from '../../src/extra/dropUntil';

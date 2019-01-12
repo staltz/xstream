@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs from '../../src/index';
 import pairwise from '../../src/extra/pairwise';
 import * as assert from 'assert';

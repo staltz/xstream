@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs from '../../src/index';
 import flattenSequentially from '../../src/extra/flattenSequentially';
 import * as assert from 'assert';
@@ -154,7 +156,7 @@ describe('flattenSequentially (extra)', () => {
       const expectedInner = [0, 1];
 
       const stream = xs.of(1)
-        .map(_i =>
+        .map(i =>
           xs.periodic(150).take(3) // 150ms, 300ms, 450ms, 600ms
             .debug(x => assert.strictEqual(x, expectedInner.shift()))
         )

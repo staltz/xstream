@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node"/>
 import xs, {Listener} from '../src/index';
 import * as assert from 'assert';
 
@@ -185,7 +187,7 @@ describe('MemoryStream', () => {
       next: (x) => {
         assert.strictEqual(x, expectedA.shift());
       },
-      error: (err) => done(err),
+      error: (err) => {},
       complete: () => {
         completeCalled += 1;
       },
@@ -195,7 +197,7 @@ describe('MemoryStream', () => {
       next: (x) => {
         assert.strictEqual(x, expectedB.shift());
       },
-      error: (err) => done(err),
+      error: (err) => {},
       complete: () => {
         completeCalled += 1;
       }
@@ -235,7 +237,7 @@ describe('MemoryStream', () => {
         assert.strictEqual(x, expectedA.shift());
         source$.removeListener(listenerA);
       },
-      error: (err: any) => done(err),
+      error: (err: any) => {},
       complete: () => {
         completeCalled += 1;
       },
@@ -247,7 +249,7 @@ describe('MemoryStream', () => {
       next: (x) => {
         assert.strictEqual(x, expectedB.shift());
       },
-      error: (err) => done(err),
+      error: (err) => {},
       complete: () => {
         completeCalled += 1;
       }

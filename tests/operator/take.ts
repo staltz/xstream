@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs, {Stream, MemoryStream} from '../../src/index';
 import * as assert from 'assert';
 
@@ -68,7 +70,7 @@ describe('Stream.prototype.take', () => {
     const stream = xs.periodic(50).take(0);
 
     stream.addListener({
-      next: () => {
+      next: (x: number) => {
         done('next should not be called');
       },
       error: (err: any) => done(err),
@@ -79,26 +81,23 @@ describe('Stream.prototype.take', () => {
   });
 
   it('should terminate properly when "next" function recursively calls itself', (done: any) => {
-
     const producer = {
-      listener: null,
-      start(this: {listener: any}, listener: any) {
+      start: (listener: any) => {
         this.listener = listener;
         listener.next(1);
       },
-      _n(this: {listener: any},value: any) {
+      _n: (value: any) => {
         const listener = this.listener;
         if (listener) listener.next(value);
       },
-      _e(this: {listener: any},value: string) {
+      _e: (value: string) => {
         const listener = this.listener;
         if (listener) listener.error(value);
       },
-      stop(this: {listener: any}) {
-        this.listener = null
-      },
+      stop: () => this.listener = null,
+      listener: null
     };
-    const stream = xs.create<number>(producer);
+    const stream = xs.create(producer);
 
     let nextCount = 0;
     stream.take(1).addListener({
