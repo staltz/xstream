@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs, { Stream } from '../../src/index';
 import split from '../../src/extra/split';
 import concat from '../../src/extra/concat';

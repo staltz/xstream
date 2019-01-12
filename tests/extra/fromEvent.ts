@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import {EventEmitter} from 'events';
 import fromEvent from '../../src/extra/fromEvent';
 import * as assert from 'assert';
@@ -5,10 +7,10 @@ function noop() {}
 
 class FakeEventTarget implements EventTarget {
   public handler: EventListener | undefined;
-  public event?: string;
-  public capture?: boolean;
-  public removedEvent?: string;
-  public removedCapture?: boolean;
+  public event: string;
+  public capture: boolean;
+  public removedEvent: string;
+  public removedCapture: boolean;
 
   constructor() {}
 
@@ -25,28 +27,28 @@ class FakeEventTarget implements EventTarget {
     this.capture = capture;
   }
 
-  removeEventListener(e: string, _handler: EventListener, capture: boolean) {
+  removeEventListener(e: string, handler: EventListener, capture: boolean) {
     this.removedEvent = e;
     this.removedCapture = capture;
 
     this.handler = void 0;
   }
 
-  dispatchEvent(_event: Event) {
+  dispatchEvent(event: Event) {
     return true;
   }
 }
 
 class FakeEventEmitter extends EventEmitter {
   public handler: Function | undefined;
-  public event?: string | symbol;
-  public removedEvent?: string | symbol;
+  public event: string | symbol;
+  public removedEvent: string | symbol;
 
   constructor() {
     super();
   }
 
-  emit(_eventName: string, ...args: any[] ): any {
+  emit( eventName: string, ...args: any[] ): any {
     if (typeof this.handler !== 'function') {
         return;
     }
@@ -60,7 +62,7 @@ class FakeEventEmitter extends EventEmitter {
     return this;
   }
 
-  removeListener(e: string, _handler: Function): this {
+  removeListener(e: string, handler: Function): this {
     this.removedEvent = e;
     this.handler = void 0;
     return this;
@@ -116,7 +118,7 @@ describe('fromEvent (extra) - DOMEvent', () => {
     const stream = fromEvent(target, 'test', true);
 
     stream.take(1).addListener({
-      next: () => {},
+      next: (x) => {},
       error: (err: any) => done(err),
       complete() {
         setTimeout(() => {
@@ -170,7 +172,7 @@ describe('fromEvent (extra) - EventEmitter', () => {
     const stream = fromEvent(target, 'test');
 
     stream.take(1).addListener({
-      next: () => {},
+      next: (x) => {},
       error: (err: any) => done(err),
       complete() {
         setTimeout(() => {

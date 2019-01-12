@@ -1,0 +1,33 @@
+{
+    "extends": "./tsconfig",
+    "compilerOptions": {
+        "removeComments": false,
+        "preserveConstEnums": true,
+        "inlineSourceMap": true,
+        "inlineSources": true,
+        "declaration": true,
+        "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "strict": true,
+    },
+    "files": [
+        "src/extra/buffer.ts",
+        "src/extra/concat.ts",
+        "src/extra/debounce.ts",
+        "src/extra/delay.ts",
+        "src/extra/dropRepeats.ts",
+        "src/extra/dropUntil.ts",
+        "src/extra/flattenSequentially.ts",
+        "src/extra/flattenConcurrently.ts",
+        "src/extra/flattenConcurrentlyAtMost.ts",
+        "src/extra/fromDiagram.ts",
+        "src/extra/fromEvent.ts",
+        "src/extra/pairwise.ts",
+        "src/extra/sampleCombine.ts",
+        "src/extra/split.ts",
+        "src/extra/throttle.ts",
+        "src/extra/tween.ts",
+        "src/index.ts"
+      ],
+}

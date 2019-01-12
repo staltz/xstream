@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs, {Stream, MemoryStream, Producer} from '../../src/index';
 import * as assert from 'assert';
 
@@ -5,7 +7,7 @@ describe('Stream.prototype.replaceError', () => {
   it('should replace a single error with an array stream', (done: any) => {
     const source = xs.of<any>('a', 'b', 'c', 2, 'd').map(i => i.toLowerCase());
     const other = xs.of(10, 20, 30);
-    const stream = source.replaceError(() => other);
+    const stream = source.replaceError(err => other);
     const expected = ['a', 'b', 'c', 10, 20, 30];
 
     stream.addListener({
@@ -33,7 +35,7 @@ describe('Stream.prototype.replaceError', () => {
       {type: 'complete'},
     ];
 
-    const source = xs.create<number>({
+    const source = xs.create({
       start: (listener) => {
         while (events.length > 0) {
           const event = events.shift();
@@ -52,7 +54,7 @@ describe('Stream.prototype.replaceError', () => {
       stop: () => void 0,
     });
 
-    const stream = source.replaceError(() => source);
+    const stream = source.replaceError(err => source);
     const expected = [10, 20, 30, 40, 50, 60];
 
     stream.addListener({
@@ -81,7 +83,7 @@ describe('Stream.prototype.replaceError', () => {
     ];
     const source = xs.create(<Producer<number>> {
       on: false,
-      start(this: Producer<number> & {on: boolean}, listener) {
+      start: (listener) => {
         this.on = true;
         for (let i = 0; i < events.length; i++) {
           if (!this.on) return;
@@ -94,12 +96,12 @@ describe('Stream.prototype.replaceError', () => {
           }
         }
       },
-      stop(this: Producer<number> & {on: boolean}) {
+      stop: () => {
         this.on = false;
       },
     });
 
-    const stream = source.replaceError(() => source).take(8);
+    const stream = source.replaceError(err => source).take(8);
     const expected = [10, 20, 30, 10, 20, 30, 10, 20];
 
     stream.addListener({
@@ -121,7 +123,7 @@ describe('Stream.prototype.replaceError', () => {
     );
 
     stream.addListener({
-      next: () => done('next should not be called'),
+      next: (s: string) => done('next should not be called'),
       error: (err) => {
         assert.notStrictEqual(err.message.match(/is not a function$/), null);
         done();
@@ -135,7 +137,7 @@ describe('Stream.prototype.replaceError', () => {
   it('should return a Stream if input stream is a Stream', (done: any) => {
     const input = xs.of(1, 2, 3);
     assert.strictEqual(input instanceof Stream, true);
-    const stream: Stream<number> = input.replaceError(() => xs.never());
+    const stream: Stream<number> = input.replaceError(err => xs.never());
     assert.strictEqual(stream instanceof Stream, true);
     done();
   });
@@ -143,7 +145,7 @@ describe('Stream.prototype.replaceError', () => {
   it('should return a MemoryStream if input stream is a MemoryStream', (done: any) => {
     const input = xs.of(1, 2, 3).remember();
     assert.strictEqual(input instanceof MemoryStream, true);
-    const stream: MemoryStream<number> = input.replaceError(() => xs.never());
+    const stream: MemoryStream<number> = input.replaceError(err => xs.never());
     assert.strictEqual(stream instanceof MemoryStream, true);
     done();
   });

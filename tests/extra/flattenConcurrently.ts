@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs, {Stream, Listener} from '../../src/index';
 import flattenConcurrently from '../../src/extra/flattenConcurrently';
 import * as assert from 'assert';
@@ -24,19 +26,18 @@ describe('flattenConcurrently (extra)', () => {
 
     it('should return a flat stream with correct TypeScript types', (done: any) => {
       const streamStrings: Stream<string> = Stream.create({
-        start: (_listener: Listener<string>) => {},
+        start: (listener: Listener<string>) => {},
         stop: () => {}
       });
 
       const streamBooleans: Stream<boolean> = Stream.create({
-        start: (_listener: Listener<boolean>) => {},
+        start: (listener: Listener<boolean>) => {},
         stop: () => {}
       });
 
       // Type checked by the compiler. Without Stream<boolean> it does not compile.
-      const flat: Stream<boolean> = streamStrings.map(_x => streamBooleans)
+      const flat: Stream<boolean> = streamStrings.map(x => streamBooleans)
         .compose(flattenConcurrently);
-      flat.drop(0); // no unused variable
       done();
     });
 

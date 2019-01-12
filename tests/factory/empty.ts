@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs from '../../src/index';
 
 describe('xs.empty()', function() {

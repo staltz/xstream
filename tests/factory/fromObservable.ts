@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs from '../../src/index';
 import * as assert from 'assert';
 
@@ -23,7 +25,7 @@ describe('xs.fromObservable', () => {
   });
 
   it('should support synchronous unsubscribe on completion', (done: any) => {
-    const stream = xs.fromObservable<number>(xs.of(10, 20, 30));
+    const stream = xs.fromObservable(xs.of(10, 20, 30));
     let expected = [10, 20, 30];
 
     stream.addListener({

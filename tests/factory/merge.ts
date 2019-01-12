@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs, {Stream} from '../../src/index';
 import * as assert from 'assert';
 
@@ -75,25 +77,22 @@ describe('xs.merge', () => {
 
   it('should have a correct TypeScript signature', () => {
     const bools = xs.create<boolean>({
-      start: _listener => {},
+      start: listener => {},
       stop: () => {}
     });
 
     const numbers = xs.create<number>({
-      start: _listener => {},
+      start: listener => {},
       stop: () => {}
     });
 
     const strings = xs.create<string>({
-      start: _listener => {},
+      start: listener => {},
       stop: () => {}
     });
 
     const emptyIsh: Stream<boolean> = xs.merge<boolean>();
     const doubled: Stream<boolean | string> = xs.merge(bools, strings);
     const tripled: Stream<boolean | number | string> = xs.merge(bools, strings, numbers);
-    emptyIsh.drop(0); // no unused variable
-    doubled.drop(0); // no unused variable
-    tripled.drop(0); // no unused variable
   });
 });

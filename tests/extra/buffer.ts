@@ -1,3 +1,5 @@
+/// <reference types="mocha"/>
+/// <reference types="node" />
 import xs from '../../src/index';
 import buffer from '../../src/extra/buffer';
 import delay from '../../src/extra/delay';

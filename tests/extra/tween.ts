@@ -1,4 +1,6 @@
-import {Stream} from '../../src/index';
+/// <reference types="mocha"/>
+/// <reference types="node" />
+import xs, {Stream} from '../../src/index';
 import tween from '../../src/extra/tween';
 import * as assert from 'assert';
 
@@ -23,7 +25,7 @@ function setCharAt(str: string, idx: number, chr: string): string {
 function rotate(lines: Array<string>): Array<string> {
   let len = lines[0].length;
   return lines[0].split('')
-    .map((_col, i) =>
+    .map((col, i) =>
       lines.map(row => row.split('')[len - i - 1])
     )
     .map(row => row.join(''));
@@ -42,7 +44,7 @@ function plot(position$: Stream<number>): Stream<string> {
     .last()
     .map(arr => {
       let coords = arr.map((y, x) => [x, y]);
-      let lines = coords.reduce((lines, [_x, y]) => {
+      let lines = coords.reduce((lines, [x, y]) => {
         let newline: string;
         if (y < 0) {
           newline = setCharAt(stutter(' ', STEPS + 1), 0, '_');
