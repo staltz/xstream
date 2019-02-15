@@ -324,6 +324,7 @@ export interface CombineSignature {
     s8: Stream<T8>,
     s9: Stream<T9>,
     s10: Stream<T10>): Stream<[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10]>;
+  <T>(...stream: Array<Stream<T>>): Stream<Array<T>>;
   (...stream: Array<Stream<any>>): Stream<Array<any>>;
 }
 
