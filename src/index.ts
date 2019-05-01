@@ -1765,7 +1765,7 @@ export class Stream<T> implements InternalListener<T> {
    *
    * @return {Stream}
    */
-  flatten<R>(this: Stream<Stream<R>>): Stream<R> {
+  flatten<R>(this: Stream<Stream<R> | MemoryStream<R>>): Stream<R> {
     return new Stream<R>(new Flatten(this));
   }
 
