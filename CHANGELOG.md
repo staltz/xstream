@@ -1,3 +1,14 @@
+<a name="11.11.0"></a>
+# [11.11.0](https://github.com/staltz/xstream/compare/v11.10.0...v11.11.0) (2019-05-04)
+
+
+### Bug Fixes
+
+* **combine:** add type signature for homogenous input streams ([5ee4037](https://github.com/staltz/xstream/commit/5ee4037)), closes [#270](https://github.com/staltz/xstream/issues/270)
+* **flatten:** support TypeScript 3.4 ([1325bbf](https://github.com/staltz/xstream/commit/1325bbf)), closes [#278](https://github.com/staltz/xstream/issues/278)
+
+
+
 <a name="11.10.0"></a>
 # [11.10.0](https://github.com/staltz/xstream/compare/v11.9.0...v11.10.0) (2019-01-15)
 
