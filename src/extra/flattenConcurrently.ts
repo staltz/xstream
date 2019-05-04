@@ -1,4 +1,4 @@
-import {Operator, Stream, OutSender, InternalListener} from '../index';
+import { Operator, Stream, MemoryStream, OutSender, InternalListener } from '../index';
 
 class FCIL<T> implements InternalListener<T>, OutSender<T> {
   constructor(public out: Stream<T>,
@@ -88,6 +88,6 @@ export class FlattenConcOperator<T> implements Operator<Stream<T>, T> {
  *
  * @return {Stream}
  */
-export default function flattenConcurrently<T>(ins: Stream<Stream<T>>): Stream<T> {
+export default function flattenConcurrently<T>(ins: Stream<Stream<T> | MemoryStream<T>>): Stream<T> {
   return new Stream<T>(new FlattenConcOperator(ins));
 }

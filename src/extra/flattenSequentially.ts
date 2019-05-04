@@ -1,4 +1,4 @@
-import {Operator, Stream, InternalListener} from '../index';
+import { Operator, Stream, MemoryStream, InternalListener } from '../index';
 
 class FSInner<T> implements InternalListener<T> {
   constructor(private out: Stream<T>,
@@ -122,6 +122,6 @@ export class FlattenSeqOperator<T> implements Operator<Stream<T>, T> {
  *
  * @return {Stream}
  */
-export default function flattenSequentially<T>(ins: Stream<Stream<T>>): Stream<T> {
+export default function flattenSequentially<T>(ins: Stream<Stream<T> | MemoryStream<T>>): Stream<T> {
   return new Stream<T>(new FlattenSeqOperator(ins));
 }

@@ -1,4 +1,4 @@
-import {Operator, Stream, OutSender, InternalListener} from '../index';
+import { Operator, Stream, MemoryStream, OutSender, InternalListener } from '../index';
 
 class FCAMIL<T> implements InternalListener<T>, OutSender<T> {
   constructor(public out: Stream<T>,
@@ -125,8 +125,8 @@ export class FlattenConcAMOperator<T> implements Operator<Stream<T>, T> {
  *
  * @return {Stream}
  */
-export default function flattenConcurrentlyAtMost<T>(n: number): (ins: Stream<Stream<T>>) => Stream<T> {
-  return function flattenConcAMOperator(ins: Stream<Stream<T>>) {
+export default function flattenConcurrentlyAtMost<T>(n: number): (ins: Stream<Stream<T> | MemoryStream<T>>) => Stream<T> {
+  return function flattenConcAMOperator(ins: Stream<Stream<T> | MemoryStream<T>>) {
     return new Stream<T>(new FlattenConcAMOperator(n, ins));
   };
 }
