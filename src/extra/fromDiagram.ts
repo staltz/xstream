@@ -65,6 +65,8 @@ export class DiagramProducer implements InternalProducer<any> {
       }
       clearInterval(id);
     }, notification.time);
+
+    this.tasks.push(id);
   }
 
   _stop() {
