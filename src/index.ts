@@ -344,10 +344,7 @@ class CombineListener<T> implements InternalListener<T>, OutSender<Array<T>> {
     const p = this.p, out = this.out;
     if (out === NO) return;
     if (p.up(t, this.i)) {
-      const a = p.vals;
-      const l = a.length;
-      const b = Array(l);
-      for (let i = 0; i < l; ++i) b[i] = a[i];
+      const b = cp(p.vals);
       out._n(b);
     }
   }
