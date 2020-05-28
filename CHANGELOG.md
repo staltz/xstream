@@ -1,3 +1,15 @@
+<a name="11.12.0"></a>
+# [11.12.0](https://github.com/staltz/xstream/compare/v11.11.0...v11.12.0) (2020-05-28)
+
+
+### Bug Fixes
+
+* **debounce:** clear emit timer interval on stop ([719bcd9](https://github.com/staltz/xstream/commit/719bcd9)), closes [#296](https://github.com/staltz/xstream/issues/296)
+* **fromDiagram:** save timers ([f65f6b7](https://github.com/staltz/xstream/commit/f65f6b7))
+* **imitate:** use null for unset this._target ([baf37aa](https://github.com/staltz/xstream/commit/baf37aa))
+
+
+
 <a name="11.11.0"></a>
 # [11.11.0](https://github.com/staltz/xstream/compare/v11.10.0...v11.11.0) (2019-05-04)
 
@@ -245,9 +257,9 @@ are zero breaking changes.
 
 ### Performance Improvements
 
-* update benchmarks ([b12065d](https://github.com/staltz/xstream/commit/b12065d))
 * **core:** improve performance by encapsulating try/catch ([31fab06](https://github.com/staltz/xstream/commit/31fab06))
 * **core:** merge together core.ts and index.ts ([a03e418](https://github.com/staltz/xstream/commit/a03e418))
+* update benchmarks ([b12065d](https://github.com/staltz/xstream/commit/b12065d))
 
 
 
