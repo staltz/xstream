@@ -1448,7 +1448,7 @@ dot-prop@^3.0.0:
 
 "dox@https://github.com/visionmedia/dox/tarball/master":
   version "0.9.0"
-  resolved "https://github.com/visionmedia/dox/tarball/master#4e9d09876e0037fbb0cf506af71016a3344f6cb7"
+  resolved "https://github.com/visionmedia/dox/tarball/master#92b1b943af41b61e67e9de734db2559ff3c990a0"
   dependencies:
     commander "~2.20.0"
     jsdoctypeparser "^1.2.0"
