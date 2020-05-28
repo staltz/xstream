@@ -1070,7 +1070,7 @@ export class Stream<T> implements InternalListener<T> {
   protected _stopID: any;
   protected _dl: InternalListener<T>; // the debug listener
   protected _d: boolean; // flag indicating the existence of the debug listener
-  protected _target: Stream<T>; // imitation target if this Stream will imitate
+  protected _target: Stream<T> | null; // imitation target if this Stream will imitate
   protected _err: any;
 
   constructor(producer?: InternalProducer<T>) {
@@ -1079,7 +1079,7 @@ export class Stream<T> implements InternalListener<T> {
     this._stopID = NO;
     this._dl = NO as InternalListener<T>;
     this._d = false;
-    this._target = NO as Stream<T>;
+    this._target = null;
     this._err = NO;
   }
 
@@ -1135,7 +1135,7 @@ export class Stream<T> implements InternalListener<T> {
 
   _add(il: InternalListener<T>): void {
     const ta = this._target;
-    if (ta !== NO) return ta._add(il);
+    if (ta) return ta._add(il);
     const a = this._ils;
     a.push(il);
     if (a.length > 1) return;
@@ -1150,7 +1150,7 @@ export class Stream<T> implements InternalListener<T> {
 
   _remove(il: InternalListener<T>): void {
     const ta = this._target;
-    if (ta !== NO) return ta._remove(il);
+    if (ta) return ta._remove(il);
     const a = this._ils;
     const i = a.indexOf(il);
     if (i > -1) {
@@ -1987,7 +1987,7 @@ export class MemoryStream<T> extends Stream<T> {
 
   _add(il: InternalListener<T>): void {
     const ta = this._target;
-    if (ta !== NO) return ta._add(il);
+    if (ta) return ta._add(il);
     const a = this._ils;
     a.push(il);
     if (a.length > 1) {
