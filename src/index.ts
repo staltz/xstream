@@ -1281,8 +1281,8 @@ export class Stream<T> implements InternalListener<T> {
    * @factory true
    * @return {Stream}
    */
-  static never(): Stream<any> {
-    return new Stream<any>({ _start: noop, _stop: noop });
+  static never<T = any>(): Stream<any> {
+    return new Stream<T>({ _start: noop, _stop: noop });
   }
 
   /**
@@ -1299,8 +1299,8 @@ export class Stream<T> implements InternalListener<T> {
    * @factory true
    * @return {Stream}
    */
-  static empty(): Stream<any> {
-    return new Stream<any>({
+  static empty<T = any>(): Stream<any> {
+    return new Stream<T>({
       _start(il: InternalListener<any>) { il._c(); },
       _stop: noop,
     });
