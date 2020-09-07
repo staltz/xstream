@@ -1,3 +1,13 @@
+<a name="11.13.0"></a>
+# [11.13.0](https://github.com/staltz/xstream/compare/v11.12.0...v11.13.0) (2020-09-07)
+
+
+### Features
+
+* add never and empty <T = any> param ([f448148](https://github.com/staltz/xstream/commit/f448148)), closes [#307](https://github.com/staltz/xstream/issues/307)
+
+
+
 <a name="11.12.0"></a>
 # [11.12.0](https://github.com/staltz/xstream/compare/v11.11.0...v11.12.0) (2020-05-28)
 
@@ -257,9 +267,9 @@ are zero breaking changes.
 
 ### Performance Improvements
 
+* update benchmarks ([b12065d](https://github.com/staltz/xstream/commit/b12065d))
 * **core:** improve performance by encapsulating try/catch ([31fab06](https://github.com/staltz/xstream/commit/31fab06))
 * **core:** merge together core.ts and index.ts ([a03e418](https://github.com/staltz/xstream/commit/a03e418))
-* update benchmarks ([b12065d](https://github.com/staltz/xstream/commit/b12065d))
 
 
 
