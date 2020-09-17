@@ -1099,12 +1099,15 @@ export class Stream<T> implements InternalListener<T> {
     const a = this._ils;
     const L = a.length;
     this._x();
-    if (this._d) this._dl._e(err);
+    if (this._d) {
+      this._dl._e(err);
+    } else if (L == 0) {
+      throw this._err;
+    }
     if (L == 1) a[0]._e(err); else if (L == 0) return; else {
       const b = cp(a);
       for (let i = 0; i < L; i++) b[i]._e(err);
     }
-    if (!this._d && L == 0) throw this._err;
   }
 
   _c(): void {
