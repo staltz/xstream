@@ -1,4 +1,7 @@
-import $$observable from 'symbol-observable';
+import ponyfillSymbolObservable from 'symbol-observable/ponyfill';
+import { getPolyfill as getGlobalThis } from 'globalthis';
+
+const $$observable = ponyfillSymbolObservable(getGlobalThis());
 
 const NO = {};
 function noop() { }
@@ -1415,7 +1418,7 @@ export class Stream<T> implements InternalListener<T> {
    * @return {Stream}
    */
   static fromObservable<T>(obs: { subscribe: any }): Stream<T> {
-    if ((obs as Stream<T>).endWhen) return obs as Stream<T>;
+    if ((obs as Stream<T>).endWhen !== undefined) return obs as Stream<T>;
     const o = typeof obs[$$observable] === 'function' ? obs[$$observable]() : obs;
     return new Stream<T>(new FromObservable(o));
   }

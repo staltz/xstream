@@ -46,7 +46,9 @@
   },
   "homepage": "https://github.com/staltz/xstream#readme",
   "dependencies": {
-    "symbol-observable": "1.2.0"
+    "@types/globalthis": "^1.0.1",
+    "globalthis": "^1.0.1",
+    "symbol-observable": "^2.0.3"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.40",
@@ -64,13 +66,13 @@
     "markdox": "0.1.10",
     "mkdirp": "0.5.1",
     "mocha": "^5.2.0",
-    "most": "1.0.3",
+    "most": "^1.9.0",
     "sinon": "1.16.0",
     "strip-comments": "0.4.4",
     "ts-node": "6.0.x",
     "tsify": "4.0.x",
     "tslint": "5.7.0",
-    "typescript": "3.2.x",
+    "typescript": "^3.4.0",
     "validate-commit-msg": "2.4.x"
   },
   "publishConfig": {
