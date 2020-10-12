@@ -14,7 +14,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var symbol_observable_1 = require("symbol-observable");
+exports.NO_IL = exports.NO = exports.MemoryStream = exports.Stream = void 0;
+var ponyfill_1 = require("symbol-observable/ponyfill");
+var globalthis_1 = require("globalthis");
+var $$observable = ponyfill_1.default(globalthis_1.getPolyfill());
 var NO = {};
 exports.NO = NO;
 function noop() { }
@@ -939,7 +942,7 @@ var Stream =  (function () {
         return new StreamSub(this, listener);
     };
     
-    Stream.prototype[symbol_observable_1.default] = function () {
+    Stream.prototype[$$observable] = function () {
         return this;
     };
     
@@ -978,7 +981,7 @@ var Stream =  (function () {
     };
     
     Stream.from = function (input) {
-        if (typeof input[symbol_observable_1.default] === 'function')
+        if (typeof input[$$observable] === 'function')
             return Stream.fromObservable(input);
         else if (typeof input.then === 'function')
             return Stream.fromPromise(input);
@@ -1004,9 +1007,9 @@ var Stream =  (function () {
     };
     
     Stream.fromObservable = function (obs) {
-        if (obs.endWhen)
+        if (obs.endWhen !== undefined)
             return obs;
-        var o = typeof obs[symbol_observable_1.default] === 'function' ? obs[symbol_observable_1.default]() : obs;
+        var o = typeof obs[$$observable] === 'function' ? obs[$$observable]() : obs;
         return new Stream(new FromObservable(o));
     };
     
@@ -1206,39 +1209,316 @@ exports.MemoryStream = MemoryStream;
 var xs = Stream;
 exports.default = xs;
 
-},{"symbol-observable":2}],2:[function(require,module,exports){
+},{"globalthis":4,"symbol-observable/ponyfill":11}],2:[function(require,module,exports){
+'use strict';
+
+var keys = require('object-keys');
+var hasSymbols = typeof Symbol === 'function' && typeof Symbol('foo') === 'symbol';
+
+var toStr = Object.prototype.toString;
+var concat = Array.prototype.concat;
+var origDefineProperty = Object.defineProperty;
+
+var isFunction = function (fn) {
+	return typeof fn === 'function' && toStr.call(fn) === '[object Function]';
+};
+
+var arePropertyDescriptorsSupported = function () {
+	var obj = {};
+	try {
+		origDefineProperty(obj, 'x', { enumerable: false, value: obj });
+		
+		for (var _ in obj) { 
+			return false;
+		}
+		return obj.x === obj;
+	} catch (e) { 
+		return false;
+	}
+};
+var supportsDescriptors = origDefineProperty && arePropertyDescriptorsSupported();
+
+var defineProperty = function (object, name, value, predicate) {
+	if (name in object && (!isFunction(predicate) || !predicate())) {
+		return;
+	}
+	if (supportsDescriptors) {
+		origDefineProperty(object, name, {
+			configurable: true,
+			enumerable: false,
+			value: value,
+			writable: true
+		});
+	} else {
+		object[name] = value;
+	}
+};
+
+var defineProperties = function (object, map) {
+	var predicates = arguments.length > 2 ? arguments[2] : {};
+	var props = keys(map);
+	if (hasSymbols) {
+		props = concat.call(props, Object.getOwnPropertySymbols(map));
+	}
+	for (var i = 0; i < props.length; i += 1) {
+		defineProperty(object, props[i], map[props[i]], predicates[props[i]]);
+	}
+};
+
+defineProperties.supportsDescriptors = !!supportsDescriptors;
+
+module.exports = defineProperties;
+
+},{"object-keys":8}],3:[function(require,module,exports){
+
+
+'use strict';
+
+if (typeof self !== 'undefined') {
+	module.exports = self;
+} else if (typeof window !== 'undefined') {
+	module.exports = window;
+} else {
+	module.exports = Function('return this')();
+}
+
+},{}],4:[function(require,module,exports){
+'use strict';
+
+var defineProperties = require('define-properties');
+
+var implementation = require('./implementation');
+var getPolyfill = require('./polyfill');
+var shim = require('./shim');
+
+var polyfill = getPolyfill();
+
+var getGlobal = function () { return polyfill; };
+
+defineProperties(getGlobal, {
+	getPolyfill: getPolyfill,
+	implementation: implementation,
+	shim: shim
+});
+
+module.exports = getGlobal;
+
+},{"./implementation":3,"./polyfill":5,"./shim":6,"define-properties":2}],5:[function(require,module,exports){
 (function (global){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+var implementation = require('./implementation');
 
-var _ponyfill = require('./ponyfill.js');
+module.exports = function getPolyfill() {
+	if (typeof global !== 'object' || !global || global.Math !== Math || global.Array !== Array) {
+		return implementation;
+	}
+	return global;
+};
 
-var _ponyfill2 = _interopRequireDefault(_ponyfill);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-var root; 
-
-
-if (typeof self !== 'undefined') {
-  root = self;
-} else if (typeof window !== 'undefined') {
-  root = window;
-} else if (typeof global !== 'undefined') {
-  root = global;
-} else if (typeof module !== 'undefined') {
-  root = module;
-} else {
-  root = Function('return this')();
-}
-
-var result = (0, _ponyfill2['default'])(root);
-exports['default'] = result;
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./ponyfill.js":3}],3:[function(require,module,exports){
+},{"./implementation":3}],6:[function(require,module,exports){
+'use strict';
+
+var define = require('define-properties');
+var getPolyfill = require('./polyfill');
+
+module.exports = function shimGlobal() {
+	var polyfill = getPolyfill();
+	if (define.supportsDescriptors) {
+		var descriptor = Object.getOwnPropertyDescriptor(polyfill, 'globalThis');
+		if (!descriptor || (descriptor.configurable && (descriptor.enumerable || descriptor.writable || globalThis !== polyfill))) { 
+			Object.defineProperty(polyfill, 'globalThis', {
+				configurable: true,
+				enumerable: false,
+				value: polyfill,
+				writable: false
+			});
+		}
+	} else if (typeof globalThis !== 'object' || globalThis !== polyfill) {
+		polyfill.globalThis = polyfill;
+	}
+	return polyfill;
+};
+
+},{"./polyfill":5,"define-properties":2}],7:[function(require,module,exports){
+'use strict';
+
+var keysShim;
+if (!Object.keys) {
+	
+	var has = Object.prototype.hasOwnProperty;
+	var toStr = Object.prototype.toString;
+	var isArgs = require('./isArguments'); 
+	var isEnumerable = Object.prototype.propertyIsEnumerable;
+	var hasDontEnumBug = !isEnumerable.call({ toString: null }, 'toString');
+	var hasProtoEnumBug = isEnumerable.call(function () {}, 'prototype');
+	var dontEnums = [
+		'toString',
+		'toLocaleString',
+		'valueOf',
+		'hasOwnProperty',
+		'isPrototypeOf',
+		'propertyIsEnumerable',
+		'constructor'
+	];
+	var equalsConstructorPrototype = function (o) {
+		var ctor = o.constructor;
+		return ctor && ctor.prototype === o;
+	};
+	var excludedKeys = {
+		$applicationCache: true,
+		$console: true,
+		$external: true,
+		$frame: true,
+		$frameElement: true,
+		$frames: true,
+		$innerHeight: true,
+		$innerWidth: true,
+		$onmozfullscreenchange: true,
+		$onmozfullscreenerror: true,
+		$outerHeight: true,
+		$outerWidth: true,
+		$pageXOffset: true,
+		$pageYOffset: true,
+		$parent: true,
+		$scrollLeft: true,
+		$scrollTop: true,
+		$scrollX: true,
+		$scrollY: true,
+		$self: true,
+		$webkitIndexedDB: true,
+		$webkitStorageInfo: true,
+		$window: true
+	};
+	var hasAutomationEqualityBug = (function () {
+		
+		if (typeof window === 'undefined') { return false; }
+		for (var k in window) {
+			try {
+				if (!excludedKeys['$' + k] && has.call(window, k) && window[k] !== null && typeof window[k] === 'object') {
+					try {
+						equalsConstructorPrototype(window[k]);
+					} catch (e) {
+						return true;
+					}
+				}
+			} catch (e) {
+				return true;
+			}
+		}
+		return false;
+	}());
+	var equalsConstructorPrototypeIfNotBuggy = function (o) {
+		
+		if (typeof window === 'undefined' || !hasAutomationEqualityBug) {
+			return equalsConstructorPrototype(o);
+		}
+		try {
+			return equalsConstructorPrototype(o);
+		} catch (e) {
+			return false;
+		}
+	};
+
+	keysShim = function keys(object) {
+		var isObject = object !== null && typeof object === 'object';
+		var isFunction = toStr.call(object) === '[object Function]';
+		var isArguments = isArgs(object);
+		var isString = isObject && toStr.call(object) === '[object String]';
+		var theKeys = [];
+
+		if (!isObject && !isFunction && !isArguments) {
+			throw new TypeError('Object.keys called on a non-object');
+		}
+
+		var skipProto = hasProtoEnumBug && isFunction;
+		if (isString && object.length > 0 && !has.call(object, 0)) {
+			for (var i = 0; i < object.length; ++i) {
+				theKeys.push(String(i));
+			}
+		}
+
+		if (isArguments && object.length > 0) {
+			for (var j = 0; j < object.length; ++j) {
+				theKeys.push(String(j));
+			}
+		} else {
+			for (var name in object) {
+				if (!(skipProto && name === 'prototype') && has.call(object, name)) {
+					theKeys.push(String(name));
+				}
+			}
+		}
+
+		if (hasDontEnumBug) {
+			var skipConstructor = equalsConstructorPrototypeIfNotBuggy(object);
+
+			for (var k = 0; k < dontEnums.length; ++k) {
+				if (!(skipConstructor && dontEnums[k] === 'constructor') && has.call(object, dontEnums[k])) {
+					theKeys.push(dontEnums[k]);
+				}
+			}
+		}
+		return theKeys;
+	};
+}
+module.exports = keysShim;
+
+},{"./isArguments":9}],8:[function(require,module,exports){
+'use strict';
+
+var slice = Array.prototype.slice;
+var isArgs = require('./isArguments');
+
+var origKeys = Object.keys;
+var keysShim = origKeys ? function keys(o) { return origKeys(o); } : require('./implementation');
+
+var originalKeys = Object.keys;
+
+keysShim.shim = function shimObjectKeys() {
+	if (Object.keys) {
+		var keysWorksWithArguments = (function () {
+			
+			var args = Object.keys(arguments);
+			return args && args.length === arguments.length;
+		}(1, 2));
+		if (!keysWorksWithArguments) {
+			Object.keys = function keys(object) { 
+				if (isArgs(object)) {
+					return originalKeys(slice.call(object));
+				}
+				return originalKeys(object);
+			};
+		}
+	} else {
+		Object.keys = keysShim;
+	}
+	return Object.keys || keysShim;
+};
+
+module.exports = keysShim;
+
+},{"./implementation":7,"./isArguments":9}],9:[function(require,module,exports){
+'use strict';
+
+var toStr = Object.prototype.toString;
+
+module.exports = function isArguments(value) {
+	var str = toStr.call(value);
+	var isArgs = str === '[object Arguments]';
+	if (!isArgs) {
+		isArgs = str !== '[object Array]' &&
+			value !== null &&
+			typeof value === 'object' &&
+			typeof value.length === 'number' &&
+			value.length >= 0 &&
+			toStr.call(value.callee) === '[object Function]';
+	}
+	return isArgs;
+};
+
+},{}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1253,8 +1533,18 @@ function symbolObservablePonyfill(root) {
 		if (_Symbol.observable) {
 			result = _Symbol.observable;
 		} else {
-			result = _Symbol('observable');
-			_Symbol.observable = result;
+
+			
+			
+			
+			result = _Symbol['for']('https://github.com/benlesh/symbol-observable');
+			try {
+				_Symbol.observable = result;
+			} catch (err) {
+				
+				
+				
+			}
 		}
 	} else {
 		result = '@@observable';
@@ -1262,5 +1552,8 @@ function symbolObservablePonyfill(root) {
 
 	return result;
 };
-},{}]},{},[1])(1)
+},{}],11:[function(require,module,exports){
+module.exports = require('./lib/ponyfill');
+
+},{"./lib/ponyfill":10}]},{},[1])(1)
 });

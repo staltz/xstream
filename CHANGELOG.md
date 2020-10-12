@@ -1,3 +1,8 @@
+<a name="11.14.0"></a>
+# [11.14.0](https://github.com/staltz/xstream/compare/v11.13.0...v11.14.0) (2020-10-12)
+
+
+
 <a name="11.13.0"></a>
 # [11.13.0](https://github.com/staltz/xstream/compare/v11.12.0...v11.13.0) (2020-09-07)
 
