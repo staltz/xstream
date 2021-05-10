@@ -38,6 +38,12 @@ export interface InternalListener<T> {
   _c: () => void;
 }
 
+export interface InternalListenerExt<T> {
+  _n: <V extends T>(v: V) => void;
+  _e: (err: any) => void;
+  _c: () => void;
+}
+
 const NO_IL: InternalListener<any> = {
   _n: noop,
   _e: noop,
@@ -1069,9 +1075,9 @@ class Take<T> implements Operator<T, T> {
 
 export class Stream<T> implements InternalListener<T> {
   public _prod: InternalProducer<T>;
-  protected _ils: Array<InternalListener<T>>; // 'ils' = Internal listeners
+  protected _ils: Array<InternalListenerExt<T>>; // 'ils' = Internal listeners
   protected _stopID: any;
-  protected _dl: InternalListener<T>; // the debug listener
+  protected _dl: InternalListenerExt<T>; // the debug listener
   protected _d: boolean; // flag indicating the existence of the debug listener
   protected _target: Stream<T> | null; // imitation target if this Stream will imitate
   protected _err: any;

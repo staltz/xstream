@@ -15,7 +15,7 @@
     "doctest": "markdown-doctest",
     "setup-browser-tests": "browserify browser-tests/index.ts -p [ tsify ] > browser-tests/tests-bundle.js",
     "teardown-browser-tests": "rm browser-tests/tests-bundle.js",
-    "compile": "tsc -P ./tsconfig.strict.json",
+    "compile": "tsc -P ./tsconfig.build.json",
     "page-content": "npm run compile && rm -rf .ignore/ && mkdirp .ignore/ && npm run changelog && node tools/make-toc.js && node tools/make-factories.js && node tools/make-methods.js && cat markdown/header.md markdown/generated-toc.md markdown/overview.md markdown/generated-factories.md markdown/generated-methods.md markdown/footer.md > .ignore/content.md",
     "extra-docs": "node tools/make-extras.js && rm EXTRA_DOCS.md && cp markdown/generated-extras.md EXTRA_DOCS.md",
     "readme": "npm run page-content && cat markdown/readme-title.md .ignore/content.md > README.md",

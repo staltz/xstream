@@ -6,10 +6,9 @@
         "inlineSourceMap": true,
         "inlineSources": true,
         "declaration": true,
-        "noImplicitAny": true,
         "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "strict": true,
+        "noUnusedParameters": true,        
+        "outDir": "./",
     },
     "files": [
         "src/extra/buffer.ts",

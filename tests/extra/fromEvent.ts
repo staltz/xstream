@@ -7,10 +7,10 @@ function noop() {}
 
 class FakeEventTarget implements EventTarget {
   public handler: EventListener | undefined;
-  public event: string;
-  public capture: boolean;
-  public removedEvent: string;
-  public removedCapture: boolean;
+  public event: string | undefined;
+  public capture: boolean | undefined;
+  public removedEvent: string | undefined;
+  public removedCapture: boolean | undefined;
 
   constructor() {}
 
@@ -41,8 +41,8 @@ class FakeEventTarget implements EventTarget {
 
 class FakeEventEmitter extends EventEmitter {
   public handler: Function | undefined;
-  public event: string | symbol;
-  public removedEvent: string | symbol;
+  public event: string | symbol | undefined;
+  public removedEvent: string | symbol | undefined;
 
   constructor() {
     super();

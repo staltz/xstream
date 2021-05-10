@@ -82,22 +82,22 @@ describe('Stream.prototype.take', () => {
 
   it('should terminate properly when "next" function recursively calls itself', (done: any) => {
     const producer = {
-      start: (listener: any) => {
+      start: function (this: any, listener: any) {
         this.listener = listener;
         listener.next(1);
       },
-      _n: (value: any) => {
+      _n: function  (this: any, value: any) {
         const listener = this.listener;
         if (listener) listener.next(value);
       },
-      _e: (value: string) => {
+      _e: function (this: any, value: string){
         const listener = this.listener;
         if (listener) listener.error(value);
       },
-      stop: () => this.listener = null,
+      stop: function (this: any) { this.listener = null; },
       listener: null
     };
-    const stream = xs.create(producer);
+    const stream = xs.create<number>(producer);
 
     let nextCount = 0;
     stream.take(1).addListener({
