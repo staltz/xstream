@@ -26,7 +26,7 @@ export const NO_IL: InternalListener<any> = {
 };
 
 export interface InternalProducer<T> {
-  _start: (listener: InternalListener<T>) => void;
+  _start: (listener: InternalListener<T> | Stream<T>) => void;
   _stop: () => void;
 }
 

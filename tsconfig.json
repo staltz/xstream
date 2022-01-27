@@ -10,7 +10,8 @@
     "module": "commonjs",
     "noEmitHelpers": false,
     "target": "ES5",
-    "outDir": "./"
+    "outDir": "./",
+    "skipLibCheck": true,
   },
   "formatCodeOptions": {
     "indentSize": 2,
