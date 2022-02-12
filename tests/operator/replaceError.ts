@@ -35,7 +35,7 @@ describe('Stream.prototype.replaceError', () => {
       {type: 'complete'},
     ];
 
-    const source = xs.create({
+    const source = xs.create<number>({
       start: (listener) => {
         while (events.length > 0) {
           const event = events.shift();
@@ -83,7 +83,7 @@ describe('Stream.prototype.replaceError', () => {
     ];
     const source = xs.create(<Producer<number>> {
       on: false,
-      start: (listener) => {
+      start: function (this: {on: boolean}, listener) {
         this.on = true;
         for (let i = 0; i < events.length; i++) {
           if (!this.on) return;
@@ -96,7 +96,7 @@ describe('Stream.prototype.replaceError', () => {
           }
         }
       },
-      stop: () => {
+      stop: function (this: {on: boolean}) {
         this.on = false;
       },
     });

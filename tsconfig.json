@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
     "suppressImplicitAnyIndexErrors": true,
+    "strict": true,
     "module": "commonjs",
     "noEmitHelpers": false,
-    "target": "ES5",
-    "outDir": "./",
+    "target": "ES5",    
     "lib": ["dom", "es5", "es2015.collection", "es2015.promise"]
   },
   "formatCodeOptions": {

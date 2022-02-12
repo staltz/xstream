@@ -127,10 +127,10 @@ describe('Stream.prototype.filter', () => {
   it('should return stream of constrained type if predicate is type guard', (done: any) => {
     class Animal { }
     class Dog extends Animal {
-      thisIsADog: boolean;
+      thisIsADog: boolean | undefined;
     }
     class Cat extends Animal {
-      thisIsACat: boolean;
+      thisIsACat: boolean | undefined;
     }
 
     function isDog(a: Animal): a is Dog {
